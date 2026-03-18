@@ -10,12 +10,8 @@ public class ShopManager : MonoBehaviour
     [SerializeField] private InventoryManager inventoryManager;
 
     public static event Action<ShopManager, bool> OnShopStateChanged;
-    private CanvasGroup canvasGroup;
     private bool shopIsOpen = false;
-    private void Awake()
-    {
-        canvasGroup = GetComponent<CanvasGroup>();
-    }
+
 
     private void Start()
     {
@@ -27,7 +23,7 @@ public class ShopManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("ToggleShop"))
+        if (Input.GetButtonDown("Interact") && shopIsOpen)
         {
             ToggleShop();
         }
@@ -44,20 +40,13 @@ public class ShopManager : MonoBehaviour
     public void OpenShop()
     {
         shopIsOpen = true;
-        Time.timeScale = 0;  // ÔÝÍ£ÓÎÏ·
-        canvasGroup.alpha = 1;
-        canvasGroup.interactable = true;      // ÔÊÐí½»»¥
-        canvasGroup.blocksRaycasts = true;   // ÔÊÐíµã»÷
+
         OnShopStateChanged?.Invoke(this, true);
     }
 
     public void CloseShop()
     {
         shopIsOpen = false;
-        Time.timeScale = 1;  // »Ö¸´ÓÎÏ·
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = false;     // ½ûÖ¹½»»¥
-        canvasGroup.blocksRaycasts = false;   // ½ûÖ¹µã»÷
         OnShopStateChanged?.Invoke(this, false);
     }
     public void PopulateShopItems()
