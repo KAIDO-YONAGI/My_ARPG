@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Rigidbody2D rb;//���������unity���϶���
-    public Animator animator;//����״̬������ͬ��
+    public Rigidbody2D rb;//刚体对象，在unity中拖动绑定
+    public Animator animator;//动画状态机对象，同上
     public PlayerCombat playerCombat;
     public PlayerBow playerBow;
 
-    private int facingDirection = 1;//Ĭ�ϳ���Ϊ��
-    private bool canBeInterrupted = true;//�Ƿ���Ա���ϣ���������������ڼ䲻�ɱ����
+    private int facingDirection = 1;//默认朝向为右
+    private bool canBeInterrupted = true;//是否可以被打断，攻击和射击动画期间不可被打断
 
-    private float timer=0;//��ʱ������ʱδʹ��        
+    private float timer = 0;//计时器，暂时未使用        
     public enum PlayerState
     {
 
@@ -24,9 +24,9 @@ public class PlayerMovement : MonoBehaviour
     }
     private PlayerState playerState = PlayerState.Idle;
 
-    public void AnimatorSM(PlayerState newState)//�����л�����
+    public void AnimatorSM(PlayerState newState)//用于切换动画
     {
-        //�˳���ǰ����
+        //退出当前动画
 
         if (playerState == PlayerState.Attacking)
         {
@@ -43,9 +43,9 @@ public class PlayerMovement : MonoBehaviour
         // else if (playerState == PlayerState.Idle)
         // {
         // }
-        //����״̬
+        //更新状态
         playerState = newState;
-        //�����¶���
+        //进入新动画
         if (playerState == PlayerState.Attacking)
         {
             animator.SetBool("isAttacking", true);
@@ -66,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if(timer >= 0)
+        if (timer >= 0)
             timer -= Time.deltaTime;
 
         if (!canBeInterrupted)
@@ -81,12 +81,11 @@ public class PlayerMovement : MonoBehaviour
             HandleKnockBackState();
             return;
         }
-
-        if (Input.GetButtonDown("Slash") && playerCombat.enabled&&timer<0)
+        if (Input.GetButtonDown("Slash") && playerCombat.enabled && timer < 0)
         {
             AnimatorSM(PlayerState.Attacking);
         }
-        else if (Input.GetButtonDown("Shoot") && playerBow.enabled&&timer<0)
+        else if (Input.GetButtonDown("Shoot") && playerBow.enabled && timer < 0)
         {
             AnimatorSM(PlayerState.Shooting);
         }
@@ -99,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
             AnimatorSM(PlayerState.Idle);
         }
 
-        switch (playerState)//状态处理机
+        switch (playerState)//用于执行逻辑
         {
             case PlayerState.Idle:
                 HandleIdleState();
@@ -157,12 +156,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleRunningState()
     {
+        //获取输入值，正负代表方向
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
+        //判断（仅）水平输入值和当前角色朝向的符号是否一致，否（意味着玩家将要转向）则调用翻转
         if (horizontal * transform.localScale.x < 0)
             Flip();
 
+        //将animator的horizontal参数的值设定为变量的值
         SetMovement(horizontal, vertical);
     }
     private void SetMovement(float horizontal, float vertical)
