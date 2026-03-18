@@ -17,7 +17,7 @@ public class StatsUI : MonoBehaviour
     }
     private void Start()
     {
-        updateAllStats();
+        UpdateAllStats();
     }
     private void Update()
     {
@@ -26,7 +26,6 @@ public class StatsUI : MonoBehaviour
             if (statsIsOpen)
             {
                 Time.timeScale = 1;//时间流速100%
-                updateAllStats();
                 statsCanvas.alpha = 0;//组件alpha值设置为0，依赖父对象的canvasGroup组件来实现，需要在unity中实现绑定
                 statsCanvas.blocksRaycasts = false;
                 statsIsOpen = false;
@@ -34,11 +33,12 @@ public class StatsUI : MonoBehaviour
             else
             {
                 Time.timeScale = 0;//暂停游戏
-                updateAllStats();
                 statsCanvas.alpha = 1;
                 statsCanvas.blocksRaycasts = true;
                 statsIsOpen = true;
             }
+            UpdateAllStats();
+
         }
     }
     public void UpdateDamage()
@@ -51,7 +51,7 @@ public class StatsUI : MonoBehaviour
         statsSlots[1].GetComponentInChildren<TMP_Text>().text = "Speed:" + StatsManager.Instance.speed;
     }
 
-    public void updateAllStats()
+    public void UpdateAllStats()
     {
         UpdateDamage();
         UpdateSpeed();

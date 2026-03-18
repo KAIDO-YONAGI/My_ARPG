@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 public class StatsManager : MonoBehaviour
 {
     public static StatsManager Instance;//µ¥ÀýÄ£Ê½
     public TMP_Text healthText;
-    public TMP_Text speedText;
-
     public StatsUI statsUI;
 
     [Header("Combat Stats")]
@@ -55,7 +54,10 @@ public class StatsManager : MonoBehaviour
     public void UpdateSpeed(float amount)
     {
         speed += amount;
-        speedText.text = "Speed" + speed.ToString();
     }
 
+    public void UpdateDamage(int amount)
+    {
+        damage += amount;
+    }
 }
