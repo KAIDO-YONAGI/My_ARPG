@@ -1,0 +1,13 @@
+# Unity
+*.meta
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln
+
+# Build outputs
+Bin/
+Obj/
