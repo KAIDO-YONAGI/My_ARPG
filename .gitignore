@@ -11,3 +11,14 @@
 # Build outputs
 Bin/
 Obj/
+bin-debug/
+bin-release/
+
+# Other files and folders
+.settings/
+
+# Executables
+*.swf
+*.air
+*.ipa
+*.apk
