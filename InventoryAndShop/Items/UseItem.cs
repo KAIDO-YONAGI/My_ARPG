@@ -13,8 +13,11 @@ public class UseItem : MonoBehaviour
             StatsManager.Instance.UpdateHealth(item.currentHealth);
         if (item.speed > 0)
             StatsManager.Instance.UpdateSpeed(item.speed);
+        if (item.damage > 0)
+            StatsManager.Instance.UpdateDamage(item.damage);
         if (item.duration > 0)
             StartCoroutine(EffectTimer(item, item.duration));
+
     }
 
     private IEnumerator EffectTimer(ItemSO item, float duration)//用以计时，一段时间之后还原
@@ -30,5 +33,9 @@ public class UseItem : MonoBehaviour
 
         if (item.speed > 0)
             StatsManager.Instance.UpdateSpeed(-item.speed);
+
+        if (item.damage > 0)
+            StatsManager.Instance.UpdateDamage(-item.damage);
+
     }
 }
