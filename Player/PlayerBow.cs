@@ -76,6 +76,7 @@ public class PlayerBow : MonoBehaviour
     public void ShootingDone()
     {
         playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
+        playerMovement.animator.SetBool("isShooting", false);
         playerMovement.SetCanBeInterrupted(true);
         playerMovement.ResetTimer();
     }
