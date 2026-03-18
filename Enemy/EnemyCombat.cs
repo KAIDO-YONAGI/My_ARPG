@@ -10,6 +10,8 @@ public class EnemyCombat : MonoBehaviour
     public LayerMask playerLayer;
     public float konckBackForce=5;
     public float stunTime=0.3f;
+
+    
     public void Attack()
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, weaponRange, playerLayer);
