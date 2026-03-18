@@ -4,15 +4,53 @@ using UnityEngine;
 
 public class ShopKeeper : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public CanvasGroup shopCanvasGroup;
+    public Animator animator;
+    private bool playerInRange;
+
     void Start()
     {
-        
+        shopCanvasGroup.alpha = 0;
+        shopCanvasGroup.interactable = false;
+        shopCanvasGroup.blocksRaycasts = false;
+
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetButtonDown("Interact") && playerInRange)
+        {
+            if (shopCanvasGroup.alpha == 0)
+            {
+                Time.timeScale = 0; // ‘›Õ£”Œœ∑
+                shopCanvasGroup.alpha = 1;
+                shopCanvasGroup.interactable = true;
+                shopCanvasGroup.blocksRaycasts = true;
+            }
+            else
+            {
+                Time.timeScale = 1; // ª÷∏¥”Œœ∑
+                shopCanvasGroup.alpha = 0;
+                shopCanvasGroup.interactable = false;
+                shopCanvasGroup.blocksRaycasts = false;
+            }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.CompareTag("Player"))
+        {
+            playerInRange = true;
+            animator.SetBool("playerInRange", true);
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.CompareTag("Player"))
+        {
+            playerInRange = false;
+            animator.SetBool("playerInRange", false);
+        }
     }
 }
