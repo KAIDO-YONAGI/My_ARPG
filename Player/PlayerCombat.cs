@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
@@ -10,22 +6,12 @@ public class PlayerCombat : MonoBehaviour
     public LayerMask enemyMask;//需要在unity中创建并且标记
     public StatsUI statsUI;
     public PlayerMovement playerMovement;
-    private float Timer = 0;
-    private void Update()
-    {
-        if (Timer > 0)
-            Timer -= Time.deltaTime;
-    }
-    public void Attack()
-    {
-        if (Timer > 0) return;
-        playerMovement.ChangeState(PlayerMovement.PlayerState.Attacking);
-        Timer = StatsManager.Instance.coolDown;
 
-    }
     public void FinshCombat()
     {
-        playerMovement.ChangeState(PlayerMovement.PlayerState.Idle);
+        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
+        playerMovement.SetCanBeInterrupted(true);
+        playerMovement.ResetTimer();
     }
 
     public void DealDamage()

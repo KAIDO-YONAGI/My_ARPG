@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.XR;
 
 public class EnemyMovement : MonoBehaviour
 {
@@ -21,7 +17,7 @@ public class EnemyMovement : MonoBehaviour
     public Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
     public LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
 
-    public void ChangeState(EnemyState newState)
+    public void AnimatorSM(EnemyState newState)
     {
         //退出当前动画
         if (enemyState == EnemyState.Idle)
@@ -44,7 +40,7 @@ public class EnemyMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        ChangeState(EnemyState.Idle);//注意状态改变需要在找到animator之后才开始
+        AnimatorSM(EnemyState.Idle);//注意状态改变需要在找到animator之后才开始
     }
     private void Update()
     {
@@ -71,21 +67,21 @@ public class EnemyMovement : MonoBehaviour
             player = hits[0].transform;
             if (Vector2.Distance(player.position, transform.position) <= attackRange && attackCoolDownTimer <= 0)
             {
-                ChangeState(EnemyState.Attacking);
+                AnimatorSM(EnemyState.Attacking);
                 attackCoolDownTimer = attackCoolDown;//重置时间
                 return;
             }
             else if (Vector2.Distance(player.position, transform.position) > attackRange && enemyState == EnemyState.Idle)
             {//if条件设置为只能从Idle状态进入chasing，这是因为攻击状态的末尾会执行状态切换，恰好可以作为一个保证攻击动画播放完成的条件
              //但是需要注意的是，如果以后有其它状态的相关动画，一定也要注意把状态切换添加到动画末尾的位置
-                ChangeState(EnemyState.Chasing);
+                AnimatorSM(EnemyState.Chasing);
             }
             //攻击完成后再unity动画添加脚本ChangeState()切换到Idle状态
         }
         else
         {
             rb.velocity = Vector2.zero;
-            ChangeState(EnemyState.Idle);
+            AnimatorSM(EnemyState.Idle);
         }
     }
 

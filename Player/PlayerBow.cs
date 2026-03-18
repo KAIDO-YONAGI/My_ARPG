@@ -49,7 +49,7 @@ public class PlayerBow : MonoBehaviour
     public void HandleShootingAiming()//用动画脚本单独触发并且记录射击方向，纠正射击和转向的时序问题(放置在第一帧)
         //新问题：瞄准要按方向键，否则会按照上一次的射击方向射击，而不是朝向,因此使用了playermovement脚本里的朝向
     {
-        playerMovement.ChangeState(PlayerMovement.PlayerState.Shooting);
+        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Shooting);
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         if (horizontal != 0 || vertical != 0)
@@ -75,7 +75,9 @@ public class PlayerBow : MonoBehaviour
     }
     public void ShootingDone()
     {
-        playerMovement.ChangeState(PlayerMovement.PlayerState.Idle);
+        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
+        playerMovement.SetCanBeInterrupted(true);
+        playerMovement.ResetTimer();
     }
 }
 
