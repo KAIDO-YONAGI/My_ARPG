@@ -1,11 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Rendering.VirtualTexturing;
-using UnityEngine.UIElements;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -15,8 +9,9 @@ public class PlayerMovement : MonoBehaviour
     public PlayerBow playerBow;
 
     private int facingDirection = 1;//默认朝向为右
+    private bool canBeInterrupted = true;//是否可以被打断，攻击和射击动画期间不可被打断
 
-
+    private float timer=0;//计时器，暂时未使用        
     public enum PlayerState
     {
 
@@ -28,11 +23,8 @@ public class PlayerMovement : MonoBehaviour
 
     }
     private PlayerState playerState = PlayerState.Idle;
-    public PlayerState GetPlayerState()
-    {
-        return playerState;
-    }
-    public void ChangeState(PlayerState newState)
+
+    public void AnimatorSM(PlayerState newState)//用于切换动画
     {
         //退出当前动画
 
@@ -46,10 +38,11 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (playerState == PlayerState.Running)
         {
+            animator.SetBool("isRunning", false);
         }
-        else if (playerState == PlayerState.KnockBack)
-        {
-        }
+        // else if (playerState == PlayerState.Idle)
+        // {
+        // }
         //更新状态
         playerState = newState;
         //进入新动画
@@ -60,34 +53,46 @@ public class PlayerMovement : MonoBehaviour
         else if (playerState == PlayerState.Shooting)
         {
             animator.SetBool("isShooting", true);
-
         }
         else if (playerState == PlayerState.Running)
         {
+            animator.SetBool("isRunning", true);
         }
-        else if (playerState == PlayerState.KnockBack)
-        {
-        }
+        // else if (playerState == PlayerState.KnockBack)
+        // {
+        // }
 
     }
 
     private void Update()
     {
-        if (Input.GetButtonDown("Slash")&&playerCombat.enabled)
+        if(timer >= 0)
+            timer -= Time.deltaTime;
+
+        if (!canBeInterrupted)
+            return;
+        else MovementSM();
+    }
+    private void MovementSM()
+    {
+        if (Input.GetButtonDown("Slash") && playerCombat.enabled&&timer<0)
         {
-            ChangeState(PlayerState.Attacking);
+            AnimatorSM(PlayerState.Attacking);
         }
-        if (Input.GetButtonDown("Shoot")&&playerBow.enabled)
+        else if (Input.GetButtonDown("Shoot") && playerBow.enabled&&timer<0)
         {
-            ChangeState(PlayerState.Shooting);
+            AnimatorSM(PlayerState.Shooting);
         }
-        if (IsToRunning())
+        else if (IsToRunning())
         {
-            ChangeState(PlayerState.Running);
+            AnimatorSM(PlayerState.Running);
+        }
+        else if (!IsToRunning())
+        {
+            AnimatorSM(PlayerState.Idle);
         }
 
-
-        switch (playerState)
+        switch (playerState)//用于执行逻辑
         {
             case PlayerState.Idle:
                 HandleIdleState();
@@ -98,7 +103,6 @@ public class PlayerMovement : MonoBehaviour
             case PlayerState.Attacking:
                 HandleAttackingState();
                 break;
-
             case PlayerState.Shooting:
                 HandleShootingState();
                 break;
@@ -108,9 +112,17 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
+    public void SetCanBeInterrupted(bool value)
+    {
+        canBeInterrupted = value;
+    }
+    public void ResetTimer()
+    {
+        timer = StatsManager.Instance.coolDown;
+    }
     private bool IsToRunning()
     {
-        return Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0;
+        return Mathf.Abs(Input.GetAxis("Horizontal")) > 0 || Mathf.Abs(Input.GetAxis("Vertical")) > 0;
     }
 
     private void HandleKnockBackState()
@@ -120,19 +132,21 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleShootingState()
     {
-        rb.velocity = Vector2.zero;
+        SetMovement(0, 0);
+        canBeInterrupted = false;
         playerBow.HandleAiming();
+        //TODO:添加打断条件
     }
 
     private void HandleAttackingState()
     {
-        rb.velocity = Vector2.zero;
-        playerCombat.Attack();
+        SetMovement(0, 0);
+        canBeInterrupted = false;
     }
 
     private void HandleIdleState()
     {
-        animator.Play("Idle");
+        SetMovement(0, 0);
     }
 
     private void HandleRunningState()
@@ -146,14 +160,14 @@ public class PlayerMovement : MonoBehaviour
             Flip();
 
         //将animator的horizontal参数的值设定为变量的值
-        animator.SetFloat("horizontal", Mathf.Abs(horizontal));
-        animator.SetFloat("vertical", Mathf.Abs(vertical));
-
+        SetMovement(horizontal, vertical);
+    }
+    private void SetMovement(float horizontal, float vertical)
+    {
         rb.velocity = new Vector2(horizontal, vertical) * StatsManager.Instance.speed;
     }
 
-
-    void Flip()
+    private void Flip()
     {
         facingDirection *= -1;
         transform.localScale =
@@ -172,7 +186,10 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = direction * force;
         StartCoroutine(KnockBackCounter(stunTime));
     }
-
+    public PlayerState GetPlayerState()
+    {
+        return playerState;
+    }
     IEnumerator KnockBackCounter(float stunTime)
     {
         yield return new WaitForSeconds(stunTime);

@@ -14,7 +14,7 @@ public class EnemyKnockBack : MonoBehaviour
     }
     public void Knockback(Transform forceTransform, float knockBackForce, float stunTime, float knockBackTime)
     {
-        enemyMovement.ChangeState(EnemyState.KnockBack);
+        enemyMovement.AnimatorSM(EnemyState.KnockBack);
         StartCoroutine(StunTimer(stunTime, knockBackTime));//用于启动协程
         Vector2 direction = (transform.position - forceTransform.position).normalized;
         rb.velocity = direction * knockBackForce;
@@ -24,6 +24,6 @@ public class EnemyKnockBack : MonoBehaviour
         yield return new WaitForSeconds(knockBackTime);//表示让协程等待的时间
         rb.velocity = Vector2.zero;
         yield return new WaitForSeconds(stunTime);
-        enemyMovement.ChangeState(EnemyState.Idle);
+        enemyMovement.AnimatorSM(EnemyState.Idle);
     }
 }
