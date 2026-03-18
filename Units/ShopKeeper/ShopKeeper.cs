@@ -8,6 +8,7 @@ public class ShopKeeper : MonoBehaviour
     public Animator animator;
     private bool playerInRange;
 
+    private bool shopIsOpen = false;
     void Start()
     {
         shopCanvasGroup.alpha = 0;
@@ -18,23 +19,39 @@ public class ShopKeeper : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetButtonDown("Interact") && playerInRange)
+        if (Input.GetButtonDown("Interact") && playerInRange)
         {
-            if (shopCanvasGroup.alpha == 0)
+
+            if (shopIsOpen)
             {
-                Time.timeScale = 0; // ‘›Õ£”Œœ∑
-                shopCanvasGroup.alpha = 1;
-                shopCanvasGroup.interactable = true;
-                shopCanvasGroup.blocksRaycasts = true;
-            }
-            else
-            {
-                Time.timeScale = 1; // ª÷∏¥”Œœ∑
+                TimeManager.Instance.ResumeGame();
                 shopCanvasGroup.alpha = 0;
                 shopCanvasGroup.interactable = false;
                 shopCanvasGroup.blocksRaycasts = false;
+                shopIsOpen = false;
+            }
+            else
+            {
+                TimeManager.Instance.PauseGame();
+                shopCanvasGroup.alpha = 1;
+                shopCanvasGroup.interactable = true;
+                shopCanvasGroup.blocksRaycasts = true;
+                shopIsOpen = true;
             }
         }
+    }
+    public void OpenItemShop()
+    {
+
+    }
+
+    public void OpenWeapnShop()
+    {
+
+    }
+    public void OpenArmourShop()
+    {
+
     }
 
     private void OnTriggerEnter2D(Collider2D collider)

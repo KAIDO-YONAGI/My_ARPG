@@ -9,18 +9,18 @@ public class ToggleSkillTree : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("ToggleSkillTree")) //ÓÃÓÚÇÐ»»×´Ì¬
+        if (Input.GetButtonDown("ToggleSkillTree"))
         {
             if(skillTreeIsOpen)
             {
-                Time.timeScale = 1;
+                TimeManager.Instance.ResumeGame();
                 statsCanvas.alpha = 0;
                 statsCanvas.blocksRaycasts = false; 
                 skillTreeIsOpen=false;
             }
             else
             {
-                Time.timeScale = 0;
+                TimeManager.Instance.PauseGame();
                 statsCanvas.alpha = 1;
                 statsCanvas.blocksRaycasts = true;
                 skillTreeIsOpen=true;
