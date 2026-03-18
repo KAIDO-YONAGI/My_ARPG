@@ -133,7 +133,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleKnockBackState()
     {
-        canBeInterrupted = false;
     }
 
     private void HandleShootingState()
@@ -201,7 +200,6 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator KnockBackCounter(float stunTime)
     {
         yield return new WaitForSeconds(stunTime);
-        rb.velocity = Vector2.zero;
         canBeInterrupted = true;
         AnimatorSM(PlayerState.Idle);
     }

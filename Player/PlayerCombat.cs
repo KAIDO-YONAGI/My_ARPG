@@ -7,12 +7,7 @@ public class PlayerCombat : MonoBehaviour
     public StatsUI statsUI;
     public PlayerMovement playerMovement;
 
-    public void FinshCombat()
-    {
-        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
-        playerMovement.SetCanBeInterrupted(true);
-        playerMovement.ResetTimer();
-    }
+
 
     public void DealDamage()
     {
@@ -32,7 +27,13 @@ public class PlayerCombat : MonoBehaviour
         StatsManager.Instance.damage += 1;
         statsUI.UpdateDamage();
     }
-
+    public void FinshCombat()
+    {
+        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
+        playerMovement.animator.SetBool("isAttacking", false);
+        playerMovement.SetCanBeInterrupted(true);
+        playerMovement.ResetTimer();
+    }
     //private void OnDrawGizmosSelected()
     //{
     //    Gizmos.color = Color.yellow;
