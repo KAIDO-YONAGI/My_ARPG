@@ -1,55 +1,10 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 public class ShopManager : MonoBehaviour
 {
-    [SerializeField] private List<ShopItems> shopItems;
     [SerializeField] private ShopSlot[] shopSlots;
     [SerializeField] private InventoryManager inventoryManager;
-
-    public static event Action<ShopManager, bool> OnShopStateChanged;
-    private bool shopIsOpen = false;
-
-
-    private void Start()
-    {
-        // 确保商店初始状态为关闭
-        CloseShop();  // 或者 InitializeShop();
-
-        PopulateShopItems();  // 填充商品
-    }
-
-    private void Update()
-    {
-        if (Input.GetButtonDown("Interact") && shopIsOpen)
-        {
-            ToggleShop();
-        }
-    }
-
-    private void ToggleShop()
-    {
-        if (shopIsOpen)
-            CloseShop();
-        else
-            OpenShop();
-    }
-
-    public void OpenShop()
-    {
-        shopIsOpen = true;
-
-        OnShopStateChanged?.Invoke(this, true);
-    }
-
-    public void CloseShop()
-    {
-        shopIsOpen = false;
-        OnShopStateChanged?.Invoke(this, false);
-    }
-    public void PopulateShopItems()
+    public void PopulateShopItems(List<ShopItems> shopItems)
     {
         for (int i = 0; i < shopItems.Count && i < shopSlots.Length; i++)
         {
