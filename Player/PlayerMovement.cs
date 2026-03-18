@@ -58,9 +58,9 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("isRunning", true);
         }
-        // else if (playerState == PlayerState.KnockBack)
-        // {
-        // }
+        else if (playerState == PlayerState.KnockBack)
+        {
+        }
 
     }
 
@@ -127,7 +127,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleKnockBackState()
     {
-
+        canBeInterrupted = false;
     }
 
     private void HandleShootingState()
@@ -135,7 +135,6 @@ public class PlayerMovement : MonoBehaviour
         SetMovement(0, 0);
         canBeInterrupted = false;
         playerBow.HandleAiming();
-        //TODO:添加打断条件
     }
 
     private void HandleAttackingState()
@@ -183,7 +182,10 @@ public class PlayerMovement : MonoBehaviour
     {
         playerState = PlayerState.KnockBack;
         Vector2 direction = (transform.position - enemy.position).normalized;
-        rb.velocity = direction * force;
+
+        Vector2 knockBackVelocity = direction * force;
+        SetMovement(knockBackVelocity.x, knockBackVelocity.y);
+
         StartCoroutine(KnockBackCounter(stunTime));
     }
     public PlayerState GetPlayerState()
