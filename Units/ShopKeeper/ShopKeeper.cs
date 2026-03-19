@@ -30,7 +30,7 @@ public class ShopKeeper : MonoBehaviour
             GameManager.transitionData.pendingShop.sceneIndex == gameObject.scene.buildIndex)
         {
             // 清空待恢复数据
-            GameManager.transitionData.pendingShop = default(PendingShopData);
+
 
             shopIsOpen = true;
             shopCanvasGroup.alpha = 1;

@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 public class StatsManager : MonoBehaviour
 {
-    public static StatsManager Instance;//单例模式
+    public static StatsManager Instance;//鍗曚緥妯″紡
     public TMP_Text healthText;
     public StatsUI statsUI;
 
@@ -22,7 +22,7 @@ public class StatsManager : MonoBehaviour
     public int currentHealth;
 
 
-    private void Awake()//每次唤醒就检测单例，如果已有有就删除
+    private void Awake()//姣忔鍞ら啋灏辨娴嬪崟渚嬶紝濡傛灉宸叉湁鏈夊氨鍒犻櫎
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
