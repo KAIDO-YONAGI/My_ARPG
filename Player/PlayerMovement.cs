@@ -112,9 +112,6 @@ public class PlayerMovement : MonoBehaviour
             case PlayerState.Shooting:
                 HandleShootingState();
                 break;
-            case PlayerState.KnockBack:
-                HandleKnockBackState();
-                break;
 
         }
     }
@@ -139,7 +136,6 @@ public class PlayerMovement : MonoBehaviour
     {
         SetMovement(0, 0);
         canBeInterrupted = false;
-        playerBow.HandleAiming();
     }
 
     private void HandleAttackingState()
