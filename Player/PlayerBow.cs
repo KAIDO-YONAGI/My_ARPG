@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,7 +14,7 @@ public class PlayerBow : MonoBehaviour
     public PlayerMovement playerMovement;
     //TODO:删除animator调用
 
-    private float shootTimer;
+    private float shootTimer;//防止多箭发射
     private void OnEnable()
     {
         anim.SetLayerWeight(0, 0);//意为把序号零的层设为优先级零
@@ -26,12 +27,20 @@ public class PlayerBow : MonoBehaviour
     }
     private void Update()
     {
-        shootTimer -= Time.deltaTime;
+        if (shootTimer >= 0)
+        {
+            shootTimer -= Time.deltaTime;
+        }
     }
 
-    public void HandleAiming()
+    public void HandleAiming()//为动画控制器触发的函数，用来配置动画条件触发，由状态机调用
     {
-        if (shootTimer > 0) return;
+        if (shootTimer > 0)
+        {
+            return;
+        }
+        aimDirection = new Vector2(playerMovement.getFacingDirection(), 0).normalized;
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
@@ -46,9 +55,11 @@ public class PlayerBow : MonoBehaviour
             anim.SetFloat("aimX", aimDirection.x);
         }
     }
+
     public void HandleShootingAiming()//用动画脚本单独触发并且记录射击方向，纠正射击和转向的时序问题(放置在第一帧)
-        //新问题：瞄准要按方向键，否则会按照上一次的射击方向射击，而不是朝向,因此使用了playermovement脚本里的朝向
+                                      //新问题：瞄准要按方向键，否则会按照上一次的射击方向射击，而不是朝向,因此使用了playermovement脚本里的朝向
     {
+        HandleAiming();
         playerMovement.AnimatorSM(PlayerMovement.PlayerState.Shooting);
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -58,11 +69,11 @@ public class PlayerBow : MonoBehaviour
         }
         else
         {
-            shootDirection = new Vector2(playerMovement.getFacingDirection(),0).normalized;
+            shootDirection = new Vector2(playerMovement.getFacingDirection(), 0).normalized;
         }
     }
 
-    public void Shoot()
+    public void Shoot()//动画事件触发的函数，生成箭矢并且设置方向
     {
         if (shootTimer <= 0)
         {
@@ -73,12 +84,21 @@ public class PlayerBow : MonoBehaviour
         }
 
     }
-    public void ShootingDone()
+    public void ShootingDone()//动画事件触发的函数，结束射击，重置状态和计时器
     {
         playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
         playerMovement.animator.SetBool("isShooting", false);
         playerMovement.SetCanBeInterrupted(true);
         playerMovement.ResetTimer();
+        StartCoroutine(ResetShooting(0.1f));
+    }
+    IEnumerator ResetShooting(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        anim.SetFloat("aimX", 0);
+        anim.SetFloat("aimY", 0);
+
     }
 }
 
