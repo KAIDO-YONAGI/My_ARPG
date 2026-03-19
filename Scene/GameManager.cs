@@ -3,25 +3,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct PendingShopData
+{
+    public int sceneIndex;
+    public ShopKeeper shopKeeper;
+}
+
+public struct SceneTransitionData
+{
+    public bool hasPendingTransition;
+    public bool isSceneReloading;
+    public Vector2 playerPosition;
+    public PendingShopData pendingShop;
+}
+
 public class GameManager : MonoBehaviour
 {
-public static GameManager instance;
+    public static GameManager instance;
 
-[Header("Persist Objects")]
-public GameObject[] persistObjects;
+    [Header("Persist Objects")]
+    public GameObject[] persistObjects;
 
-// 场景切换事件
-public static event Action OnSceneTransition;
+    // 场景切换事件
+    public static event Action OnSceneTransition;
 
-// 是否有待处理的场景切换
-public static bool hasPendingTransition = false;
+    // 场景切换数据
+    public static SceneTransitionData transitionData;
 
-// 触发场景切换事件
-public static void TriggerSceneTransition()
-{
-    hasPendingTransition = true;
-    OnSceneTransition?.Invoke();
-}
+    // 触发场景切换事件
+    public static void TriggerSceneTransition()
+    {
+        transitionData.hasPendingTransition = true;
+        OnSceneTransition?.Invoke();
+    }
 
     private void Awake()
     {
@@ -43,7 +57,7 @@ public static void TriggerSceneTransition()
         {
             if (obj != null)
             {
-                obj.transform.SetParent(null);
+                obj.transform.SetParent(null);//转为父对象再设置为不销毁
                 DontDestroyOnLoad(obj);
             }
         }
