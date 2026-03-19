@@ -12,7 +12,7 @@ public class ShopManager : MonoBehaviour
             shopSlots[i].Initialize(shopItem.item, shopItem.price);
             shopSlots[i].gameObject.SetActive(true);
         }
-        for (int i = shopItems.Count; i < shopSlots.Length; i++)//ÖÃ¿ÕÊ£ÓàÉÌµê²ÛÎ»
+        for (int i = shopItems.Count; i < shopSlots.Length; i++)//ç½®ç©ºå‰©ä½™å•†åº—æ§½ä½
         {
             shopSlots[i].gameObject.SetActive(false);
 
@@ -45,11 +45,11 @@ public class ShopManager : MonoBehaviour
     public void SellItem(ItemSO item)
     {
         if (item == null) return;
-        foreach (var slot in shopSlots)//ÕÒµ½ÏëÂô³öµÄÎïÆ·
+        foreach (var slot in shopSlots)//æ‰¾åˆ°æƒ³å–å‡ºçš„ç‰©å“
         {
             if (slot.item == item)
             {
-                inventoryManager.UpdateGold(-slot.price);//¸ºÖµ£¬ÊÇ³öÊÛ
+                inventoryManager.UpdateGold(-slot.price);//è´Ÿå€¼ï¼Œæ˜¯å‡ºå”®
                 return;
             }
         }

@@ -40,7 +40,7 @@ public class InventoryManager : MonoBehaviour
             amountText.text = goldAmount.ToString();
             return;
         }
-        foreach (InventorySlot slot in itemSlots)//物品堆叠逻辑
+        foreach (InventorySlot slot in itemSlots)//鐗╁搧鍫嗗彔閫昏緫
         {
             if (slot.itemSO == item && slot.quantity < item.stackableSize)
             {
@@ -57,7 +57,7 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        foreach (InventorySlot slot in itemSlots)//寻找可堆叠的格子
+        foreach (InventorySlot slot in itemSlots)//瀵绘壘鍙爢鍙犵殑鏍煎瓙
         {
             if (slot.itemSO == null)
             {
@@ -91,7 +91,7 @@ public class InventoryManager : MonoBehaviour
     {
         if (slot.itemSO != null && slot.quantity >= 0)
         {
-            useItem.ApplyItemEffects(slot.itemSO);//使用效果
+            useItem.ApplyItemEffects(slot.itemSO);//浣跨敤鏁堟灉
             slot.quantity--;
             if (slot.quantity <= 0)
             {
