@@ -9,16 +9,26 @@ public class SceneChanger : MonoBehaviour
     public string sceneToLoad;
     public Animator[] transitionImages;
     public Vector2 playerPositionInNewScene;
-    private Transform playerTransform;
 
     public float timeToWait = 1f;
 
     private void Start()
     {
         // 检查是否有待处理的场景切换
-        if (GameManager.hasPendingTransition)
+        if (GameManager.transitionData.hasPendingTransition)
         {
-            GameManager.hasPendingTransition = false;
+            // 先保存玩家位置
+            Vector2 playerPos = GameManager.transitionData.playerPosition;
+
+            // 清空数据
+            GameManager.transitionData = default(SceneTransitionData);
+
+            // 设置玩家位置
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                player.transform.position = playerPos;
+            }
 
             // 新场景加载后，在过渡动画期间确保透明度为1，然后播放FadeOut
             CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
@@ -42,7 +52,9 @@ public class SceneChanger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            playerTransform = other.transform;
+            // 保存目标位置到 GameManager
+            GameManager.transitionData.playerPosition = playerPositionInNewScene;
+
             // 触发场景切换事件
             GameManager.TriggerSceneTransition();
             foreach (Animator transitionImage in transitionImages)
@@ -59,10 +71,6 @@ public class SceneChanger : MonoBehaviour
     IEnumerator LoadScene()
     {
         yield return new WaitForSeconds(timeToWait);
-        if (playerTransform != null)
-        {
-            playerTransform.position = playerPositionInNewScene;
-        }
         SceneManager.LoadScene(sceneToLoad);
     }
 }
