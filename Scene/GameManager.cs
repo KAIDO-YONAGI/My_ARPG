@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,19 @@ public static GameManager instance;
 [Header("Persist Objects")]
 public GameObject[] persistObjects;
 
+// åœºæ™¯åˆ‡æ¢äº‹ä»¶
+public static event Action OnSceneTransition;
+
+// æ˜¯å¦æœ‰å¾…å¤„ç†çš„åœºæ™¯åˆ‡æ¢
+public static bool hasPendingTransition = false;
+
+// è§¦å‘åœºæ™¯åˆ‡æ¢äº‹ä»¶
+public static void TriggerSceneTransition()
+{
+    hasPendingTransition = true;
+    OnSceneTransition?.Invoke();
+}
+
     private void Awake()
     {
         if (instance == null)
@@ -17,7 +31,7 @@ public GameObject[] persistObjects;
             DontDestroyOnLoad(gameObject);
             MarkPersistObjects();
         }
-        else//½øÈëĞÂ³¡¾°ÖĞ×Ô¶¯Ïú»Ùµ±Ç°£¨¾É£©¶ÔÏó
+        else
         {
             CleanAndDestroy();
         }
@@ -29,6 +43,7 @@ public GameObject[] persistObjects;
         {
             if (obj != null)
             {
+                obj.transform.SetParent(null);
                 DontDestroyOnLoad(obj);
             }
         }
