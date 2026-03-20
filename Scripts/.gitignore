@@ -24,6 +24,3 @@ bin-release/
 *.air
 *.ipa
 *.apk
-*.exe
-*.dll
-*.meta
