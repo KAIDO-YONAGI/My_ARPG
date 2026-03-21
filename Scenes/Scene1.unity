@@ -11810,7 +11810,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e25bd9d12f18574cbaa5c043e695aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saveSystem: {fileID: 0}
   persistObjects:
   - {fileID: 4405909309584411089}
   - {fileID: 423922444786972226}

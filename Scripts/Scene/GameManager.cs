@@ -1,44 +1,22 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
-public struct SceneTransitionData//保证场景切换效果的
-{
-    public bool hasPendingTransition;
-    public Vector2 playerPosition;
-}
-public class SceneData
-{
-    private string sceneName;
-    private GameObject[] sceneObjects;
+// 全局唯一单例，管理场景间切换时需要保留的持久化对象
 
-    public SceneData(GameObject[] objects)
-    {
-        sceneName = SceneManager.GetActiveScene().name+".yonagi";
-        sceneObjects = objects;
-    }
-    public string getSceneName()
-    {
-        return sceneName;
-    }
-}
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public SaveSystem saveSystem;
+    // 场景间保持的持久化对象（如玩家、UI等）
+    [Header("Persistant Objects")]
 
-    [Header("Persist Objects")]
     public GameObject[] persistObjects;
 
-    [Header("Save Objects")]
-    public GameObject[] saveObjects;
-
-
-
+    // 当前场景的SaveSystem引用
+    public SaveSystem currentSceneSaveSystem { get; private set; }
 
     // 场景切换事件
     public static event Action OnSceneTransition;
@@ -46,7 +24,9 @@ public class GameManager : MonoBehaviour
     // 场景切换数据
     public static SceneTransitionData transitionData;
 
+    
     // 触发场景切换事件
+    
     public static void TriggerSceneTransition()
     {
         transitionData.hasPendingTransition = true;
@@ -55,24 +35,53 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        saveSystem = new SaveSystem();
-
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            saveSystem.MarkPersistObjects(persistObjects);
-
+            MarkPersistObjects(persistObjects);
+        }
+        else
+        {
+            CleanAndDestroy(persistObjects, gameObject);
 
         }
-        else//如果实例已经存在，说明已经跳到下一个场景，调用相关函数保存当前数据
+    }
+    public void CleanAndDestroy(GameObject[] persistObjects, GameObject owner)
+    {
+        foreach (GameObject obj in persistObjects)
         {
-            SceneData sceneData = new(saveObjects);
-            saveSystem.SaveByJson(DateTime.Now.ToString() + sceneData.getSceneName(), sceneData);
-            saveSystem.CleanAndDestroy(persistObjects, gameObject);
+            if (obj != null)
+            {
+                Destroy(obj);
+            }
+        }
+        if (owner != null)
+        {
+            Destroy(owner);
+        }
+    }
+    public void MarkPersistObjects(GameObject[] objects)
+    {
+        foreach (GameObject obj in objects)
+        {
+            if (obj != null)
+            {
+                obj.transform.SetParent(null);
+                DontDestroyOnLoad(obj);
+            }
         }
     }
 
-
-
 }
+
+
+// 场景切换数据
+
+public struct SceneTransitionData
+{
+    public bool hasPendingTransition;
+    public Vector2 playerPosition;
+}
+
+
