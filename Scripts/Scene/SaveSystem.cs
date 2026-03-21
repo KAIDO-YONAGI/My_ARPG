@@ -34,17 +34,17 @@ public class SaveSystem
         var json = JsonUtility.ToJson(data);
         var path = Path.Combine(Application.persistentDataPath, fileName);
 
-        try
-        {
-            File.WriteAllText(path, json);
-        }
-        catch (IOException e)
-        {
-            Debug.LogError($"Failed to save data to {path}: {e.Message}");
-        }
-        #if UNITY_EDITOR
-        Debug.Log($"Saved data to {path}");
-        #endif
+        // try
+        // {
+        //     File.WriteAllText(path, json);
+        // }
+        // catch (IOException e)
+        // {
+        //     Debug.LogError($"Failed to save data to {path}: {e.Message}");
+        // }
+        // #if UNITY_EDITOR
+        // Debug.Log($"Saved data to {path}");
+        // #endif
     }
 
     public T LoadByJson<T>(string fileName)

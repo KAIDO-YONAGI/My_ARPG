@@ -37,7 +37,6 @@ public class GameManager : MonoBehaviour
     [Header("Save Objects")]
     public GameObject[] saveObjects;
 
-    public SceneChanger sceneChanger;
 
 
 
