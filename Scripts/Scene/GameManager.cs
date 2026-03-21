@@ -1,34 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
-public struct SceneTransitionData//保证场景切换效果的
-{
-    public bool hasPendingTransition;
-    public Vector2 playerPosition;
-}
-public class SceneData
-{
-    private string sceneName;
-    private GameObject[] sceneObjects;
-
-    public SceneData(GameObject[] objects)
-    {
-        sceneName = SceneManager.GetActiveScene().name+".yonagi";
-        sceneObjects = objects;
-    }
-    public string getSceneName()
-    {
-        return sceneName;
-    }
-}
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-
     public SaveSystem saveSystem;
 
     [Header("Persist Objects")]
@@ -37,16 +13,9 @@ public class GameManager : MonoBehaviour
     [Header("Save Objects")]
     public GameObject[] saveObjects;
 
-
-
-
-    // 场景切换事件
     public static event Action OnSceneTransition;
-
-    // 场景切换数据
     public static SceneTransitionData transitionData;
 
-    // 触发场景切换事件
     public static void TriggerSceneTransition()
     {
         transitionData.hasPendingTransition = true;
@@ -56,6 +25,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         saveSystem = new SaveSystem();
+        string currentSceneName = SceneManager.GetActiveScene().name;
 
         if (instance == null)
         {
@@ -63,16 +33,56 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             saveSystem.MarkPersistObjects(persistObjects);
 
-
+            saveSystem.LoadAndRestoreSceneObjects(currentSceneName, saveObjects);
         }
-        else//如果实例已经存在，说明已经跳到下一个场景，调用相关函数保存当前数据
+        else
         {
-            SceneData sceneData = new(saveObjects);
-            saveSystem.SaveByJson(DateTime.Now.ToString() + sceneData.getSceneName(), sceneData);
+            saveSystem.SaveSceneObjects(currentSceneName, saveObjects);
             saveSystem.CleanAndDestroy(persistObjects, gameObject);
         }
     }
+}
 
+public struct SceneTransitionData
+{
+    public bool hasPendingTransition;
+    public Vector2 playerPosition;
+}
 
+[Serializable]
+public class ObjectState
+{
+    public string path;
+    public bool isActive;
 
+    public ObjectState(string objectPath, bool active)
+    {
+        path = objectPath;
+        isActive = active;
+    }
+}
+
+[Serializable]
+public class SceneObjectData
+{
+    public System.Collections.Generic.List<ObjectState> objectStates = new System.Collections.Generic.List<ObjectState>();
+}
+
+public class SceneData
+{
+    public string sceneName;
+    public SceneObjectData objectData;
+
+    public SceneData() { }
+
+    public SceneData(string name, SceneObjectData data)
+    {
+        sceneName = name + ".yonagi";
+        objectData = data;
+    }
+
+    public string getSceneName()
+    {
+        return sceneName;
+    }
 }
