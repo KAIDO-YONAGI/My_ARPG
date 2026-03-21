@@ -93,10 +93,10 @@ namespace TMPro.Examples
         }
 
 
-        /// <summary>
-        /// Method to draw a rectangle around each character.
-        /// </summary>
-        /// <param name="text"></param>
+        
+        // Method to draw a rectangle around each character.
+        
+        // <param name="text"></param>
         void DrawCharactersBounds()
         {
             int characterCount = m_TextInfo.characterCount;
@@ -257,10 +257,10 @@ namespace TMPro.Examples
         }
 
 
-        /// <summary>
-        /// Method to draw rectangles around each word of the text.
-        /// </summary>
-        /// <param name="text"></param>
+        
+        // Method to draw rectangles around each word of the text.
+        
+        // <param name="text"></param>
         void DrawWordBounds()
         {
             for (int i = 0; i < m_TextInfo.wordCount; i++)
@@ -361,10 +361,10 @@ namespace TMPro.Examples
         }
 
 
-        /// <summary>
-        /// Draw rectangle around each of the links contained in the text.
-        /// </summary>
-        /// <param name="text"></param>
+        
+        // Draw rectangle around each of the links contained in the text.
+        
+        // <param name="text"></param>
         void DrawLinkBounds()
         {
             TMP_TextInfo textInfo = m_TextComponent.textInfo;
@@ -465,10 +465,10 @@ namespace TMPro.Examples
         }
 
 
-        /// <summary>
-        /// Draw Rectangles around each lines of the text.
-        /// </summary>
-        /// <param name="text"></param>
+        
+        // Draw Rectangles around each lines of the text.
+        
+        // <param name="text"></param>
         void DrawLineBounds()
         {
             int lineCount = m_TextInfo.lineCount;
@@ -546,9 +546,9 @@ namespace TMPro.Examples
         }
 
 
-        /// <summary>
-        /// Draw Rectangle around the bounds of the text object.
-        /// </summary>
+        
+        // Draw Rectangle around the bounds of the text object.
+        
         void DrawBounds()
         {
             Bounds meshBounds = m_TextComponent.bounds;
