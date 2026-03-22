@@ -61,7 +61,7 @@ public class SceneChanger : MonoBehaviour
             {
                 if (transitionImage != null)
                 {
-                    transitionImage.Play("FadeIn");
+                    transitionImage.Play("FadeIn", 0, 0f);
                 }
             }
             StartCoroutine(LoadScene());
@@ -72,5 +72,12 @@ public class SceneChanger : MonoBehaviour
     {
         yield return new WaitForSeconds(timeToWait);
         SceneManager.LoadScene(sceneToLoad);
+        foreach (Animator transitionImage in transitionImages)
+        {
+            if (transitionImage != null)
+            {
+                transitionImage.Play("Idle");
+            }
+        }
     }
 }

@@ -76,10 +76,12 @@ GameObject:
   - component: {fileID: 5464445826183332479}
   - component: {fileID: 2256170124106506200}
   - component: {fileID: 7544162249560536073}
+  - component: {fileID: 4911926949611949316}
   - component: {fileID: 6296319202402296221}
+  - component: {fileID: 1213893711025281261}
   m_Layer: 9
   m_Name: TorchGoblin_Red
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -255,6 +257,21 @@ MonoBehaviour:
   playerMask:
     serializedVersion: 2
     m_Bits: 256
+--- !u!114 &4911926949611949316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6395274551889381215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3d55389e9ebe0d4a98e88e983158755, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 5
+  maxHealth: 5
+  expReward: 2
 --- !u!95 &6296319202402296221
 Animator:
   serializedVersion: 5
@@ -276,3 +293,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1213893711025281261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6395274551889381215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e38cc1eda57dca94d8bc19de97545810, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
