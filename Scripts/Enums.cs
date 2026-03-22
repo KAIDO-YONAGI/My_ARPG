@@ -18,4 +18,9 @@ namespace MyEnums
         Attacking,
         KnockBack
     }
+    public enum SceneType
+    {
+        Location,
+        Menu
+    }
 }
