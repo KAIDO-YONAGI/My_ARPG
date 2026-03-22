@@ -1133,7 +1133,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 523051121979621372, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
       propertyPath: m_Name
-      value: ShfitMapTrigger
+      value: Teleport
+      objectReference: {fileID: 0}
+    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
+      propertyPath: sceneToGo
+      value: 
+      objectReference: {fileID: 11400000, guid: 2a6c9a782e8ae9c458ddf8f2ded4ac6b, type: 2}
+    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
+      propertyPath: position.x
+      value: 8.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
+      propertyPath: position.y
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
+      propertyPath: sceneToLoad
+      value: 
+      objectReference: {fileID: 11400000, guid: 2a6c9a782e8ae9c458ddf8f2ded4ac6b, type: 2}
+    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
+      propertyPath: newPosition.x
+      value: 8.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
+      propertyPath: newPosition.y
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 3924943693869348669, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
       propertyPath: cam
