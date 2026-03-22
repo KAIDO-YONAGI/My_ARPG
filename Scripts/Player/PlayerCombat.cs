@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using MyEnums;
 public class PlayerCombat : MonoBehaviour
 {
     public Transform attackPoint;
@@ -29,7 +29,7 @@ public class PlayerCombat : MonoBehaviour
     }
     public void FinshCombat()
     {
-        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
+        playerMovement.AnimatorSM(PlayerState.Idle);
         playerMovement.animator.SetBool("isAttacking", false);
         playerMovement.SetCanBeInterrupted(true);
         playerMovement.ResetTimer();

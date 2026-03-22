@@ -25,7 +25,8 @@ MonoBehaviour:
   - m_GUID: c1fa93511c3a71d429f0211868d41e08
     m_Address: Assets/Prefabs/Units/TorchGoblin_Red.prefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Enemies
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ee8b6f39f2f3996479298e0621c06dc1
     m_Address: Assets/Prefabs/Units/Arrow.prefab

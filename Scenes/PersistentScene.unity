@@ -4921,7 +4921,7 @@ GameObject:
   - component: {fileID: 5031346064064601231}
   - component: {fileID: 5031346064064601232}
   m_Layer: 0
-  m_Name: ===Persistant Objects===
+  m_Name: SceneManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5656,10 +5656,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 3184029326220715994}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e25bd9d12f18574cbaa5c043e695aa7, type: 3}
+  m_Script: {fileID: 11500000, guid: 55f1a515b64ebe640868999928218c10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  persistObjects: []
+  sceneReference:
+    m_AssetGUID: 2cda990e2423bbf4892e6590ba056729
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
 --- !u!224 &5032307257695124838
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8233,8 +8237,8 @@ SpriteRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 5031346064064601231}
   - {fileID: 3468478369980149558}
   - {fileID: 7920227249279348528}
   - {fileID: 781860693603705375}
+  - {fileID: 5031346064064601231}
   - {fileID: 80645715}

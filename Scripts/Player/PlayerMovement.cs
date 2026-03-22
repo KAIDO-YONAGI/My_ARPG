@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using MyEnums;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -12,16 +13,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canBeInterrupted = true;//是否可以被打断，攻击和射击动画期间不可被打断
 
     private float timer = 0;//计时器，暂时未使用        
-    public enum PlayerState
-    {
 
-        Idle,
-        Running,
-        Attacking,
-        Shooting,
-        KnockBack
-
-    }
     private PlayerState playerState = PlayerState.Idle;
 
     public void AnimatorSM(PlayerState newState)//用于切换动画
