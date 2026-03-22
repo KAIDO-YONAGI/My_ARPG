@@ -1,0 +1,63 @@
+{
+    "version": 1,
+    "name": "PlayerActions",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "78bd9ed1-b5fb-4948-b6ad-e000181c126e",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "4340dbd2-a207-4fdf-b095-98eeb68a9e4c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "cb4d0b90-0b1d-49ac-a45d-c9efac5ea4b7",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "ba24a6c6-0eef-4f47-bbf2-04685dfb6654",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "8cde3a73-a27e-4d1c-ae43-bb2600e94c7d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6b89e893-36c2-4c6d-ba2f-1af399b11ee1",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
