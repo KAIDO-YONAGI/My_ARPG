@@ -44,7 +44,6 @@ public class GameManager : MonoBehaviour
         else
         {
             CleanAndDestroy(persistObjects, gameObject);
-
         }
     }
     public void CleanAndDestroy(GameObject[] persistObjects, GameObject owner)

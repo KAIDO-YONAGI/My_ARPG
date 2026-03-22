@@ -97,7 +97,7 @@ MonoBehaviour:
   - {fileID: 8499308266113674986}
   - {fileID: 4983972393504125305}
   playerPositionInNewScene: {x: 10, y: 10}
-  timeToWait: 0.5
+  timeToWait: 1
 --- !u!225 &1579996532184971951
 CanvasGroup:
   m_ObjectHideFlags: 0

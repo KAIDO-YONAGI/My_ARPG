@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Grid
+  m_EditorClassIdentifier: 
+  m_GroupName: Grid
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 38882be1ebd6715499c3aa8eeaef32ab
+  m_SerializeEntries:
+  - m_GUID: 0428698298931684b9736c493629271c
+    m_Address: Assets/Prefabs/Grid/Stair.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c702d393669d4f4790d43f08612badc
+    m_Address: Assets/Prefabs/Grid/Tree.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 279c495c53e18d5449c50909fc7c77bb, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 6d004739b1721fc4c8f3278c027dfd94, type: 2}
+    - {fileID: 11400000, guid: be9878d693edd854b9909f34017f48d0, type: 2}

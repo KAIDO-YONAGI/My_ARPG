@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: UI Things
+  m_EditorClassIdentifier: 
+  m_GroupName: UI Things
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 98bc1bd6329cfaa4caa70a31fe795b45
+  m_SerializeEntries:
+  - m_GUID: 5f9c694f2cf92844b8ec92657b680da8
+    m_Address: Assets/Prefabs/UI/StatsSlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a28c895636a44e04585eb69925200290
+    m_Address: Assets/Prefabs/UI/Stats.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad3422a7b05d6d042bbe0134510b5282
+    m_Address: Assets/Prefabs/UI/InventorySlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad6c571997aade34da41c92faf999008
+    m_Address: Assets/Prefabs/UI/SkillButton.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b27c85496cf4fc54ea2e4d7d66fdef3d
+    m_Address: Assets/Prefabs/UI/ShopSlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e284130909f13b543ac4c09566faa738
+    m_Address: Assets/Prefabs/UI/ShopButton.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 279c495c53e18d5449c50909fc7c77bb, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 55d7ccea28e44a44da19f73175119cd9, type: 2}
+    - {fileID: 11400000, guid: baaa425449b6a1c4d90dcbf5a6452b10, type: 2}
