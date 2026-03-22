@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using MyEnums;
 public class PlayerBow : MonoBehaviour
 {
     public Transform launchPoint;
@@ -60,7 +60,7 @@ public class PlayerBow : MonoBehaviour
                                       //新问题：瞄准要按方向键，否则会按照上一次的射击方向射击，而不是朝向,因此使用了playermovement脚本里的朝向
     {
         HandleAiming();
-        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Shooting);
+        playerMovement.AnimatorSM(PlayerState.Shooting);
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         if (horizontal != 0 || vertical != 0)
@@ -86,7 +86,7 @@ public class PlayerBow : MonoBehaviour
     }
     public void ShootingDone()//动画事件触发的函数，结束射击，重置状态和计时器
     {
-        playerMovement.AnimatorSM(PlayerMovement.PlayerState.Idle);
+        playerMovement.AnimatorSM(PlayerState.Idle);
         playerMovement.animator.SetBool("isShooting", false);
         playerMovement.SetCanBeInterrupted(true);
         playerMovement.ResetTimer();

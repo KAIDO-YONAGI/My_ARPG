@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "New Item")]//添加后使得SO在项目文件夹中可被创建
+[CreateAssetMenu(fileName = "New Item",menuName = "GameLootSO/ItemSO")]//添加后使得SO在项目文件夹中可被创建
 public class ItemSO : ScriptableObject
 {
     public string itemName;
