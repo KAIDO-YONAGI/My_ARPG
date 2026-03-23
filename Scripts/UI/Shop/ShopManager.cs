@@ -4,11 +4,15 @@ public class ShopManager : MonoBehaviour
 {
     [SerializeField] private ShopSlot[] shopSlots;
     [SerializeField] private InventoryManager inventoryManager;
+
+    [Header("Events")]
+    public InventorySlotsStatsSO InventoryUpdateRequest;
     public void PopulateShopItems(List<ShopItems> shopItems)
     {
         for (int i = 0; i < shopItems.Count && i < shopSlots.Length; i++)
         {
             ShopItems shopItem = shopItems[i];
+
             shopSlots[i].Initialize(shopItem.item, shopItem.price);
             shopSlots[i].gameObject.SetActive(true);
         }
@@ -21,13 +25,14 @@ public class ShopManager : MonoBehaviour
 
     public void TryBuyItem(ItemSO item, int price)
     {
+        InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, price, 1);
         if (item == null || inventoryManager.goldAmount < price) return;
         else
         {
             if (HasSpaceForItem(item))
             {
                 inventoryManager.UpdateGold(price);
-                inventoryManager.AddItem(item, 1);
+                inventoryManager.AddPickedLoot(item, 1);
             }
         }
     }
@@ -44,15 +49,18 @@ public class ShopManager : MonoBehaviour
 
     public void SellItem(ItemSO item)
     {
+        bool haveItem = false;
         if (item == null) return;
         foreach (var slot in shopSlots)//找到想卖出的物品
         {
-            if (slot.item == item)
+            if (slot.GetItemSO() == item)
             {
-                inventoryManager.UpdateGold(-slot.price);//负值，是出售
+                inventoryManager.UpdateGold(-slot.GetPrice());//负值，是出售
+                haveItem = true;
                 return;
             }
         }
+        if (!haveItem) Debug.Log("Here is no " + item.itemName + " for sell");
     }
 }
 [System.Serializable]

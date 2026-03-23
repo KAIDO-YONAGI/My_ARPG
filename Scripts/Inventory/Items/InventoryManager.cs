@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,24 +15,32 @@ public class InventoryManager : MonoBehaviour
 
     public int goldAmount;
 
+    [Header("Events")]
+    public InventorySlotsStatsSO InventoryUpdateRequest;
     private void Start()
     {
         foreach (InventorySlot slot in itemSlots)
         {
             slot.UpdateUI();
-
         }
     }
     private void OnEnable()
     {
-        Loot.OnItemLooted += AddItem;
+        Loot.OnItemLooted += AddPickedLoot;
+        InventoryUpdateRequest.InventoryUpdateRequestEvent+=UpdateInventory;
 
     }
+
+    private void UpdateInventory(ItemSO arg0, int arg1, int arg2)
+    {
+        throw new NotImplementedException();
+    }
+
     private void OnDisable()
     {
-        Loot.OnItemLooted -= AddItem;
+        Loot.OnItemLooted -= AddPickedLoot;
     }
-    public void AddItem(ItemSO item, int quantity)
+    public void AddPickedLoot(ItemSO item, int quantity)
     {
         if (item.isGold)
         {
