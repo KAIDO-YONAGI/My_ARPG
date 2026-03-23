@@ -3971,6 +3971,7 @@ MonoBehaviour:
   lootPrefab: {fileID: 4449130243353109343, guid: 96f2efcecf1a358409f694adadbddbed, type: 3}
   player: {fileID: 3468478369980149558}
   goldAmount: 0
+  InventoryUpdateRequest: {fileID: 11400000, guid: 9288ed250bdecb643afeabf9ce4ba424, type: 2}
 --- !u!114 &432747330827997248
 MonoBehaviour:
   m_ObjectHideFlags: 0
