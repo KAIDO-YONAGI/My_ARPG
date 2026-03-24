@@ -83,7 +83,10 @@ public class Loot : MonoBehaviour, ISaveable
 
     public void GetSaveData(Data data)
     {
-        throw new NotImplementedException();
+        if (data.characterPosDic.ContainsKey(GetDataID().ID))
+        {
+            
+        }
     }
 
     public void LoadSaveData(Data data)
