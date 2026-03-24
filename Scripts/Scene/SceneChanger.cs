@@ -7,6 +7,8 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 public class SceneChanger : MonoBehaviour
 {
+    public static SceneChanger Instance { get; private set; }
+
     public Vector3 initialPosition = Vector3.zero;
     public float fadeDuration = 1f;
     public GameSceneSO firstScene;
@@ -19,13 +21,19 @@ public class SceneChanger : MonoBehaviour
     private GameSceneSO sceneToLoad;
 
     private GameSceneSO currentScene;
-
+    private Scene loadedScene;
     private Vector3 newPosition;
     private bool isToFade;
     private bool isInitialScene = true;
 
+    public Scene GetCurrentScene()
+    {
+        return loadedScene != null ? loadedScene : SceneManager.GetActiveScene();
+    }
+
     private void Awake()
     {
+        Instance = this;
         sceneToLoad = firstScene;
         SetPlayerPostion(initialPosition);
         LoadScene(sceneToLoad);
@@ -86,19 +94,14 @@ public class SceneChanger : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 场景加载完成
-    /// </summary>
-    /// <param name="newPosition"></param>
     private void OnLoadCompleted(AsyncOperationHandle<SceneInstance> handle)
     {
         currentScene = sceneToLoad;
+        loadedScene = handle.Result.Scene;
         if (isToFade && !isInitialScene)
         {
             PlayLoadingAnimation("FadeOut");
         }
         isInitialScene = false;
     }
-
-
 }

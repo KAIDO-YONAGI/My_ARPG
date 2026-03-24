@@ -43,6 +43,8 @@ public class Loot : MonoBehaviour, ISaveable
         canBePick = false;
         this.item = item;
         this.quantity = quantity;
+        saveDataEvent.OnEventRaised();
+
         UpdateAppearence();
     }
 
@@ -98,7 +100,7 @@ public class Loot : MonoBehaviour, ISaveable
 
     public void LoadData(Data data)
     {
-        if(data==null) return;
+        if (data == null) return;
         if (data.lootsStatsDic == null) return;
 
         var dataId = GetDataID();
