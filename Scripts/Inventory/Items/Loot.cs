@@ -43,7 +43,7 @@ public class Loot : MonoBehaviour, ISaveable
         canBePick = false;
         this.item = item;
         this.quantity = quantity;
-        saveDataEvent.OnEventRaised();
+        saveDataEvent?.OnEventRaised();
 
         UpdateAppearence();
     }
