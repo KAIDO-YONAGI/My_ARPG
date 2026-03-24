@@ -11,8 +11,13 @@ public class InventoryManager : MonoBehaviour
 
     public int goldAmount;
 
+
     [Header("Events")]
     public InventorySlotsStatsSO InventoryUpdateRequest;
+
+
+    private InventorySlot slotBeenClicked;
+
     private void Start()
     {
         foreach (InventorySlot slot in itemSlots)
@@ -23,18 +28,18 @@ public class InventoryManager : MonoBehaviour
     private void OnEnable()
     {
         Loot.OnItemLooted += UpdateInvetorySlots;
-        InventoryUpdateRequest.InventoryUpdateRequestEvent += HandleUpdateInventoryRequest;
+        InventoryUpdateRequest.InventoryUpdateRequestEvent += HandleShopping;
 
     }
     private void OnDisable()
     {
         Loot.OnItemLooted -= UpdateInvetorySlots;
-        InventoryUpdateRequest.InventoryUpdateRequestEvent -= HandleUpdateInventoryRequest;
+        InventoryUpdateRequest.InventoryUpdateRequestEvent -= HandleShopping;
     }
-    private void HandleUpdateInventoryRequest(ItemSO item, int price, int amount)
+    private void HandleShopping(ItemSO item, int price, int amount)
     {
         if (item == null || goldAmount < price) return;
-        else if (amount > 0)
+        else if (amount > 0)//购买
         {
             if (HasSpaceForItem(item))
             {
@@ -42,7 +47,7 @@ public class InventoryManager : MonoBehaviour
                 UpdateInvetorySlots(item, amount);
             }
         }
-        else if (amount < 0)
+        else if (amount < 0)//出售
         {
             UpdateGold(price);
             UpdateInvetorySlots(item, amount);
@@ -50,7 +55,7 @@ public class InventoryManager : MonoBehaviour
     }
 
 
-    public void UpdateInvetorySlots(ItemSO item, int quantity)
+    private void UpdateInvetorySlots(ItemSO item, int quantity)
     {
         if (item.isGold)
         {
@@ -61,15 +66,15 @@ public class InventoryManager : MonoBehaviour
         }
         if (quantity < 0)//物品出售
         {
-            foreach (InventorySlot slot in itemSlots)
+            if (slotBeenClicked == null)
             {
-
-                if (slot.itemSO == item)
-                {
-                    slot.quantity += quantity;
-                    slot.UpdateUI();
-                    return;
-                }
+                Debug.Log("No slot been Marked");
+            }
+            else if (slotBeenClicked.quantity>0)
+            {
+                slotBeenClicked.quantity += quantity;
+                slotBeenClicked.UpdateUI();
+                return;
             }
         }
         else if (quantity > 0)//物品拾取以及购买
@@ -118,7 +123,16 @@ public class InventoryManager : MonoBehaviour
         }
         return false;
     }
+    private void DropLoot(ItemSO item, int quantity)
+    {
+        Loot loot = Instantiate(lootPrefab, player.position, Quaternion.identity).GetComponent<Loot>();
+        loot.Initialize(item, quantity);
 
+    }
+    public void SetSlotBeenClicked(InventorySlot slot)
+    {
+        slotBeenClicked=slot;
+    }
     public void DropByClick(InventorySlot slot)
     {
         DropLoot(slot.itemSO, 1);
@@ -149,10 +163,5 @@ public class InventoryManager : MonoBehaviour
         goldAmount -= price;
         amountText.text = goldAmount.ToString();
     }
-    private void DropLoot(ItemSO item, int quantity)
-    {
-        Loot loot = Instantiate(lootPrefab, player.position, Quaternion.identity).GetComponent<Loot>();
-        loot.Initialize(item, quantity);
 
-    }
 }

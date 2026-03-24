@@ -4,7 +4,7 @@ using UnityEngine;
 
 // 每个场景挂载的组件，用于标记需要持久化的场景数据
 
-public class SaveSystem : MonoBehaviour
+public class SaveManager : MonoBehaviour
 {
     [Header("SceneSaves")]
     public List<GameObject> saveObjects = new List<GameObject>();

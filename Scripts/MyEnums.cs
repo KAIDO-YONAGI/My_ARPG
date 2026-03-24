@@ -23,4 +23,9 @@ namespace MyEnums
         Location,
         Menu
     }
+    public enum PersistentType
+    {
+        ReadWrite,
+        DontPersist
+    }
 }

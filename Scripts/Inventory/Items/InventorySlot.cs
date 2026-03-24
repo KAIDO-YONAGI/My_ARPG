@@ -41,6 +41,7 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
             {
                 if (activeShop != null)//如果检测到商店活跃，那就出售物品
                 {
+                    inventoryManager.SetSlotBeenClicked(this);
                     activeShop.SellItem(itemSO);
                 }
                 else
