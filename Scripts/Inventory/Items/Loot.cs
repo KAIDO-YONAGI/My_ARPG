@@ -11,26 +11,19 @@ public class Loot : MonoBehaviour, ISaveable
     public static event Action<ItemSO, int> OnItemLooted;
     public int quantity = 10;
     private bool canBePick = true;
+    private bool hasBeenPicked = false;
+    [Header("Send")]
+    public VoidEventSO saveDataEvent;
+    public VoidEventSO loadDataEvent;
+
     private void Awake()
     {
-        var pos = GetComponent<Transform>().position;
-        /*
-        
-        foreach(var position:DestoryLootsPosition)
-        {
-            if(pos==position){
-                return;
-            }
-        }     
-        
-        
-        */
-
+        loadDataEvent.OnEventRaised();
     }
     private void OnEnable()
     {
         ISaveable saveable = this;
-        saveable.RegisterSaveable();
+        saveable.RegisterSaveable();//注册在需要保存的数据的列表中
     }
 
     private void OnDisable()
@@ -64,10 +57,15 @@ public class Loot : MonoBehaviour, ISaveable
         {
             animator.Play("Pickup");
             OnItemLooted?.Invoke(item, quantity);
-            Destroy(gameObject, .5f);
-        }
+            hasBeenPicked = true;
 
+
+            saveDataEvent.OnEventRaised();
+            Destroy(gameObject, .5f);
+            // LoadData();
+        }
     }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
@@ -81,16 +79,29 @@ public class Loot : MonoBehaviour, ISaveable
         return GetComponent<DataDefinition>();
     }
 
-    public void GetSaveData(Data data)
+    public void SaveData(Data data)
     {
-        if (data.characterPosDic.ContainsKey(GetDataID().ID))
+        if (data.lootsStatsDic.ContainsKey(GetDataID().ID))
         {
-            
+            data.lootsStatsDic[GetDataID().ID] = (transform.position, hasBeenPicked);
+        }
+        else
+        {
+            data.lootsStatsDic.Add(GetDataID().ID, (transform.position, hasBeenPicked));
         }
     }
 
-    public void LoadSaveData(Data data)
+    public void LoadData(Data data)
     {
-        throw new NotImplementedException();
+        if(data==null)return;
+        if (data.lootsStatsDic.ContainsKey(GetDataID().ID))
+        {
+            transform.position = data.lootsStatsDic[GetDataID().ID].Item1;
+            hasBeenPicked = data.lootsStatsDic[GetDataID().ID].Item2;
+        }
+        if (hasBeenPicked)
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

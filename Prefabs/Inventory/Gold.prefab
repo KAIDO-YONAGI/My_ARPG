@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 300813345599123674}
   - component: {fileID: 1870836630986557636}
   - component: {fileID: 3866848329499056819}
+  - component: {fileID: 4746021137863698182}
   m_Layer: 0
   m_Name: Gold
   m_TagString: Untagged
@@ -135,6 +136,8 @@ MonoBehaviour:
   sr: {fileID: 7171248118452406504}
   animator: {fileID: 1870836630986557636}
   quantity: 0
+  saveDataEvent: {fileID: 11400000, guid: 5515505a9aa8e8d48a08941905512b9f, type: 2}
+  loadDataEvent: {fileID: 11400000, guid: 34ee6145d8eac2c46a84b66cb736ea70, type: 2}
 --- !u!95 &1870836630986557636
 Animator:
   serializedVersion: 5
@@ -191,3 +194,17 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &4746021137863698182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7178226962014870998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc5403d5296dc0744ab632433f73b1bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  persistentType: 1
+  ID: 
