@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,14 +29,19 @@ public class InventoryManager : MonoBehaviour
     }
     private void OnEnable()
     {
-        Loot.OnItemLooted += UpdateInvetorySlots;
+        Loot.OnItemLooted += OnItemLootedHandler;
         InventoryUpdateRequest.InventoryUpdateRequestEvent += HandleShopping;
 
     }
     private void OnDisable()
     {
-        Loot.OnItemLooted -= UpdateInvetorySlots;
+        Loot.OnItemLooted -= OnItemLootedHandler;
         InventoryUpdateRequest.InventoryUpdateRequestEvent -= HandleShopping;
+    }
+
+    private void OnItemLootedHandler(ItemSO item, int quantity, Loot lootObj)
+    {
+        UpdateInvetorySlots(item, quantity, lootObj);
     }
     private void HandleShopping(ItemSO item, int price, int amount)
     {
@@ -56,13 +62,14 @@ public class InventoryManager : MonoBehaviour
     }
 
 
-    private void UpdateInvetorySlots(ItemSO item, int quantity)
+    private void UpdateInvetorySlots(ItemSO item, int quantity, Loot lootObj = null)
     {
         if (item.isGold)
         {
             if (!amountText) return;
             goldAmount += quantity;
             amountText.text = goldAmount.ToString();
+            lootObj?.MarkAsDestroyed();
             return;
         }
         if (quantity < 0)//物品出售
@@ -71,7 +78,7 @@ public class InventoryManager : MonoBehaviour
             {
                 Debug.Log("No slot been Marked");
             }
-            else if (slotBeenClicked.quantity>0)
+            else if (slotBeenClicked.quantity > 0)
             {
                 slotBeenClicked.quantity += quantity;
                 slotBeenClicked.UpdateUI();
@@ -93,7 +100,11 @@ public class InventoryManager : MonoBehaviour
 
                     slot.UpdateUI();
 
-                    if (quantity <= 0) return;
+                    if (quantity <= 0)
+                    {
+                        lootObj?.MarkAsDestroyed();
+                        return;
+                    }
 
                 }
             }
@@ -107,11 +118,12 @@ public class InventoryManager : MonoBehaviour
                     slot.itemSO = item;
                     slot.quantity = amount;
                     slot.UpdateUI();
+                    lootObj?.MarkAsDestroyed();
                     return;
                 }
             }
 
-            DropLoot(item, quantity);
+            DropLoot(item, quantity, lootObj);
         }
 
     }
@@ -124,18 +136,39 @@ public class InventoryManager : MonoBehaviour
         }
         return false;
     }
-    private void DropLoot(ItemSO item, int quantity)
+    private void DropLoot(ItemSO item, int quantity, Loot existingLoot = null)
     {
-        var sceneChanger = FindObjectOfType<SceneChanger>();
-        Scene currentScene = sceneChanger != null ? sceneChanger.GetCurrentScene() : SceneManager.GetActiveScene();
-        GameObject lootObj = Instantiate(lootPrefab, player.position, Quaternion.identity);
-        SceneManager.MoveGameObjectToScene(lootObj, currentScene);
-        Loot loot = lootObj.GetComponent<Loot>();
-        loot.Initialize(item, quantity);
+        if (existingLoot != null)
+        {
+            // 直接位移现有loot对象到玩家脚下
+            existingLoot.transform.position = player.position;
+            existingLoot.Initialize(item, quantity);
+            existingLoot.sr.enabled = true;
+            existingLoot.gameObject.SetActive(true);
+            StartCoroutine(ResetLootState(existingLoot));
+        }
+        else
+        {
+            var sceneChanger = FindObjectOfType<SceneChanger>();
+            Scene currentScene = sceneChanger != null ? sceneChanger.GetCurrentScene() : SceneManager.GetActiveScene();
+            GameObject lootObj = Instantiate(lootPrefab, player.position, Quaternion.identity);
+            SceneManager.MoveGameObjectToScene(lootObj, currentScene);
+            Loot loot = lootObj.GetComponent<Loot>();
+            loot.Initialize(item, quantity);
+        }
+    }
+    private IEnumerator ResetLootState(Loot loot)
+    {
+        yield return new WaitForFixedUpdate();
+        AnimatorStateInfo stateInfo = loot.animator.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(stateInfo.length * 0.3f);
+        loot.canBePick = true;
+        loot.hasBeenPicked = false;
+        loot.animator.SetBool("isPicked", false);
     }
     public void SetSlotBeenClicked(InventorySlot slot)
     {
-        slotBeenClicked=slot;
+        slotBeenClicked = slot;
     }
     public void DropByClick(InventorySlot slot)
     {

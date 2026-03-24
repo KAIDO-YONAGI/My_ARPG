@@ -8,10 +8,10 @@ public class Loot : MonoBehaviour, ISaveable
     public ItemSO item;
     public SpriteRenderer sr;
     public Animator animator;
-    public static event Action<ItemSO, int> OnItemLooted;
+    public static event Action<ItemSO, int, Loot> OnItemLooted;
     public int quantity = 10;
-    private bool canBePick = true;
-    private bool hasBeenPicked = false;
+    public bool canBePick = true;
+    public bool hasBeenPicked = false;
     [Header("Send")]
     public VoidEventSO saveDataEvent;
     public VoidEventSO loadDataEvent;
@@ -66,14 +66,16 @@ public class Loot : MonoBehaviour, ISaveable
         if (collision.CompareTag("Player") && canBePick)
         {
             animator.Play("Pickup");
-            OnItemLooted?.Invoke(item, quantity);
+            animator.SetBool("isPicked", true);
+            OnItemLooted?.Invoke(item, quantity, this);
             hasBeenPicked = true;
-
-
             saveDataEvent.OnEventRaised();
-            Destroy(gameObject, .5f);
-            // LoadData();
         }
+    }
+
+    public void MarkAsDestroyed()
+    {
+        Destroy(gameObject, .5f);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
