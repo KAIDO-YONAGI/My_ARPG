@@ -43,6 +43,14 @@ public class Loot : MonoBehaviour, ISaveable
         canBePick = false;
         this.item = item;
         this.quantity = quantity;
+
+        // 重新生成 GUID，避免与 prefab 或其他实例共享 ID
+        var dataDef = GetComponent<DataDefinition>();
+        if (dataDef != null)
+        {
+            dataDef.ID = System.Guid.NewGuid().ToString();
+        }
+
         saveDataEvent?.OnEventRaised();
 
         UpdateAppearence();
