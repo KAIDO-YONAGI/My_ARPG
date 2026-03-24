@@ -18,7 +18,7 @@ public class Loot : MonoBehaviour, ISaveable
 
     private void Awake()
     {
-        loadDataEvent.OnEventRaised();
+        loadDataEvent?.OnEventRaised();
     }
     private void OnEnable()
     {
@@ -81,23 +81,33 @@ public class Loot : MonoBehaviour, ISaveable
 
     public void SaveData(Data data)
     {
-        if (data.lootsStatsDic.ContainsKey(GetDataID().ID))
+        if (data == null || data.lootsStatsDic == null) return;
+
+        var dataId = GetDataID();
+        if (dataId == null) return;
+
+        if (data.lootsStatsDic.ContainsKey(dataId.ID))
         {
-            data.lootsStatsDic[GetDataID().ID] = (transform.position, hasBeenPicked);
+            data.lootsStatsDic[dataId.ID] = (transform.position, hasBeenPicked);
         }
         else
         {
-            data.lootsStatsDic.Add(GetDataID().ID, (transform.position, hasBeenPicked));
+            data.lootsStatsDic.Add(dataId.ID, (transform.position, hasBeenPicked));
         }
     }
 
     public void LoadData(Data data)
     {
-        if(data==null)return;
-        if (data.lootsStatsDic.ContainsKey(GetDataID().ID))
+        if(data==null) return;
+        if (data.lootsStatsDic == null) return;
+
+        var dataId = GetDataID();
+        if (dataId == null) return;
+
+        if (data.lootsStatsDic.ContainsKey(dataId.ID))
         {
-            transform.position = data.lootsStatsDic[GetDataID().ID].Item1;
-            hasBeenPicked = data.lootsStatsDic[GetDataID().ID].Item2;
+            transform.position = data.lootsStatsDic[dataId.ID].Item1;
+            hasBeenPicked = data.lootsStatsDic[dataId.ID].Item2;
         }
         if (hasBeenPicked)
         {

@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 public class InventoryManager : MonoBehaviour
 {
     public InventorySlot[] itemSlots;

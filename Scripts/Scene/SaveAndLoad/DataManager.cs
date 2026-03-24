@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 [DefaultExecutionOrder(-100)]
@@ -50,7 +52,7 @@ public class DataManager : MonoBehaviour
     }
     void Save()
     {
-        foreach (var saveable in saveables)
+        foreach (var saveable in saveables.ToList())
         {
             saveable.SaveData(dataToSave);
         }
@@ -62,7 +64,7 @@ public class DataManager : MonoBehaviour
     }
     void Load()
     {
-        foreach (var saveable in saveables)
+        foreach (var saveable in saveables.ToList())
         {
             saveable.LoadData(dataToSave);
         }
