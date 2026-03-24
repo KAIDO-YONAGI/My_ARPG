@@ -126,9 +126,12 @@ public class InventoryManager : MonoBehaviour
     }
     private void DropLoot(ItemSO item, int quantity)
     {
-        Loot loot = Instantiate(lootPrefab, player.position, Quaternion.identity).GetComponent<Loot>();
+        var sceneChanger = FindObjectOfType<SceneChanger>();
+        Scene currentScene = sceneChanger != null ? sceneChanger.GetCurrentScene() : SceneManager.GetActiveScene();
+        GameObject lootObj = Instantiate(lootPrefab, player.position, Quaternion.identity);
+        SceneManager.MoveGameObjectToScene(lootObj, currentScene);
+        Loot loot = lootObj.GetComponent<Loot>();
         loot.Initialize(item, quantity);
-
     }
     public void SetSlotBeenClicked(InventorySlot slot)
     {
