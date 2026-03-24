@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 public class InventoryManager : MonoBehaviour
 {
@@ -26,21 +22,35 @@ public class InventoryManager : MonoBehaviour
     }
     private void OnEnable()
     {
-        Loot.OnItemLooted += AddPickedLoot;
-        InventoryUpdateRequest.InventoryUpdateRequestEvent+=UpdateInventory;
+        Loot.OnItemLooted += UpdateInvetorySlots;
+        InventoryUpdateRequest.InventoryUpdateRequestEvent += HandleUpdateInventoryRequest;
 
     }
-
-    private void UpdateInventory(ItemSO arg0, int arg1, int arg2)
-    {
-        throw new NotImplementedException();
-    }
-
     private void OnDisable()
     {
-        Loot.OnItemLooted -= AddPickedLoot;
+        Loot.OnItemLooted -= UpdateInvetorySlots;
+        InventoryUpdateRequest.InventoryUpdateRequestEvent -= HandleUpdateInventoryRequest;
     }
-    public void AddPickedLoot(ItemSO item, int quantity)
+    private void HandleUpdateInventoryRequest(ItemSO item, int price, int amount)
+    {
+        if (item == null || goldAmount < price) return;
+        else if (amount > 0)
+        {
+            if (HasSpaceForItem(item))
+            {
+                UpdateGold(price);
+                UpdateInvetorySlots(item, amount);
+            }
+        }
+        else if (amount < 0)
+        {
+            UpdateGold(price);
+            UpdateInvetorySlots(item, amount);
+        }
+    }
+
+
+    public void UpdateInvetorySlots(ItemSO item, int quantity)
     {
         if (item.isGold)
         {
@@ -49,48 +59,73 @@ public class InventoryManager : MonoBehaviour
             amountText.text = goldAmount.ToString();
             return;
         }
-        foreach (InventorySlot slot in itemSlots)//物品堆叠逻辑
+        if (quantity < 0)//物品出售
         {
-            if (slot.itemSO == item && slot.quantity < item.stackableSize)
+            foreach (InventorySlot slot in itemSlots)
             {
-                int availableSize = item.stackableSize - slot.quantity;
-                int amountToAdd = Mathf.Min(availableSize, quantity);
 
-                slot.quantity += amountToAdd;
-                quantity -= amountToAdd;
-
-                slot.UpdateUI();
-
-                if (quantity <= 0) return;
-
+                if (slot.itemSO == item)
+                {
+                    slot.quantity += quantity;
+                    slot.UpdateUI();
+                    return;
+                }
             }
         }
-
-        foreach (InventorySlot slot in itemSlots)//寻找可堆叠的格子
+        else if (quantity > 0)//物品拾取以及购买
         {
-            if (slot.itemSO == null)
+
+            foreach (InventorySlot slot in itemSlots)//物品堆叠逻辑
             {
-                int amountToAdd = Mathf.Min(item.stackableSize, quantity);
+                if (slot.itemSO == item && slot.quantity < item.stackableSize)
+                {
+                    int availableSize = item.stackableSize - slot.quantity;
+                    int amount = Mathf.Min(availableSize, quantity);
 
-                slot.itemSO = item;
-                slot.quantity = amountToAdd;
-                slot.UpdateUI();
-                return;
+                    slot.quantity += amount;
+                    quantity -= amount;
+
+                    slot.UpdateUI();
+
+                    if (quantity <= 0) return;
+
+                }
             }
-        }
-        if (quantity > 0)
-        {
+
+            foreach (InventorySlot slot in itemSlots)//寻找可堆叠的格子
+            {
+                if (slot.itemSO == null)
+                {
+                    int amount = Mathf.Min(item.stackableSize, quantity);
+
+                    slot.itemSO = item;
+                    slot.quantity = amount;
+                    slot.UpdateUI();
+                    return;
+                }
+            }
+
             DropLoot(item, quantity);
         }
 
     }
+    private bool HasSpaceForItem(ItemSO item)
+    {
+        foreach (var slot in itemSlots)
+        {
+            if ((slot.itemSO == item && slot.quantity < item.stackableSize)
+                || slot.itemSO == null) return true;
+        }
+        return false;
+    }
+
     public void DropByClick(InventorySlot slot)
     {
         DropLoot(slot.itemSO, 1);
         slot.quantity -= 1;
-        if(slot.quantity <= 0)
+        if (slot.quantity <= 0)
         {
-            slot.itemSO=null;
+            slot.itemSO = null;
         }
         slot.UpdateUI();
     }
@@ -108,7 +143,7 @@ public class InventoryManager : MonoBehaviour
             }
             slot.UpdateUI();
         }
-    } 
+    }
     public void UpdateGold(int price)
     {
         goldAmount -= price;

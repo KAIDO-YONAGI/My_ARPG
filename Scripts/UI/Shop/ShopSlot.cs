@@ -8,7 +8,7 @@ public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     //ui部分在unity中链接到队对应子对象
 
-
+    //从SO中初始化
     private ItemSO item;
     private int price;
 
