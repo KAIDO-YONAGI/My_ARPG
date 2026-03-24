@@ -2,19 +2,38 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-
+[DefaultExecutionOrder(-100)]
 public class DataManager : MonoBehaviour
 {
     public static DataManager instance;
 
     List<ISaveable> saveables = new List<ISaveable>();
 
+    Data dataToSave;
+
+    [Header("Receive")]
+    public VoidEventSO saveDataEvent;
+    public VoidEventSO loadDataEvent;
+
+    private void OnEnable()
+    {
+        saveDataEvent.VoidEvent += Save;
+        loadDataEvent.VoidEvent += Load;
+    }
+    private void OnDisable()
+    {
+        saveDataEvent.VoidEvent -= Save;
+        loadDataEvent.VoidEvent -= Load;
+
+    }
     private void Awake()
     {
         if (instance == null)
             instance = this;
         else
-            Destroy(this.gameObject);
+            Destroy(gameObject);
+
+        dataToSave = new Data();
     }
 
     public void RegisterSaveableData(ISaveable saveable)
@@ -24,9 +43,29 @@ public class DataManager : MonoBehaviour
             saveables.Add(saveable);
         }
     }
-    
+
     public void UnRegisterSaveableData(ISaveable saveable)
     {
         saveables.Remove(saveable);
     }
+    void Save()
+    {
+        foreach (var saveable in saveables)
+        {
+            saveable.SaveData(dataToSave);
+        }
+        // foreach (var data in dataToSave.lootsStatsDic)
+        // {
+        //     Debug.Log(data.Value.Item1);
+
+        // }
+    }
+    void Load()
+    {
+        foreach (var saveable in saveables)
+        {
+            saveable.LoadData(dataToSave);
+        }
+    }
+
 }

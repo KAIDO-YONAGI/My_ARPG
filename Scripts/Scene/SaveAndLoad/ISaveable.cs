@@ -10,6 +10,6 @@ public interface ISaveable
         DataManager.instance.UnRegisterSaveableData(this);
     }
 
-    void GetSaveData(Data data);
-    void LoadSaveData(Data data);
+    void SaveData(Data data);
+    void LoadData(Data data);
 }
