@@ -3,7 +3,6 @@ using UnityEngine;
 public class ShopManager : MonoBehaviour
 {
     [SerializeField] private ShopSlot[] shopSlots;
-    [SerializeField] private InventoryManager inventoryManager;
 
     [Header("Events")]
     public InventorySlotsStatsSO InventoryUpdateRequest;
@@ -26,41 +25,19 @@ public class ShopManager : MonoBehaviour
     public void TryBuyItem(ItemSO item, int price)
     {
         InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, price, 1);
-        if (item == null || inventoryManager.goldAmount < price) return;
-        else
-        {
-            if (HasSpaceForItem(item))
-            {
-                inventoryManager.UpdateGold(price);
-                inventoryManager.AddPickedLoot(item, 1);
-            }
-        }
     }
-
-    private bool HasSpaceForItem(ItemSO item)
-    {
-        foreach (var slot in inventoryManager.itemSlots)
-        {
-            if ((slot.itemSO == item && slot.quantity < item.stackableSize)
-                || slot.itemSO == null) return true;
-        }
-        return false;
-    }
-
     public void SellItem(ItemSO item)
     {
-        bool haveItem = false;
         if (item == null) return;
         foreach (var slot in shopSlots)//找到想卖出的物品
         {
             if (slot.GetItemSO() == item)
             {
-                inventoryManager.UpdateGold(-slot.GetPrice());//负值，是出售
-                haveItem = true;
+                //价格和数目均设置为负，出售
+                InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, -slot.GetPrice(), -1);
                 return;
             }
         }
-        if (!haveItem) Debug.Log("Here is no " + item.itemName + " for sell");
     }
 }
 [System.Serializable]

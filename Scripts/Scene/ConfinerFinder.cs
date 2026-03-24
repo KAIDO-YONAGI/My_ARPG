@@ -36,7 +36,7 @@ public class ConfinerFinder : MonoBehaviour
 
         if (obj == null)
         {
-            Debug.LogWarning("没找到 Confiner！");
+            Debug.LogWarning("Can't find Confiner");
             yield break;
         }
 
@@ -44,7 +44,7 @@ public class ConfinerFinder : MonoBehaviour
 
         if (col == null)
         {
-            Debug.LogWarning("Confiner 没有 Collider2D！");
+            Debug.LogWarning("No Confiner Collider2D");
             yield break;
         }
 

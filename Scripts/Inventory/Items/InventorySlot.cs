@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +6,6 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
 {
     public ItemSO itemSO;
     public int quantity;
-
     public Image itemImage;
     public TMP_Text quantityText;
     public InventoryManager inventoryManager;
@@ -45,8 +42,6 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
                 if (activeShop != null)//如果检测到商店活跃，那就出售物品
                 {
                     activeShop.SellItem(itemSO);
-                    quantity--;
-                    UpdateUI();
                 }
                 else
                 {
