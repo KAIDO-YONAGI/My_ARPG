@@ -136,6 +136,8 @@ MonoBehaviour:
   sr: {fileID: 7171248118452406504}
   animator: {fileID: 1870836630986557636}
   quantity: 0
+  canBePick: 1
+  hasBeenPicked: 0
   saveDataEvent: {fileID: 11400000, guid: 5515505a9aa8e8d48a08941905512b9f, type: 2}
   loadDataEvent: {fileID: 11400000, guid: 34ee6145d8eac2c46a84b66cb736ea70, type: 2}
 --- !u!95 &1870836630986557636

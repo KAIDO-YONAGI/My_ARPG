@@ -28,4 +28,9 @@ namespace MyEnums
         ReadWrite,
         DontPersist
     }
+    public enum AStarNodeType
+    {
+        Obstacle,
+        Walkable
+    }
 }
