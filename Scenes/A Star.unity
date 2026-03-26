@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: 78191669}
   - component: {fileID: 78191671}
   - component: {fileID: 78191670}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Non_Collision_High
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1059,13 +1059,13 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1975168680}
+  - {fileID: 1943928078}
   - {fileID: 78191669}
   - {fileID: 411086781}
   - {fileID: 953023009}
   - {fileID: 167664063}
-  - {fileID: 1975168680}
   - {fileID: 1660720813}
-  - {fileID: 1943928078}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &411086780
@@ -1079,7 +1079,7 @@ GameObject:
   - component: {fileID: 411086781}
   - component: {fileID: 411086783}
   - component: {fileID: 411086782}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Non_Collision_Low
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2897,7 +2897,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1218895887}
   - component: {fileID: 1218895886}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: NodeMapManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2916,6 +2916,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13f373ae34953cd4ca19ad4a4eb891c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tilemaps:
+  - {fileID: 1975168682}
+  - {fileID: 78191671}
+  - {fileID: 411086783}
+  - {fileID: 953023008}
+  - {fileID: 167664062}
+  - {fileID: 1660720816}
 --- !u!4 &1218895887
 Transform:
   m_ObjectHideFlags: 0
@@ -2943,7 +2950,7 @@ GameObject:
   - component: {fileID: 1660720816}
   - component: {fileID: 1660720815}
   - component: {fileID: 1660720814}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MapEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4152,7 +4159,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1943928078}
   - component: {fileID: 1943928079}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4237,7 +4244,7 @@ GameObject:
   - component: {fileID: 1975168680}
   - component: {fileID: 1975168682}
   - component: {fileID: 1975168681}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -4,19 +4,77 @@ using UnityEngine;
 using MyEnums;
 public class AStarNode
 {
-    int x;
-    int y;
+    private int x;
+    private int y;
 
-    float cost;
-    float disToBeg;
-    float disToEnd;
-    public AStarNode fatherNode;
-    AStarNodeType nodeType;
+    private float cost;
+    private float disToBeg;
+    private float disToEnd;
+    private AStarNode fatherNode;
+    private AStarNodeType nodeType;
 
-    public AStarNode(int x,int y, AStarNodeType nodeType)
+    public AStarNode(Vector3Int nodePos, AStarNodeType nodeType)
     {
-        this.x=x;
-        this.y=y;
-        this.nodeType=nodeType;
+        this.x = nodePos.x;
+        this.y = nodePos.y;
+        this.nodeType = nodeType;
+    }
+
+    public int GetX()
+    {
+        return x;
+    }
+
+    public int GetY()
+    {
+        return y;
+    }
+
+    public float GetCost()
+    {
+        return cost;
+    }
+
+    public float GetDisToBeg()
+    {
+        return disToBeg;
+    }
+
+    public float GetDisToEnd()
+    {
+        return disToEnd;
+    }
+
+    public AStarNode GetFatherNode()
+    {
+        return fatherNode;
+    }
+
+    public AStarNodeType GetNodeType()
+    {
+        return nodeType;
+    }
+
+    public void SetNodeType(AStarNodeType newType)
+    {
+        if (CanOverride(nodeType, newType))
+        {
+            nodeType=newType;
+        }
+    }
+    private bool CanOverride(AStarNodeType existing, AStarNodeType newType)
+    {
+        // 障碍物不能被覆盖
+        if (existing == AStarNodeType.Obstacle) return false;
+
+        // 其他情况的覆盖规则
+        switch (existing)
+        {
+            case AStarNodeType.Walkable:
+                return newType != AStarNodeType.Obstacle; 
+
+            default:
+                return true;
+        }
     }
 }
