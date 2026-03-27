@@ -11,9 +11,8 @@ public class AStarNode
     {
         x = nodePos.x;
         y = nodePos.y;
-        nodePos = new Vector3Int(x, y, 0);
+        this.nodePos = new Vector3Int(x, y, 0);
         this.nodeType = nodeType;
-
     }
 
     public int GetX() => x;
