@@ -94,7 +94,7 @@ public class EnemyMovement : MonoBehaviour
             Flip();
         }
         
-        
+        //TODO:需要取消按帧刷新的chase
         Vector2 direction = (player.position - transform.position).normalized;
         //使用两者坐标相减创建一个向量，并且使用normalized归一化
         rb.velocity = direction * speed;

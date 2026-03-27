@@ -1,54 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using MyEnums;
 public class AStarNode
 {
     private int x;
     private int y;
-
-    private float cost;
-    private float disToBeg;
-    private float disToEnd;
-    private AStarNode fatherNode;
     private AStarNodeType nodeType;
+    Vector3Int nodePos;
 
     public AStarNode(Vector3Int nodePos, AStarNodeType nodeType)
     {
-        this.x = nodePos.x;
-        this.y = nodePos.y;
+        x = nodePos.x;
+        y = nodePos.y;
+        nodePos = new Vector3Int(x, y, 0);
         this.nodeType = nodeType;
+
     }
 
-    public int GetX()
-    {
-        return x;
-    }
+    public int GetX() => x;
 
-    public int GetY()
-    {
-        return y;
-    }
+    public int GetY() => y;
 
-    public float GetCost()
-    {
-        return cost;
-    }
+    public Vector3Int GetNodePos()=>nodePos;
 
-    public float GetDisToBeg()
-    {
-        return disToBeg;
-    }
-
-    public float GetDisToEnd()
-    {
-        return disToEnd;
-    }
-
-    public AStarNode GetFatherNode()
-    {
-        return fatherNode;
-    }
 
     public AStarNodeType GetNodeType()
     {
@@ -62,10 +35,7 @@ public class AStarNode
             nodeType = newType;
         }
     }
-    public void SetFatherNode(AStarNode fatherNode)
-    {
-        this.fatherNode = fatherNode;
-    }
+
     private bool CanOverride(AStarNodeType existing, AStarNodeType newType)
     {
         // 障碍物不能被覆盖
