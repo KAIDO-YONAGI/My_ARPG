@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using MyEnums;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -18,8 +15,8 @@ public class AStarPathFinder : MonoBehaviour
 
     public static AStarPathFinder instance;
     private Dictionary<Vector3Int, AStarNode> nodeCellMap;
-    private List<AStarNode> openList;
-    private List<AStarNode> closeList;
+
+
     private void Awake()
     {
         if (instance == null)
@@ -101,33 +98,66 @@ public class AStarPathFinder : MonoBehaviour
                 break;
         }
     }
-    public List<AStarNode> FindPath(Vector3 startPos, Vector3 endPos)
+    public Stack<PathFinderDetails> FindPath(Vector3 startPos, Vector3 endPos)
     {
+        Dictionary<Vector3Int, PathFinderDetails> openDic = new();
+        Stack<PathFinderDetails> closeStack = new();
         Vector3Int startCellPos = WorldToCell(startPos);
         Vector3Int endCellPos = WorldToCell(endPos);
-        List<AStarNode> beginList = new();
-        Stack<AStarNode> closeStack = new();
+        bool isDone = false;
 
         if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
             return null;
 
         AStarNode startNode = nodeCellMap[startCellPos];
+        PathFinderDetails startNodeDetails = MakePathFinderDetails(startCellPos, endCellPos, null);
+        closeStack.Push(startNodeDetails);//起点压栈
 
-        beginList.Add(startNode);//起点加入开启列表
-        closeStack.Push(startNode);//起点压栈
-
-        AStarNode relativeFather = startNode;
+        PathFinderDetails relativeFather = null;
         Vector3Int currentNodeCellPos = startCellPos;
 
         while (true)
         {
-            AddNodeToList(currentNodeCellPos, beginList, relativeFather);
-            // relativeFather=
-            break;
+            AddNodeToOpen(currentNodeCellPos, endCellPos, openDic, relativeFather);
+            relativeFather = MakePathFinderDetails(currentNodeCellPos, endCellPos, relativeFather);
+
+            if (isDone) break;
         }
 
 
-        return null;
+        return closeStack;
+    }
+    private void AddNodeToOpen(Vector3Int currentNodeCellPos, Vector3Int endCellPos, Dictionary<Vector3Int, PathFinderDetails> openDic, PathFinderDetails relativeFather)
+    {
+        int x = nodeCellMap[currentNodeCellPos].GetX();
+        int y = nodeCellMap[currentNodeCellPos].GetY();
+
+        int[] dx = { 1, 1, 1, -1, -1, -1, 0, 0 };
+        int[] dy = { 0, 1, -1, 0, 1, -1, -1, 1 };
+
+        Vector3Int newNodeCellPos;
+
+        for (int i = 0; i < 8; i++)
+        {
+            newNodeCellPos = new Vector3Int(x + dx[i], y + dy[i]);
+            if (nodeCellMap.ContainsKey(newNodeCellPos))
+            {
+                AStarNodeType aStarNodeType = nodeCellMap[newNodeCellPos].GetNodeType();
+                switch (aStarNodeType)
+                {
+                    case AStarNodeType.Walkable:
+                        if (!openDic.ContainsKey(newNodeCellPos))
+                            openDic.Add(newNodeCellPos, MakePathFinderDetails(newNodeCellPos, endCellPos, relativeFather));
+                        else//可能需要更新
+                        {
+                            openDic.Remove(newNodeCellPos);
+                            openDic.Add(newNodeCellPos, MakePathFinderDetails(newNodeCellPos, endCellPos, relativeFather));
+                        }
+                        break;
+                }
+            }
+        }
+
     }
     private Vector3Int WorldToCell(Vector3 worldPos)
     {
@@ -145,45 +175,10 @@ public class AStarPathFinder : MonoBehaviour
             0
         );
     }
-
-
-    private void AddNodeToList(Vector3Int nodeCellPos, List<AStarNode> beginList, AStarNode relativeFather)
+    private PathFinderDetails MakePathFinderDetails(Vector3Int nodePos, Vector3Int endPos, PathFinderDetails fatherNode)
     {
-        nodeCellMap[nodeCellPos].SetFatherNode(null);
-
-        int x = nodeCellMap[nodeCellPos].GetX();
-        int y = nodeCellMap[nodeCellPos].GetY();
-
-        int[] dx = { 1, 1, 1, -1, -1, -1, 0, 0 };
-        int[] dy = { 0, 1, -1, 0, 1, -1, -1, 1 };
-
-        for (int i = 0; i < 8; i++)
-        {
-            Vector3Int tempVector = new Vector3Int(x + dx[i], y + dy[i]);
-            DealNode(tempVector, beginList, relativeFather);
-        }
-
-    }
-    private void DealNode(Vector3Int tempVector, List<AStarNode> beginList, AStarNode relativeFather)
-    {
-        if (nodeCellMap.ContainsKey(tempVector))
-        {
-            AStarNodeType aStarNodeType = nodeCellMap[tempVector].GetNodeType();
-            switch (aStarNodeType)
-            {
-                case AStarNodeType.Walkable:
-                    beginList.Add(nodeCellMap[tempVector]);
-                    break;
-            }
-
-
-
-        }
+        return new PathFinderDetails(nodePos, endPos, fatherNode);
     }
 
-    private float CalDistance(Vector3Int startPos, Vector3Int endPos)
-    {
-        return Vector3Int.Distance(startPos, endPos);
-    }
 
 }
