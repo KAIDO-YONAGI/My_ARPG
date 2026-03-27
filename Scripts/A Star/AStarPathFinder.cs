@@ -55,39 +55,39 @@ public class AStarPathFinder : MonoBehaviour
             {
                 if (currentTilemap.HasTile(cellPos))
                 {
-                    int layer = currentTilemap.gameObject.layer;
-                    ProcessTile(layer, cellPos);
-                    
+                    string layerName = LayerMask.LayerToName(currentTilemap.gameObject.layer);
+                    ProcessTile(layerName, cellPos);
+
                 }
             }
         }
-        foreach (var item in nodeCellMap)
-        {
-            if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
-                Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
-        }
-        
+        // foreach (var item in nodeCellMap)
+        // {
+        //     if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
+        //         Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
+        // }
+        Debug.Log(nodeCellMap[new Vector3Int(0,-3,0)].GetNodeType());
     }
-    private void ProcessTile(int layerIndex, Vector3Int cellPos)
+    private void ProcessTile(string layerName, Vector3Int cellPos)
     {
         Vector3Int key;
 
-        switch (layerIndex)
+        switch (layerName)
         {
-            case 10: // Obstacle
+            case "Obstacle":
                 key = new Vector3Int(cellPos.x, cellPos.y);
 
                 if (nodeCellMap.ContainsKey(key))
                 {
                     nodeCellMap[key].SetNodeType(AStarNodeType.Obstacle);
                 }
-                else//只在没有节点的时候创建对象
+                else
                 {
                     nodeCellMap[key] = new AStarNode(cellPos, AStarNodeType.Obstacle);
                 }
                 break;
 
-            case 11: // Walkable
+            case "Walkable":
                 key = new Vector3Int(cellPos.x, cellPos.y);
 
                 if (nodeCellMap.ContainsKey(key))
