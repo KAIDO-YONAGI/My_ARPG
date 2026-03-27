@@ -30,17 +30,12 @@ public class AStarNode
 
     private bool CanOverride(AStarNodeType existing, AStarNodeType newType)
     {
-        // 障碍物不能被覆盖
+        // Obstacle 永远最高优先级
+        if (newType == AStarNodeType.Obstacle) return true;
+
+        // 已经是 Obstacle，不能被覆盖
         if (existing == AStarNodeType.Obstacle) return false;
 
-        // 其他情况的覆盖规则
-        switch (existing)
-        {
-            case AStarNodeType.Walkable:
-                return newType != AStarNodeType.Obstacle;
-
-            default:
-                return true;
-        }
+        return true;
     }
 }

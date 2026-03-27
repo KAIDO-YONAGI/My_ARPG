@@ -12,7 +12,7 @@ public class AStarPathFinder : MonoBehaviour
 {
     [Header("Tilemaps")]
     public Tilemap[] tilemaps;
-    public float cellSize = 1.0f;
+    private float cellSize = 1.0f;
 
     public static AStarPathFinder instance;
     private Dictionary<Vector3Int, AStarNode> nodeCellMap;
@@ -61,11 +61,11 @@ public class AStarPathFinder : MonoBehaviour
                 }
             }
         }
-        // foreach (var item in nodeCellMap)
-        // {
-        //     if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
-        //         Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
-        // }
+        foreach (var item in nodeCellMap)
+        {
+            if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
+                Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
+        }
         Debug.Log(nodeCellMap[new Vector3Int(0,-3,0)].GetNodeType());
     }
     private void ProcessTile(string layerName, Vector3Int cellPos)
