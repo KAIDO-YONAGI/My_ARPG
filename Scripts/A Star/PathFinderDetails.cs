@@ -11,7 +11,9 @@ public class PathFinderDetails
     public float GetCost() => cost;
     public float GetDisToBeg() => disToBeg;
     public float GetDisToEnd() => disToEnd;
-    public PathFinderDetails FatherNode => fatherNode;
+    public Vector3Int GetNodePos() => nodePos;
+
+    public PathFinderDetails GetFatherNode() => fatherNode;
     public void SetFatherNode(PathFinderDetails fatherNode)
     {
         this.fatherNode = fatherNode;
@@ -28,7 +30,7 @@ public class PathFinderDetails
         else
         {
             disToBeg = fatherNode.disToBeg +
-                (CalDistance(nodePos, fatherNode.nodePos) >= 2 ? 1.414f : 1);
+                (CalDistance(nodePos, fatherNode.nodePos) >= 2 ? 1.414f : 1);//曼哈顿距离。遇到大于二的就赋斜线值，精度更高
         }
 
         disToEnd = CalDistance(nodePos, endPos);
