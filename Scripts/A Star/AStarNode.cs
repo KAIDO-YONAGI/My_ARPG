@@ -59,8 +59,12 @@ public class AStarNode
     {
         if (CanOverride(nodeType, newType))
         {
-            nodeType=newType;
+            nodeType = newType;
         }
+    }
+    public void SetFatherNode(AStarNode fatherNode)
+    {
+        this.fatherNode = fatherNode;
     }
     private bool CanOverride(AStarNodeType existing, AStarNodeType newType)
     {
@@ -71,7 +75,7 @@ public class AStarNode
         switch (existing)
         {
             case AStarNodeType.Walkable:
-                return newType != AStarNodeType.Obstacle; 
+                return newType != AStarNodeType.Obstacle;
 
             default:
                 return true;
