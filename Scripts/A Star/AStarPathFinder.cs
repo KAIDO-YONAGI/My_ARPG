@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MyEnums;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -56,6 +57,7 @@ public class AStarPathFinder : MonoBehaviour
                 {
                     int layer = currentTilemap.gameObject.layer;
                     ProcessTile(layer, cellPos);
+                    
                 }
             }
         }
@@ -64,6 +66,7 @@ public class AStarPathFinder : MonoBehaviour
             if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
                 Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
         }
+        
     }
     private void ProcessTile(int layerIndex, Vector3Int cellPos)
     {
@@ -98,34 +101,61 @@ public class AStarPathFinder : MonoBehaviour
                 break;
         }
     }
+    public Dictionary<Vector3Int, AStarNode> GetNodeMap()
+    {
+        return nodeCellMap;
+    }
     public Stack<PathFinderDetails> FindPath(Vector3 startPos, Vector3 endPos)
     {
         Dictionary<Vector3Int, PathFinderDetails> openDic = new();
         Stack<PathFinderDetails> closeStack = new();
         Vector3Int startCellPos = WorldToCell(startPos);
         Vector3Int endCellPos = WorldToCell(endPos);
-        bool isDone = false;
 
         if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
             return null;
 
-        AStarNode startNode = nodeCellMap[startCellPos];
         PathFinderDetails startNodeDetails = MakePathFinderDetails(startCellPos, endCellPos, null);
-        closeStack.Push(startNodeDetails);//起点压栈
 
-        PathFinderDetails relativeFather = null;
+        closeStack.Push(startNodeDetails);//起点压栈
+        PathFinderDetails relativeFather = startNodeDetails;
         Vector3Int currentNodeCellPos = startCellPos;
+        bool isDone=false;    
 
         while (true)
         {
-            AddNodeToOpen(currentNodeCellPos, endCellPos, openDic, relativeFather);
-            relativeFather = MakePathFinderDetails(currentNodeCellPos, endCellPos, relativeFather);
 
-            if (isDone) break;
+            if (closeStack.Count > 0 && closeStack.Peek().GetNodePos() == endCellPos) break;
+
+            AddNodeToOpen(currentNodeCellPos, endCellPos, openDic, relativeFather);
+
+            Vector3Int minCostCellPos = SearchCheapestCost(openDic);
+
+            closeStack.Push(openDic[minCostCellPos]);
+
+            //找到下一步之后更新
+            relativeFather = openDic[minCostCellPos];
+            currentNodeCellPos = minCostCellPos;
+            openDic.Remove(minCostCellPos);
         }
 
 
         return closeStack;
+    }
+    private Vector3Int SearchCheapestCost(Dictionary<Vector3Int, PathFinderDetails> openDic)
+    {
+        float minCost = float.MaxValue;
+        Vector3Int minCostCellPos = new();
+        foreach (var node in openDic)
+        {
+            float currentCost = node.Value.GetCost();
+            if (minCost > currentCost)
+            {
+                minCost = currentCost;
+                minCostCellPos = node.Key;
+            }
+        }
+        return minCostCellPos;
     }
     private void AddNodeToOpen(Vector3Int currentNodeCellPos, Vector3Int endCellPos, Dictionary<Vector3Int, PathFinderDetails> openDic, PathFinderDetails relativeFather)
     {
@@ -148,11 +178,11 @@ public class AStarPathFinder : MonoBehaviour
                     case AStarNodeType.Walkable:
                         if (!openDic.ContainsKey(newNodeCellPos))
                             openDic.Add(newNodeCellPos, MakePathFinderDetails(newNodeCellPos, endCellPos, relativeFather));
-                        else//可能需要更新
-                        {
-                            openDic.Remove(newNodeCellPos);
-                            openDic.Add(newNodeCellPos, MakePathFinderDetails(newNodeCellPos, endCellPos, relativeFather));
-                        }
+                        // else//可能需要更新
+                        // {
+                        //     openDic.Remove(newNodeCellPos);
+                        //     openDic.Add(newNodeCellPos, MakePathFinderDetails(newNodeCellPos, endCellPos, relativeFather));
+                        // }
                         break;
                 }
             }

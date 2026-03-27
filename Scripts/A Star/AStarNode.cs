@@ -17,16 +17,9 @@ public class AStarNode
     }
 
     public int GetX() => x;
-
     public int GetY() => y;
-
-    public Vector3Int GetNodePos()=>nodePos;
-
-
-    public AStarNodeType GetNodeType()
-    {
-        return nodeType;
-    }
+    public Vector3Int GetNodePos() => nodePos;
+    public AStarNodeType GetNodeType() => nodeType;
 
     public void SetNodeType(AStarNodeType newType)
     {
