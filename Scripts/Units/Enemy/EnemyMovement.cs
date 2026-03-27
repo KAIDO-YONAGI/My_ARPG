@@ -16,6 +16,7 @@ public class EnemyMovement : MonoBehaviour
     public float playerDetectRange = 5;
     public Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
     public LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
+    public PathFinderRequestSO pathFinderRequestEvent;
 
     public void AnimatorSM(EnemyState newState)
     {
@@ -92,6 +93,8 @@ public class EnemyMovement : MonoBehaviour
         {
             Flip();
         }
+        
+        
         Vector2 direction = (player.position - transform.position).normalized;
         //使用两者坐标相减创建一个向量，并且使用normalized归一化
         rb.velocity = direction * speed;
