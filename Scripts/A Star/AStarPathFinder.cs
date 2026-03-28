@@ -9,6 +9,7 @@ using UnityEngine.Tilemaps;
 //地图数据获取也可以优化，用以解决稀疏地图的遍历问题
 //可以用带权路径替换开根计算
 //细分单元格
+[DefaultExecutionOrder(-100)]
 public class AStarPathFinder : MonoBehaviour
 {
     [Header("Tilemaps")]
@@ -33,7 +34,7 @@ public class AStarPathFinder : MonoBehaviour
     {
         return nodeCellMap;
     }
-    public float GetCellSize()=>cellSize;
+    public float GetCellSize() => cellSize;
 
     public Stack<PathFinderDetails> FindPath(Vector3 startPos, Vector3 endPos)
     {
@@ -45,7 +46,14 @@ public class AStarPathFinder : MonoBehaviour
             return null;
         PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
         openDic.Add(startCellPos, startNode);
+        Debug.Log($"start:{startCellPos} exist:{nodeCellMap.ContainsKey(startCellPos)}");
+        Debug.Log($"end:{endCellPos} exist:{nodeCellMap.ContainsKey(endCellPos)}");
 
+        if (nodeCellMap.ContainsKey(startCellPos))
+            Debug.Log($"start type:{nodeCellMap[startCellPos].GetNodeType()}");
+
+        if (nodeCellMap.ContainsKey(endCellPos))
+            Debug.Log($"end type:{nodeCellMap[endCellPos].GetNodeType()}");
         while (openDic.Count > 0)
         {
             Vector3Int currentPos = SearchCheapestCost(openDic);
