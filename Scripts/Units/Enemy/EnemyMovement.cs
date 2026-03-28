@@ -1,5 +1,6 @@
 using UnityEngine;
 using MyEnums;
+using System.Collections.Generic;
 public class EnemyMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
@@ -16,7 +17,7 @@ public class EnemyMovement : MonoBehaviour
     public float playerDetectRange = 5;
     public Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
     public LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
-    public PathFinderRequestSO pathFinderRequestEvent;
+    public AStarController aStarController;
 
     public void AnimatorSM(EnemyState newState)
     {
@@ -93,12 +94,16 @@ public class EnemyMovement : MonoBehaviour
         {
             Flip();
         }
-        
-        //TODO:需要取消按帧刷新的chase
-        Vector2 direction = (player.position - transform.position).normalized;
+        Vector3 startPos = transform.position;
+        Vector3 endPos = player.position;
+
+        Vector3 posToGo = aStarController.GetPosToGo(startPos, endPos);
+
+        Vector2 direction = (posToGo - transform.position).normalized;
         //使用两者坐标相减创建一个向量，并且使用normalized归一化
         rb.velocity = direction * speed;
-
+        if (Vector3.Distance(transform.position, posToGo) < aStarController.GetThreshold())
+            aStarController.ArrivedPos();
     }
     private void Flip()
     {
