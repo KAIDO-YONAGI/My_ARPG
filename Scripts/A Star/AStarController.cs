@@ -26,6 +26,10 @@ public class AStarController : MonoBehaviour
         if (path != null && path.Count > 0)
             path.Pop();
     }
+    public void ResetPath()
+    {
+        path=null;
+    }
     public float GetThreshold() => threshold;
     private void FindWay(Vector3 startPos, Vector3 endPos)
     {

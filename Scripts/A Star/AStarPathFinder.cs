@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using MyEnums;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -84,7 +83,6 @@ public class AStarPathFinder : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[InitiateNodes] tilemaps.Length = {tilemaps.Length}");
 
         // 遍历所有 Tilemap
         for (int i = 0; i < tilemaps.Length; i++)
@@ -106,7 +104,6 @@ public class AStarPathFinder : MonoBehaviour
                     tileCount++;
                 }
             }
-            Debug.Log($"[InitiateNodes] processed {tileCount} tiles");
         }
         // foreach (var item in nodeCellMap)
         // {
@@ -117,7 +114,6 @@ public class AStarPathFinder : MonoBehaviour
     }
     private void ProcessTile(string layerName, Vector3Int cellPos)
     {
-        Debug.Log($"[ProcessTile] layerName={layerName}, cellPos={cellPos}");
         Vector3Int key;
 
         switch (layerName)
