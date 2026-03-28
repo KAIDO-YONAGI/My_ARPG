@@ -2940,7 +2940,6 @@ MonoBehaviour:
   - {fileID: 953023008}
   - {fileID: 167664062}
   - {fileID: 1660720816}
-  cellSize: 1
 --- !u!4 &1218895887
 Transform:
   m_ObjectHideFlags: 0
@@ -2950,7 +2949,7 @@ Transform:
   m_GameObject: {fileID: 1218895885}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.554413, y: -8.062212, z: -0.043003954}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12427,11 +12426,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 21.73
+      value: 11.62
       objectReference: {fileID: 0}
     - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -14.67
+      value: -12.72
       objectReference: {fileID: 0}
     - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
       propertyPath: m_LocalPosition.z

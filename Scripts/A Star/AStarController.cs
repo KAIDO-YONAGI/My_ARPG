@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class AStarController : MonoBehaviour
 {
-    Vector3 startPos = new Vector3(0, 0, 0); Vector3 endPos = new Vector3(0, -8f, 0);
+    Vector3 startPos = new Vector3(0, 0, 0); Vector3 endPos = new Vector3(0, -5f, 0);
     public Stack<PathFinderDetails> FindWay()
     {
         return AStarPathFinder.instance.FindPath(startPos, endPos);
@@ -20,9 +20,10 @@ public class AStarController : MonoBehaviour
         }
         while (wayStack.Count > 0)
         {
-            Debug.Log(wayStack.Peek().GetNodePos().ToString() +
-            wayStack.Peek().GetFatherNode().GetNodePos().ToString() +
-            AStarPathFinder.instance.GetNodeMap()[wayStack.Peek().GetNodePos()].GetNodeType().ToString());
+            Debug.Log(wayStack.Peek().GetNodePos().ToString()
+            // + wayStack.Peek().GetFatherNode().GetNodePos().ToString()
+            + AStarPathFinder.instance.GetNodeMap()[wayStack.Peek().GetNodePos()].GetNodeType().ToString()
+            );
             wayStack.Pop();
         }
     }

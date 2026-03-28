@@ -8,6 +8,7 @@ using UnityEngine.Tilemaps;
 //关于网格和世界坐标的转化 由于转化关系，需要先导航到这个网格中心点才能开始导航
 //地图数据获取也可以优化，用以解决稀疏地图的遍历问题
 //可以用带权路径替换开根计算
+//细分单元格
 public class AStarPathFinder : MonoBehaviour
 {
     [Header("Tilemaps")]
@@ -61,12 +62,12 @@ public class AStarPathFinder : MonoBehaviour
                 }
             }
         }
-        foreach (var item in nodeCellMap)
-        {
-            if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
-                Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
-        }
-        Debug.Log(nodeCellMap[new Vector3Int(0,-3,0)].GetNodeType());
+        // foreach (var item in nodeCellMap)
+        // {
+        //     if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
+        //         Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
+        // }
+        Debug.Log(nodeCellMap[new Vector3Int(0, -4, 0)].GetNodeType());
     }
     private void ProcessTile(string layerName, Vector3Int cellPos)
     {
@@ -108,39 +109,45 @@ public class AStarPathFinder : MonoBehaviour
     public Stack<PathFinderDetails> FindPath(Vector3 startPos, Vector3 endPos)
     {
         Dictionary<Vector3Int, PathFinderDetails> openDic = new();
-        Stack<PathFinderDetails> closeStack = new();
         Vector3Int startCellPos = WorldToCell(startPos);
         Vector3Int endCellPos = WorldToCell(endPos);
-
+        HashSet<Vector3Int> closeSet = new();
         if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
             return null;
-
-        PathFinderDetails startNodeDetails = MakePathFinderDetails(startCellPos, endCellPos, null);
-
-        closeStack.Push(startNodeDetails);//起点压栈
-        PathFinderDetails relativeFather = startNodeDetails;
-        Vector3Int currentNodeCellPos = startCellPos;
-        bool isDone=false;    
-
-        while (true)
+        PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
+        openDic.Add(startCellPos, startNode);
+        while (openDic.Count > 0)
         {
+            Vector3Int currentPos = SearchCheapestCost(openDic);
+            PathFinderDetails current = openDic[currentPos];
 
-            if (closeStack.Count > 0 && closeStack.Peek().GetNodePos() == endCellPos) break;
+            openDic.Remove(currentPos);
+            closeSet.Add(currentPos);
 
-            AddNodeToOpen(currentNodeCellPos, endCellPos, openDic, relativeFather);
+            if (currentPos == endCellPos)
+            {
+                return RetracePath(current);
+            }
 
-            Vector3Int minCostCellPos = SearchCheapestCost(openDic);
-
-            closeStack.Push(openDic[minCostCellPos]);
-
-            //找到下一步之后更新
-            relativeFather = openDic[minCostCellPos];
-            currentNodeCellPos = minCostCellPos;
-            openDic.Remove(minCostCellPos);
+            AddNodeToOpen(currentPos, endCellPos, openDic, closeSet, current);
         }
 
 
-        return closeStack;
+        return null;
+    }
+    private Stack<PathFinderDetails> RetracePath(PathFinderDetails endNode)
+    {
+        Stack<PathFinderDetails> path = new Stack<PathFinderDetails>();
+
+        PathFinderDetails current = endNode;
+
+        while (current != null)
+        {
+            path.Push(current);
+            current = current.GetFatherNode(); // 确保你有这个方法
+        }
+
+        return path;
     }
     private Vector3Int SearchCheapestCost(Dictionary<Vector3Int, PathFinderDetails> openDic)
     {
@@ -157,37 +164,46 @@ public class AStarPathFinder : MonoBehaviour
         }
         return minCostCellPos;
     }
-    private void AddNodeToOpen(Vector3Int currentNodeCellPos, Vector3Int endCellPos, Dictionary<Vector3Int, PathFinderDetails> openDic, PathFinderDetails relativeFather)
+    private void AddNodeToOpen(
+        Vector3Int currentPos,
+        Vector3Int endPos,
+        Dictionary<Vector3Int, PathFinderDetails> openDic,
+        HashSet<Vector3Int> closeSet,
+        PathFinderDetails current)
     {
-        int x = nodeCellMap[currentNodeCellPos].GetX();
-        int y = nodeCellMap[currentNodeCellPos].GetY();
+        int x = currentPos.x;
+        int y = currentPos.y;
 
         int[] dx = { 1, 1, 1, -1, -1, -1, 0, 0 };
         int[] dy = { 0, 1, -1, 0, 1, -1, -1, 1 };
 
-        Vector3Int newNodeCellPos;
-
         for (int i = 0; i < 8; i++)
         {
-            newNodeCellPos = new Vector3Int(x + dx[i], y + dy[i]);
-            if (nodeCellMap.ContainsKey(newNodeCellPos))
+            Vector3Int neighborPos = new Vector3Int(x + dx[i], y + dy[i]);
+
+            //  不存在 or 障碍
+            if (!nodeCellMap.ContainsKey(neighborPos)) continue;
+            if (nodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
+
+            //  已经处理过
+            if (closeSet.Contains(neighborPos)) continue;
+
+            PathFinderDetails newNode = MakePathFinderDetails(neighborPos, endPos, current);
+
+            //  不在 open，直接加
+            if (!openDic.ContainsKey(neighborPos))
             {
-                AStarNodeType aStarNodeType = nodeCellMap[newNodeCellPos].GetNodeType();
-                switch (aStarNodeType)
+                openDic.Add(neighborPos, newNode);
+            }
+            else
+            {
+                // 更优路径更新
+                if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())
                 {
-                    case AStarNodeType.Walkable:
-                        if (!openDic.ContainsKey(newNodeCellPos))
-                            openDic.Add(newNodeCellPos, MakePathFinderDetails(newNodeCellPos, endCellPos, relativeFather));
-                        // else//可能需要更新
-                        // {
-                        //     openDic.Remove(newNodeCellPos);
-                        //     openDic.Add(newNodeCellPos, MakePathFinderDetails(newNodeCellPos, endCellPos, relativeFather));
-                        // }
-                        break;
+                    openDic[neighborPos] = newNode;
                 }
             }
         }
-
     }
     private Vector3Int WorldToCell(Vector3 worldPos)
     {
