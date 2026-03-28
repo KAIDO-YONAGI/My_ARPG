@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MyEnums;
 using UnityEngine;
@@ -185,8 +186,8 @@ public class AStarPathFinder : MonoBehaviour
         int x = currentPos.x;
         int y = currentPos.y;
 
-        int[] dx = { 1, 1, 1, -1, -1, -1, 0, 0 };
-        int[] dy = { 0, 1, -1, 0, 1, -1, -1, 1 };
+        int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
+        int[] dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
 
         for (int i = 0; i < 8; i++)
         {
@@ -195,6 +196,8 @@ public class AStarPathFinder : MonoBehaviour
             //  不存在 or 障碍
             if (!nodeCellMap.ContainsKey(neighborPos)) continue;
             if (nodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
+            if (nodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(x, y, dx[i], dy[i])) continue;
+
 
             //  已经处理过
             if (closeSet.Contains(neighborPos)) continue;//在set里的都是最优路径点（遍历完了，剪枝）
@@ -215,6 +218,23 @@ public class AStarPathFinder : MonoBehaviour
                 }
             }
         }
+    }
+    private bool CanWalkDiagonally(int x, int y, int dx, int dy)
+    {
+
+        if (Math.Abs(dx * dy) == 1)//说明是四个角
+        {
+            Vector3Int pos = new Vector3Int(x + dx, y + dy);
+            Vector3Int xOffset = new Vector3Int(dx, 0);
+            Vector3Int yOffset = new Vector3Int(0, dy);
+
+            if (!(nodeCellMap[pos - xOffset].GetNodeType() == AStarNodeType.Walkable) &&
+            !(nodeCellMap[pos - yOffset].GetNodeType() == AStarNodeType.Walkable))
+            {
+                return false;
+            }
+        }
+        return true;
     }
     private Vector3Int WorldToCell(Vector3 worldPos)
     {
