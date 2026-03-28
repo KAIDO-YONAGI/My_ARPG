@@ -2312,7 +2312,7 @@ GameObject:
   - component: {fileID: 7360010809769456065}
   - component: {fileID: 2729389038899809956}
   - component: {fileID: 5149895740485747167}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Non_Collision_Low
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13149,7 +13149,7 @@ GameObject:
   - component: {fileID: 7455445946435763107}
   - component: {fileID: 705764143184132178}
   - component: {fileID: 5973390315843453992}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13167,7 +13167,7 @@ GameObject:
   - component: {fileID: 3204033756574670326}
   - component: {fileID: 3445898034430238238}
   - component: {fileID: 8280914287301637633}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Non_Collision_High
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14506,7 +14506,7 @@ GameObject:
   - component: {fileID: 7158493698134340736}
   - component: {fileID: 9181116751458055198}
   - component: {fileID: 2534317876729686227}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MountainEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14634,7 +14634,7 @@ GameObject:
   - component: {fileID: 3882171395182104815}
   - component: {fileID: 5317294179428680423}
   - component: {fileID: 5459671030813504499}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MapEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
