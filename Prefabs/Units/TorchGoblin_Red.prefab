@@ -26,7 +26,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.48, y: -0.28, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4414708773720522193}
@@ -253,7 +253,7 @@ MonoBehaviour:
   speed: 2
   attackRange: 1.2
   attackCoolDown: 1
-  playerDetectRange: 5
+  playerDetectRange: 8
   detectionPoint: {fileID: 6539773393019522231}
   playerMask:
     serializedVersion: 2
@@ -319,3 +319,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e06d23035593d84289bcbffedfd8c71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pathRebuildDistance: 2
+  showPath: 1
+  pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  startColor: {r: 0, g: 1, b: 0, a: 1}
+  endColor: {r: 1, g: 0, b: 0, a: 1}
+  nodeRadius: 0.2
