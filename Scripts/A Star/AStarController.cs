@@ -9,6 +9,8 @@ public class AStarController : MonoBehaviour
     private float cellSize;
     private float threshold = 0.1f;
     [SerializeField] private float pathRebuildDistance = 2f; // 目标移动超过此距离时重新寻路
+    [SerializeField] private float pathRebuildCooldown = 0.5f; // 寻路冷却时间
+    private float pathRebuildTimer; // 寻路计时器
 
     [Header("可视化设置")]
     [SerializeField] private bool showPath = true;
@@ -28,6 +30,10 @@ public class AStarController : MonoBehaviour
     }
     public Vector3 GetPosToGo(Vector3 startPos, Vector3 endPos)
     {
+        // 更新计时器
+        if (pathRebuildTimer > 0)
+            pathRebuildTimer -= Time.deltaTime;
+
         // 检查是否需要重新寻路
         if (!hasValidPath || path == null || path.Count == 0)
         {
@@ -35,16 +41,20 @@ public class AStarController : MonoBehaviour
         }
         else
         {
-            // 检查目标是否移动超过阈值
+            // 检查目标是否移动超过阈值且冷却时间已过
             float distToTarget = (endPos - this.endPos).sqrMagnitude;
-            if (distToTarget > pathRebuildDistance * pathRebuildDistance)
+            if (distToTarget > pathRebuildDistance * pathRebuildDistance && pathRebuildTimer <= 0)
             {
                 // 目标移动太远，重新寻路
                 FindWay(startPos, endPos);
+                pathRebuildTimer = pathRebuildCooldown;
             }
         }
+        
         if (path != null && path.Count > 0)
+        {
             return CellToWorld(path.Peek().GetNodePos());
+        }
         else return Vector3.zero;
     }
     public void ArrivedPos()
