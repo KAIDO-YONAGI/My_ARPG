@@ -5,26 +5,41 @@ using UnityEngine;
 
 public class AStarController : MonoBehaviour
 {
-    Vector3 startPos = new Vector3(0, 0, 0); Vector3 endPos = new Vector3(0, -5f, 0);
-    public Stack<PathFinderDetails> FindWay()
+    private Stack<PathFinderDetails> path;
+    private float cellSize;
+    private float threshold = 0.1f;
+    private void OnEnable()
     {
-        return AStarPathFinder.instance.FindPath(startPos, endPos);
+        if (AStarPathFinder.instance != null)
+            cellSize = AStarPathFinder.instance.GetCellSize();
     }
-    private void Start()
+    public Vector3 GetPosToGo(Vector3 startPos, Vector3 endPos)
     {
-        Stack<PathFinderDetails> wayStack = FindWay();
-        if (wayStack == null)
-        {
-            Debug.Log("没找到路径");
-            return;
-        }
-        while (wayStack.Count > 0)
-        {
-            Debug.Log(wayStack.Peek().GetNodePos().ToString()
-            // + wayStack.Peek().GetFatherNode().GetNodePos().ToString()
-            + AStarPathFinder.instance.GetNodeMap()[wayStack.Peek().GetNodePos()].GetNodeType().ToString()
-            );
-            wayStack.Pop();
-        }
+        if (path == null)
+            FindWay(startPos, endPos);
+        if (path.Count > 0)
+            return CellToWorld(path.Peek().GetNodePos());
+        else return Vector3.zero;
     }
+    public void ArrivedPos()
+    {
+        if (path.Count > 0)
+            path.Pop();
+    }
+    public float GetThreshold() => threshold;
+    private void FindWay(Vector3 startPos, Vector3 endPos)
+    {
+        path = AStarPathFinder.instance.FindPath(startPos, endPos);
+
+    }
+    // 网格坐标 → 世界坐标（中心点）
+    private Vector3 CellToWorld(Vector3Int cellPos)
+    {
+        return new Vector3(
+            cellPos.x * cellSize + cellSize * 0.5f,
+            cellPos.y * cellSize + cellSize * 0.5f,
+            0
+        );
+    }
+
 }

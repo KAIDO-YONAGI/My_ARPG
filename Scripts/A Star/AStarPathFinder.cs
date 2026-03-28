@@ -29,6 +29,42 @@ public class AStarPathFinder : MonoBehaviour
         InitiateNodes();
 
     }
+    public Dictionary<Vector3Int, AStarNode> GetNodeMap()
+    {
+        return nodeCellMap;
+    }
+    public float GetCellSize()=>cellSize;
+
+    public Stack<PathFinderDetails> FindPath(Vector3 startPos, Vector3 endPos)
+    {
+        Dictionary<Vector3Int, PathFinderDetails> openDic = new();
+        Vector3Int startCellPos = WorldToCell(startPos);
+        Vector3Int endCellPos = WorldToCell(endPos);
+        HashSet<Vector3Int> closeSet = new();
+        if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
+            return null;
+        PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
+        openDic.Add(startCellPos, startNode);
+
+        while (openDic.Count > 0)
+        {
+            Vector3Int currentPos = SearchCheapestCost(openDic);
+            PathFinderDetails current = openDic[currentPos];
+
+            openDic.Remove(currentPos);
+            closeSet.Add(currentPos);
+
+            if (currentPos == endCellPos)
+            {
+                return RetracePath(current);
+            }
+
+            AddNodeToOpen(currentPos, endCellPos, openDic, closeSet, current);
+        }
+
+
+        return null;
+    }
     private void InitMapInfo()
     {
         nodeCellMap = new Dictionary<Vector3Int, AStarNode>();
@@ -67,7 +103,7 @@ public class AStarPathFinder : MonoBehaviour
         //     if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
         //         Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
         // }
-        Debug.Log(nodeCellMap[new Vector3Int(0, -4, 0)].GetNodeType());
+        // Debug.Log(nodeCellMap[new Vector3Int(0, -4, 0)].GetNodeType());
     }
     private void ProcessTile(string layerName, Vector3Int cellPos)
     {
@@ -102,39 +138,7 @@ public class AStarPathFinder : MonoBehaviour
                 break;
         }
     }
-    public Dictionary<Vector3Int, AStarNode> GetNodeMap()
-    {
-        return nodeCellMap;
-    }
-    public Stack<PathFinderDetails> FindPath(Vector3 startPos, Vector3 endPos)
-    {
-        Dictionary<Vector3Int, PathFinderDetails> openDic = new();
-        Vector3Int startCellPos = WorldToCell(startPos);
-        Vector3Int endCellPos = WorldToCell(endPos);
-        HashSet<Vector3Int> closeSet = new();
-        if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
-            return null;
-        PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
-        openDic.Add(startCellPos, startNode);
-        while (openDic.Count > 0)
-        {
-            Vector3Int currentPos = SearchCheapestCost(openDic);
-            PathFinderDetails current = openDic[currentPos];
 
-            openDic.Remove(currentPos);
-            closeSet.Add(currentPos);
-
-            if (currentPos == endCellPos)
-            {
-                return RetracePath(current);
-            }
-
-            AddNodeToOpen(currentPos, endCellPos, openDic, closeSet, current);
-        }
-
-
-        return null;
-    }
     private Stack<PathFinderDetails> RetracePath(PathFinderDetails endNode)
     {
         Stack<PathFinderDetails> path = new Stack<PathFinderDetails>();
@@ -186,9 +190,9 @@ public class AStarPathFinder : MonoBehaviour
             if (nodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
 
             //  已经处理过
-            if (closeSet.Contains(neighborPos)) continue;
+            if (closeSet.Contains(neighborPos)) continue;//在set里的都是最优路径点（遍历完了，剪枝）
 
-            PathFinderDetails newNode = MakePathFinderDetails(neighborPos, endPos, current);
+            PathFinderDetails newNode = MakePathFinderDetails(neighborPos, endPos, current);//current作为父节点构造一个新的节点
 
             //  不在 open，直接加
             if (!openDic.ContainsKey(neighborPos))
@@ -200,7 +204,7 @@ public class AStarPathFinder : MonoBehaviour
                 // 更优路径更新
                 if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())
                 {
-                    openDic[neighborPos] = newNode;
+                    openDic[neighborPos] = newNode;//会更新父节点、寻路代价等信息
                 }
             }
         }
@@ -212,15 +216,6 @@ public class AStarPathFinder : MonoBehaviour
         return new Vector3Int(x, y);
     }
 
-    // 网格坐标 → 世界坐标（中心点）
-    private Vector3 CellToWorld(Vector3Int cellPos)
-    {
-        return new Vector3(
-            cellPos.x * cellSize + cellSize * 0.5f,
-            cellPos.y * cellSize + cellSize * 0.5f,
-            0
-        );
-    }
     private PathFinderDetails MakePathFinderDetails(Vector3Int nodePos, Vector3Int endPos, PathFinderDetails fatherNode)
     {
         return new PathFinderDetails(nodePos, endPos, fatherNode);
