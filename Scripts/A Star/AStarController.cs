@@ -12,7 +12,7 @@ public class AStarController : MonoBehaviour
     [SerializeField] private float pathRebuildCooldown = 0.5f; // 寻路冷却时间
     private float pathRebuildTimer; // 寻路计时器
 
-    [Header("可视化设置")]
+    [Header("Track Options")]
     [SerializeField] private bool showPath = true;
     [SerializeField] private Color pathColor = Color.yellow;
     [SerializeField] private Color startColor = Color.green;
@@ -45,8 +45,8 @@ public class AStarController : MonoBehaviour
             float distToTarget = (endPos - this.endPos).sqrMagnitude;
             if (distToTarget > pathRebuildDistance * pathRebuildDistance && pathRebuildTimer <= 0)
             {
-                // 目标移动太远，重新寻路
-                FindWay(startPos, endPos);
+                // 目标移动太远，重新寻路，并比较新旧路径
+                FindWayWithOptimize(startPos, endPos);
                 pathRebuildTimer = pathRebuildCooldown;
             }
         }
@@ -83,6 +83,59 @@ public class AStarController : MonoBehaviour
         {
             Debug.LogWarning("找不到路径！");
         }
+    }
+
+    // 重新寻路并优化路径选择
+    private void FindWayWithOptimize(Vector3 startPos, Vector3 endPos)
+    {
+        if (AStarPathFinder.instance == null)
+        {
+            path = null;
+            hasValidPath = false;
+            return;
+        }
+
+        // 获取当前路径
+        PathFinderDetails[] currentPath = path.ToArray();
+
+        // 重新寻路
+        Stack<PathFinderDetails> newPath = AStarPathFinder.instance.FindPath(startPos, endPos);
+
+        if (newPath == null || newPath.Count == 0)
+        {
+            Debug.LogWarning("找不到路径！");
+            path = null;
+            hasValidPath = false;
+            return;
+        }
+
+        // 比较新旧路径的前两个节点
+        PathFinderDetails[] newPathArray = newPath.ToArray();
+
+        // 如果当前路径还有多个节点，比较新旧路径的第一个节点
+        if (currentPath.Length >= 2 && newPathArray.Length >= 2)
+        {
+            Vector3 currentSecondNode = CellToWorld(currentPath[1].GetNodePos());
+            Vector3 newFirstNode = CellToWorld(newPathArray[1].GetNodePos());
+
+            float distCurrent = (currentSecondNode - endPos).sqrMagnitude;
+            float distNew = (newFirstNode - endPos).sqrMagnitude;
+
+            // 如果新路径的第一个节点更远，保留当前路径
+            if (distCurrent <= distNew)
+            {
+                // 保持当前路径，只更新终点
+                this.endPos = endPos;
+                hasValidPath = true;
+                return;
+            }
+        }
+
+        // 使用新路径
+        path = newPath;
+        this.startPos = startPos;
+        this.endPos = endPos;
+        hasValidPath = true;
     }
 
     private void OnDrawGizmos()

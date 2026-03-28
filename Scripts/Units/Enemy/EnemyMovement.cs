@@ -19,10 +19,34 @@ public class EnemyMovement : MonoBehaviour
     public LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
     public AStarController aStarController;
 
-    [Header("方向切换")]
-    [SerializeField] private float velocityCooldown = 0.2f; // 速度方向变更冷却时间
-    private float velocityTimer; // 速度方向变更计时器
-    private Vector2 lastVelocity; // 上一次的速度方向
+    private float velocityCooldown = 0.2f;
+    private float velocityTimer;
+    private Vector2 lastVelocity;
+
+    private void UpdateVelocity()
+    {
+        if (velocityTimer > 0)
+            velocityTimer -= Time.deltaTime;
+    }
+
+    private void SetVelocity(Vector2 direction, float speed)
+    {
+        bool shouldUpdate = velocityTimer <= 0 || lastVelocity == Vector2.zero ||
+                           Vector2.Dot(direction, lastVelocity) < 0.9f;
+
+        if (shouldUpdate)
+        {
+            rb.velocity = direction * speed;
+            lastVelocity = direction;
+            velocityTimer = velocityCooldown;
+
+            if ((direction.x > 0 && facingDirec < 0) || (direction.x < 0 && facingDirec > 0))
+            {
+                Flip();
+            }
+        }
+    }
+
 
     public void AnimatorSM(EnemyState newState)
     {
@@ -98,9 +122,7 @@ public class EnemyMovement : MonoBehaviour
         if (aStarController == null)
             return;
 
-        // 更新速度方向变更计时器
-        if (velocityTimer > 0)
-            velocityTimer -= Time.deltaTime;
+        UpdateVelocity();
 
         Vector3 startPos = transform.position;
         Vector3 endPos = player.position;
@@ -112,22 +134,8 @@ public class EnemyMovement : MonoBehaviour
 
         Vector2 direction = (posToGo - transform.position).normalized;
 
-        // 只在冷却时间结束后或方向变化较大时才更新速度
-        if (velocityTimer <= 0 || lastVelocity == Vector2.zero ||
-            Vector2.Dot(direction, lastVelocity) < 0.9f)
-        {
-            rb.velocity = direction * speed;
-            lastVelocity = direction;
-            velocityTimer = velocityCooldown;
+        SetVelocity(direction, speed);
 
-            // 检测是否需要反转图像
-            if ((direction.x > 0 && facingDirec < 0) || (direction.x < 0 && facingDirec > 0))
-            {
-                Flip();
-            }
-        }
-        // 否则保持原速度
-        // Debug.Log($"posToGo: {posToGo}, self: {transform.position}");
         float t = aStarController.GetThreshold();
         if ((transform.position - posToGo).sqrMagnitude < t * t)
         {

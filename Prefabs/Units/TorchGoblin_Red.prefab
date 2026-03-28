@@ -144,7 +144,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -2077630443, guid: bdeb4ad40a6ba944d8808857a10dad1e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -215,8 +215,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.005650401, y: -0.10069224}
-  m_Size: {x: 0.7060058, y: 0.8769465}
+  m_Offset: {x: 0.1035229, y: -0.2643515}
+  m_Size: {x: 0.5102608, y: 0.5102608}
   m_Direction: 0
 --- !u!114 &2256170124106506200
 MonoBehaviour:
@@ -259,6 +259,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   aStarController: {fileID: 4744295733257843321}
+  velocityCooldown: 0.2
 --- !u!114 &4911926949611949316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,6 +321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathRebuildDistance: 2
+  pathRebuildCooldown: 0.5
   showPath: 1
   pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   startColor: {r: 0, g: 1, b: 0, a: 1}
