@@ -15,7 +15,7 @@ public class AStarController : MonoBehaviour
     }
     public Vector3 GetPosToGo(Vector3 startPos, Vector3 endPos)
     {
-        if (path == null)
+        if (path == null||path.Count==0)
             FindWay(startPos, endPos);
         if (path != null && path.Count > 0)
             return CellToWorld(path.Peek().GetNodePos());

@@ -41,19 +41,16 @@ public class AStarPathFinder : MonoBehaviour
         Dictionary<Vector3Int, PathFinderDetails> openDic = new();
         Vector3Int startCellPos = WorldToCell(startPos);
         Vector3Int endCellPos = WorldToCell(endPos);
+
         HashSet<Vector3Int> closeSet = new();
         if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
+        {
+            Debug.LogError($"[FindPath] 路径检查失败 - 起点存在:{nodeCellMap.ContainsKey(startCellPos)}, 终点存在:{nodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
             return null;
+        }
         PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
         openDic.Add(startCellPos, startNode);
-        Debug.Log($"start:{startCellPos} exist:{nodeCellMap.ContainsKey(startCellPos)}");
-        Debug.Log($"end:{endCellPos} exist:{nodeCellMap.ContainsKey(endCellPos)}");
 
-        if (nodeCellMap.ContainsKey(startCellPos))
-            Debug.Log($"start type:{nodeCellMap[startCellPos].GetNodeType()}");
-
-        if (nodeCellMap.ContainsKey(endCellPos))
-            Debug.Log($"end type:{nodeCellMap[endCellPos].GetNodeType()}");
         while (openDic.Count > 0)
         {
             Vector3Int currentPos = SearchCheapestCost(openDic);
@@ -83,8 +80,11 @@ public class AStarPathFinder : MonoBehaviour
     {
         if (tilemaps == null || tilemaps.Length == 0)
         {
+            Debug.LogError("Tilemaps 未赋值！");
             return;
         }
+
+        Debug.Log($"[InitiateNodes] tilemaps.Length = {tilemaps.Length}");
 
         // 遍历所有 Tilemap
         for (int i = 0; i < tilemaps.Length; i++)
@@ -96,15 +96,17 @@ public class AStarPathFinder : MonoBehaviour
             BoundsInt bounds = currentTilemap.cellBounds;
 
             // 遍历 Tilemap 中的所有单元格
+            int tileCount = 0;
             foreach (Vector3Int cellPos in bounds.allPositionsWithin)
             {
                 if (currentTilemap.HasTile(cellPos))
                 {
                     string layerName = LayerMask.LayerToName(currentTilemap.gameObject.layer);
                     ProcessTile(layerName, cellPos);
-
+                    tileCount++;
                 }
             }
+            Debug.Log($"[InitiateNodes] processed {tileCount} tiles");
         }
         // foreach (var item in nodeCellMap)
         // {
@@ -115,6 +117,7 @@ public class AStarPathFinder : MonoBehaviour
     }
     private void ProcessTile(string layerName, Vector3Int cellPos)
     {
+        Debug.Log($"[ProcessTile] layerName={layerName}, cellPos={cellPos}");
         Vector3Int key;
 
         switch (layerName)

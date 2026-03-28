@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1477567537749184773}
   - component: {fileID: 2237933740480212869}
   - component: {fileID: 6831617344548052322}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShopKeeper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4454145306787149478}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.84314585, y: -0.6334181, z: 0.029638477}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -210,11 +210,9 @@ MonoBehaviour:
     price: 3
   - item: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
     price: 2
-  - item: {fileID: 11400000, guid: c01bff83a367af34795d4e25ec716e63, type: 2}
-    price: 1
   shopWeapon:
   - item: {fileID: 11400000, guid: c8ecb006185903f4097848777dcd30cd, type: 2}
-    price: 50
+    price: 100
   shopArmour: []
 --- !u!1 &4921139100446789027
 GameObject:
@@ -226,7 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5627823522119454331}
   - component: {fileID: 1837204484013985447}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: GoldIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,7 +309,7 @@ GameObject:
   - component: {fileID: 8979628199724305081}
   - component: {fileID: 864744866698824075}
   - component: {fileID: 7250176339750171359}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShopLogo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
