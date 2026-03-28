@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class AStarController : MonoBehaviour
 {
-    private Stack<PathFinderDetails> path;
+    private Stack<PathFinderDetails> path = null;
     private float cellSize;
     private float threshold = 0.1f;
     private void OnEnable()
@@ -17,20 +17,25 @@ public class AStarController : MonoBehaviour
     {
         if (path == null)
             FindWay(startPos, endPos);
-        if (path.Count > 0)
+        if (path != null && path.Count > 0)
             return CellToWorld(path.Peek().GetNodePos());
         else return Vector3.zero;
     }
     public void ArrivedPos()
     {
-        if (path.Count > 0)
+        if (path != null && path.Count > 0)
             path.Pop();
     }
     public float GetThreshold() => threshold;
     private void FindWay(Vector3 startPos, Vector3 endPos)
     {
-        path = AStarPathFinder.instance.FindPath(startPos, endPos);
 
+        if (AStarPathFinder.instance != null)
+            path = AStarPathFinder.instance.FindPath(startPos, endPos);
+        if (path == null || path.Count == 0)
+        {
+            Debug.LogWarning("找不到路径！");
+        }
     }
     // 网格坐标 → 世界坐标（中心点）
     private Vector3 CellToWorld(Vector3Int cellPos)

@@ -89,6 +89,8 @@ public class EnemyMovement : MonoBehaviour
 
     void Chase()
     {
+        if (aStarController == null)
+            return;
 
         if ((player.position.x - transform.position.x) * facingDirec < 0)
         {
@@ -99,11 +101,18 @@ public class EnemyMovement : MonoBehaviour
 
         Vector3 posToGo = aStarController.GetPosToGo(startPos, endPos);
 
+        if (posToGo == Vector3.zero)
+            return;
+
         Vector2 direction = (posToGo - transform.position).normalized;
         //使用两者坐标相减创建一个向量，并且使用normalized归一化
         rb.velocity = direction * speed;
-        if (Vector3.Distance(transform.position, posToGo) < aStarController.GetThreshold())
+        Debug.Log($"posToGo: {posToGo}, self: {transform.position}");
+        float t=aStarController.GetThreshold();
+        if ((transform.position - posToGo).sqrMagnitude < t*t)
+        {
             aStarController.ArrivedPos();
+        }
     }
     private void Flip()
     {
