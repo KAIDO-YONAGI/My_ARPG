@@ -108,7 +108,7 @@ public class EnemyMovement : MonoBehaviour
         Vector2 direction = (posToGo - transform.position).normalized;
         //使用两者坐标相减创建一个向量，并且使用normalized归一化
         rb.velocity = direction * speed;
-        Debug.Log($"posToGo: {posToGo}, self: {transform.position}");
+        // Debug.Log($"posToGo: {posToGo}, self: {transform.position}");
         float t = aStarController.GetThreshold();
         if ((transform.position - posToGo).sqrMagnitude < t * t)
         {
