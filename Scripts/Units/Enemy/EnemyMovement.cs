@@ -51,13 +51,14 @@ public class EnemyMovement : MonoBehaviour
             CheckForPlayer();
 
             if (attackCoolDownTimer > 0)
-            {
                 attackCoolDownTimer -= Time.deltaTime;//减去了实际的时间，保证间隔一致，不会因为游戏帧数/刷新率而变化
-            }
+
             if (enemyState == EnemyState.Chasing)
                 Chase();
             else if (enemyState == EnemyState.Attacking)
                 rb.velocity = Vector2.zero;
+            else if (enemyState == EnemyState.Idle)
+                aStarController.ResetPath();
         }
     }
 
@@ -108,8 +109,8 @@ public class EnemyMovement : MonoBehaviour
         //使用两者坐标相减创建一个向量，并且使用normalized归一化
         rb.velocity = direction * speed;
         Debug.Log($"posToGo: {posToGo}, self: {transform.position}");
-        float t=aStarController.GetThreshold();
-        if ((transform.position - posToGo).sqrMagnitude < t*t)
+        float t = aStarController.GetThreshold();
+        if ((transform.position - posToGo).sqrMagnitude < t * t)
         {
             aStarController.ArrivedPos();
         }
