@@ -14,19 +14,19 @@ public class AStarNodeManager : MonoBehaviour
     [Range(0.1f, 1f)]
     public float cellSize = 1.0f;
 
-    private Dictionary<Vector3Int, AStarNode> nodeCellMap;
+    private Dictionary<Vector3, AStarNode> nodeCellMap;
 
-    public Dictionary<Vector3Int, AStarNode> GetNodeMap() => nodeCellMap;
+    public Dictionary<Vector3, AStarNode> GetNodeMap() => nodeCellMap;
     public float GetCellSize() => cellSize;
 
-    public Vector3Int WorldToCell(Vector3 worldPos)
+    public Vector3 WorldToCell(Vector3 worldPos)
     {
         int x = Mathf.FloorToInt(worldPos.x / cellSize);
         int y = Mathf.FloorToInt(worldPos.y / cellSize);
-        return new Vector3Int(x, y);
+        return new Vector3(x, y);
     }
 
-    public Vector3 CellToWorld(Vector3Int cellPos)
+    public Vector3 CellToWorld(Vector3 cellPos)
     {
         return new Vector3(
             cellPos.x * cellSize + cellSize * 0.5f,
@@ -43,7 +43,7 @@ public class AStarNodeManager : MonoBehaviour
 
     private void InitMapInfo()
     {
-        nodeCellMap = new Dictionary<Vector3Int, AStarNode>();
+        nodeCellMap = new Dictionary<Vector3, AStarNode>();
     }
 
     private void InitiateNodes()
@@ -74,24 +74,24 @@ public class AStarNodeManager : MonoBehaviour
         }
     }
 
-    private void ProcessTileWithSubdivision(string layerName, Vector3Int cellPos, int subdivision)
+    private void ProcessTileWithSubdivision(string layerName, Vector3 cellPos, int subdivision)
     {
-        int startX = cellPos.x * subdivision;
-        int startY = cellPos.y * subdivision;
+        float startX = cellPos.x * subdivision;
+        float startY = cellPos.y * subdivision;
 
         for (int i = 0; i < subdivision; i++)
         {
             for (int j = 0; j < subdivision; j++)
             {
-                Vector3Int subCellPos = new(startX + i, startY + j);
+                Vector3 subCellPos = new(startX + i, startY + j);
                 ProcessTile(layerName, subCellPos);
             }
         }
     }
 
-    private void ProcessTile(string layerName, Vector3Int cellPos)
+    private void ProcessTile(string layerName, Vector3 cellPos)
     {
-        Vector3Int key = new Vector3Int(cellPos.x, cellPos.y);
+        Vector3 key = new Vector3(cellPos.x, cellPos.y);
 
         switch (layerName)
         {

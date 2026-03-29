@@ -25,12 +25,12 @@ public class AStarPathFinder : MonoBehaviour
         nodeManager = GetComponent<AStarNodeManager>();
     }
 
-    public Dictionary<Vector3Int, AStarNode> GetNodeMap() => nodeManager.GetNodeMap();
-    public Vector3Int WorldToCell(Vector3 worldPos) => nodeManager.WorldToCell(worldPos);
-    public Vector3 CellToWorld(Vector3Int cellPos) => nodeManager.CellToWorld(cellPos);
+    public Dictionary<Vector3, AStarNode> GetNodeMap() => nodeManager.GetNodeMap();
+    public Vector3 WorldToCell(Vector3 worldPos) => nodeManager.WorldToCell(worldPos);
+    public Vector3 CellToWorld(Vector3 cellPos) => nodeManager.CellToWorld(cellPos);
     public float GetCellSize() => nodeManager.GetCellSize();
 
-    private Dictionary<Vector3Int, AStarNode> NodeCellMap => nodeManager.GetNodeMap();
+    private Dictionary<Vector3, AStarNode> NodeCellMap => nodeManager.GetNodeMap();
 
     public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
@@ -38,16 +38,16 @@ public class AStarPathFinder : MonoBehaviour
         {
             optPos = startPos;
         }
-        Dictionary<Vector3Int, PathFinderDetails> openDic = new();
-        Vector3Int startCellPos = WorldToCell(startPos);
-        Vector3Int endCellPos = WorldToCell(endPos);
-        Vector3Int optCellPos = WorldToCell(optPos);
+        Dictionary<Vector3, PathFinderDetails> openDic = new();
+        Vector3 startCellPos = WorldToCell(startPos);
+        Vector3 endCellPos = WorldToCell(endPos);
+        Vector3 optCellPos = WorldToCell(optPos);
         if (NodeCellMap.ContainsKey(optCellPos) && NodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable)
         {
             startCellPos = optCellPos;
         }
 
-        HashSet<Vector3Int> closeSet = new();
+        HashSet<Vector3> closeSet = new();
         if ((!NodeCellMap.ContainsKey(startCellPos)) || (!NodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
         {
             Debug.Log($"[FindPath] 路径检查失败 - 起点存在:{NodeCellMap.ContainsKey(startCellPos)}, 终点存在:{NodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
@@ -58,7 +58,7 @@ public class AStarPathFinder : MonoBehaviour
 
         while (openDic.Count > 0)
         {
-            Vector3Int currentPos = SearchCheapestCost(openDic);
+            Vector3 currentPos = SearchCheapestCost(openDic);
             PathFinderDetails current = openDic[currentPos];
 
             openDic.Remove(currentPos);
@@ -84,15 +84,15 @@ public class AStarPathFinder : MonoBehaviour
         {
             lastNodeWorldNode = current;
 
-            // if (Vector3.Distance(current.GetNodePos(), lastNodeWorldNode.GetNodePos()) > 1 /GetCellSize())
-            // {
-            //     float x1=current.GetNodePos().x;
-            //     float y1=current.GetNodePos().y;
-            //     float x2=lastNodeWorldNode.GetNodePos().x;
-            //     float y2=lastNodeWorldNode.GetNodePos().y;
-            //     Vector3 midPoint = new Vector3((x1 + x2) / 2, (y1 + y2) / 2);
-            //     PathFinderDetails insertNode=MakePathFinderDetails(midPoint, midPoint, current.GetFatherNode());
-            // }
+            if (Vector3.Distance(current.GetNodePos(), lastNodeWorldNode.GetNodePos()) > 1 /GetCellSize())
+            {
+                float x1=current.GetNodePos().x;
+                float y1=current.GetNodePos().y;
+                float x2=lastNodeWorldNode.GetNodePos().x;
+                float y2=lastNodeWorldNode.GetNodePos().y;
+                Vector3 midPoint = new Vector3((x1 + x2) / 2, (y1 + y2) / 2);
+                PathFinderDetails insertNode=MakePathFinderDetails(midPoint, midPoint, current.GetFatherNode());
+            }
 
 
             path.Push(current);
@@ -102,10 +102,10 @@ public class AStarPathFinder : MonoBehaviour
         return path;
     }
 
-    private Vector3Int SearchCheapestCost(Dictionary<Vector3Int, PathFinderDetails> openDic)
+    private Vector3 SearchCheapestCost(Dictionary<Vector3, PathFinderDetails> openDic)
     {
         float minCost = float.MaxValue;
-        Vector3Int minCostCellPos = new();
+        Vector3 minCostCellPos = new();
         foreach (var node in openDic)
         {
             float currentCost = node.Value.GetCost();
@@ -119,21 +119,21 @@ public class AStarPathFinder : MonoBehaviour
     }
 
     private void AddNodeToOpen(
-        Vector3Int currentPos,
-        Vector3Int endPos,
-        Dictionary<Vector3Int, PathFinderDetails> openDic,
-        HashSet<Vector3Int> closeSet,
+        Vector3 currentPos,
+        Vector3 endPos,
+        Dictionary<Vector3, PathFinderDetails> openDic,
+        HashSet<Vector3> closeSet,
         PathFinderDetails current)
     {
-        int x = currentPos.x;
-        int y = currentPos.y;
+        float x = currentPos.x;
+        float y = currentPos.y;
 
         int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
         int[] dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
 
         for (int i = 0; i < 8; i++)
         {
-            Vector3Int neighborPos = new Vector3Int(x + dx[i], y + dy[i]);
+            Vector3 neighborPos = new Vector3(x + dx[i], y + dy[i]);
 
             if (!NodeCellMap.ContainsKey(neighborPos)) continue;
             if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
@@ -157,13 +157,13 @@ public class AStarPathFinder : MonoBehaviour
         }
     }
 
-    private bool CanWalkDiagonally(int x, int y, int dx, int dy)
+    private bool CanWalkDiagonally(float x, float y, float dx, float dy)
     {
         if (Math.Abs(dx * dy) == 1)
         {
-            Vector3Int pos = new Vector3Int(x + dx, y + dy);
-            Vector3Int xOffset = new Vector3Int(dx, 0);
-            Vector3Int yOffset = new Vector3Int(0, dy);
+            Vector3 pos = new Vector3(x + dx, y + dy);
+            Vector3 xOffset = new Vector3(dx, 0);
+            Vector3 yOffset = new Vector3(0, dy);
 
             if (!(NodeCellMap[pos - xOffset].GetNodeType() == AStarNodeType.Walkable) &&
             !(NodeCellMap[pos - yOffset].GetNodeType() == AStarNodeType.Walkable))
@@ -174,7 +174,7 @@ public class AStarPathFinder : MonoBehaviour
         return true;
     }
 
-    private PathFinderDetails MakePathFinderDetails(Vector3Int nodePos, Vector3Int endPos, PathFinderDetails fatherNode)
+    private PathFinderDetails MakePathFinderDetails(Vector3 nodePos, Vector3 endPos, PathFinderDetails fatherNode)
     {
         return new PathFinderDetails(nodePos, endPos, fatherNode);
     }
