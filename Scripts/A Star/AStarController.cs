@@ -28,7 +28,6 @@ public class AStarController : MonoBehaviour
         if (pathRebuildTimer > 0)
             pathRebuildTimer -= Time.deltaTime;
 
-        // 检查是否需要重新寻路
         if (!hasValidPath || path == null || path.Count == 0)
         {
             if (!FindWay(optPos, startPos, endPos)) return Vector3.zero;
@@ -44,38 +43,11 @@ public class AStarController : MonoBehaviour
                 pathRebuildTimer = pathRebuildCooldown;
             }
         }
+
+        if (path == null || path.Count == 0) return Vector3.zero;
         return CellToWorld(path.Peek().GetNodePos());
     }
-    // static Vector3 lastNodeWorldPos = Vector3.zero;
-    // private Vector3 ReCalPosToGo()
-    // {
 
-    //     if (path != null && path.Count > 0)
-    //     {
-    //         Vector3 currentNodeWorldPos = CellToWorld(path.Peek().GetNodePos());
-
-    //         if (lastNodeWorldPos != Vector3.zero)
-    //         {
-    //             float k = Mathf.Abs((currentNodeWorldPos.y - lastNodeWorldPos.y) / (currentNodeWorldPos.x - lastNodeWorldPos.x));
-    //             Debug.Log($"当前节点: {currentNodeWorldPos}, 上一节点: {lastNodeWorldPos}, 斜率: {k}");
-    //             if (Mathf.Abs(k) > 0.05f) // 斜率较大时才进行偏移，避免过度调整
-    //             {
-    //                 float dis = Vector3.Distance(lastNodeWorldPos, currentNodeWorldPos);
-    //                 float shiftDisY = dis / Mathf.Sqrt(1 + k * k);
-    //                 float shiftDisX = shiftDisY * k;
-    //                 currentNodeWorldPos.y += shiftDisY;
-    //                 currentNodeWorldPos.x += shiftDisX;
-    //                 Debug.Log($"路径优化 - 原节点: {CellToWorld(path.Peek().GetNodePos())}, 优化后节点: {currentNodeWorldPos}");
-    //             }
-    //             lastNodeWorldPos = currentNodeWorldPos;
-
-    //         }
-
-    //         return currentNodeWorldPos;
-
-    //     }
-    //     else return Vector3.zero;
-    // }
     public void ArrivedPos()
     {
         if (path != null && path.Count > 0)
@@ -127,7 +99,7 @@ public class AStarController : MonoBehaviour
 
         if (newPath == null || newPath.Count == 0)
         {
-            Debug.LogWarning("找不到路径！");
+            Debug.Log("找不到路径！");
             path = null;
             hasValidPath = false;
             return;
