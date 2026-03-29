@@ -203,18 +203,17 @@ public class AStarController : MonoBehaviour
 
     private Vector3Int WorldToCell(Vector3 worldPos)
     {
-        int x = Mathf.FloorToInt(worldPos.x / cellSize);
-        int y = Mathf.FloorToInt(worldPos.y / cellSize);
-        return new Vector3Int(x, y);
+
+        return
+        AStarPathFinder.instance != null ?
+        AStarPathFinder.instance.WorldToCell(worldPos) : Vector3Int.zero;
     }
     // 网格坐标 → 世界坐标（中心点）
     private Vector3 CellToWorld(Vector3Int cellPos)
     {
-        return new Vector3(
-            cellPos.x * cellSize + cellSize * 0.5f,
-            cellPos.y * cellSize + cellSize * 0.5f,
-            0
-        );
+        return
+        AStarPathFinder.instance != null ?
+        AStarPathFinder.instance.CellToWorld(cellPos) : Vector3.zero;
     }
 
 }

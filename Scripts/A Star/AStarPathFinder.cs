@@ -34,6 +34,20 @@ public class AStarPathFinder : MonoBehaviour
     {
         return nodeCellMap;
     }
+    public Vector3Int WorldToCell(Vector3 worldPos)
+    {
+        int x = Mathf.FloorToInt(worldPos.x / cellSize);
+        int y = Mathf.FloorToInt(worldPos.y / cellSize);
+        return new Vector3Int(x, y);
+    }
+    public Vector3 CellToWorld(Vector3Int cellPos)
+    {
+        return new Vector3(
+            cellPos.x * cellSize + cellSize * 0.5f,
+            cellPos.y * cellSize + cellSize * 0.5f,
+            0
+        );
+    }
     public float GetCellSize() => cellSize;
 
     public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
@@ -240,12 +254,6 @@ public class AStarPathFinder : MonoBehaviour
             }
         }
         return true;
-    }
-    private Vector3Int WorldToCell(Vector3 worldPos)
-    {
-        int x = Mathf.FloorToInt(worldPos.x / cellSize);
-        int y = Mathf.FloorToInt(worldPos.y / cellSize);
-        return new Vector3Int(x, y);
     }
 
     private PathFinderDetails MakePathFinderDetails(Vector3Int nodePos, Vector3Int endPos, PathFinderDetails fatherNode)
