@@ -36,16 +36,21 @@ public class AStarPathFinder : MonoBehaviour
     }
     public float GetCellSize() => cellSize;
 
-    public Stack<PathFinderDetails> FindPath(Vector3 startPos, Vector3 endPos)
+    public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         Dictionary<Vector3Int, PathFinderDetails> openDic = new();
         Vector3Int startCellPos = WorldToCell(startPos);
         Vector3Int endCellPos = WorldToCell(endPos);
+        Vector3Int optCellPos = WorldToCell(optPos);
+        if (nodeCellMap.ContainsKey(optCellPos) && nodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable)
+        {
+            startCellPos = optCellPos;
+        }
 
         HashSet<Vector3Int> closeSet = new();
         if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
         {
-            Debug.LogError($"[FindPath] 路径检查失败 - 起点存在:{nodeCellMap.ContainsKey(startCellPos)}, 终点存在:{nodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
+            Debug.Log($"[FindPath] 路径检查失败 - 起点存在:{nodeCellMap.ContainsKey(startCellPos)}, 终点存在:{nodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
             return null;
         }
         PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2352373223552345559}
   - component: {fileID: 3714345224475523958}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: StumpMask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 691543179493864998}
   - component: {fileID: 239145331137739242}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Tree
   m_TagString: Tree
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 6522560290896863681}
   - component: {fileID: 7385147942258621409}
   - component: {fileID: 6170067819596440146}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Non_Collision_High
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -196,7 +196,7 @@ Transform:
   m_GameObject: {fileID: 8594226735988221209}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.17, y: -0.05, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -287,7 +287,7 @@ GameObject:
   - component: {fileID: 5996087696636190715}
   - component: {fileID: 1717655593619403444}
   - component: {fileID: 1287475737988707122}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Collision_Low
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -303,7 +303,7 @@ Transform:
   m_GameObject: {fileID: 9167003540063207074}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.17, y: -1.5, z: 0}
+  m_LocalPosition: {x: 0, y: -1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
