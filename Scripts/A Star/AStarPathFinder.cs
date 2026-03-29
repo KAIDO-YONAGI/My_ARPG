@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using MyEnums;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 //可能的优化：小顶堆存开启列表，动态A*，距离算法的优化
 //关于网格和世界坐标的转化 由于转化关系，需要先导航到这个网格中心点才能开始导航
@@ -10,17 +9,11 @@ using UnityEngine.Tilemaps;
 //可以用带权路径替换开根计算
 //细分单元格
 [DefaultExecutionOrder(-100)]
+[RequireComponent(typeof(AStarNodeManager))]
 public class AStarPathFinder : MonoBehaviour
 {
-    [Header("Tilemaps")]
-    public Tilemap[] tilemaps;
-    [Header("Grid Settings")]
-    [Range(0.1f, 1f)]
-    public float cellSize = 1.0f;
-
     public static AStarPathFinder instance;
-    private Dictionary<Vector3Int, AStarNode> nodeCellMap;
-
+    private AStarNodeManager nodeManager;
 
     private void Awake()
     {
@@ -28,29 +21,16 @@ public class AStarPathFinder : MonoBehaviour
             instance = this;
         else
             Destroy(gameObject);
-        InitMapInfo();
-        InitiateNodes();
 
+        nodeManager = GetComponent<AStarNodeManager>();
     }
-    public Dictionary<Vector3Int, AStarNode> GetNodeMap()
-    {
-        return nodeCellMap;
-    }
-    public Vector3Int WorldToCell(Vector3 worldPos)
-    {
-        int x = Mathf.FloorToInt(worldPos.x / cellSize);
-        int y = Mathf.FloorToInt(worldPos.y / cellSize);
-        return new Vector3Int(x, y);
-    }
-    public Vector3 CellToWorld(Vector3Int cellPos)
-    {
-        return new Vector3(
-            cellPos.x * cellSize + cellSize * 0.5f,
-            cellPos.y * cellSize + cellSize * 0.5f,
-            0
-        );
-    }
-    public float GetCellSize() => cellSize;
+
+    public Dictionary<Vector3Int, AStarNode> GetNodeMap() => nodeManager.GetNodeMap();
+    public Vector3Int WorldToCell(Vector3 worldPos) => nodeManager.WorldToCell(worldPos);
+    public Vector3 CellToWorld(Vector3Int cellPos) => nodeManager.CellToWorld(cellPos);
+    public float GetCellSize() => nodeManager.GetCellSize();
+
+    private Dictionary<Vector3Int, AStarNode> NodeCellMap => nodeManager.GetNodeMap();
 
     public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
@@ -58,15 +38,15 @@ public class AStarPathFinder : MonoBehaviour
         Vector3Int startCellPos = WorldToCell(startPos);
         Vector3Int endCellPos = WorldToCell(endPos);
         Vector3Int optCellPos = WorldToCell(optPos);
-        if (nodeCellMap.ContainsKey(optCellPos) && nodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable)
+        if (NodeCellMap.ContainsKey(optCellPos) && NodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable)
         {
             startCellPos = optCellPos;
         }
 
         HashSet<Vector3Int> closeSet = new();
-        if ((!nodeCellMap.ContainsKey(startCellPos)) || (!nodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
+        if ((!NodeCellMap.ContainsKey(startCellPos)) || (!NodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
         {
-            Debug.Log($"[FindPath] 路径检查失败 - 起点存在:{nodeCellMap.ContainsKey(startCellPos)}, 终点存在:{nodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
+            Debug.Log($"[FindPath] 路径检查失败 - 起点存在:{NodeCellMap.ContainsKey(startCellPos)}, 终点存在:{NodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
             return null;
         }
         PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
@@ -88,97 +68,7 @@ public class AStarPathFinder : MonoBehaviour
             AddNodeToOpen(currentPos, endCellPos, openDic, closeSet, current);
         }
 
-
         return null;
-    }
-    private void InitMapInfo()
-    {
-        nodeCellMap = new Dictionary<Vector3Int, AStarNode>();
-    }
-
-
-    private void InitiateNodes()
-    {
-        if (tilemaps == null || tilemaps.Length == 0)
-        {
-            Debug.LogError("Tilemaps 未赋值！");
-            return;
-        }
-
-        // 计算细分倍数，例如 cellSize=0.5 时，细分为 2x2
-        int subdivision = Mathf.RoundToInt(1f / cellSize);
-
-        // 遍历所有 Tilemap
-        for (int i = 0; i < tilemaps.Length; i++)
-        {
-            Tilemap currentTilemap = tilemaps[i];
-            if (currentTilemap == null) continue;
-
-            // 获取 Tilemap 边界
-            BoundsInt bounds = currentTilemap.cellBounds;
-
-            // 遍历 Tilemap 中的所有单元格
-            int tileCount = 0;
-            foreach (Vector3Int cellPos in bounds.allPositionsWithin)
-            {
-                if (currentTilemap.HasTile(cellPos))
-                {
-                    string layerName = LayerMask.LayerToName(currentTilemap.gameObject.layer);
-                    // 根据 subdivision 将原始单元格细分为多个子单元格
-                    ProcessTileWithSubdivision(layerName, cellPos, subdivision);
-                    tileCount++;
-                }
-            }
-        }
-    }
-
-    private void ProcessTileWithSubdivision(string layerName, Vector3Int cellPos, int subdivision)
-    {
-        // 将原始单元格坐标转换为细分后的起始坐标
-        int startX = cellPos.x * subdivision;
-        int startY = cellPos.y * subdivision;
-
-        for (int i = 0; i < subdivision; i++)
-        {
-            for (int j = 0; j < subdivision; j++)
-            {
-                Vector3Int subCellPos = new(startX + i, startY + j);
-                ProcessTile(layerName, subCellPos);
-            }
-        }
-    }
-    private void ProcessTile(string layerName, Vector3Int cellPos)
-    {
-        Vector3Int key;
-
-        switch (layerName)
-        {
-            case "Obstacle":
-                key = new Vector3Int(cellPos.x, cellPos.y);
-
-                if (nodeCellMap.ContainsKey(key))
-                {
-                    nodeCellMap[key].SetNodeType(AStarNodeType.Obstacle);
-                }
-                else
-                {
-                    nodeCellMap[key] = new AStarNode(cellPos, AStarNodeType.Obstacle);
-                }
-                break;
-
-            case "Walkable":
-                key = new Vector3Int(cellPos.x, cellPos.y);
-
-                if (nodeCellMap.ContainsKey(key))
-                {
-                    nodeCellMap[key].SetNodeType(AStarNodeType.Walkable);
-                }
-                else
-                {
-                    nodeCellMap[key] = new AStarNode(cellPos, AStarNodeType.Walkable);
-                }
-                break;
-        }
     }
 
     private Stack<PathFinderDetails> RetracePath(PathFinderDetails endNode)
@@ -190,11 +80,12 @@ public class AStarPathFinder : MonoBehaviour
         while (current != null)
         {
             path.Push(current);
-            current = current.GetFatherNode(); // 确保你有这个方法
+            current = current.GetFatherNode();
         }
 
         return path;
     }
+
     private Vector3Int SearchCheapestCost(Dictionary<Vector3Int, PathFinderDetails> openDic)
     {
         float minCost = float.MaxValue;
@@ -210,6 +101,7 @@ public class AStarPathFinder : MonoBehaviour
         }
         return minCostCellPos;
     }
+
     private void AddNodeToOpen(
         Vector3Int currentPos,
         Vector3Int endPos,
@@ -227,43 +119,38 @@ public class AStarPathFinder : MonoBehaviour
         {
             Vector3Int neighborPos = new Vector3Int(x + dx[i], y + dy[i]);
 
-            //  不存在 or 障碍
-            if (!nodeCellMap.ContainsKey(neighborPos)) continue;
-            if (nodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
-            if (nodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(x, y, dx[i], dy[i])) continue;
+            if (!NodeCellMap.ContainsKey(neighborPos)) continue;
+            if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
+            if (NodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(x, y, dx[i], dy[i])) continue;
 
+            if (closeSet.Contains(neighborPos)) continue;
 
-            //  已经处理过
-            if (closeSet.Contains(neighborPos)) continue;//在set里的都是最优路径点（遍历完了，剪枝）
+            PathFinderDetails newNode = MakePathFinderDetails(neighborPos, endPos, current);
 
-            PathFinderDetails newNode = MakePathFinderDetails(neighborPos, endPos, current);//current作为父节点构造一个新的节点
-
-            //  不在 open，直接加
             if (!openDic.ContainsKey(neighborPos))
             {
                 openDic.Add(neighborPos, newNode);
             }
             else
             {
-                // 更优路径更新
                 if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())
                 {
-                    openDic[neighborPos] = newNode;//会更新父节点、寻路代价等信息
+                    openDic[neighborPos] = newNode;
                 }
             }
         }
     }
+
     private bool CanWalkDiagonally(int x, int y, int dx, int dy)
     {
-
-        if (Math.Abs(dx * dy) == 1)//说明是四个角
+        if (Math.Abs(dx * dy) == 1)
         {
             Vector3Int pos = new Vector3Int(x + dx, y + dy);
             Vector3Int xOffset = new Vector3Int(dx, 0);
             Vector3Int yOffset = new Vector3Int(0, dy);
 
-            if (!(nodeCellMap[pos - xOffset].GetNodeType() == AStarNodeType.Walkable) &&
-            !(nodeCellMap[pos - yOffset].GetNodeType() == AStarNodeType.Walkable))
+            if (!(NodeCellMap[pos - xOffset].GetNodeType() == AStarNodeType.Walkable) &&
+            !(NodeCellMap[pos - yOffset].GetNodeType() == AStarNodeType.Walkable))
             {
                 return false;
             }
@@ -275,6 +162,4 @@ public class AStarPathFinder : MonoBehaviour
     {
         return new PathFinderDetails(nodePos, endPos, fatherNode);
     }
-
-
 }

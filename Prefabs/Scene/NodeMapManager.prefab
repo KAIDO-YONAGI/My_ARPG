@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 504388108521046658}
   - component: {fileID: 8064405776818628369}
+  - component: {fileID: 5286357175813698029}
   m_Layer: 10
   m_Name: NodeMapManager
   m_TagString: Untagged
@@ -44,14 +45,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13f373ae34953cd4ca19ad4a4eb891c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilemaps:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  collisionRadius: 0.4
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 1024
+--- !u!114 &5286357175813698029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3032635884689918868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce3247521ed720844abca05f93269235, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tilemaps: []
+  cellSize: 0.992

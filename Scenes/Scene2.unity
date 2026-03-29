@@ -271,6 +271,42 @@ PrefabInstance:
       propertyPath: m_Name
       value: NodeMapManager
       objectReference: {fileID: 0}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: cellSize
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[0]
+      value: 
+      objectReference: {fileID: 3445898034430238238}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[1]
+      value: 
+      objectReference: {fileID: 2729389038899809956}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[2]
+      value: 
+      objectReference: {fileID: 7345096658543551313}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[3]
+      value: 
+      objectReference: {fileID: 146972205035662722}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[4]
+      value: 
+      objectReference: {fileID: 705764143184132178}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[5]
+      value: 
+      objectReference: {fileID: 7158493698134340736}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[6]
+      value: 
+      objectReference: {fileID: 3882171395182104815}
     - target: {fileID: 8064405776818628369, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
       propertyPath: tilemaps.Array.size
       value: 7
