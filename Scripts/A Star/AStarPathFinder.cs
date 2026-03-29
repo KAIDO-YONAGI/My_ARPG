@@ -9,7 +9,7 @@ using UnityEngine;
 //可以用带权路径替换开根计算
 //细分单元格
 [DefaultExecutionOrder(-100)]
-[RequireComponent(typeof(AStarNodeManager))]
+[RequireComponent(typeof(AStarNodeManager))]//依赖保证（不存在会自动添加）
 public class AStarPathFinder : MonoBehaviour
 {
     public static AStarPathFinder instance;
@@ -34,6 +34,10 @@ public class AStarPathFinder : MonoBehaviour
 
     public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
+        if (optPos == Vector3.zero)
+        {
+            optPos = startPos;
+        }
         Dictionary<Vector3Int, PathFinderDetails> openDic = new();
         Vector3Int startCellPos = WorldToCell(startPos);
         Vector3Int endCellPos = WorldToCell(endPos);
@@ -70,15 +74,27 @@ public class AStarPathFinder : MonoBehaviour
 
         return null;
     }
-
     private Stack<PathFinderDetails> RetracePath(PathFinderDetails endNode)
     {
         Stack<PathFinderDetails> path = new Stack<PathFinderDetails>();
-
         PathFinderDetails current = endNode;
+        PathFinderDetails lastNodeWorldNode;
 
         while (current != null)
         {
+            lastNodeWorldNode = current;
+
+            // if (Vector3.Distance(current.GetNodePos(), lastNodeWorldNode.GetNodePos()) > 1 /GetCellSize())
+            // {
+            //     float x1=current.GetNodePos().x;
+            //     float y1=current.GetNodePos().y;
+            //     float x2=lastNodeWorldNode.GetNodePos().x;
+            //     float y2=lastNodeWorldNode.GetNodePos().y;
+            //     Vector3 midPoint = new Vector3((x1 + x2) / 2, (y1 + y2) / 2);
+            //     PathFinderDetails insertNode=MakePathFinderDetails(midPoint, midPoint, current.GetFatherNode());
+            // }
+
+
             path.Push(current);
             current = current.GetFatherNode();
         }
