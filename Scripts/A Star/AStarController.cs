@@ -28,7 +28,7 @@ public class AStarController : MonoBehaviour
         if (AStarPathFinder.instance != null)
             cellSize = AStarPathFinder.instance.GetCellSize();
     }
-    public Vector3 GetPosToGo(Vector3 startPos, Vector3 endPos)
+    public Vector3 GetPosToGo(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         // 更新计时器
         if (pathRebuildTimer > 0)
@@ -37,7 +37,7 @@ public class AStarController : MonoBehaviour
         // 检查是否需要重新寻路
         if (!hasValidPath || path == null || path.Count == 0)
         {
-            FindWay(startPos, endPos);
+            if (!FindWay(optPos, startPos, endPos)) return Vector3.zero;
         }
         else
         {
@@ -46,21 +46,49 @@ public class AStarController : MonoBehaviour
             if (distToTarget > pathRebuildDistance * pathRebuildDistance && pathRebuildTimer <= 0)
             {
                 // 目标移动太远，重新寻路，并比较新旧路径
-                FindWayWithOptimize(startPos, endPos);
+                FindWayWithOptimize(optPos, startPos, endPos);
                 pathRebuildTimer = pathRebuildCooldown;
             }
         }
-        
+        return CellToWorld(path.Peek().GetNodePos());
+    }
+    static Vector3 lastNodeWorldPos = Vector3.zero;
+    private Vector3 ReCalPosToGo()
+    {
+
         if (path != null && path.Count > 0)
         {
-            return CellToWorld(path.Peek().GetNodePos());
+            Vector3 currentNodeWorldPos = CellToWorld(path.Peek().GetNodePos());
+
+            if (lastNodeWorldPos != Vector3.zero)
+            {
+                float k = Mathf.Abs((currentNodeWorldPos.y - lastNodeWorldPos.y) / (currentNodeWorldPos.x - lastNodeWorldPos.x));
+                Debug.Log($"当前节点: {currentNodeWorldPos}, 上一节点: {lastNodeWorldPos}, 斜率: {k}");
+                if (Mathf.Abs(k) > 0.05f) // 斜率较大时才进行偏移，避免过度调整
+                {
+                    float dis = Vector3.Distance(lastNodeWorldPos, currentNodeWorldPos);
+                    float shiftDisY = dis / Mathf.Sqrt(1 + k * k);
+                    float shiftDisX = shiftDisY * k;
+                    currentNodeWorldPos.y += shiftDisY;
+                    currentNodeWorldPos.x += shiftDisX;
+                    Debug.Log($"路径优化 - 原节点: {CellToWorld(path.Peek().GetNodePos())}, 优化后节点: {currentNodeWorldPos}");
+                }
+                lastNodeWorldPos = currentNodeWorldPos;
+
+            }
+
+            return currentNodeWorldPos;
+
         }
         else return Vector3.zero;
     }
     public void ArrivedPos()
     {
         if (path != null && path.Count > 0)
+        {
             path.Pop();
+            lastNodeWorldPos = path.Peek().GetNodePos();
+        }
     }
     public void ResetPath()
     {
@@ -70,23 +98,25 @@ public class AStarController : MonoBehaviour
         hasValidPath = false;
     }
     public float GetThreshold() => threshold;
-    private void FindWay(Vector3 startPos, Vector3 endPos)
+    private bool FindWay(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         this.startPos = startPos;
         this.endPos = endPos;
 
         if (AStarPathFinder.instance != null)
-            path = AStarPathFinder.instance.FindPath(startPos, endPos);
+            path = AStarPathFinder.instance.FindPath(optPos, startPos, endPos);
 
         hasValidPath = path != null && path.Count > 0;
         if (!hasValidPath)
         {
             Debug.LogWarning("找不到路径！");
+            return false;
         }
+        return true;
     }
 
     // 重新寻路并优化路径选择
-    private void FindWayWithOptimize(Vector3 startPos, Vector3 endPos)
+    private void FindWayWithOptimize(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         if (AStarPathFinder.instance == null)
         {
@@ -99,7 +129,7 @@ public class AStarController : MonoBehaviour
         PathFinderDetails[] currentPath = path.ToArray();
 
         // 重新寻路
-        Stack<PathFinderDetails> newPath = AStarPathFinder.instance.FindPath(startPos, endPos);
+        Stack<PathFinderDetails> newPath = AStarPathFinder.instance.FindPath(optPos, startPos, endPos);
 
         if (newPath == null || newPath.Count == 0)
         {

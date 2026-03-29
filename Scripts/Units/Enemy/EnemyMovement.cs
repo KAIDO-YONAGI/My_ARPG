@@ -126,13 +126,12 @@ public class EnemyMovement : MonoBehaviour
 
         Vector3 startPos = transform.position;
         Vector3 endPos = player.position;
+        Vector3 optPos = (player.position - transform.position).normalized + startPos;//防止敌人产生远离玩家的路径，增加一个优化点，优先从这个点开始寻路，如果这个点不可行走才从敌人当前位置开始寻路
 
-        Vector3 posToGo = aStarController.GetPosToGo(startPos, endPos);
-
-        if (posToGo == Vector3.zero)
-            return;
-
-        Vector2 direction = (posToGo - transform.position).normalized;
+        Vector3 posToGo = aStarController.GetPosToGo(optPos, startPos, endPos);
+        Vector2 direction = Vector2.zero;
+        if (!(posToGo == Vector3.zero)&&posToGo!=null)
+            direction = (posToGo - transform.position).normalized;
 
         SetVelocity(direction, speed);
 
