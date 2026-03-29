@@ -14,7 +14,9 @@ public class AStarPathFinder : MonoBehaviour
 {
     [Header("Tilemaps")]
     public Tilemap[] tilemaps;
-    private float cellSize = 1.0f;
+    [Header("Grid Settings")]
+    [Range(0.1f, 1f)]
+    public float cellSize = 1.0f;
 
     public static AStarPathFinder instance;
     private Dictionary<Vector3Int, AStarNode> nodeCellMap;
@@ -103,6 +105,8 @@ public class AStarPathFinder : MonoBehaviour
             return;
         }
 
+        // 计算细分倍数，例如 cellSize=0.5 时，细分为 2x2
+        int subdivision = Mathf.RoundToInt(1f / cellSize);
 
         // 遍历所有 Tilemap
         for (int i = 0; i < tilemaps.Length; i++)
@@ -120,17 +124,28 @@ public class AStarPathFinder : MonoBehaviour
                 if (currentTilemap.HasTile(cellPos))
                 {
                     string layerName = LayerMask.LayerToName(currentTilemap.gameObject.layer);
-                    ProcessTile(layerName, cellPos);
+                    // 根据 subdivision 将原始单元格细分为多个子单元格
+                    ProcessTileWithSubdivision(layerName, cellPos, subdivision);
                     tileCount++;
                 }
             }
         }
-        // foreach (var item in nodeCellMap)
-        // {
-        //     if (item.Value.GetNodeType() == AStarNodeType.Obstacle)
-        //         Debug.Log(item.Key.ToString() + item.Value.GetNodeType().ToString());
-        // }
-        // Debug.Log(nodeCellMap[new Vector3Int(0, -4, 0)].GetNodeType());
+    }
+
+    private void ProcessTileWithSubdivision(string layerName, Vector3Int cellPos, int subdivision)
+    {
+        // 将原始单元格坐标转换为细分后的起始坐标
+        int startX = cellPos.x * subdivision;
+        int startY = cellPos.y * subdivision;
+
+        for (int i = 0; i < subdivision; i++)
+        {
+            for (int j = 0; j < subdivision; j++)
+            {
+                Vector3Int subCellPos = new(startX + i, startY + j);
+                ProcessTile(layerName, subCellPos);
+            }
+        }
     }
     private void ProcessTile(string layerName, Vector3Int cellPos)
     {

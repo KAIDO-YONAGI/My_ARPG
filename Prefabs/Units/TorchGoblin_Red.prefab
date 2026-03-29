@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  attackRange: 1
+  attackRange: 0.8
   attackCoolDown: 1
   playerDetectRange: 8
   detectionPoint: {fileID: 6539773393019522231}

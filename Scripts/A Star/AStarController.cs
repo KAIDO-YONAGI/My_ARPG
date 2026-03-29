@@ -6,7 +6,6 @@ using UnityEngine;
 public class AStarController : MonoBehaviour
 {
     private Stack<PathFinderDetails> path = null;
-    private float cellSize;
     private float threshold = 0.1f;
     [SerializeField] private float pathRebuildDistance = 2f; // 目标移动超过此距离时重新寻路
     [SerializeField] private float pathRebuildCooldown = 0.5f; // 寻路冷却时间
@@ -23,11 +22,6 @@ public class AStarController : MonoBehaviour
     private Vector3 endPos;
     private bool hasValidPath = false; // 是否有有效路径
 
-    private void OnEnable()
-    {
-        if (AStarPathFinder.instance != null)
-            cellSize = AStarPathFinder.instance.GetCellSize();
-    }
     public Vector3 GetPosToGo(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         // 更新计时器
@@ -52,42 +46,42 @@ public class AStarController : MonoBehaviour
         }
         return CellToWorld(path.Peek().GetNodePos());
     }
-    static Vector3 lastNodeWorldPos = Vector3.zero;
-    private Vector3 ReCalPosToGo()
-    {
+    // static Vector3 lastNodeWorldPos = Vector3.zero;
+    // private Vector3 ReCalPosToGo()
+    // {
 
-        if (path != null && path.Count > 0)
-        {
-            Vector3 currentNodeWorldPos = CellToWorld(path.Peek().GetNodePos());
+    //     if (path != null && path.Count > 0)
+    //     {
+    //         Vector3 currentNodeWorldPos = CellToWorld(path.Peek().GetNodePos());
 
-            if (lastNodeWorldPos != Vector3.zero)
-            {
-                float k = Mathf.Abs((currentNodeWorldPos.y - lastNodeWorldPos.y) / (currentNodeWorldPos.x - lastNodeWorldPos.x));
-                Debug.Log($"当前节点: {currentNodeWorldPos}, 上一节点: {lastNodeWorldPos}, 斜率: {k}");
-                if (Mathf.Abs(k) > 0.05f) // 斜率较大时才进行偏移，避免过度调整
-                {
-                    float dis = Vector3.Distance(lastNodeWorldPos, currentNodeWorldPos);
-                    float shiftDisY = dis / Mathf.Sqrt(1 + k * k);
-                    float shiftDisX = shiftDisY * k;
-                    currentNodeWorldPos.y += shiftDisY;
-                    currentNodeWorldPos.x += shiftDisX;
-                    Debug.Log($"路径优化 - 原节点: {CellToWorld(path.Peek().GetNodePos())}, 优化后节点: {currentNodeWorldPos}");
-                }
-                lastNodeWorldPos = currentNodeWorldPos;
+    //         if (lastNodeWorldPos != Vector3.zero)
+    //         {
+    //             float k = Mathf.Abs((currentNodeWorldPos.y - lastNodeWorldPos.y) / (currentNodeWorldPos.x - lastNodeWorldPos.x));
+    //             Debug.Log($"当前节点: {currentNodeWorldPos}, 上一节点: {lastNodeWorldPos}, 斜率: {k}");
+    //             if (Mathf.Abs(k) > 0.05f) // 斜率较大时才进行偏移，避免过度调整
+    //             {
+    //                 float dis = Vector3.Distance(lastNodeWorldPos, currentNodeWorldPos);
+    //                 float shiftDisY = dis / Mathf.Sqrt(1 + k * k);
+    //                 float shiftDisX = shiftDisY * k;
+    //                 currentNodeWorldPos.y += shiftDisY;
+    //                 currentNodeWorldPos.x += shiftDisX;
+    //                 Debug.Log($"路径优化 - 原节点: {CellToWorld(path.Peek().GetNodePos())}, 优化后节点: {currentNodeWorldPos}");
+    //             }
+    //             lastNodeWorldPos = currentNodeWorldPos;
 
-            }
+    //         }
 
-            return currentNodeWorldPos;
+    //         return currentNodeWorldPos;
 
-        }
-        else return Vector3.zero;
-    }
+    //     }
+    //     else return Vector3.zero;
+    // }
     public void ArrivedPos()
     {
         if (path != null && path.Count > 0)
         {
+            // lastNodeWorldPos = path.Peek().GetNodePos();
             path.Pop();
-            lastNodeWorldPos = path.Peek().GetNodePos();
         }
     }
     public void ResetPath()

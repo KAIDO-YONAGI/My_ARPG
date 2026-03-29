@@ -30,16 +30,16 @@ public class PathFinderDetails
         else
         {
             disToBeg = fatherNode.disToBeg +
-                (CalDistance(nodePos, fatherNode.nodePos) >= 2 ? 1.414f : 1);//曼哈顿距离。遇到大于二的就赋斜线值，精度更高
+                CalDistance(nodePos, fatherNode.nodePos);
         }
 
         disToEnd = CalDistance(nodePos, endPos);
         cost = disToBeg + disToEnd;
     }
 
-    private int CalDistance(Vector3Int startPos, Vector3Int endPos)
+    private float CalDistance(Vector3Int startPos, Vector3Int endPos)
     {
         int distance = Mathf.Abs(endPos.x - startPos.x) + Mathf.Abs(endPos.y - startPos.y);
-        return distance;
+        return distance >= 2 ? 1.414f : 1;//曼哈顿距离。遇到大于二的就赋斜线值，精度更高
     }
 }
