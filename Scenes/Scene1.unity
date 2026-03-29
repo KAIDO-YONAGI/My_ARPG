@@ -438,6 +438,42 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: cellSize
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[0]
+      value: 
+      objectReference: {fileID: 7267270851361043022}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[1]
+      value: 
+      objectReference: {fileID: 7466161838661254652}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[2]
+      value: 
+      objectReference: {fileID: 4292079941678521480}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[3]
+      value: 
+      objectReference: {fileID: 4871744905724270185}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[4]
+      value: 
+      objectReference: {fileID: 5774314827665564068}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[5]
+      value: 
+      objectReference: {fileID: 7919498298291931369}
+    - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
+      propertyPath: tilemaps.Array.data[6]
+      value: 
+      objectReference: {fileID: 4739925390072883042}
     - target: {fileID: 8064405776818628369, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
       propertyPath: tilemaps.Array.size
       value: 7
