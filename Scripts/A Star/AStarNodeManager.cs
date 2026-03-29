@@ -13,6 +13,8 @@ public class AStarNodeManager : MonoBehaviour
     [Header("Grid Settings")]
     [Range(0.1f, 1f)]
     public float cellSize = 1.0f;
+    [Range(0f, 1f)]
+    public float safetyMargin = 0.3f; // 路径与障碍物的安全距离
 
     private Dictionary<Vector3, AStarNode> nodeCellMap;
 
@@ -28,11 +30,41 @@ public class AStarNodeManager : MonoBehaviour
 
     public Vector3 CellToWorld(Vector3 cellPos)
     {
-        return new Vector3(
+        Vector3 basePos = new Vector3(
             cellPos.x * cellSize + cellSize * 0.5f,
             cellPos.y * cellSize + cellSize * 0.5f,
             0
         );
+
+        // 应用安全边距
+        return ApplySafetyMargin(cellPos, basePos);
+    }
+
+    private Vector3 ApplySafetyMargin(Vector3 cellPos, Vector3 worldPos)
+    {
+        if (safetyMargin <= 0) return worldPos;
+
+        // 检查四个方向是否有障碍物
+        int[] dx = { 1, -1, 0, 0 };
+        int[] dy = { 0, 0, 1, -1 };
+        float marginX = 0, marginY = 0;
+
+        for (int i = 0; i < 4; i++)
+        {
+            Vector3 neighborPos = new Vector3(cellPos.x + dx[i], cellPos.y + dy[i]);
+            if (nodeCellMap.TryGetValue(neighborPos, out AStarNode neighbor))
+            {
+                if (neighbor.GetNodeType() == AStarNodeType.Obstacle)
+                {
+                    if (dx[i] > 0) marginX = -safetyMargin;
+                    else if (dx[i] < 0) marginX = safetyMargin;
+                    else if (dy[i] > 0) marginY = -safetyMargin;
+                    else if (dy[i] < 0) marginY = safetyMargin;
+                }
+            }
+        }
+
+        return new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
     }
 
     private void Awake()
