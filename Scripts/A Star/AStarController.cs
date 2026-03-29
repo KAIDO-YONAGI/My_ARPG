@@ -167,15 +167,15 @@ public class AStarController : MonoBehaviour
         }
     }
 
-    private Vector3Int WorldToCell(Vector3 worldPos)
+    private Vector3 WorldToCell(Vector3 worldPos)
     {
 
         return
         AStarPathFinder.instance != null ?
-        AStarPathFinder.instance.WorldToCell(worldPos) : Vector3Int.zero;
+        AStarPathFinder.instance.WorldToCell(worldPos) : Vector3.zero;
     }
     // 网格坐标 → 世界坐标（中心点）
-    private Vector3 CellToWorld(Vector3Int cellPos)
+    private Vector3 CellToWorld(Vector3 cellPos)
     {
         return
         AStarPathFinder.instance != null ?

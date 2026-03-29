@@ -2,22 +2,22 @@ using UnityEngine;
 using MyEnums;
 public class AStarNode
 {
-    private int x;
-    private int y;
+    private float x;
+    private float y;
     private AStarNodeType nodeType;
-    Vector3Int nodePos;
+    Vector3 nodePos;
 
-    public AStarNode(Vector3Int nodePos, AStarNodeType nodeType)
+    public AStarNode(Vector3 nodePos, AStarNodeType nodeType)
     {
         x = nodePos.x;
         y = nodePos.y;
-        this.nodePos = new Vector3Int(x, y, 0);
+        this.nodePos = new Vector3(x, y, 0);
         this.nodeType = nodeType;
     }
 
-    public int GetX() => x;
-    public int GetY() => y;
-    public Vector3Int GetNodePos() => nodePos;
+    public float GetX() => x;
+    public float GetY() => y;
+    public Vector3 GetNodePos() => nodePos;
     public AStarNodeType GetNodeType() => nodeType;
 
     public void SetNodeType(AStarNodeType newType)
