@@ -78,21 +78,21 @@ public class AStarPathFinder : MonoBehaviour
     {
         Stack<PathFinderDetails> path = new Stack<PathFinderDetails>();
         PathFinderDetails current = endNode;
-        PathFinderDetails lastNodeWorldNode;
+        // PathFinderDetails lastNodeWorldNode;
 
         while (current != null)
         {
-            lastNodeWorldNode = current;
+            // lastNodeWorldNode = current;
 
-            if (Vector3.Distance(current.GetNodePos(), lastNodeWorldNode.GetNodePos()) > 1 /GetCellSize())
-            {
-                float x1=current.GetNodePos().x;
-                float y1=current.GetNodePos().y;
-                float x2=lastNodeWorldNode.GetNodePos().x;
-                float y2=lastNodeWorldNode.GetNodePos().y;
-                Vector3 midPoint = new Vector3((x1 + x2) / 2, (y1 + y2) / 2);
-                PathFinderDetails insertNode=MakePathFinderDetails(midPoint, midPoint, current.GetFatherNode());
-            }
+            // if (Vector3.Distance(current.GetNodePos(), lastNodeWorldNode.GetNodePos()) > 1 /GetCellSize())
+            // {
+            //     float x1=current.GetNodePos().x;
+            //     float y1=current.GetNodePos().y;
+            //     float x2=lastNodeWorldNode.GetNodePos().x;
+            //     float y2=lastNodeWorldNode.GetNodePos().y;
+            //     Vector3 midPoint = new Vector3((x1 + x2) / 2, (y1 + y2) / 2);
+            //     PathFinderDetails insertNode=MakePathFinderDetails(midPoint, midPoint, current.GetFatherNode());
+            // }
 
 
             path.Push(current);
