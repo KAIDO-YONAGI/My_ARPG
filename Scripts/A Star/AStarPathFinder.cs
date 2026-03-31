@@ -135,21 +135,20 @@ public class AStarPathFinder : MonoBehaviour
         {
             Vector3 neighborPos = new Vector3(x + dx[i], y + dy[i]);
 
-            if (!NodeCellMap.ContainsKey(neighborPos)) continue;
-            if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
-            if (NodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(x, y, dx[i], dy[i])) continue;
-
-            if (closeSet.Contains(neighborPos)) continue;
+            if (closeSet.Contains(neighborPos)) continue;//已经在关闭列表中
+            if (!NodeCellMap.ContainsKey(neighborPos)) continue;//节点不在地图中
+            if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;//节点不可行走
+            if (NodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(x, y, dx[i], dy[i])) continue;//判断能不能走对角线
 
             PathFinderDetails newNode = MakePathFinderDetails(neighborPos, endPos, current);
 
-            if (!openDic.ContainsKey(neighborPos))
+            if (!openDic.ContainsKey(neighborPos))//不含临近节点
             {
                 openDic.Add(neighborPos, newNode);
             }
             else
             {
-                if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())
+                if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())//如果新节点到起点的距离更短，更新父节点和距离
                 {
                     openDic[neighborPos] = newNode;
                 }

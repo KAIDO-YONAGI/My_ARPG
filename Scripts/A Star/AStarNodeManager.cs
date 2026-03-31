@@ -11,10 +11,9 @@ public class AStarNodeManager : MonoBehaviour
     [Header("Tilemaps")]
     public Tilemap[] tilemaps;
     [Header("Grid Settings")]
-    [Range(0.1f, 1f)]
     public float cellSize = 1.0f;
-    [Range(0f, 1f)]
     public float safetyMargin = 0.3f; // 路径与障碍物的安全距离
+    public LayerMask obstacleLayers; // 需要识别为障碍物的层
 
     private Dictionary<Vector3, AStarNode> nodeCellMap;
 
@@ -40,16 +39,17 @@ public class AStarNodeManager : MonoBehaviour
         return ApplySafetyMargin(cellPos, basePos);
     }
 
-    private Vector3 ApplySafetyMargin(Vector3 cellPos, Vector3 worldPos)
+    private Vector3 ApplySafetyMargin(Vector3 cellPos, Vector3 worldPos)//为了让路径与障碍物保持一定距离，避免贴边行走导致的卡顿或碰撞问题，添加了安全边距的计算
     {
         if (safetyMargin <= 0) return worldPos;
 
-        // 检查四个方向是否有障碍物
-        int[] dx = { 1, -1, 0, 0 };
-        int[] dy = { 0, 0, 1, -1 };
+        // 检查是否有障碍物
+
+        int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
+        int[] dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
         float marginX = 0, marginY = 0;
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 8; i++)
         {
             Vector3 neighborPos = new Vector3(cellPos.x + dx[i], cellPos.y + dy[i]);
             if (nodeCellMap.TryGetValue(neighborPos, out AStarNode neighbor))
@@ -104,6 +104,37 @@ public class AStarNodeManager : MonoBehaviour
                 }
             }
         }
+
+        // 处理带有Collider的障碍物
+        ProcessColliderObstacles();
+    }
+
+    private void ProcessColliderObstacles()
+    {
+        Collider2D[] colliders = FindObjectsOfType<Collider2D>();
+        int obstacleCount = 0;
+
+        foreach (Collider2D col in colliders)
+        {
+            // 检查层是否在障碍层中
+            if ((obstacleLayers.value & (1 << col.gameObject.layer)) == 0) continue;
+
+            Vector3 worldPos = col.transform.position;
+            Vector3 cellPos = WorldToCell(worldPos);
+            Vector3 key = new Vector3(cellPos.x, cellPos.y);
+
+            if (nodeCellMap.TryGetValue(key, out AStarNode node))
+            {
+                node.SetNodeType(AStarNodeType.Obstacle);
+            }
+            else
+            {
+                nodeCellMap[key] = new AStarNode(cellPos, AStarNodeType.Obstacle);
+            }
+            obstacleCount++;
+        }
+
+        Debug.Log($"A* 寻路地图已录入 {obstacleCount} 个Collider障碍物");
     }
 
     private void ProcessTileWithSubdivision(string layerName, Vector3 cellPos, int subdivision)

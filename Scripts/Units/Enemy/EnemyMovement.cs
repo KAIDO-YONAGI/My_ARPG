@@ -12,7 +12,7 @@ public class EnemyMovement : MonoBehaviour
     private float attackCoolDownTimer;//攻击间隔冷却计时器
 
     public int speed = 5;
-    public float attackRange = 2;
+    public float attackDetectRange = 2;
     public float attackCoolDown = 1;//每次恢复计时会被赋给计时器
     public float playerDetectRange = 5;
     public Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
@@ -97,13 +97,13 @@ public class EnemyMovement : MonoBehaviour
         if (hits.Length > 0)
         {
             player = hits[0].transform;
-            if (Vector2.Distance(player.position, transform.position) <= attackRange && attackCoolDownTimer <= 0)
+            if ((player.position - transform.position).sqrMagnitude <= attackDetectRange * attackDetectRange && attackCoolDownTimer <= 0)
             {
                 AnimatorSM(EnemyState.Attacking);
                 attackCoolDownTimer = attackCoolDown;//重置时间
                 return;
             }
-            else if (Vector2.Distance(player.position, transform.position) > attackRange && enemyState == EnemyState.Idle)
+            else if ((player.position - transform.position).sqrMagnitude > attackDetectRange * attackDetectRange && enemyState == EnemyState.Idle)
             {//if条件设置为只能从Idle状态进入chasing，这是因为攻击状态的末尾会执行状态切换，恰好可以作为一个保证攻击动画播放完成的条件
              //但是需要注意的是，如果以后有其它状态的相关动画，一定也要注意把状态切换添加到动画末尾的位置
                 AnimatorSM(EnemyState.Chasing);
