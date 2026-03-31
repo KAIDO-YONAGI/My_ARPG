@@ -6,21 +6,23 @@ using UnityEngine;
 public class AStarController : MonoBehaviour
 {
     private Stack<PathFinderDetails> path = null;
-    private float threshold = 0.1f;
-    [SerializeField] private float pathRebuildDistance = 2f; // 目标移动超过此距离时重新寻路
-    [SerializeField] private float pathRebuildCooldown = 0.5f; // 寻路冷却时间
+    private float threshold = 0.5f;
+    [SerializeField] private float pathRebuildDistance = .5f; // 目标移动超过此距离时重新寻路
+    [SerializeField] private float pathRebuildCooldown = .5f; // 寻路冷却时间
     private float pathRebuildTimer; // 寻路计时器
-
-    [Header("Track Options")]
-    [SerializeField] private bool showPath = true;
-    [SerializeField] private Color pathColor = Color.yellow;
-    [SerializeField] private Color startColor = Color.green;
-    [SerializeField] private Color endColor = Color.red;
-    [SerializeField] private float nodeRadius = 0.2f;
-
+    private bool showPath = true;
+    private Color pathColor = Color.yellow;
+    private Color startColor = Color.green;
+    private Color endColor = Color.red;
+    private float nodeRadius = 0.2f;
     private Vector3 startPos;
     private Vector3 endPos;
     private bool hasValidPath = false; // 是否有有效路径
+
+    private float GetCellSize()
+    {
+        return AStarNodeManager.instance.GetCellSize();
+    }
 
     public Vector3 GetPosToGo(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
@@ -36,10 +38,11 @@ public class AStarController : MonoBehaviour
         {
             // 检查目标是否移动超过阈值且冷却时间已过
             float distToTarget = (endPos - this.endPos).sqrMagnitude;
-            if (distToTarget > pathRebuildDistance * pathRebuildDistance && pathRebuildTimer <= 0)
+            float realPathRebuildDistance=pathRebuildDistance*GetCellSize();
+            if (distToTarget > realPathRebuildDistance * realPathRebuildDistance && pathRebuildTimer <= 0)
             {
                 // 目标移动太远，重新寻路，并比较新旧路径
-                FindWayWithOptimize(optPos, startPos, endPos);
+                ReFindWay(optPos, startPos, endPos);
                 pathRebuildTimer = pathRebuildCooldown;
             }
         }
@@ -63,7 +66,7 @@ public class AStarController : MonoBehaviour
         endPos = Vector3.zero;
         hasValidPath = false;
     }
-    public float GetThreshold() => threshold;
+    public float GetThreshold() => threshold*AStarNodeManager.instance.GetCellSize();
     private bool FindWay(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         this.startPos = startPos;
@@ -82,7 +85,7 @@ public class AStarController : MonoBehaviour
     }
 
     // 重新寻路并优化路径选择
-    private void FindWayWithOptimize(Vector3 optPos, Vector3 startPos, Vector3 endPos)
+    private void ReFindWay(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         if (AStarPathFinder.instance == null)
         {
@@ -99,7 +102,7 @@ public class AStarController : MonoBehaviour
 
         if (newPath == null || newPath.Count == 0)
         {
-            Debug.Log("找不到路径！");
+            Debug.Log("ReFindWay()找不到路径！");
             path = null;
             hasValidPath = false;
             return;

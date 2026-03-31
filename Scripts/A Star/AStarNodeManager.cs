@@ -8,13 +8,27 @@ using UnityEngine.Tilemaps;
 /// </summary>
 public class AStarNodeManager : MonoBehaviour
 {
+
+
+    public static AStarNodeManager instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+        InitMapInfo();
+        InitiateNodes();
+    }
+
     [Header("Tilemaps")]
     public Tilemap[] tilemaps;
     [Header("Grid Settings")]
-    public float cellSize = 1.0f;
-    public float safetyMargin = 0.3f; // 路径与障碍物的安全距离
     public LayerMask obstacleLayers; // 需要识别为障碍物的层
-
+    
+    private float cellSize = 1f;
+    private float safetyMargin = 0.3f; // 路径与障碍物的安全距离
     private Dictionary<Vector3, AStarNode> nodeCellMap;
 
     public Dictionary<Vector3, AStarNode> GetNodeMap() => nodeCellMap;
@@ -56,21 +70,18 @@ public class AStarNodeManager : MonoBehaviour
             {
                 if (neighbor.GetNodeType() == AStarNodeType.Obstacle)
                 {
-                    if (dx[i] > 0) marginX = -safetyMargin;
-                    else if (dx[i] < 0) marginX = safetyMargin;
-                    else if (dy[i] > 0) marginY = -safetyMargin;
-                    else if (dy[i] < 0) marginY = safetyMargin;
+                    float realsafetyMargin = safetyMargin * cellSize;
+                    if (dx[i] > 0) marginX = -realsafetyMargin;
+                    else if (dx[i] < 0) marginX = realsafetyMargin;
+                    else if (dy[i] > 0) marginY = -realsafetyMargin;
+                    else if (dy[i] < 0) marginY = realsafetyMargin;
                 }
             }
         }
-
-        return new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
-    }
-
-    private void Awake()
-    {
-        InitMapInfo();
-        InitiateNodes();
+        Vector3 optNode = new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
+        if (nodeCellMap[WorldToCell(optNode)].GetNodeType() != AStarNodeType.Obstacle)
+            return optNode;
+        else return worldPos;
     }
 
     private void InitMapInfo()
