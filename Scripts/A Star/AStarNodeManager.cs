@@ -26,7 +26,7 @@ public class AStarNodeManager : MonoBehaviour
     public Tilemap[] tilemaps;
     [Header("Grid Settings")]
     public LayerMask obstacleLayers; // 需要识别为障碍物的层
-    
+
     private float cellSize = 1f;
     private float safetyMargin = 0.3f; // 路径与障碍物的安全距离
     private Dictionary<Vector3, AStarNode> nodeCellMap;
@@ -145,7 +145,7 @@ public class AStarNodeManager : MonoBehaviour
             obstacleCount++;
         }
 
-        Debug.Log($"A* 寻路地图已录入 {obstacleCount} 个Collider障碍物");
+        // Debug.Log($"A* 寻路地图已录入 {obstacleCount} 个Collider障碍物");
     }
 
     private void ProcessTileWithSubdivision(string layerName, Vector3 cellPos, int subdivision)
