@@ -13,7 +13,6 @@ using UnityEngine;
 public class AStarPathFinder : MonoBehaviour
 {
     public static AStarPathFinder instance;
-    private AStarNodeManager nodeManager;
 
     private void Awake()
     {
@@ -21,28 +20,28 @@ public class AStarPathFinder : MonoBehaviour
             instance = this;
         else
             Destroy(gameObject);
-
-        nodeManager = GetComponent<AStarNodeManager>();
     }
 
-    public Dictionary<Vector3, AStarNode> GetNodeMap() => nodeManager.GetNodeMap();
-    public Vector3 WorldToCell(Vector3 worldPos) => nodeManager.WorldToCell(worldPos);
-    public Vector3 CellToWorld(Vector3 cellPos) => nodeManager.CellToWorld(cellPos);
-    public float GetCellSize() => nodeManager.GetCellSize();
+    public Dictionary<Vector3, AStarNode> GetNodeMap() => AStarNodeManager.instance.GetNodeMap();
+    public Vector3 WorldToCell(Vector3 worldPos) => AStarNodeManager.instance.WorldToCell(worldPos);
+    public Vector3 CellToWorld(Vector3 cellPos) => AStarNodeManager.instance.CellToWorld(cellPos);
+    public float GetCellSize() => AStarNodeManager.instance.GetCellSize();
 
-    private Dictionary<Vector3, AStarNode> NodeCellMap => nodeManager.GetNodeMap();
+    private Dictionary<Vector3, AStarNode> NodeCellMap => AStarNodeManager.instance.GetNodeMap();
 
     public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
-        if (optPos == Vector3.zero)
-        {
-            optPos = startPos;
-        }
+        if (optPos == Vector3.zero) optPos = startPos;
         Dictionary<Vector3, PathFinderDetails> openDic = new();
+
         Vector3 startCellPos = WorldToCell(startPos);
         Vector3 endCellPos = WorldToCell(endPos);
         Vector3 optCellPos = WorldToCell(optPos);
-        if (NodeCellMap.ContainsKey(optCellPos) && NodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable)
+
+
+        if (NodeCellMap.ContainsKey(optCellPos)
+            && NodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable
+            && NoCoverObstacleNodes(startCellPos,optCellPos))
         {
             startCellPos = optCellPos;
         }
@@ -64,15 +63,37 @@ public class AStarPathFinder : MonoBehaviour
             openDic.Remove(currentPos);
             closeSet.Add(currentPos);
 
-            if (currentPos == endCellPos)
-            {
-                return RetracePath(current);
-            }
+            if (currentPos == endCellPos) return RetracePath(current);
 
             AddNodeToOpen(currentPos, endCellPos, openDic, closeSet, current);
         }
 
         return null;
+    }
+    private bool NoCoverObstacleNodes(Vector3 startCellPos, Vector3 optCellPos)
+    {
+        // 计算两点之间的距离
+        float distance = Vector3.Distance(startCellPos, optCellPos);
+
+        // 使用射线检测方式检查两点之间的路径
+        Vector3 direction = (optCellPos - startCellPos).normalized;
+        float step = 1*GetCellSize(); // 步长，根据需要调整
+
+        for (float t = step; t < distance; t += step)
+        {
+            Vector3 checkPos = startCellPos + direction * t;
+            Vector3 cellPos = new Vector3(Mathf.Round(checkPos.x), Mathf.Round(checkPos.y), Mathf.Round(checkPos.z));
+
+            if (NodeCellMap.ContainsKey(cellPos))
+            {
+                if (NodeCellMap[cellPos].GetNodeType() == AStarNodeType.Obstacle)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
     private Stack<PathFinderDetails> RetracePath(PathFinderDetails endNode)
     {
@@ -82,19 +103,6 @@ public class AStarPathFinder : MonoBehaviour
 
         while (current != null)
         {
-            // lastNodeWorldNode = current;
-
-            // if (Vector3.Distance(current.GetNodePos(), lastNodeWorldNode.GetNodePos()) > 1 /GetCellSize())
-            // {
-            //     float x1=current.GetNodePos().x;
-            //     float y1=current.GetNodePos().y;
-            //     float x2=lastNodeWorldNode.GetNodePos().x;
-            //     float y2=lastNodeWorldNode.GetNodePos().y;
-            //     Vector3 midPoint = new Vector3((x1 + x2) / 2, (y1 + y2) / 2);
-            //     PathFinderDetails insertNode=MakePathFinderDetails(midPoint, midPoint, current.GetFatherNode());
-            // }
-
-
             path.Push(current);
             current = current.GetFatherNode();
         }
