@@ -277,7 +277,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
       propertyPath: tilemaps.Array.size
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
       propertyPath: obstacleLayers.m_Bits
@@ -306,7 +306,7 @@ PrefabInstance:
     - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
       propertyPath: tilemaps.Array.data[5]
       value: 
-      objectReference: {fileID: 7158493698134340736}
+      objectReference: {fileID: 3882171395182104815}
     - target: {fileID: 5286357175813698029, guid: 82d439faaeaf7f9419d2ae16d7a2901a, type: 3}
       propertyPath: tilemaps.Array.data[6]
       value: 
