@@ -8,7 +8,7 @@ public class EnemyHealth : MonoBehaviour
     public int maxHealth;
     public int expReward=2;
 
-    public delegate void MonsterDefeated(int exp);//¹Û²ìÕßÄ£Ê½
+    public delegate void MonsterDefeated(int exp);//è§‚å¯Ÿè€…æ¨¡å¼
     public static event MonsterDefeated OnDefeated;
 
     private void Start()
@@ -24,7 +24,7 @@ public class EnemyHealth : MonoBehaviour
         }
         else if (currentHealth <= 0)
         {
-            OnDefeated(expReward);//ÊÂ¼ş±»´¥·¢
+            OnDefeated(expReward);//äº‹ä»¶è¢«è§¦å‘
             Destroy(gameObject);
         }
     }
