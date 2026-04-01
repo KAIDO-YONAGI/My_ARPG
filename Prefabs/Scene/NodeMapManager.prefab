@@ -58,4 +58,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemaps: []
-  cellSize: 0.992
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 12288
