@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1477567537749184773}
   - component: {fileID: 2237933740480212869}
   - component: {fileID: 6831617344548052322}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: ShopKeeper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5627823522119454331}
   - component: {fileID: 1837204484013985447}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: GoldIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 8979628199724305081}
   - component: {fileID: 864744866698824075}
   - component: {fileID: 7250176339750171359}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: ShopLogo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
