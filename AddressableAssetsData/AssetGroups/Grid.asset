@@ -27,6 +27,26 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 57c8bce743e1d2f4a81682e997f7a871
+    m_Address: Assets/Prefabs/Grid/Rocks/Rock_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8dc757da0b93d2b4c8f53b809bbe3842
+    m_Address: Assets/Prefabs/Grid/Rocks/Rock_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c3135ebdcf15da94ca183bc0979b9f64
+    m_Address: Assets/Prefabs/Grid/Rocks/Rock_3.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e75b802fc615b8545a699751a55f02d5
+    m_Address: Assets/Prefabs/Grid/Rocks/Rock_4.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 279c495c53e18d5449c50909fc7c77bb, type: 2}
   m_SchemaSet:
