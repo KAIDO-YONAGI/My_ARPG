@@ -8,11 +8,14 @@ public class DialogManager : MonoBehaviour
     public static DialogManager instance;
 
     [Header("Dialog UI")]
+    public CanvasGroup dialogCanvasGroup;
     public Image speakerPortrait;
     public TMP_Text dialogText;
     public TMP_Text speakerNameText;
+    public bool isDialogActive;
 
-    public DialogSO currentDialog;
+
+    private DialogSO currentDialog;
 
     private void Awake()
     {
@@ -26,11 +29,29 @@ public class DialogManager : MonoBehaviour
         }
     }
     private int currentLineIndex = 0;
-    private void Start()
+
+    public void StartDialog(DialogSO dialog)
     {
-        if (currentDialog != null)
+        dialogCanvasGroup.alpha = 1;
+        currentDialog = dialog;
+        currentLineIndex = 0;
+        isDialogActive = true;
+        ShowDialog();
+    }
+    public void EndDialog()
+    {
+        isDialogActive = false;
+        dialogCanvasGroup.alpha = 0;
+    }
+    public void AdvanceDialog()
+    {
+        if (currentLineIndex < currentDialog.dialogLines.Length)//防止越界
         {
             ShowDialog();
+        }
+        else
+        {
+            EndDialog();
         }
     }
     private void ShowDialog()

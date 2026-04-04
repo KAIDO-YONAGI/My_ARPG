@@ -8,6 +8,7 @@ public class NPCChat : MonoBehaviour
     private Rigidbody2D rb;
     // public Animator moveAnimator;
     public Animator chatAnimator;
+    public DialogSO dialogSO;
 
     private void Awake()
     {
@@ -23,5 +24,19 @@ public class NPCChat : MonoBehaviour
     {
         rb.isKinematic = false;
         chatAnimator.Play("Idle");
+    }
+
+    private void Update() {
+        if (Input.GetButtonDown("Interact"))
+        {
+            if (dialogSO != null&& !DialogManager.instance.isDialogActive)
+            {
+                DialogManager.instance.StartDialog(dialogSO);
+            }
+            else
+            {
+                DialogManager.instance.AdvanceDialog();
+            }
+        }
     }
 }

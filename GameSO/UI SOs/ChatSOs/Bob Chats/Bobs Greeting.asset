@@ -15,5 +15,5 @@ MonoBehaviour:
   dialogLines:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
     text: Hello
-  - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
+  - speaker: {fileID: 11400000, guid: e69c09f810cffc64bb4ecc29855d9d11, type: 2}
     text: 1
