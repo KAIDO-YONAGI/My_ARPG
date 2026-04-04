@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -27,7 +28,11 @@ public class NPCPatrol : MonoBehaviour
         targetPosition = circleCenter + randomDirection();
         aStarController.ResetPath();
         posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        t = aStarController.GetThreshold()*.2f;
+        t = aStarController.GetThreshold() * .2f;
+    }
+    private void OnDisable()
+    {
+        animator.SetBool("isWalking", false);
     }
     private void Update()
     {
