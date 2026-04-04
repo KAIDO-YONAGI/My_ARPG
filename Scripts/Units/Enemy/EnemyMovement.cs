@@ -17,35 +17,14 @@ public class EnemyMovement : MonoBehaviour
     public float playerDetectRange = 5;
     public Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
     public LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
-    public AStarController aStarController;
+    public MovementController aStarController;
 
     private float velocityCooldown = 0.2f;
     private float velocityTimer;
     private Vector2 lastVelocity;
+    float t;
 
-    private void UpdateVelocity()
-    {
-        if (velocityTimer > 0)
-            velocityTimer -= Time.deltaTime;
-    }
 
-    private void SetVelocity(Vector2 direction, float speed)
-    {
-        bool shouldUpdate = velocityTimer <= 0 || lastVelocity == Vector2.zero ||
-                           Vector2.Dot(direction, lastVelocity) < 0.9f;
-
-        if (shouldUpdate)
-        {
-            rb.velocity = direction * speed;
-            lastVelocity = direction;
-            velocityTimer = velocityCooldown;
-
-            if ((direction.x > 0 && facingDirec < 0) || (direction.x < 0 && facingDirec > 0))
-            {
-                Flip();
-            }
-        }
-    }
 
 
     public void AnimatorSM(EnemyState newState)
@@ -72,6 +51,7 @@ public class EnemyMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         AnimatorSM(EnemyState.Idle);//注意状态改变需要在找到animator之后才开始
+        t = aStarController.GetThreshold();
     }
     private void Update()
     {
@@ -122,23 +102,41 @@ public class EnemyMovement : MonoBehaviour
         if (aStarController == null)
             return;
 
-        UpdateVelocity();
+        if (velocityTimer > 0)
+            velocityTimer -= Time.deltaTime;
 
         Vector3 startPos = transform.position;
         Vector3 endPos = player.position;
-        Vector3 optPos = (player.position - transform.position).normalized*.2f + startPos;//防止敌人产生远离玩家的路径，增加一个优化点，优先从这个点开始寻路，如果这个点不可行走才从敌人当前位置开始寻路
+        Vector3 optPos = (player.position - transform.position).normalized * .2f + startPos;
+        //防止敌人产生远离玩家的路径，增加一个优化点，优先从这个点开始寻路，如果这个点不可行走才从敌人当前位置开始寻路
 
         Vector3 posToGo = aStarController.GetPosToGo(optPos, startPos, endPos);
         Vector2 direction = Vector2.zero;
-        if (!(posToGo == Vector3.zero)&&posToGo!=null)
+        if (!(posToGo == Vector3.zero) && posToGo != null)
             direction = (posToGo - transform.position).normalized;
 
         SetVelocity(direction, speed);
 
-        float t = aStarController.GetThreshold();
         if ((transform.position - posToGo).sqrMagnitude < t * t)
         {
             aStarController.ArrivedPos();
+        }
+    }
+    private void SetVelocity(Vector2 direction, float speed)
+    {
+        bool shouldUpdate = velocityTimer <= 0 || lastVelocity == Vector2.zero ||
+                           Vector2.Dot(direction, lastVelocity) < 0.9f;
+
+        if (shouldUpdate)
+        {
+            rb.velocity = direction * speed;
+            lastVelocity = direction;
+            velocityTimer = velocityCooldown;
+
+            if (direction.x * facingDirec < 0)
+            {
+                Flip();
+            }
         }
     }
     private void Flip()
