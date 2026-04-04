@@ -2,65 +2,65 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class NPCPatrol : MonoBehaviour
 {
-    public Vector2[] patrolPoints;
+    public int patrolRadius = 5;
     public Animator animator;
+    public MovementController aStarController;
+
     public float speed = 2f;
     public float waitTime = 1f;
-
+    private int facingDirec = 1; // 1表示朝右，-1表示朝左
+    private Vector3 circleCenter;
+    private Vector3 targetPosition;
+    Vector3 posToGo;
     private Rigidbody2D rb;
-    private Vector2 currentTarget;
-    private bool isPatrolling = true;
-    private int currentPointIndex = 0;
+    private bool isWaiting = false;
+    float t = 0;
+    //TODO: 完全去掉巡逻方框，使用单位向量随机函数随机取点和as寻路
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-
-        if (patrolPoints != null && patrolPoints.Length > 0)
-        {
-            currentTarget = patrolPoints[0];
-            animator.SetBool("isWalking", true);
-        }
-        else
-        {
-            isPatrolling = false;
-            animator.SetBool("isWalking", false);
-        }
+        circleCenter = transform.position;
+        targetPosition = circleCenter + randomDirection();
+        posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+        t = aStarController.GetThreshold();
     }
-
     private void Update()
     {
-
-        if (!isPatrolling || patrolPoints.Length == 0)
+        if (isWaiting)
             return;
 
         // 计算朝向目标的方向
-        Vector2 direction = (currentTarget - rb.position).normalized;
-        if ((direction.x > 0 && facingDirec < 0) || (direction.x < 0 && facingDirec > 0))
+        Vector2 direction = (posToGo - transform.position).normalized;
+        if (direction.x * facingDirec < 0)
         {
             Flip();
         }
-        // 施加速度
-        rb.velocity = direction * speed;
+        if (posToGo != Vector3.zero)
+            rb.velocity = direction * speed;
+        else rb.velocity = Vector2.zero;
 
-        // 检查是否到达当前目标点
-        if (Vector2.Distance(rb.position, currentTarget) < 0.1f)
+
+        Debug.Log(targetPosition);
+
+        if ((transform.position - posToGo).sqrMagnitude < t * t)//到寻路节点则告知controller
         {
-            // 到达目标点
-            rb.velocity = Vector2.zero;
-            animator.SetBool("isWalking", false);
+            aStarController.ArrivedPos();
+            posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+        }
+        else
+        {
+            animator.SetBool("isWalking", true);
+        }
 
-            // 切换到下一个巡逻点
-            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
-            currentTarget = patrolPoints[currentPointIndex];
-
-            // 等待后继续巡逻
+        if ((transform.position - targetPosition).sqrMagnitude < t * t)//到终点则重新获取巡逻点
+        {
             StartCoroutine(WaitAndContinue());
         }
     }
-    int facingDirec = 1; // 1表示朝右，-1表示朝左
     private void Flip()
     {
         facingDirec *= -1;
@@ -69,13 +69,35 @@ public class NPCPatrol : MonoBehaviour
     }
     IEnumerator WaitAndContinue()
     {
-        isPatrolling = false;
+        isWaiting = true;
         yield return new WaitForSeconds(waitTime);
 
-        if (patrolPoints.Length > 0)
+        //如果没有路径了，说明被堵住了，换点找到有为止
+        do
         {
-            isPatrolling = true;
-            animator.SetBool("isWalking", true);
-        }
+            targetPosition = circleCenter + randomDirection();
+            posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+            Debug.Log($"[NPCPatrol] 计算新巡逻点 {targetPosition}，得到路径点 {posToGo}");
+        } while (posToGo == Vector3.zero);
+
+
+        isWaiting = false;
+    }
+
+    private Vector3 randomDirection()
+    {
+        Vector2 dir = Random.insideUnitCircle; // 均匀分布在圆内
+        return new Vector3(dir.x, dir.y, 0) * patrolRadius;
+    }
+    private void OnDrawGizmos()
+    {
+        if (patrolRadius == 0)
+            return;
+        Gizmos.color = Color.yellow;
+
+        // 编辑器模式（未运行）：圆圈跟随角色
+        // 运行游戏后：圆圈固定在初始位置 circleCenter
+        Vector3 drawPos = Application.isPlaying ? circleCenter : transform.position;
+        Gizmos.DrawWireSphere(drawPos, patrolRadius);
     }
 }

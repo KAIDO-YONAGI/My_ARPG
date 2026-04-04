@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class AStarController : MonoBehaviour
+public class MovementController : MonoBehaviour
 {
     private Stack<PathFinderDetails> path = null;
     private float threshold = 0.5f;
@@ -23,7 +23,15 @@ public class AStarController : MonoBehaviour
     {
         return AStarNodeManager.instance.GetCellSize();
     }
+/// <summary>
+/// 获取下一个目标点，自动处理路径重建逻辑
+/// </summary>
+/// <param name="optPos">可选，用来更好规划路径，避免动画鬼畜，不用就给Vector3.zero</param>
+/// <param name="startPos"></param>
+/// <param name="endPos"> 一直传入相同值即可</param>
+/// <returns></returns> <summary>
 
+//TODO:用事件系统解耦controller和movement，controller只负责提供路径点，movement负责移动和告知controller到达节点，并只由controller负责操作（重建）路径
     public Vector3 GetPosToGo(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         // 更新计时器
