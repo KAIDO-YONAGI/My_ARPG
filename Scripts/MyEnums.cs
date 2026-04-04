@@ -33,4 +33,10 @@ namespace MyEnums
         Obstacle,
         Walkable
     }
+    public enum NPCState
+    {
+        Idle,
+        Patrol,
+        Chat
+    }
 }
