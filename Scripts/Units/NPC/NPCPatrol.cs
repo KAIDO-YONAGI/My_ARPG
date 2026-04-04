@@ -30,6 +30,10 @@ public class NPCPatrol : MonoBehaviour
         posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
         t = aStarController.GetThreshold() * .2f;
     }
+    private void OnEnable()
+    {
+        rb.isKinematic = false;
+    }
     private void OnDisable()
     {
         animator.SetBool("isWalking", false);
