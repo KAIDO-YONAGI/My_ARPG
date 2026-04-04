@@ -73,7 +73,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 4
   m_Sprite: {fileID: 884934726, guid: 7e00d39f9631d0d4fa5984bd2fb85815, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -225,8 +225,8 @@ GameObject:
   - component: {fileID: 8925514775317041003}
   - component: {fileID: 8765801072042679794}
   - component: {fileID: 1183249147012332139}
-  - component: {fileID: 5008691633861797579}
   - component: {fileID: 7847235826292514568}
+  - component: {fileID: 5008691633861797579}
   - component: {fileID: 6306788409250537581}
   m_Layer: 0
   m_Name: NPC
@@ -284,8 +284,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.10861421}
-  m_Size: {x: 0.5, y: 0.5831559}
+  m_Offset: {x: 0.000000029802322, y: -0.22303745}
+  m_Size: {x: 0.5, y: 0.5}
   m_Direction: 0
 --- !u!50 &8925514775317041003
 Rigidbody2D:
@@ -364,6 +364,20 @@ MonoBehaviour:
   currentState: 0
   patrolState: {fileID: 5008691633861797579}
   chatState: {fileID: 6306788409250537581}
+--- !u!114 &7847235826292514568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1108407708067783558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e06d23035593d84289bcbffedfd8c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathRebuildDistance: 0.5
+  pathRebuildCooldown: 0.5
 --- !u!114 &5008691633861797579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -381,20 +395,6 @@ MonoBehaviour:
   aStarController: {fileID: 7847235826292514568}
   speed: 2
   waitTime: 1
---- !u!114 &7847235826292514568
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1108407708067783558}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e06d23035593d84289bcbffedfd8c71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pathRebuildDistance: 0.5
-  pathRebuildCooldown: 0.5
 --- !u!114 &6306788409250537581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,3 +408,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chatAnimator: {fileID: 245929698277191774}
+  dialogSO: {fileID: 0}
