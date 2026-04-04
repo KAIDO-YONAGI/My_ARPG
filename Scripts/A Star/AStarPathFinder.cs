@@ -39,7 +39,8 @@ public class AStarPathFinder : MonoBehaviour
         Vector3 optCellPos = WorldToCell(optPos);
 
 
-        if (NodeCellMap.ContainsKey(optCellPos)
+        if (startCellPos!= optCellPos
+            && NodeCellMap.ContainsKey(optCellPos)
             && NodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable
             && NoCoverObstacleNodes(startCellPos,optCellPos))
         {
