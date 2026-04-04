@@ -27,7 +27,7 @@ public class NPCPatrol : MonoBehaviour
         targetPosition = circleCenter + randomDirection();
         aStarController.ResetPath();
         posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        t = aStarController.GetThreshold();
+        t = aStarController.GetThreshold()*.2f;
     }
     private void Update()
     {
@@ -45,26 +45,18 @@ public class NPCPatrol : MonoBehaviour
         else rb.velocity = Vector2.zero;
 
 
-        Debug.Log(targetPosition);
 
         if ((transform.position - posToGo).sqrMagnitude < t * t)//到寻路节点则告知controller
         {
             aStarController.ArrivedPos();
             posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-
-            // 如果找不到路径，重新选择巡逻点
-            if (posToGo == Vector3.zero)
-            {
-                StartCoroutine(WaitAndContinue());
-                return;
-            }
         }
         else
         {
             animator.SetBool("isWalking", true);
         }
 
-        if ((transform.position - targetPosition).sqrMagnitude < t * t && !isWaiting)//到终点则重新获取巡逻点
+        if ((transform.position - targetPosition).sqrMagnitude < t * t || posToGo == Vector3.zero)//到终点则重新获取巡逻点
         {
             StartCoroutine(WaitAndContinue());
         }
@@ -77,18 +69,22 @@ public class NPCPatrol : MonoBehaviour
     }
     IEnumerator WaitAndContinue()
     {
-        Debug.Log("in COROUTINE");
         isWaiting = true;
         animator.SetBool("isWalking", false);
+        rb.velocity = Vector2.zero;
         yield return new WaitForSeconds(waitTime);
 
         //如果没有路径了，说明被堵住了，换点找到有为止
         do
         {
             targetPosition = circleCenter + randomDirection();
+            //如果随机点太近了就重新随机，避免被卡住
+            if ((targetPosition - transform.position).sqrMagnitude < t * t)
+            {
+                targetPosition = circleCenter + (transform.position - circleCenter).normalized * patrolRadius;
+            }
             aStarController.ResetPath();
             posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-            Debug.Log($"[NPCPatrol] 计算新巡逻点 {targetPosition}，得到路径点 {posToGo}");
         } while (posToGo == Vector3.zero);
         isWaiting = false;
     }
