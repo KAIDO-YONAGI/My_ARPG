@@ -5,18 +5,24 @@ using UnityEngine;
 
 public class NPCStateController : MonoBehaviour
 {
-    public MyEnums.NPCState currentState;
-    public NPCPatrol patrolState;
-    public NPCChat chatState;
+    [Header("Component References")]
+    public NPCWander wanderScript;
+    public NPCChat chatScript;
+    public NPCPatrol patrolScript;
+    [SerializeField]
+    public MyEnums.NPCState DefaultState = MyEnums.NPCState.Patrol;
+    private MyEnums.NPCState currentState;
+
     private void Start()
     {
-        SwitchState(MyEnums.NPCState.Patrol);
+        SwitchState(DefaultState);
     }
     public void SwitchState(MyEnums.NPCState newState)
     {
         currentState = newState;
-        patrolState.enabled = (currentState == MyEnums.NPCState.Patrol);
-        chatState.enabled = (currentState == MyEnums.NPCState.Chat);
+        if (wanderScript != null) wanderScript.enabled = currentState == MyEnums.NPCState.Wander;
+        if (chatScript != null) chatScript.enabled = currentState == MyEnums.NPCState.Chat;
+        if (patrolScript != null) patrolScript.enabled = currentState == MyEnums.NPCState.Patrol;
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -29,7 +35,7 @@ public class NPCStateController : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            SwitchState(MyEnums.NPCState.Patrol);
+            SwitchState(DefaultState);
         }
     }
 }

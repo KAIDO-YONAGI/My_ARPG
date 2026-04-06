@@ -7,8 +7,8 @@ public class MovementController : MonoBehaviour
 {
     private Stack<PathFinderDetails> path = null;
     private float threshold = 0.5f;
-    [SerializeField] private float pathRebuildDistance = .5f; // 目标移动超过此距离时重新寻路
-    [SerializeField] private float pathRebuildCooldown = .5f; // 寻路冷却时间
+    private float pathRebuildDistance = .5f; // 目标移动超过此距离时重新寻路
+    private float pathRebuildCooldown = .5f; // 寻路冷却时间
     private float pathRebuildTimer; // 寻路计时器
     private bool showPath = true;
     private Color pathColor = Color.yellow;
