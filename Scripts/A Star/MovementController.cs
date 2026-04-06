@@ -23,15 +23,15 @@ public class MovementController : MonoBehaviour
     {
         return AStarNodeManager.instance.GetCellSize();
     }
-/// <summary>
-/// 获取下一个目标点，自动处理路径重建逻辑
-/// </summary>
-/// <param name="optPos">可选，用来更好规划路径，避免动画鬼畜，不用就给Vector3.zero</param>
-/// <param name="startPos"></param>
-/// <param name="endPos"> 一直传入相同值即可</param>
-/// <returns></returns> <summary>
+    /// <summary>
+    /// 获取下一个目标点，自动处理路径重建逻辑
+    /// </summary>
+    /// <param name="optPos">可选，用来更好规划路径，避免动画鬼畜，不用就给Vector3.zero</param>
+    /// <param name="startPos"></param>
+    /// <param name="endPos"> 一直传入相同值即可</param>
+    /// <returns></returns> <summary>
 
-//TODO:用事件系统解耦controller和movement，controller只负责提供路径点，movement负责移动和告知controller到达节点，并只由controller负责操作（重建）路径
+    //TODO:用事件系统解耦controller和movement，controller只负责提供路径点，movement负责移动和告知controller到达节点，并只由controller负责操作（重建）路径
     public Vector3 GetPosToGo(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         // 更新计时器
@@ -46,7 +46,7 @@ public class MovementController : MonoBehaviour
         {
             // 检查目标是否移动超过阈值且冷却时间已过
             float distToTarget = (endPos - this.endPos).sqrMagnitude;
-            float realPathRebuildDistance=pathRebuildDistance*GetCellSize();
+            float realPathRebuildDistance = pathRebuildDistance * GetCellSize();
             if (distToTarget > realPathRebuildDistance * realPathRebuildDistance && pathRebuildTimer <= 0)
             {
                 // 目标移动太远，重新寻路，并比较新旧路径
@@ -74,7 +74,16 @@ public class MovementController : MonoBehaviour
         endPos = Vector3.zero;
         hasValidPath = false;
     }
-    public float GetThreshold() => threshold*AStarNodeManager.instance.GetCellSize();
+    public float GetThreshold()
+    {
+        if (AStarNodeManager.instance == null)
+        {
+            Debug.LogWarning("AStarNodeManager.instance is NULL!");
+            return 0f;
+        }
+
+        return threshold * AStarNodeManager.instance.GetCellSize();
+    }
     private bool FindWay(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         this.startPos = startPos;

@@ -42,6 +42,12 @@ public class NPCPatrol : MonoBehaviour
 
     private void Start()
     {
+        if(aStarController==null)
+        {
+            Debug.LogError("NPCPatrol: Missing MovementController reference.");
+            enabled = false;
+            return;
+        }
         CalculateCornerPositions();
 
         // 从当前角落开始，找最近的角作为起点

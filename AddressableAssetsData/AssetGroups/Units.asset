@@ -28,6 +28,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - Enemies
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cde43cc87679436439995d5bcc3afc0b
+    m_Address: Assets/Prefabs/Units/NPC.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ee8b6f39f2f3996479298e0621c06dc1
     m_Address: Assets/Prefabs/Units/Arrow.prefab
     m_ReadOnly: 0

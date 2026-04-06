@@ -46,10 +46,13 @@ public class EnemyMovement : MonoBehaviour
         else if (enemyState == EnemyState.Attacking)
             animator.SetBool("isAttacking", true);
     }
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+    }
+    private void Start()
+    {
         AnimatorSM(EnemyState.Idle);//注意状态改变需要在找到animator之后才开始
         t = aStarController.GetThreshold();
     }
