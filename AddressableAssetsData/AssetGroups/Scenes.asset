@@ -22,6 +22,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39b4c5c3f91378d4b922675c04cb10bf
+    m_Address: Assets/Scenes/Menu.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3f115ced3216f104b801fcb47a064dec
     m_Address: Assets/Scenes/Scene2.unity
     m_ReadOnly: 0
@@ -29,6 +34,16 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 823843722642c914dba2fb270e6b288d
     m_Address: Assets/Scenes/PersistentScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 82d439faaeaf7f9419d2ae16d7a2901a
+    m_Address: Assets/Prefabs/Scene/NodeMapManager.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d32678e832dfec34bb8d1f6ff1be164a
+    m_Address: Assets/Prefabs/Scene/Teleport.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
