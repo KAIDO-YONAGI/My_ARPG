@@ -36,6 +36,7 @@ namespace MyEnums
     public enum NPCState
     {
         Idle,
+        Wander,
         Patrol,
         Chat
     }

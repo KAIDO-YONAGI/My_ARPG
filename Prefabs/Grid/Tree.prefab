@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2352373223552345559}
   - component: {fileID: 3714345224475523958}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: StumpMask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 6522560290896863681}
   - component: {fileID: 7385147942258621409}
   - component: {fileID: 6170067819596440146}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Non_Collision_High
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -340,6 +340,6 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.0271492, y: 0.02821672}
-  m_Size: {x: 0.49895096, y: 0.49895096}
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.6, y: 0.6}
   m_Direction: 0

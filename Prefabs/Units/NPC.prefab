@@ -224,8 +224,9 @@ GameObject:
   - component: {fileID: 3628908761987256276}
   - component: {fileID: 8925514775317041003}
   - component: {fileID: 8765801072042679794}
-  - component: {fileID: 1183249147012332139}
   - component: {fileID: 7847235826292514568}
+  - component: {fileID: 1183249147012332139}
+  - component: {fileID: 5190203172235163306}
   - component: {fileID: 5008691633861797579}
   - component: {fileID: 6306788409250537581}
   m_Layer: 0
@@ -349,21 +350,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 1
---- !u!114 &1183249147012332139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1108407708067783558}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa510dbf9c3988043afc60489c96f202, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentState: 0
-  patrolState: {fileID: 5008691633861797579}
-  chatState: {fileID: 6306788409250537581}
 --- !u!114 &7847235826292514568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,8 +362,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e06d23035593d84289bcbffedfd8c71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pathRebuildDistance: 0.5
-  pathRebuildCooldown: 0.5
+--- !u!114 &1183249147012332139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1108407708067783558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa510dbf9c3988043afc60489c96f202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wanderScript: {fileID: 5008691633861797579}
+  chatScript: {fileID: 6306788409250537581}
+  patrolScript: {fileID: 5190203172235163306}
+  DefaultState: 2
+--- !u!114 &5190203172235163306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1108407708067783558}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1e8629fea338e34a866f05d88d9db62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patrolSize: {x: 5, y: 3}
+  clockwise: 1
+  speed: 2
+  waitTime: 1
+  animator: {fileID: 8459053997004837389}
+  aStarController: {fileID: 7847235826292514568}
 --- !u!114 &5008691633861797579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -390,11 +408,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90afda22cc60aaa498afc3512638bd99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patrolRadius: 5
   animator: {fileID: 8459053997004837389}
   aStarController: {fileID: 7847235826292514568}
   speed: 2
   waitTime: 1
+  patrolRadius: 5
 --- !u!114 &6306788409250537581
 MonoBehaviour:
   m_ObjectHideFlags: 0

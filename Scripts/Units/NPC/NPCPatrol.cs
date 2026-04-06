@@ -1,43 +1,63 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
-
+/// <summary>
+/// NPC按矩形路线巡逻
+/// </summary>
 public class NPCPatrol : MonoBehaviour
 {
-    public int patrolRadius = 5;
-    public Animator animator;
-    public MovementController aStarController;
+    [Header("Patrol Rectangle Settings")]
+    public Vector2 patrolSize = new Vector2(5f, 3f); // 矩形的长和宽
+    public bool clockwise = true; // true为顺时针，false为逆时针
+
+    [Header("Movement Settings")]
     public float speed = 2f;
     public float waitTime = 1f;
 
+    [Header("Component References")]
+    public Animator animator;
+    public MovementController aStarController;
+
+    // 四个角的位置
+    private Vector3[] cornerPositions = new Vector3[4];
+    private int currentCornerIndex = 0; // 当前目标角索引
+
     private int facingDirec = 1; // 1表示朝右，-1表示朝左
-    private Vector3 circleCenter;
-    private Vector3 targetPosition;
-    private Vector3 posToGo;
+    private Vector3 targetPosition; // 当前巡逻目标点
+    private Vector3 posToGo; // 下一个寻路节点
     private Rigidbody2D rb;
     private bool isWaiting = false;
-    private float t = 0;
-    //TODO: 完全去掉巡逻方框，使用单位向量随机函数随机取点和as寻路
+    private float threshold;
 
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        circleCenter = transform.position;
-        targetPosition = circleCenter + randomDirection();
-        aStarController.ResetPath();
-        posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        t = aStarController.GetThreshold() * .2f;
     }
+
     private void OnEnable()
     {
         rb.isKinematic = false;
     }
+
+    private void Start()
+    {
+        CalculateCornerPositions();
+
+        // 从当前角落开始，找最近的角作为起点
+        currentCornerIndex = GetNearestCornerIndex();
+        targetPosition = cornerPositions[currentCornerIndex];
+
+        aStarController.ResetPath();
+        posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+        threshold = aStarController.GetThreshold() * 0.2f;
+    }
+
     private void OnDisable()
     {
         animator.SetBool("isWalking", false);
     }
+
     private void Update()
     {
         if (isWaiting)
@@ -49,13 +69,14 @@ public class NPCPatrol : MonoBehaviour
         {
             Flip();
         }
+
         if (posToGo != Vector3.zero)
             rb.velocity = direction * speed;
-        else rb.velocity = Vector2.zero;
+        else
+            rb.velocity = Vector2.zero;
 
-
-
-        if ((transform.position - posToGo).sqrMagnitude < t * t)//到寻路节点则告知controller
+        // 到达寻路节点
+        if ((transform.position - posToGo).sqrMagnitude < threshold * threshold)
         {
             aStarController.ArrivedPos();
             posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
@@ -65,53 +86,109 @@ public class NPCPatrol : MonoBehaviour
             animator.SetBool("isWalking", true);
         }
 
-        if ((transform.position - targetPosition).sqrMagnitude < t * t || posToGo == Vector3.zero)//到终点则重新获取巡逻点
+        // 到达角落目标点
+        if ((transform.position - targetPosition).sqrMagnitude < threshold * threshold || posToGo == Vector3.zero)
         {
-            StartCoroutine(WaitAndContinue());
+            StartCoroutine(WaitAndMoveToNextCorner());
         }
     }
+
     private void Flip()
     {
         facingDirec *= -1;
         transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
-        //这个向量应该乘-1而不是facingDirec，因为facingDirec仅记录当前的状态（朝向），可以为1
     }
-    IEnumerator WaitAndContinue()
+
+    private void CalculateCornerPositions()
+    {
+        Vector3 center = transform.position;
+        float halfWidth = patrolSize.x / 2f;
+        float halfHeight = patrolSize.y / 2f;
+
+        // 顺时针：右下 -> 左下 -> 左上 -> 右上
+        cornerPositions[0] = center + new Vector3(halfWidth, -halfHeight, 0);
+        cornerPositions[1] = center + new Vector3(-halfWidth, -halfHeight, 0);
+        cornerPositions[2] = center + new Vector3(-halfWidth, halfHeight, 0);
+        cornerPositions[3] = center + new Vector3(halfWidth, halfHeight, 0);
+    }
+
+    private int GetNearestCornerIndex()
+    {
+        int nearestIndex = 0;
+        float minDist = float.MaxValue;
+
+        for (int i = 0; i < 4; i++)
+        {
+            float dist = (transform.position - cornerPositions[i]).sqrMagnitude;
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestIndex = i;
+            }
+        }
+        return nearestIndex;
+    }
+
+    IEnumerator WaitAndMoveToNextCorner()
     {
         isWaiting = true;
         animator.SetBool("isWalking", false);
         rb.velocity = Vector2.zero;
         yield return new WaitForSeconds(waitTime);
 
-        //如果没有路径了，说明被堵住了，换点找到有为止
-        do
+        // 计算下一个角落索引
+        if (clockwise)
         {
-            targetPosition = circleCenter + randomDirection();
-            //如果随机点太近了就重新随机，避免被卡住
-            if ((targetPosition - transform.position).sqrMagnitude < t * t)
-            {
-                targetPosition = circleCenter + (transform.position - circleCenter).normalized * patrolRadius;
-            }
-            aStarController.ResetPath();
-            posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        } while (posToGo == Vector3.zero);
+            currentCornerIndex = (currentCornerIndex + 1) % 4;
+        }
+        else
+        {
+            currentCornerIndex = (currentCornerIndex + 3) % 4;
+        }
+
+        targetPosition = cornerPositions[currentCornerIndex];
+        aStarController.ResetPath();
+        posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+
         isWaiting = false;
     }
 
-    private Vector3 randomDirection()
+    private void OnDrawGizmosSelected()
     {
-        Vector2 dir = Random.insideUnitCircle; // 均匀分布在圆内
-        return new Vector3(dir.x, dir.y, 0) * patrolRadius;
-    }
-    private void OnDrawGizmos()
-    {
-        if (patrolRadius == 0)
+        if (!enabled)
             return;
+        // 在编辑器中绘制巡逻路径
         Gizmos.color = Color.yellow;
 
-        // 编辑器模式（未运行）：圆圈跟随角色
-        // 运行游戏后：圆圈固定在初始位置 circleCenter
-        Vector3 drawPos = Application.isPlaying ? circleCenter : transform.position;
-        Gizmos.DrawWireSphere(drawPos, patrolRadius);
+        // 计算当前显示的角位置
+        Vector3 center = Application.isPlaying ? cornerPositions[0] - (cornerPositions[0] - transform.position) : transform.position;
+        float halfWidth = patrolSize.x / 2f;
+        float halfHeight = patrolSize.y / 2f;
+
+        Vector3[] drawCorners = new Vector3[4];
+        drawCorners[0] = center + new Vector3(halfWidth, -halfHeight, 0);
+        drawCorners[1] = center + new Vector3(-halfWidth, -halfHeight, 0);
+        drawCorners[2] = center + new Vector3(-halfWidth, halfHeight, 0);
+        drawCorners[3] = center + new Vector3(halfWidth, halfHeight, 0);
+
+        // 绘制矩形边框
+        for (int i = 0; i < 4; i++)
+        {
+            Gizmos.DrawLine(drawCorners[i], drawCorners[(i + 1) % 4]);
+        }
+
+        // 绘制角点
+        Gizmos.color = Color.green;
+        for (int i = 0; i < 4; i++)
+        {
+            Gizmos.DrawWireSphere(drawCorners[i], 0.2f);
+        }
+
+        // 绘制当前目标角
+        if (Application.isPlaying && currentCornerIndex < 4)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(cornerPositions[currentCornerIndex], 0.3f);
+        }
     }
 }
