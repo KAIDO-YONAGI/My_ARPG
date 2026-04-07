@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class ExitManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public void QuitGame()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false; // 在编辑器里停止运行
+#else
+    Application.Quit(); // 在构建的游戏里退出
+#endif
     }
 }

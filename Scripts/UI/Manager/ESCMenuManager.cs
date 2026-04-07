@@ -9,7 +9,7 @@ public class ESCMenuManager : MonoBehaviour
     {
         if (Input.GetButtonDown("ESC"))
         {
-            if (TimeManager.instance.IsGamePaused())
+            if (TimeManager.instance.IsGamePaused() && ESCGroup.interactable)
             {
                 TimeManager.instance.ResumeGame();
                 ESCGroup.alpha = 0;
@@ -25,4 +25,5 @@ public class ESCMenuManager : MonoBehaviour
             }
         }
     }
+
 }

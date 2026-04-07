@@ -12,31 +12,26 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 /// </summary>
 public class SceneChanger : MonoBehaviour
 {
-    /// <summary>单例实例</summary>
     public static SceneChanger instance;
 
     /// <summary>玩家初始位置</summary>
     public Vector3 initialPosition = Vector3.zero;
-    /// <summary>淡入淡出持续时间</summary>
     public float fadeDuration = 1f;
-    /// <summary>第一个加载的场景（游戏启动时）</summary>
     public GameSceneSO firstScene;
-    /// <summary>玩家对象引用</summary>
     public GameObject player;
-    /// <summary>淡入淡出画布组</summary>
     public CanvasGroup fadeCanva;
     /// <summary>过渡动画播放器数组</summary>
     public Animator[] transitionImages;
     [Header("Events")]
-    /// <summary>场景加载事件</summary>
     public SceneLoadEventSO loadEventSO;
     [Header("Objects to Unable")]
     public Object[] objectsToUnable;
+    /// <summary>要重置的画布组数组 </summary>
+    [Header("Canvas to Reset")]
+    public CanvasGroup[] canvasesToReset;
 
-    /// <summary>要加载的场景</summary>
     private GameSceneSO sceneToLoad;
 
-    /// <summary>当前已加载的场景</summary>
     private GameSceneSO currentScene;
     /// <summary>已加载的场景对象</summary>
     private Scene loadedScene;
@@ -44,7 +39,6 @@ public class SceneChanger : MonoBehaviour
     private Vector3 newPosition;
     /// <summary>是否需要淡入淡出</summary>
     private bool isToFade;
-    /// <summary>是否是初始场景（启动场景）</summary>
     private bool isInitialScene = true;
 
     /// <summary>
@@ -157,6 +151,19 @@ public class SceneChanger : MonoBehaviour
                 if (obj is GameObject go)
                 {
                     go.SetActive(false);
+                }
+            }
+            foreach (var canvas in canvasesToReset)
+            {
+                if (canvas.GetComponent<CanvasGroup>() != null)
+                {
+                    canvas.alpha = 0;
+                    canvas.interactable = false;
+                    canvas.blocksRaycasts = false;
+                }
+                else
+                {
+                    Debug.LogWarning($"CanvasGroup component not found on {canvas.name}");
                 }
             }
         }
