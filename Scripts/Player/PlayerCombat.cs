@@ -11,16 +11,25 @@ public class PlayerCombat : MonoBehaviour
 
     public void DealDamage()
     {
-
+        //TODO:可以引入空间优化算法
         StrengthBUff();
 
-        Collider2D[] enemis = Physics2D.OverlapCircleAll(attackPoint.position, StatsManager.instance.GetWeaponRange(), enemyMask);
+        Collider2D[] enemis = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            StatsManager.instance.GetWeaponRange(),
+            enemyMask);
 
-        if (enemis.Length > 0)
+        foreach (Collider2D enemy in enemis)
         {
-            enemis[0].GetComponent<EnemyHealth>().ChangeHealth(-(StatsManager.instance.GetDamage()));
-            enemis[0].GetComponent<EnemyKnockBack>().Knockback(transform, StatsManager.instance.GetKnockBackForce(), StatsManager.instance.GetStunTime(), StatsManager.instance.GetKnockBackTime());
+            enemy.GetComponent<EnemyHealth>().
+            ChangeHealth(-StatsManager.instance.GetDamage());
+            enemy.GetComponent<EnemyKnockBack>().Knockback(
+            transform,
+            StatsManager.instance.GetKnockBackForce(),
+            StatsManager.instance.GetStunTime(),
+            StatsManager.instance.GetKnockBackTime());
         }
+
     }
     private void StrengthBUff()
     {

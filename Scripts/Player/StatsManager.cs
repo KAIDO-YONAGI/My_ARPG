@@ -6,41 +6,41 @@ public class StatsManager : MonoBehaviour
     public TMP_Text healthText;
     public StatsUI statsUI;
 
-    [SerializeField, Header("Combat Stats")]
-    private int damage;
+
+    [SerializeField]private int damage;
+    [SerializeField] private float weaponRange;
+    [SerializeField] private float knockBackForce;
+    [SerializeField] private float knockBackTime;
+    [SerializeField] private float stunTime;
+    [SerializeField] private float coolDown;
+    [SerializeField]private float speed;
+    [SerializeField]private int maxHealth;
+    [SerializeField]private int currentHealth;
     public int GetDamage() { return damage; }
     public void SetDamage(int value) { damage = value; }
 
-    private float weaponRange;
     public float GetWeaponRange() { return weaponRange; }
     public void SetWeaponRange(float value) { weaponRange = value; }
 
-    private float knockBackForce;
     public float GetKnockBackForce() { return knockBackForce; }
     public void SetKnockBackForce(float value) { knockBackForce = value; }
 
-    private float knockBackTime;
     public float GetKnockBackTime() { return knockBackTime; }
     public void SetKnockBackTime(float value) { knockBackTime = value; }
 
-    private float stunTime;
     public float GetStunTime() { return stunTime; }
     public void SetStunTime(float value) { stunTime = value; }
 
-    private float coolDown;
     public float GetCoolDown() { return coolDown; }
     public void SetCoolDown(float value) { coolDown = value; }
 
-    [SerializeField, Header("Movement Stats")]
-    private float speed;
     public float GetSpeed() { return speed; }
     public void SetSpeed(float value) { speed = value; }
 
-    [SerializeField, Header("Health Stats")]
-    private int maxHealth;
+
     public int GetMaxHealth() { return maxHealth; }
     public void SetMaxHealth(int value) { maxHealth = value; }
-    private int currentHealth;
+
 
     public int GetCurrentHealth() { return currentHealth; }
     public void SetCurrentHealth(int value) { currentHealth = value; }
