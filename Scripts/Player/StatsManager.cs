@@ -6,21 +6,44 @@ public class StatsManager : MonoBehaviour
     public TMP_Text healthText;
     public StatsUI statsUI;
 
-    [Header("Combat Stats")]
-    public int damage;
-    public float weaponRange;
-    public float knockBackForce;
-    public float knockBackTime;
-    public float stunTime;
-    public float coolDown;
+    [SerializeField, Header("Combat Stats")]
+    private int damage;
+    public int GetDamage() { return damage; }
+    public void SetDamage(int value) { damage = value; }
 
-    [Header("Movement Stats")]
-    public float speed;
+    private float weaponRange;
+    public float GetWeaponRange() { return weaponRange; }
+    public void SetWeaponRange(float value) { weaponRange = value; }
 
-    [Header("Health Stats")]
-    public int maxHealth;
-    public int currentHealth;
+    private float knockBackForce;
+    public float GetKnockBackForce() { return knockBackForce; }
+    public void SetKnockBackForce(float value) { knockBackForce = value; }
 
+    private float knockBackTime;
+    public float GetKnockBackTime() { return knockBackTime; }
+    public void SetKnockBackTime(float value) { knockBackTime = value; }
+
+    private float stunTime;
+    public float GetStunTime() { return stunTime; }
+    public void SetStunTime(float value) { stunTime = value; }
+
+    private float coolDown;
+    public float GetCoolDown() { return coolDown; }
+    public void SetCoolDown(float value) { coolDown = value; }
+
+    [SerializeField, Header("Movement Stats")]
+    private float speed;
+    public float GetSpeed() { return speed; }
+    public void SetSpeed(float value) { speed = value; }
+
+    [SerializeField, Header("Health Stats")]
+    private int maxHealth;
+    public int GetMaxHealth() { return maxHealth; }
+    public void SetMaxHealth(int value) { maxHealth = value; }
+    private int currentHealth;
+
+    public int GetCurrentHealth() { return currentHealth; }
+    public void SetCurrentHealth(int value) { currentHealth = value; }
 
     private void Awake()//每次唤醒就检测单例，如果已有有就删除
     {

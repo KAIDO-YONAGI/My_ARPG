@@ -10,17 +10,17 @@ public class PlayerHealth : MonoBehaviour
     public Animator animator;
     void Start()
     {
-        healthText.text = "HP:" + StatsManager.instance.currentHealth + "/" + StatsManager.instance.maxHealth;
+        StatsManager.instance.UpdateHealth(StatsManager.instance.GetMaxHealth());
     }
-    public void changeHealth(int amount)
+    public void ChangeHealth(int amount)
     {
-        StatsManager.instance.currentHealth += amount;
-        healthText.text = "HP:" + StatsManager.instance.currentHealth + "/" + StatsManager.instance.maxHealth;
+        StatsManager.instance.UpdateHealth(amount);        
         animator.Play("TextUpdate");
 
-        if (StatsManager.instance.currentHealth <= 0)
+        if (StatsManager.instance.GetCurrentHealth() <= 0)
         {
             gameObject.SetActive(false);
+            
         }
     }
 }

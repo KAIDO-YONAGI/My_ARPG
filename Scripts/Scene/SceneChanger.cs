@@ -16,7 +16,7 @@ public class SceneChanger : MonoBehaviour
     public static SceneChanger instance;
 
     /// <summary>玩家初始位置</summary>
-    public  Vector3 initialPosition = Vector3.zero;
+    public Vector3 initialPosition = Vector3.zero;
     /// <summary>淡入淡出持续时间</summary>
     public float fadeDuration = 1f;
     /// <summary>第一个加载的场景（游戏启动时）</summary>
@@ -168,6 +168,11 @@ public class SceneChanger : MonoBehaviour
                 if (obj is GameObject go)
                 {
                     go.SetActive(true);
+
+                    if (go.CompareTag("Player"))
+                    {
+                        go.GetComponent<PlayerHealth>().ChangeHealth(StatsManager.instance.GetMaxHealth());
+                    }
                 }
             }
         }

@@ -113,7 +113,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void ResetTimer()
     {
-        timer = StatsManager.instance.coolDown;
+        timer = StatsManager.instance.GetCoolDown();
     }
     private bool IsToRunning()
     {
@@ -156,7 +156,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void SetMovement(float horizontal, float vertical)
     {
-        rb.velocity = new Vector2(horizontal, vertical) * StatsManager.instance.speed;
+        rb.velocity = new Vector2(horizontal, vertical) * StatsManager.instance.GetSpeed();
     }
 
     private void Flip()
