@@ -7985,6 +7985,7 @@ GameObject:
   - component: {fileID: 2144094352}
   - component: {fileID: 2144094351}
   - component: {fileID: 2144094350}
+  - component: {fileID: 2144094353}
   m_Layer: 0
   m_Name: RetryButton
   m_TagString: Untagged
@@ -8055,7 +8056,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2144094351}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2144094353}
+        m_TargetAssemblyTypeName: ButtonSceneToggler, Assembly-CSharp
+        m_MethodName: RaiseLoadRequestEvent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2144094351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8094,6 +8107,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2144094348}
   m_CullTransparentMesh: 1
+--- !u!114 &2144094353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144094348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87d1fc010ab61f143bbc0071fe380f72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
+  sceneToLoad: {fileID: 0}
+  ButtonCanvas: {fileID: 138144116}
+  newPosition: {x: 0, y: 0, z: 0}
+  isToFade: 1
 --- !u!223 &7716898650382567
 Canvas:
   m_ObjectHideFlags: 0

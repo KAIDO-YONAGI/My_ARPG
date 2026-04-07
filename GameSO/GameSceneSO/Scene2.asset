@@ -17,3 +17,5 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  sceneType: 0
+  initialPosition: {x: 10.5, y: 8, z: 0}

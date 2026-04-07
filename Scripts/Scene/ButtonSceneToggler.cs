@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MyEnums;
+using UnityEditor.EditorTools;
 public class ButtonSceneToggler : MonoBehaviour
 {
     public SceneLoadEventSO loadEventSO;
-    public GameSceneSO sceneToLoad;
+    [Tooltip("如果不指定场景，则默认重载当前场景")]
+    public GameSceneSO sceneToLoad;//如果不指定场景，则默认重载当前场景
     public CanvasGroup ButtonCanvas;
     public Vector3 newPosition;
 
@@ -15,10 +17,23 @@ public class ButtonSceneToggler : MonoBehaviour
         ButtonCanvas.alpha = 0;
         ButtonCanvas.interactable = false;
         ButtonCanvas.blocksRaycasts = false;
-        if(sceneToLoad.sceneType==SceneType.Menu)
+
+        if (sceneToLoad != null)
         {
-            TimeManager.instance.ForceResumeGame();
+            loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
+            if (sceneToLoad.sceneType == SceneType.Menu)
+            {
+                TimeManager.instance.ForceResumeGame();
+            }
         }
+        else
+        {
+            ReloadCurrentScene();
+        }
+    }
+    public void ReloadCurrentScene()
+    {
+        sceneToLoad = SceneChanger.instance.GetCurrentSceneSO();
         loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
     }
 }
