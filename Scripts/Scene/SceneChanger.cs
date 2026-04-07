@@ -113,8 +113,9 @@ public class SceneChanger : MonoBehaviour
     /// <param name="isToFade">是否显示过渡动画</param>
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
+        ForbidInput();
         sceneToLoad = scene;
-        this.newPosition = newPosition==Vector3.zero? sceneToLoad.initialPosition : newPosition;
+        this.newPosition = newPosition == Vector3.zero ? sceneToLoad.initialPosition : newPosition;
         //如果传入位置为零向量，则使用场景预设的初始位置
         this.isToFade = isToFade;
         if (isToFade && !isInitialScene)
@@ -208,5 +209,14 @@ public class SceneChanger : MonoBehaviour
             PlayLoadingAnimation("FadeOut");
         }
         isInitialScene = false;
+        AllowInput();
+    }
+    private void ForbidInput()
+    {
+        player.GetComponent<PlayerMovement>().enabled = false;
+    }
+    private void AllowInput()
+    {
+        player.GetComponent<PlayerMovement>().enabled = true;
     }
 }
