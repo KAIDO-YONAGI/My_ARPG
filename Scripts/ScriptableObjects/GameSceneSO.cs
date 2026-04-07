@@ -5,5 +5,5 @@ using MyEnums;
 public class GameSceneSO : ScriptableObject {
     public  AssetReference sceneReference;
     public SceneType sceneType;
-    
+    public Vector3 initialPosition;
 }

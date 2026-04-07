@@ -49,7 +49,10 @@ public class SceneChanger : MonoBehaviour
     {
         return loadedScene != null ? loadedScene : SceneManager.GetActiveScene();
     }
-
+    public GameSceneSO GetCurrentSceneSO()
+    {
+        return currentScene;
+    }
     /// <summary>
     /// 唤醒时初始化单例并加载首个场景
     /// </summary>
@@ -111,7 +114,8 @@ public class SceneChanger : MonoBehaviour
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
         sceneToLoad = scene;
-        this.newPosition = newPosition;
+        this.newPosition = newPosition==Vector3.zero? sceneToLoad.initialPosition : newPosition;
+        //如果传入位置为零向量，则使用场景预设的初始位置
         this.isToFade = isToFade;
         if (isToFade && !isInitialScene)
         {
