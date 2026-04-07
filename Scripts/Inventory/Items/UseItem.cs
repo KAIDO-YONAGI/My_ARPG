@@ -8,13 +8,13 @@ public class UseItem : MonoBehaviour
     {
 
         if (item.maxHealth > 0)
-            StatsManager.Instance.UpdateMaxHealth(item.maxHealth);
+            StatsManager.instance.UpdateMaxHealth(item.maxHealth);
         if (item.currentHealth > 0)
-            StatsManager.Instance.UpdateHealth(item.currentHealth);
+            StatsManager.instance.UpdateHealth(item.currentHealth);
         if (item.speed > 0)
-            StatsManager.Instance.UpdateSpeed(item.speed);
+            StatsManager.instance.UpdateSpeed(item.speed);
         if (item.damage > 0)
-            StatsManager.Instance.UpdateDamage(item.damage);
+            StatsManager.instance.UpdateDamage(item.damage);
         if (item.duration > 0)
             StartCoroutine(EffectTimer(item, item.duration));
 
@@ -25,17 +25,17 @@ public class UseItem : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         if (item.maxHealth > 0)
-            StatsManager.Instance.UpdateMaxHealth(-item.maxHealth);
+            StatsManager.instance.UpdateMaxHealth(-item.maxHealth);
 
-        int healthDiff = StatsManager.Instance.currentHealth - StatsManager.Instance.maxHealth;
+        int healthDiff = StatsManager.instance.currentHealth - StatsManager.instance.maxHealth;
         if (healthDiff > 0)//如果更新前当前生命大于更新后（已经减小回去）最大生命，那就会减去healthDiff
-            StatsManager.Instance.UpdateHealth(healthDiff);
+            StatsManager.instance.UpdateHealth(healthDiff);
 
         if (item.speed > 0)
-            StatsManager.Instance.UpdateSpeed(-item.speed);
+            StatsManager.instance.UpdateSpeed(-item.speed);
 
         if (item.damage > 0)
-            StatsManager.Instance.UpdateDamage(-item.damage);
+            StatsManager.instance.UpdateDamage(-item.damage);
 
     }
 }

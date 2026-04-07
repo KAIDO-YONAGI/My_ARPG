@@ -13,14 +13,14 @@ public class ToggleSkillTree : MonoBehaviour
         {
             if(skillTreeIsOpen)
             {
-                TimeManager.Instance.ResumeGame();
+                TimeManager.instance.ResumeGame();
                 statsCanvas.alpha = 0;
                 statsCanvas.blocksRaycasts = false; 
                 skillTreeIsOpen=false;
             }
             else
             {
-                TimeManager.Instance.PauseGame();
+                TimeManager.instance.PauseGame();
                 statsCanvas.alpha = 1;
                 statsCanvas.blocksRaycasts = true;
                 skillTreeIsOpen=true;

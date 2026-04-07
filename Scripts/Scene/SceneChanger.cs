@@ -13,7 +13,7 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 public class SceneChanger : MonoBehaviour
 {
     /// <summary>单例实例</summary>
-    public static SceneChanger Instance;
+    public static SceneChanger instance;
 
     /// <summary>玩家初始位置</summary>
     public  Vector3 initialPosition = Vector3.zero;
@@ -61,7 +61,7 @@ public class SceneChanger : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        Instance = this;
+        instance = this;
         sceneToLoad = firstScene;
         SetPlayerPostion(initialPosition);
         LoadScene(sceneToLoad);
