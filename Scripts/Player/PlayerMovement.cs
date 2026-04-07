@@ -173,6 +173,8 @@ public class PlayerMovement : MonoBehaviour
     }
     public void KonckBack(Transform enemy, float force, float stunTime)
     {
+        if(gameObject.activeSelf == false)
+            return;
         playerState = PlayerState.KnockBack;
         Vector2 direction = (transform.position - enemy.position).normalized;
 
