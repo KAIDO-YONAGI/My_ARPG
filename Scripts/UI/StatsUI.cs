@@ -25,14 +25,14 @@ public class StatsUI : MonoBehaviour
         {
             if (statsIsOpen)
             {
-                TimeManager.Instance.ResumeGame();
+                TimeManager.instance.ResumeGame();
                 statsCanvas.alpha = 0;//组件alpha值设置为0，依赖父对象的canvasGroup组件来实现，需要在unity中实现绑定
                 statsCanvas.blocksRaycasts = false;
                 statsIsOpen = false;
             }
             else
             {
-                TimeManager.Instance.PauseGame();
+                TimeManager.instance.PauseGame();
                 statsCanvas.alpha = 1;
                 statsCanvas.blocksRaycasts = true;
                 statsIsOpen = true;
@@ -43,12 +43,12 @@ public class StatsUI : MonoBehaviour
     }
     public void UpdateDamage()
     {
-        statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.Instance.damage;
+        statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.instance.damage;
         //注意components是复数，会导致返回一个数组，不要拼错了
     }
     public void UpdateSpeed()
     {
-        statsSlots[1].GetComponentInChildren<TMP_Text>().text = "Speed:" + StatsManager.Instance.speed;
+        statsSlots[1].GetComponentInChildren<TMP_Text>().text = "Speed:" + StatsManager.instance.speed;
     }
 
     public void UpdateAllStats()

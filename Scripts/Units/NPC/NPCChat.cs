@@ -27,7 +27,7 @@ public class NPCChat : MonoBehaviour
     }
 
     private void Update() {
-        if (Input.GetButtonDown("Interact"))
+        if (Input.GetButtonDown("NPCInteract"))
         {
             if (dialogSO != null&& !DialogManager.instance.isDialogActive)
             {

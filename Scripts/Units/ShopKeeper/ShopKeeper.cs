@@ -34,7 +34,7 @@ public class ShopKeeper : MonoBehaviour
         {
             if (shopIsOpen)
             {
-                TimeManager.Instance.ResumeGame();
+                TimeManager.instance.ResumeGame();
                 OnShopStateChanged?.Invoke(shopManager, false);
                 currentShopKeeper = null;
                 shopCanvasGroup.alpha = 0;
@@ -44,7 +44,7 @@ public class ShopKeeper : MonoBehaviour
             }
             else
             {
-                TimeManager.Instance.PauseGame();
+                TimeManager.instance.PauseGame();
                 OnShopStateChanged?.Invoke(shopManager, true);
                 currentShopKeeper = this;
 

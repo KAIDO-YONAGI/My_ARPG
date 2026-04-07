@@ -118,6 +118,12 @@ public class EnemyMovement : MonoBehaviour
         if (!(posToGo == Vector3.zero) && posToGo != null)
             direction = (posToGo - transform.position).normalized;
 
+        else
+        {
+            AnimatorSM(EnemyState.Idle);
+            return;
+        }
+
         SetVelocity(direction, speed);
 
         if ((transform.position - posToGo).sqrMagnitude < t * t)

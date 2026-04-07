@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SceneToggler : MonoBehaviour
+public class ButtonSceneToggler : MonoBehaviour
 {
     public SceneLoadEventSO loadEventSO;
     public Vector3 newPosition;
     public GameSceneSO sceneToLoad;
     public bool isToFade = true;
-    private void OnTriggerEnter2D(Collider2D collider)
+    public void RaiseLoadRequestEvent()
     {
+        Debug.Log("ButtonSceneToggler: Raising Load Request Event for scene " + sceneToLoad.sceneType);
         loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
     }
 }
