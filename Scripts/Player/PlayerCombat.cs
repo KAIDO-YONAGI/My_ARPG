@@ -14,17 +14,17 @@ public class PlayerCombat : MonoBehaviour
 
         StrengthBUff();
 
-        Collider2D[] enemis = Physics2D.OverlapCircleAll(attackPoint.position, StatsManager.instance.weaponRange, enemyMask);
+        Collider2D[] enemis = Physics2D.OverlapCircleAll(attackPoint.position, StatsManager.instance.GetWeaponRange(), enemyMask);
 
         if (enemis.Length > 0)
         {
-            enemis[0].GetComponent<EnemyHealth>().ChangeHealth(-(StatsManager.instance.damage));
-            enemis[0].GetComponent<EnemyKnockBack>().Knockback(transform, StatsManager.instance.knockBackForce, StatsManager.instance.stunTime, StatsManager.instance.knockBackTime);
+            enemis[0].GetComponent<EnemyHealth>().ChangeHealth(-(StatsManager.instance.GetDamage()));
+            enemis[0].GetComponent<EnemyKnockBack>().Knockback(transform, StatsManager.instance.GetKnockBackForce(), StatsManager.instance.GetStunTime(), StatsManager.instance.GetKnockBackTime());
         }
     }
     private void StrengthBUff()
     {
-        StatsManager.instance.damage += 1;
+        StatsManager.instance.SetDamage(StatsManager.instance.GetDamage() + 1);
         statsUI.UpdateDamage();
     }
     public void FinshCombat()

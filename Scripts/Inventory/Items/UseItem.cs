@@ -27,7 +27,7 @@ public class UseItem : MonoBehaviour
         if (item.maxHealth > 0)
             StatsManager.instance.UpdateMaxHealth(-item.maxHealth);
 
-        int healthDiff = StatsManager.instance.currentHealth - StatsManager.instance.maxHealth;
+        int healthDiff = StatsManager.instance.GetCurrentHealth() - StatsManager.instance.GetMaxHealth();
         if (healthDiff > 0)//如果更新前当前生命大于更新后（已经减小回去）最大生命，那就会减去healthDiff
             StatsManager.instance.UpdateHealth(healthDiff);
 

@@ -10,7 +10,7 @@ public class ButtonSceneToggler : MonoBehaviour
     public bool isToFade = true;
     public void RaiseLoadRequestEvent()
     {
-        Debug.Log("ButtonSceneToggler: Raising Load Request Event for scene " + sceneToLoad.sceneType);
+        
         loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
     }
 }

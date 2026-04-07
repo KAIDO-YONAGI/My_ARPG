@@ -19,7 +19,7 @@ public class EnemyCombat : MonoBehaviour
 
         if (hits.Length > 0&&hits[0].enabled)//如果有目标，并且目标具有PlayerHealth组件
         {
-            hits[0].GetComponent<PlayerHealth>().changeHealth(-damage);
+            hits[0].GetComponent<PlayerHealth>().ChangeHealth(-damage);
             hits[0].GetComponent<PlayerMovement>().KonckBack(transform, konckBackForce,stunTime);
         }
     }
