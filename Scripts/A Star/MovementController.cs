@@ -95,7 +95,9 @@ public class MovementController : MonoBehaviour
         hasValidPath = path != null && path.Count > 0;
         if (!hasValidPath)
         {
-            Debug.LogWarning("找不到路径！");
+            #if UNITY_EDITOR
+            Debug.LogWarning("找不到路径！");//编辑器模式下警告，发布后不显示,减少性能浪费
+            #endif
             return false;
         }
         return true;

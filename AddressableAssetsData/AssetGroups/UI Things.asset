@@ -22,6 +22,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fc27dc080333ad40b820052cc738a40
+    m_Address: Assets/Prefabs/UI/RetryButton.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a28c895636a44e04585eb69925200290
     m_Address: Assets/Prefabs/UI/Stats.prefab
     m_ReadOnly: 0
@@ -39,6 +44,16 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b27c85496cf4fc54ea2e4d7d66fdef3d
     m_Address: Assets/Prefabs/UI/ShopSlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b409be61da8ae4b4dbcce25e78833d85
+    m_Address: Assets/Prefabs/UI/ExitButton.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d1e11eb959f03ff49a24a7affc115f92
+    m_Address: Assets/Prefabs/UI/TitleButton.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
