@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ToggleSkillTree : MonoBehaviour
 {
-    public CanvasGroup statsCanvas;
+    public CanvasGroup skillsCanvas;
     private bool skillTreeIsOpen=false;
 
     private void Update()
@@ -14,15 +14,17 @@ public class ToggleSkillTree : MonoBehaviour
             if(skillTreeIsOpen)
             {
                 TimeManager.instance.ResumeGame();
-                statsCanvas.alpha = 0;
-                statsCanvas.blocksRaycasts = false; 
+                skillsCanvas.alpha = 0;
+                skillsCanvas.blocksRaycasts = false; 
+                skillsCanvas.interactable = false;
                 skillTreeIsOpen=false;
             }
             else
             {
                 TimeManager.instance.PauseGame();
-                statsCanvas.alpha = 1;
-                statsCanvas.blocksRaycasts = true;
+                skillsCanvas.alpha = 1;
+                skillsCanvas.blocksRaycasts = true;
+                skillsCanvas.interactable = true;
                 skillTreeIsOpen=true;
 
             }

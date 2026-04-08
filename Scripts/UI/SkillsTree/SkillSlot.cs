@@ -15,8 +15,8 @@ public class SkillSlot : MonoBehaviour
     public int currentLevel;
     public bool isUnlocked = false;
 
-    public static event Action<SkillSlot> OnAbilityPointSpent;//ÊÂ¼þ¹ã²¥
-    public static event Action<SkillSlot> OnMaxSkillLevel;//ÊÂ¼þ¹ã²¥
+    public static event Action<SkillSlot> OnAbilityPointSpent;//äº‹ä»¶å¹¿æ’­
+    public static event Action<SkillSlot> OnMaxSkillLevel;//äº‹ä»¶å¹¿æ’­
     private void OnValidate()
     {
         if (skillSO != null && skillLevelText != null)
@@ -48,7 +48,7 @@ public class SkillSlot : MonoBehaviour
         {
             currentLevel++;
 
-            OnAbilityPointSpent?.Invoke(this);//Èç¹ûÊÂ¼þ·Ç¿Õ£º ?. ·¢ËÍÊÂ¼þ¸ø¶©ÔÄÕß
+            OnAbilityPointSpent?.Invoke(this);//å¦‚æžœäº‹ä»¶éžç©ºï¼š ?. å‘é€äº‹ä»¶ç»™è®¢é˜…è€…
             if (currentLevel >= skillSO.maxLevel)
             {
                 OnMaxSkillLevel?.Invoke(this);
