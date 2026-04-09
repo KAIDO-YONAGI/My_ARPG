@@ -2297,7 +2297,7 @@ Transform:
   m_GameObject: {fileID: 548963471}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.202015, y: -18.84521, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8587,7 +8587,7 @@ MonoBehaviour:
   healthText: {fileID: 5017396996528277926}
   statsUI: {fileID: 2489995085478689421}
   damage: 1
-  weaponRange: 0.5
+  weaponRange: 1
   knockBackForce: 2
   knockBackTime: 0.5
   stunTime: 0.2
@@ -9023,7 +9023,7 @@ Transform:
   m_GameObject: {fileID: 3910970513268255629}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.812016, y: -17.455208, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10051,7 +10051,7 @@ Transform:
   m_GameObject: {fileID: 9140946962347789005}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10425,7 +10425,7 @@ Transform:
   m_GameObject: {fileID: 2803874550310743378}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 15.323146, y: -16.626583, z: -0.029638477}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10560,7 +10560,7 @@ Transform:
   m_GameObject: {fileID: 7898114213098828720}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 18.353127, y: -9.720106, z: 0.26736572}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
