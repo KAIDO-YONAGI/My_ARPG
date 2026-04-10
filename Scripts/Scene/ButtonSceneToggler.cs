@@ -5,18 +5,19 @@ using MyEnums;
 public class ButtonSceneToggler : MonoBehaviour
 {
     public SceneLoadEventSO loadEventSO;
-    public GameSceneSO sceneToLoad;//如果不指定场景，则默认重载当前场景
+    public GameSceneSO sceneToLoad;
     public CanvasGroup ButtonCanvas;
     public Vector3 newPosition;
-
     public bool isToFade = true;
+    [Header("Retry Event")]
+    public VoidEventSO retryEventSO;
     public void RaiseLoadRequestEvent()
     {
         ButtonCanvas.alpha = 0;
         ButtonCanvas.interactable = false;
         ButtonCanvas.blocksRaycasts = false;
 
-        if (sceneToLoad.sceneName!="Retry")
+        if (sceneToLoad.sceneName != "Retry")
         {
             loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
             if (sceneToLoad.sceneType == SceneType.Menu)
@@ -26,12 +27,9 @@ public class ButtonSceneToggler : MonoBehaviour
         }
         else
         {
-            ReloadCurrentScene();
+            retryEventSO.OnEventRaised();
+
         }
     }
-    public void ReloadCurrentScene()
-    {
-        sceneToLoad = SceneChanger.instance.GetCurrentSceneSO();
-        loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
-    }
+
 }

@@ -17,18 +17,18 @@ public class SceneChanger : MonoBehaviour
     /// <summary>玩家初始位置</summary>
     public Vector3 initialPosition = Vector3.zero;
     public float fadeDuration = 1f;
-    public GameSceneSO firstScene;
+    public GameSceneSO initScene;
     public GameObject player;
     public CanvasGroup fadeCanva;
     /// <summary>过渡动画播放器数组</summary>
-    public Animator[] transitionImages;
+    ///     
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
-    [Header("Objects to Unable")]
+    public Animator[] transitionImages;
+
     public Object[] objectsToUnable;
     /// <summary>要重置的画布组数组 </summary>
-    [Header("Canvas to Reset")]
-    public CanvasGroup[] canvasesToReset;
+    public CanvasGroup[] canvasToReset;
 
     private GameSceneSO sceneToLoad;
 
@@ -59,7 +59,7 @@ public class SceneChanger : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        sceneToLoad = firstScene;
+        sceneToLoad = initScene;
         SetPlayerPostion(initialPosition);
         LoadScene(sceneToLoad);
     }
@@ -158,7 +158,7 @@ public class SceneChanger : MonoBehaviour
                     go.SetActive(false);
                 }
             }
-            foreach (var canvas in canvasesToReset)
+            foreach (var canvas in canvasToReset)
             {
                 if (canvas.GetComponent<CanvasGroup>() != null)
                 {

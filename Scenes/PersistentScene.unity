@@ -9235,7 +9235,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
   fadeDuration: 1
-  firstScene: {fileID: 11400000, guid: 7c55136055a6e324ba090da1c0385003, type: 2}
+  initScene: {fileID: 0}
   player: {fileID: 6166002366618250803}
   fadeCanva: {fileID: 1424539692}
   transitionImages:
@@ -9245,7 +9245,7 @@ MonoBehaviour:
   objectsToUnable:
   - {fileID: 6733727039573014254}
   - {fileID: 6166002366618250803}
-  canvasesToReset:
+  canvasToReset:
   - {fileID: 512097847646187518}
   - {fileID: 1081069818152936524}
   - {fileID: 666307407}
