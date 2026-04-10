@@ -25,7 +25,6 @@ public class SceneChanger : MonoBehaviour
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
     public Animator[] transitionImages;
-
     public Object[] objectsToUnable;
     /// <summary>要重置的画布组数组 </summary>
     public CanvasGroup[] canvasToReset;
@@ -48,10 +47,6 @@ public class SceneChanger : MonoBehaviour
     public Scene GetCurrentScene()
     {
         return loadedScene != null ? loadedScene : SceneManager.GetActiveScene();
-    }
-    public GameSceneSO GetCurrentSceneSO()
-    {
-        return currentScene;
     }
     /// <summary>
     /// 唤醒时初始化单例并加载首个场景
@@ -180,11 +175,6 @@ public class SceneChanger : MonoBehaviour
                 if (obj is GameObject go)
                 {
                     go.SetActive(true);
-
-                    if (go.CompareTag("Player"))
-                    {
-                        go.GetComponent<PlayerHealth>().ChangeHealth(StatsManager.instance.GetMaxHealth());
-                    }
                 }
             }
         }
