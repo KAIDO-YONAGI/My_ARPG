@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class RetryManager : MonoBehaviour
@@ -30,5 +31,6 @@ public class RetryManager : MonoBehaviour
     private void OnReTry()
     {
         loadEventSO.RaiseLoadRequestEvent(currentScene, Vector3.zero, true);
+        StatsManager.instance.UpdateHealth(StatsManager.instance.GetMaxHealth());
     }
 }

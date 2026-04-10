@@ -39,12 +39,7 @@ public class StatsManager : MonoBehaviour
 
 
     public int GetMaxHealth() { return maxHealth; }
-    public void SetMaxHealth(int value) { maxHealth = value; }
-
-
     public int GetCurrentHealth() { return currentHealth; }
-    public void SetCurrentHealth(int value) { currentHealth = value; }
-
     private void Awake()//每次唤醒就检测单例，如果已有有就删除
     {
         if (instance == null) instance = this;

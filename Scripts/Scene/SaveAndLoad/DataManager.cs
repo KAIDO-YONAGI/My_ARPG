@@ -52,7 +52,7 @@ public class DataManager : MonoBehaviour
     }
     void Save()
     {
-        foreach (var saveable in saveables.ToList())
+        foreach (var saveable in saveables)
         {
             saveable.SaveData(dataToSave);
         }
@@ -64,7 +64,7 @@ public class DataManager : MonoBehaviour
     }
     void Load()
     {
-        foreach (var saveable in saveables.ToList())
+        foreach (var saveable in saveables)
         {
             saveable.LoadData(dataToSave);
         }
