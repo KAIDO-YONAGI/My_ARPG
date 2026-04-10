@@ -151,6 +151,7 @@ MonoBehaviour:
   ButtonCanvas: {fileID: 0}
   newPosition: {x: 0, y: 0, z: 0}
   isToFade: 1
+  retryEventSO: {fileID: 11400000, guid: ab55211f38f1eba4b8515a1ac13837a3, type: 2}
 --- !u!1 &7632956191357238880
 GameObject:
   m_ObjectHideFlags: 0

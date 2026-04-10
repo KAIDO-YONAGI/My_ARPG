@@ -1,18 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RetryManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    RetryManager instance;
+    private void Awake()
     {
-        
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
     }
 
-    // Update is called once per frame
-    void Update()
+    public GameSceneSO currentScene;
+    public SceneLoadEventSO loadEventSO;
+    [Header("Retry Event")]
+    public VoidEventSO retryEventSO;
+
+    private void OnEnable()
     {
-        
+        retryEventSO.VoidEvent += OnReTry;
+    }
+    private void OnDisable()
+    {
+        retryEventSO.VoidEvent -= OnReTry;
+    }
+    private void OnReTry()
+    {
+        loadEventSO.RaiseLoadRequestEvent(currentScene, Vector3.zero, true);
     }
 }
