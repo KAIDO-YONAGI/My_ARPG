@@ -5,7 +5,6 @@ using MyEnums;
 public class ButtonSceneToggler : MonoBehaviour
 {
     public SceneLoadEventSO loadEventSO;
-    [Tooltip("如果不指定场景，则默认重载当前场景")]
     public GameSceneSO sceneToLoad;//如果不指定场景，则默认重载当前场景
     public CanvasGroup ButtonCanvas;
     public Vector3 newPosition;
@@ -17,7 +16,7 @@ public class ButtonSceneToggler : MonoBehaviour
         ButtonCanvas.interactable = false;
         ButtonCanvas.blocksRaycasts = false;
 
-        if (sceneToLoad != null)
+        if (sceneToLoad.sceneName!="Retry")
         {
             loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
             if (sceneToLoad.sceneType == SceneType.Menu)

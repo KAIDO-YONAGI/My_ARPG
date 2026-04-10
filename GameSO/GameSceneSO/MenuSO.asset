@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09a4ebb01acc81c41889f97c05800566, type: 3}
   m_Name: MenuSO
   m_EditorClassIdentifier: 
+  sceneName: Menu
   sceneReference:
     m_AssetGUID: 39b4c5c3f91378d4b922675c04cb10bf
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   sceneType: 1
+  initialPosition: {x: 0, y: 0, z: 0}

@@ -11001,6 +11001,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7955157176541925022, guid: 9fc27dc080333ad40b820052cc738a40, type: 3}
+      propertyPath: sceneToLoad
+      value: 
+      objectReference: {fileID: 11400000, guid: ebd6b38e5d8c51b4080a49222c8c9c22, type: 2}
+    - target: {fileID: 7955157176541925022, guid: 9fc27dc080333ad40b820052cc738a40, type: 3}
       propertyPath: ButtonCanvas
       value: 
       objectReference: {fileID: 138144116}
