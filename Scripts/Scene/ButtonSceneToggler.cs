@@ -27,8 +27,8 @@ public class ButtonSceneToggler : MonoBehaviour
         }
         else
         {
-            retryEventSO.OnEventRaised();
-
+            TimeManager.instance.ForceResumeGame();
+            retryEventSO.OnEventRaised();//RetryManager位于每个场景内
         }
     }
 

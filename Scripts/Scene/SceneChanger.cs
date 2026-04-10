@@ -146,45 +146,46 @@ public class SceneChanger : MonoBehaviour
     {
         if (sceneToLoad.sceneType == MyEnums.SceneType.Menu)
         {
-            foreach (Object obj in objectsToUnable)
-            {
-                if (obj is GameObject go)
-                {
-                    go.SetActive(false);
-                }
-            }
-            foreach (var canvas in canvasToReset)
-            {
-                if (canvas.GetComponent<CanvasGroup>() != null)
-                {
-                    canvas.alpha = 0;
-                    canvas.interactable = false;
-                    canvas.blocksRaycasts = false;
-                }
-                else
-                {
-                    Debug.LogWarning($"CanvasGroup component not found on {canvas.name}");
-                }
-            }
+            setObjects(false);
         }
+
         else if (sceneToLoad.sceneType == MyEnums.SceneType.Location)
         {
-            Time.timeScale = 1;
-            foreach (Object obj in objectsToUnable)
-            {
-                if (obj is GameObject go)
-                {
-                    go.SetActive(true);
-                }
-            }
+            setObjects(true);
         }
         if (sceneToLoad != null)
         {
             var loadingOption = sceneToLoad.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
             loadingOption.Completed += OnLoadCompleted;
         }
+        resetCanvas();
     }
-
+    private void setObjects(bool state)
+    {
+        foreach (Object obj in objectsToUnable)
+        {
+            if (obj is GameObject go)
+            {
+                go.SetActive(state);
+            }
+        }
+    }
+    private void resetCanvas()
+    {
+        foreach (var canvas in canvasToReset)
+        {
+            if (canvas.GetComponent<CanvasGroup>() != null)
+            {
+                canvas.alpha = 0;
+                canvas.interactable = false;
+                canvas.blocksRaycasts = false;
+            }
+            else
+            {
+                Debug.LogWarning($"CanvasGroup component not found on {canvas.name}");
+            }
+        }
+    }
     /// <summary>
     /// 场景加载完成回调
     /// 更新当前场景引用，播放淡出动画
