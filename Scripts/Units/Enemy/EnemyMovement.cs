@@ -22,7 +22,7 @@ public class EnemyMovement : MonoBehaviour
     private float velocityCooldown = 0.2f;
     private float velocityTimer;
     private Vector2 lastVelocity;
-    float t;
+    float threshold;
 
 
 
@@ -54,7 +54,7 @@ public class EnemyMovement : MonoBehaviour
     private void Start()
     {
         AnimatorSM(EnemyState.Idle);//注意状态改变需要在找到animator之后才开始
-        t = aStarController.GetThreshold();
+        threshold = aStarController.GetThreshold();
     }
     private void Update()
     {
@@ -126,7 +126,7 @@ public class EnemyMovement : MonoBehaviour
 
         SetVelocity(direction, speed);
 
-        if ((transform.position - posToGo).sqrMagnitude < t * t)
+        if ((transform.position - posToGo).sqrMagnitude < threshold * threshold)
         {
             aStarController.ArrivedPos();
         }

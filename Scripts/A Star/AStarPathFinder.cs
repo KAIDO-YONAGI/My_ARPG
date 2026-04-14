@@ -80,9 +80,9 @@ public class AStarPathFinder : MonoBehaviour
         Vector3 direction = (optCellPos - startCellPos).normalized;
         float step = 1*GetCellSize(); // 步长，根据需要调整
 
-        for (float t = step; t < distance; t += step)
+        for (float threshold = step; threshold < distance; threshold += step)
         {
-            Vector3 checkPos = startCellPos + direction * t;
+            Vector3 checkPos = startCellPos + direction * threshold;
             Vector3 cellPos = new Vector3(Mathf.Round(checkPos.x), Mathf.Round(checkPos.y), Mathf.Round(checkPos.z));
 
             if (NodeCellMap.ContainsKey(cellPos))

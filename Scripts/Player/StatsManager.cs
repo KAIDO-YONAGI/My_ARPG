@@ -7,39 +7,32 @@ public class StatsManager : MonoBehaviour
     public StatsUI statsUI;
 
 
-    [SerializeField]private int damage;
+    [SerializeField] private int damage;
     [SerializeField] private float weaponRange;
     [SerializeField] private float knockBackForce;
     [SerializeField] private float knockBackTime;
     [SerializeField] private float stunTime;
     [SerializeField] private float coolDown;
-    [SerializeField]private float speed;
-    [SerializeField]private int maxHealth;
-    [SerializeField]private int currentHealth;
+    [SerializeField] private float speed;
+    [SerializeField] private int maxHealth;
+    [SerializeField] private int currentHealth;
+    
     public int GetDamage() { return damage; }
-    public void SetDamage(int value) { damage = value; }
-
     public float GetWeaponRange() { return weaponRange; }
-    public void SetWeaponRange(float value) { weaponRange = value; }
-
     public float GetKnockBackForce() { return knockBackForce; }
-    public void SetKnockBackForce(float value) { knockBackForce = value; }
-
     public float GetKnockBackTime() { return knockBackTime; }
-    public void SetKnockBackTime(float value) { knockBackTime = value; }
-
     public float GetStunTime() { return stunTime; }
-    public void SetStunTime(float value) { stunTime = value; }
-
     public float GetCoolDown() { return coolDown; }
-    public void SetCoolDown(float value) { coolDown = value; }
-
     public float GetSpeed() { return speed; }
-    public void SetSpeed(float value) { speed = value; }
-
-
     public int GetMaxHealth() { return maxHealth; }
     public int GetCurrentHealth() { return currentHealth; }
+
+
+    public void SetWeaponRange(float value) { weaponRange = value; }
+    public void SetKnockBackForce(float value) { knockBackForce = value; }
+    public void SetKnockBackTime(float value) { knockBackTime = value; }
+    public void SetStunTime(float value) { stunTime = value; }
+    public void SetCoolDown(float value) { coolDown = value; }
     private void Awake()//每次唤醒就检测单例，如果已有有就删除
     {
         if (instance == null) instance = this;
@@ -74,5 +67,7 @@ public class StatsManager : MonoBehaviour
     public void UpdateDamage(int amount)
     {
         damage += amount;
+        statsUI.UpdateDamage();
+
     }
 }

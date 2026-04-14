@@ -4563,7 +4563,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 51
+  m_SortingOrder: 1000
   m_TargetDisplay: 0
 --- !u!224 &1424539691
 RectTransform:
@@ -8834,7 +8834,6 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 512
-  statsUI: {fileID: 2489995085478689421}
   playerMovement: {fileID: 5523715633723475569}
 --- !u!114 &4136015730807369908 stripped
 MonoBehaviour:

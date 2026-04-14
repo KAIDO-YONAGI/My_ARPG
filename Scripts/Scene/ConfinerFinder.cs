@@ -24,10 +24,10 @@ public class ConfinerFinder : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        StartCoroutine(BindConfiner());
+        StartCoroutine(FindConfiner());
     }
 
-    IEnumerator BindConfiner()
+    IEnumerator FindConfiner()
     {
         // 等一帧，确保场景物体初始化完成
         yield return null;
@@ -36,7 +36,7 @@ public class ConfinerFinder : MonoBehaviour
 
         if (obj == null)
         {
-            Debug.LogWarning("Can't find Confiner");
+            Debug.LogWarning("Can'threshold find Confiner");
             yield break;
         }
 

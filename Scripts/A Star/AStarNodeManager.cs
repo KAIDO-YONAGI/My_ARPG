@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using MyEnums;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+[DefaultExecutionOrder(-101)]
 
 /// <summary>
 /// AStar 节点管理器，负责地图初始化和节点数据管理
 /// </summary>
+/// 
 public class AStarNodeManager : MonoBehaviour
 {
 
