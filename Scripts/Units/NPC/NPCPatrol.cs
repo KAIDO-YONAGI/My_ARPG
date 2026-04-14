@@ -81,8 +81,10 @@ public class NPCPatrol : MonoBehaviour
         else
             rb.velocity = Vector2.zero;
 
+        float thresholdSqr = threshold * threshold;
+
         // 到达寻路节点
-        if ((transform.position - posToGo).sqrMagnitude < threshold * threshold)
+        if ((transform.position - posToGo).sqrMagnitude < thresholdSqr)
         {
             aStarController.ArrivedPos();
             posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
@@ -93,7 +95,7 @@ public class NPCPatrol : MonoBehaviour
         }
 
         // 到达角落目标点
-        if ((transform.position - targetPosition).sqrMagnitude < threshold * threshold || posToGo == Vector3.zero)
+        if ((transform.position - targetPosition).sqrMagnitude < thresholdSqr || posToGo == Vector3.zero)
         {
             StartCoroutine(WaitAndMoveToNextCorner());
         }

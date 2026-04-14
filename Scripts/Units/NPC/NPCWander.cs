@@ -9,7 +9,7 @@ public class NPCWander : MonoBehaviour
     [Header("Component References")]
     public Animator animator;
     public MovementController aStarController;
-    
+
     [Header("Movement Settings")]
     public float speed = 2f;
     public float waitTime = 1f;
@@ -59,9 +59,9 @@ public class NPCWander : MonoBehaviour
             rb.velocity = direction * speed;
         else rb.velocity = Vector2.zero;
 
+        float thresholdSqr = threshold * threshold;
 
-
-        if ((transform.position - posToGo).sqrMagnitude < threshold * threshold)//到寻路节点则告知controller
+        if ((transform.position - posToGo).sqrMagnitude < thresholdSqr)//到寻路节点则告知controller
         {
             aStarController.ArrivedPos();
             posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
@@ -71,7 +71,7 @@ public class NPCWander : MonoBehaviour
             animator.SetBool("isWalking", true);
         }
 
-        if ((transform.position - targetPosition).sqrMagnitude < threshold * threshold || posToGo == Vector3.zero)//到终点则重新获取巡逻点
+        if ((transform.position - targetPosition).sqrMagnitude < thresholdSqr || posToGo == Vector3.zero)//到终点则重新获取巡逻点
         {
             StartCoroutine(WaitAndContinue());
         }
