@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogLines:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
-    text: More...
-  nextDialogNodes: []
+    text: More!
+  nextDialogOptions: []

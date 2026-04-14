@@ -28,12 +28,16 @@ public class DialogManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        DisableButtons();
+
     }
     private int currentLineIndex = 0;
 
     public void StartDialog(DialogSO dialog)
     {
         dialogCanvasGroup.alpha = 1;
+        dialogCanvasGroup.interactable = true;
+        dialogCanvasGroup.blocksRaycasts = true;
         currentDialog = dialog;
         currentLineIndex = 0;
         isDialogActive = true;
@@ -43,7 +47,8 @@ public class DialogManager : MonoBehaviour
     {
         isDialogActive = false;
         dialogCanvasGroup.alpha = 0;
-        DisableButtons();
+        dialogCanvasGroup.interactable = false;
+        dialogCanvasGroup.blocksRaycasts = false;
     }
     public void AdvanceDialog()
     {
@@ -51,17 +56,38 @@ public class DialogManager : MonoBehaviour
         {
             ShowDialog();
         }
-        else
+        else if (currentDialog.nextDialogOptions.Length == 0 &&
+         currentLineIndex == currentDialog.dialogLines.Length)
+        {
+            EndDialog();
+        }
+        if (currentDialog.dialogLines.Length != 0 &&
+        currentDialog.dialogLines.Length == currentLineIndex)
+        //非零的时候才是有对话打开的
+        //另外，这个if是让选项直接和对话一同出现，不用多点一下
         {
             ShowChoices();
         }
+
     }
     private void ShowChoices()
     {
         if (currentDialog.nextDialogOptions.Length == 0)
-            EndDialog();
-        else
-            InitializeButtons();
+        {
+            return;
+        }
+        InitializeButtons();
+        for (int i = 0; i < currentDialog.nextDialogOptions.Length; i++)
+        {
+            if (i >= optionButtons.Length) break; // 边界检查
+
+            int index = i;
+            DialogSO nextDialog = currentDialog.nextDialogOptions[index].nextDialogNode;
+
+            optionButtons[index].onClick.AddListener(
+                () => OnOptionSelected(nextDialog)
+            );
+        }
     }
     private void ShowDialog()//显示当前对话行的文本和说话人信息
     {
@@ -84,11 +110,12 @@ public class DialogManager : MonoBehaviour
     {
         for (int i = 0; i < optionButtons.Length; i++)
         {
+            // Debug.Log($"按钮 {i}: active={optionButtons[i].gameObject.activeSelf}, interactable={optionButtons[i].interactable}");
             if (i < currentDialog.nextDialogOptions.Length)
             {
+                optionButtons[i].interactable = true;
                 optionButtons[i].gameObject.SetActive(true);
                 optionButtons[i].GetComponentInChildren<TMP_Text>().text = currentDialog.nextDialogOptions[i].optionText;
-                optionButtons[i].onClick.AddListener(() => OnOptionSelected(i));
             }
             else
             {
@@ -97,17 +124,16 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    private void OnOptionSelected(int i)//按钮事件，根据选择的选项加载下一个对话节点
+    private void OnOptionSelected(DialogSO nextDialog)//按钮事件，根据选择的选项加载下一个对话节点
     {
-        DialogSO nextDialog = currentDialog.nextDialogOptions[i].nextDialogNode;
         if (nextDialog != null)
         {
             StartDialog(nextDialog);
+            DisableButtons();
         }
         else
         {
             EndDialog();
         }
-
     }
 }

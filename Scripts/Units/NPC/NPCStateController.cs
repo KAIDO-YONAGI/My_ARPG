@@ -38,4 +38,5 @@ public class NPCStateController : MonoBehaviour
             SwitchState(DefaultState);
         }
     }
+
 }

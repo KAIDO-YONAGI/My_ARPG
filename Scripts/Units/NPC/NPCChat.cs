@@ -26,22 +26,27 @@ public class NPCChat : MonoBehaviour
     {
         rb.isKinematic = false;
         chatAnimator.Play("Idle");
-
+        DialogManager.instance.EndDialog();
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))//左键点击
+        if (Input.GetButtonDown("NPCInteract"))
         {
             if (dialogSO != null && !DialogManager.instance.isDialogActive)
             {
                 DialogManager.instance.StartDialog(dialogSO);
             }
-            else
+            else if (DialogManager.instance.isDialogActive)
             {
-                DialogManager.instance.AdvanceDialog();
+                DialogManager.instance.EndDialog();
             }
-        }
-    }
 
+        }
+        else if (Input.GetMouseButtonDown(0) && DialogManager.instance.isDialogActive)
+        {
+            DialogManager.instance.AdvanceDialog();
+        }
+
+    }
 }
