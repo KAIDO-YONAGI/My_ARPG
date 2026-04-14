@@ -4,7 +4,6 @@ public class PlayerCombat : MonoBehaviour
 {
     public Transform attackPoint;
     public LayerMask enemyMask;//需要在unity中创建并且标记
-    public StatsUI statsUI;
     public PlayerMovement playerMovement;
 
 
@@ -33,8 +32,7 @@ public class PlayerCombat : MonoBehaviour
     }
     private void StrengthBUff()
     {
-        StatsManager.instance.SetDamage(StatsManager.instance.GetDamage() + 1);
-        statsUI.UpdateDamage();
+        StatsManager.instance.UpdateDamage(1);//伤害+1
     }
     public void FinshCombat()
     {

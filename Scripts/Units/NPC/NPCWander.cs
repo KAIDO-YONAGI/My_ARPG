@@ -21,7 +21,7 @@ public class NPCWander : MonoBehaviour
     private Vector3 posToGo;
     private Rigidbody2D rb;
     private bool isWaiting = false;
-    private float t = 0;
+    private float threshold = 0;
     //TODO: 完全去掉巡逻方框，使用单位向量随机函数随机取点和as寻路
     private void Awake()
     {
@@ -37,7 +37,7 @@ public class NPCWander : MonoBehaviour
         targetPosition = circleCenter + randomDirection();
         aStarController.ResetPath();
         posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        t = aStarController.GetThreshold() * .2f;
+        threshold = aStarController.GetThreshold() * .2f;
     }
 
     private void OnDisable()
@@ -61,7 +61,7 @@ public class NPCWander : MonoBehaviour
 
 
 
-        if ((transform.position - posToGo).sqrMagnitude < t * t)//到寻路节点则告知controller
+        if ((transform.position - posToGo).sqrMagnitude < threshold * threshold)//到寻路节点则告知controller
         {
             aStarController.ArrivedPos();
             posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
@@ -71,7 +71,7 @@ public class NPCWander : MonoBehaviour
             animator.SetBool("isWalking", true);
         }
 
-        if ((transform.position - targetPosition).sqrMagnitude < t * t || posToGo == Vector3.zero)//到终点则重新获取巡逻点
+        if ((transform.position - targetPosition).sqrMagnitude < threshold * threshold || posToGo == Vector3.zero)//到终点则重新获取巡逻点
         {
             StartCoroutine(WaitAndContinue());
         }
@@ -94,7 +94,7 @@ public class NPCWander : MonoBehaviour
         {
             targetPosition = circleCenter + randomDirection();
             //如果随机点太近了就重新随机，避免被卡住
-            if ((targetPosition - transform.position).sqrMagnitude < t * t)
+            if ((targetPosition - transform.position).sqrMagnitude < threshold * threshold)
             {
                 targetPosition = circleCenter + (transform.position - circleCenter).normalized * patrolRadius;
             }
