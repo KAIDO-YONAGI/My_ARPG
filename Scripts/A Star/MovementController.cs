@@ -78,7 +78,10 @@ public class MovementController : MonoBehaviour
     {
         if (AStarNodeManager.instance == null)
         {
+#if UNITY_EDITOR
             Debug.LogWarning("AStarNodeManager.instance is NULL!");
+#endif
+
             return 0f;
         }
 
@@ -95,9 +98,9 @@ public class MovementController : MonoBehaviour
         hasValidPath = path != null && path.Count > 0;
         if (!hasValidPath)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             Debug.LogWarning("找不到路径！");//编辑器模式下警告，发布后不显示,减少性能浪费
-            #endif
+#endif
             return false;
         }
         return true;

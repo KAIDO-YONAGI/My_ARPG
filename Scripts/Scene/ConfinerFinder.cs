@@ -36,7 +36,7 @@ public class ConfinerFinder : MonoBehaviour
 
         if (obj == null)
         {
-            Debug.LogWarning("Can'threshold find Confiner");
+            Debug.LogWarning("Can't find Confiner");
             yield break;
         }
 

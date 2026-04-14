@@ -947,6 +947,10 @@ PrefabInstance:
       propertyPath: playerDetectRange
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7544162249560536073, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: playerMask.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1218,6 +1222,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7544162249560536073, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
       propertyPath: playerDetectRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7544162249560536073, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: playerMask.m_Bits
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -5110,6 +5118,10 @@ PrefabInstance:
       propertyPath: playerDetectRange
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7544162249560536073, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: playerMask.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5954,6 +5966,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1183249147012332139, guid: cde43cc87679436439995d5bcc3afc0b, type: 3}
+      propertyPath: DefaultState
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8551115239627395981, guid: cde43cc87679436439995d5bcc3afc0b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.42
@@ -6273,6 +6289,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7544162249560536073, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
       propertyPath: playerDetectRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7544162249560536073, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: playerMask.m_Bits
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
