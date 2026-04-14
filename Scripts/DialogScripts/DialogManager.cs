@@ -15,7 +15,7 @@ public class DialogManager : MonoBehaviour
     public bool isDialogActive;
     public Button[] optionButtons;
 
-
+    private int currentLineIndex = 0;
     private DialogSO currentDialog;
 
     private void Awake()
@@ -28,27 +28,27 @@ public class DialogManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        setDialogCanvas(false);
         DisableButtons();
 
     }
-    private int currentLineIndex = 0;
-
+    public void setDialogCanvas(bool state)
+    {
+        dialogCanvasGroup.alpha = state ? 1 : 0;
+        dialogCanvasGroup.interactable = state;
+        dialogCanvasGroup.blocksRaycasts = state;
+        isDialogActive = state;
+    }
     public void StartDialog(DialogSO dialog)
     {
-        dialogCanvasGroup.alpha = 1;
-        dialogCanvasGroup.interactable = true;
-        dialogCanvasGroup.blocksRaycasts = true;
+        setDialogCanvas(true);
         currentDialog = dialog;
         currentLineIndex = 0;
-        isDialogActive = true;
         ShowDialog();
     }
     public void EndDialog()
     {
-        isDialogActive = false;
-        dialogCanvasGroup.alpha = 0;
-        dialogCanvasGroup.interactable = false;
-        dialogCanvasGroup.blocksRaycasts = false;
+        setDialogCanvas(false);
     }
     public void AdvanceDialog()
     {
@@ -108,10 +108,18 @@ public class DialogManager : MonoBehaviour
     }
     public void InitializeButtons()//初始化按钮，显示选项文本并添加监听器
     {
-        for (int i = 0; i < optionButtons.Length; i++)
+        int nextDialogOptions = currentDialog.nextDialogOptions.Length;
+        int buttonQuantity = optionButtons.Length;
+
+        if (nextDialogOptions > buttonQuantity)
+        {
+            Debug.Log("Dialog options out of button quantity:" + buttonQuantity);
+            return;
+        }
+        for (int i = 0; i < buttonQuantity; i++)
         {
             // Debug.Log($"按钮 {i}: active={optionButtons[i].gameObject.activeSelf}, interactable={optionButtons[i].interactable}");
-            if (i < currentDialog.nextDialogOptions.Length)
+            if (i < nextDialogOptions)
             {
                 optionButtons[i].interactable = true;
                 optionButtons[i].gameObject.SetActive(true);
