@@ -6433,7 +6433,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!224 &1930580369
 RectTransform:
@@ -6618,6 +6618,7 @@ MonoBehaviour:
   ButtonCanvas: {fileID: 1930580370}
   newPosition: {x: 0, y: 0, z: 0}
   isToFade: 1
+  retryEventSO: {fileID: 0}
 --- !u!1001 &2084638590
 PrefabInstance:
   m_ObjectHideFlags: 0

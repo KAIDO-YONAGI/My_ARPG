@@ -50,7 +50,7 @@ public class AStarPathFinder : MonoBehaviour
         HashSet<Vector3> closeSet = new();
         if ((!NodeCellMap.ContainsKey(startCellPos)) || (!NodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
         {
-            Debug.Log($"[FindPath] 路径检查失败 - 起点存在:{NodeCellMap.ContainsKey(startCellPos)}, 终点存在:{NodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
+            // Debug.Log($"[FindPath] 路径检查失败 - 起点存在:{NodeCellMap.ContainsKey(startCellPos)}, 终点存在:{NodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
             return null;
         }
         PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
