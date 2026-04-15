@@ -31,6 +31,6 @@ public class RetryManager : MonoBehaviour
     private void OnReTry()
     {
         loadEventSO.RaiseLoadRequestEvent(currentScene, Vector3.zero, true);
-        StatsManager.instance.UpdateHealth(StatsManager.instance.GetMaxHealth());
+        StatsManager.instance.ResetHealth();
     }
 }
