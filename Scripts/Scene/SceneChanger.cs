@@ -24,10 +24,10 @@ public class SceneChanger : MonoBehaviour
     ///     
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
-    public Animator[] transitionImages;
-    public Object[] objectsToUnable;
+    public Animator[] transitionImagesDuringFade;
+    public Object[] objectsToUnableWhileGameReset;
     /// <summary>要重置的画布组数组 </summary>
-    public CanvasGroup[] canvasToReset;
+    public CanvasGroup[] canvasToResetWhileGameReset;
 
     private GameSceneSO sceneToLoad;
 
@@ -82,7 +82,7 @@ public class SceneChanger : MonoBehaviour
     private void PlayLoadingAnimation(string name)
     {
         fadeCanva.alpha = 1;
-        foreach (Animator transitionImage in transitionImages)
+        foreach (Animator transitionImage in transitionImagesDuringFade)
         {
             if (transitionImage != null)
             {
@@ -162,7 +162,7 @@ public class SceneChanger : MonoBehaviour
     }
     private void setObjects(bool state)
     {
-        foreach (Object obj in objectsToUnable)
+        foreach (Object obj in objectsToUnableWhileGameReset)
         {
             if (obj is GameObject go)
             {
@@ -172,7 +172,7 @@ public class SceneChanger : MonoBehaviour
     }
     private void resetCanvas()
     {
-        foreach (var canvas in canvasToReset)
+        foreach (var canvas in canvasToResetWhileGameReset)
         {
             if (canvas.GetComponent<CanvasGroup>() != null)
             {
