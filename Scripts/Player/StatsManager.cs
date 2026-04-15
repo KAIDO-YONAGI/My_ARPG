@@ -16,7 +16,7 @@ public class StatsManager : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private int maxHealth;
     [SerializeField] private int currentHealth;
-    
+
     public int GetDamage() { return damage; }
     public float GetWeaponRange() { return weaponRange; }
     public float GetKnockBackForce() { return knockBackForce; }
@@ -33,6 +33,11 @@ public class StatsManager : MonoBehaviour
     public void SetKnockBackTime(float value) { knockBackTime = value; }
     public void SetStunTime(float value) { stunTime = value; }
     public void SetCoolDown(float value) { coolDown = value; }
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;
+        UpdateHealthText();
+    }
     private void Awake()//每次唤醒就检测单例，如果已有有就删除
     {
         if (instance == null) instance = this;

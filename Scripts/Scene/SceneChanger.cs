@@ -1,4 +1,3 @@
-using UnityEngine.AddressableAssets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
@@ -146,21 +145,21 @@ public class SceneChanger : MonoBehaviour
     {
         if (sceneToLoad.sceneType == MyEnums.SceneType.Menu)
         {
-            setObjects(false);
+            SetObjects(false);
         }
 
         else if (sceneToLoad.sceneType == MyEnums.SceneType.Location)
         {
-            setObjects(true);
+            SetObjects(true);
         }
         if (sceneToLoad != null)
         {
             var loadingOption = sceneToLoad.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
             loadingOption.Completed += OnLoadCompleted;
         }
-        resetCanvas();
+        ResetCanvas();
     }
-    private void setObjects(bool state)
+    private void SetObjects(bool state)
     {
         foreach (Object obj in objectsToUnableWhileGameReset)
         {
@@ -170,7 +169,7 @@ public class SceneChanger : MonoBehaviour
             }
         }
     }
-    private void resetCanvas()
+    private void ResetCanvas()
     {
         foreach (var canvas in canvasToResetWhileGameReset)
         {
