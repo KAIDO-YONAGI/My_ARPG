@@ -1,11 +1,36 @@
-# Visual Studio / VS Code
+# ========== Unity Generated ==========
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+UserSettings/
+
+# ========== IDE / Editor ==========
 .vs/
 .vscode/
-*.user
-*.suo
-*.sln
-*.code-workspace
+.idea/
+.gradle/
+.settings/
 
+# Visual Studio / Rider
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.code-workspace
 
 # Build outputs
 Bin/
@@ -13,14 +38,46 @@ Obj/
 bin-debug/
 bin-release/
 
-# Other files and folders
-.settings/
+# ========== OS Files ==========
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Executables
+# ========== Crash / Cache Files ==========
+sysinfo.txt
+crashlytics-build.properties
+
+# ========== Addressables Generated ==========
+Assets/AddressableAssetsData/*/*.bin*
+Assets/AddressableAssetsData/Android/*
+Assets/AddressableAssetsData/iOS/*
+Assets/AddressableAssetsData/WebGL/*
+Assets/AddressableAssetsData/Windows/*
+Assets/AddressableAssetsData/macOS/*
+
+# Generated Asset Bundles
+Assets/StreamingAssets/aa/
+
+# ========== Executables / Packages ==========
 *.swf
 *.air
 *.ipa
 *.apk
+*.aab
 *.exe
-*.dll
-*.meta
+
+# ========== Optional Large Raw Assets ==========
+# Assets/RawArt/
+# Assets/PSD/
+# Assets/Videos/
+# Assets/HugeSourceFiles/
+# Assets/Recordings/
+# Assets/Captures/
+
+# ========== Important ==========
+# Do NOT ignore:
+# - Assets/
+# - Packages/
+# - ProjectSettings/
+# - *.meta
+# - *.dll
