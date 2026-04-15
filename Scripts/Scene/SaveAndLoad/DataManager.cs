@@ -52,19 +52,14 @@ public class DataManager : MonoBehaviour
     }
     void Save()
     {
-        foreach (var saveable in saveables)
+        foreach (var saveable in saveables.ToList())
         {
             saveable.SaveData(dataToSave);
         }
-        // foreach (var data in dataToSave.lootsStatsDic)
-        // {
-        //     Debug.Log(data.Value.Item1);
-
-        // }
     }
     void Load()
     {
-        foreach (var saveable in saveables)
+        foreach (var saveable in saveables.ToList())
         {
             saveable.LoadData(dataToSave);
         }

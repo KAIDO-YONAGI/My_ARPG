@@ -36,7 +36,11 @@ public class ConfinerFinder : MonoBehaviour
 
         if (obj == null)
         {
+#if UNITY_EDITOR
+
             Debug.LogWarning("Can't find Confiner");
+#endif
+
             yield break;
         }
 
