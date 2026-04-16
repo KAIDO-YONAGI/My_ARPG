@@ -31,7 +31,7 @@ UserSettings/
 *.opendb
 *.VC.db
 *.code-workspace
-
+*.bat
 # Build outputs
 Bin/
 Obj/
