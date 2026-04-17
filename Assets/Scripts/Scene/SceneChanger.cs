@@ -108,6 +108,7 @@ public class SceneChanger : MonoBehaviour
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
         ForbidInput();
+        TimeManager.instance.PauseGame();
         sceneToLoad = scene;
         this.newPosition = newPosition == Vector3.zero ? sceneToLoad.initialPosition : newPosition;
         //如果传入位置为零向量，则使用场景预设的初始位置
@@ -127,7 +128,7 @@ public class SceneChanger : MonoBehaviour
     private IEnumerator UnloadCurrentScene(GameSceneSO sceneToLoad)
     {
 
-        yield return new WaitForSeconds(fadeDuration);
+        yield return new WaitForSecondsRealtime(fadeDuration);
 
         if (currentScene != null)
             yield return currentScene.sceneReference.UnLoadScene();
@@ -200,6 +201,7 @@ public class SceneChanger : MonoBehaviour
         }
         isInitialScene = false;
         AllowInput();
+        TimeManager.instance.ForceResumeGame();
     }
     private void ForbidInput()
     {
