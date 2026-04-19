@@ -12,11 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3702dda32becabe4b903f0c35e67d66e, type: 3}
   m_Name: RefuseByCharacter
   m_EditorClassIdentifier: 
-  chatType: 2
+  chatType: 3
+  canOnlyBeTriggeredOnce: 0
   mainCharacter: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
   dialogLines:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
     text: Please help me find YellowBob, he's near the brige.
   nextDialogOptions: []
+  parentDialog: {fileID: 0}
   requireCharacters: []
+  requireItems: []
   refuseDialogs: []

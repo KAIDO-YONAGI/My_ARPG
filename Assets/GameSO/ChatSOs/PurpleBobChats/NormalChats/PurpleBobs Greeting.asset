@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3702dda32becabe4b903f0c35e67d66e, type: 3}
   m_Name: PurpleBobs Greeting
   m_EditorClassIdentifier: 
-  chatType: 0
+  chatType: 1
+  canOnlyBeTriggeredOnce: 0
   mainCharacter: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
   dialogLines:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
@@ -26,7 +27,9 @@ MonoBehaviour:
     nextDialogNode: {fileID: 11400000, guid: 400cfa5d1a0d96948b5042eb69c08794, type: 2}
   - optionText: No Intersted
     nextDialogNode: {fileID: 11400000, guid: 2a9a4adff5c1da742bbe283b9a3c960c, type: 2}
+  parentDialog: {fileID: 0}
   requireCharacters:
   - {fileID: 11400000, guid: 7f3cc91fdcfd4a14984d0ec96da48d7f, type: 2}
+  requireItems: []
   refuseDialogs:
   - {fileID: 11400000, guid: 2640f05e292840349a9a8455b45e0cd1, type: 2}
