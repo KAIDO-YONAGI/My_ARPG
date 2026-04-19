@@ -40,4 +40,13 @@ namespace MyEnums
         Patrol,
         Chat
     }
+    public enum ChatType
+    {
+        NormalChat,
+        Option,
+        RefuseChatByCharacter,
+        RefuseChatByItem,
+        RefuseChatByVisited
+
+    }
 }

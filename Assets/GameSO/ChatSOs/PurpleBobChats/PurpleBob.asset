@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e1acefe050034840b79a1cb9b02f11e, type: 3}
-  m_Name: YellowBob
+  m_Name: PurpleBob
   m_EditorClassIdentifier: 
-  characterName: YellowBob
-  characterPortrait: {fileID: 41347009, guid: 1d6fd76e64d9b724489cb8b62f685636, type: 3}
+  guid: 58b22150-b217-4c9e-aa17-f43b1ce6be40
+  characterName: PurpleBob
+  characterPortrait: {fileID: 884934726, guid: 7e00d39f9631d0d4fa5984bd2fb85815, type: 3}

@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using Unity.VisualScripting;
+using System.Collections.Generic;
 public class DialogManager : MonoBehaviour
 {
     public static DialogManager instance;
@@ -41,6 +42,9 @@ public class DialogManager : MonoBehaviour
     }
     public void StartDialog(DialogSO dialog)
     {
+        if (!MatchConditionsToStartDialog(dialog))
+            return;
+
         setDialogCanvas(true);
         currentDialog = dialog;
         currentLineIndex = 0;
@@ -71,6 +75,38 @@ public class DialogManager : MonoBehaviour
             ShowChoices();
         }
 
+    }
+
+    private bool MatchConditionsToStartDialog(DialogSO dialog)
+    {
+        HashSet<CharacterSO> needToTalk = new(dialog.requireCharacters);
+
+        Debug.Log(needToTalk.Count);
+
+        needToTalk.ExceptWith(ConversationHistoryManager.instance.CharactersHasChated);
+
+        if (needToTalk.Count > 0)
+        {
+            DialogSO characterRefuseDialog;
+
+            foreach (var d in dialog.refuseDialogs)
+            {
+                if (d.chatType == MyEnums.ChatType.RefuseChatByCharacter)
+                {
+                    characterRefuseDialog = d;
+
+                    StartDialog(characterRefuseDialog);
+                    
+                    break;
+                }
+            }
+
+            return false;
+        }
+
+
+
+        return true;
     }
     private void ShowChoices()
     {
