@@ -43,8 +43,7 @@ public class DialogManager : MonoBehaviour
     }
     public void StartDialog(DialogSO dialog)
     {
-        if (dialog.HasChated)
-            return;
+
         if (!MatchConditionsToStartDialog(dialog))
             return;
 
@@ -80,10 +79,15 @@ public class DialogManager : MonoBehaviour
         if (currentDialog != null)
             ConversationHistoryManager.instance.RecordCharacter(currentDialog.mainCharacter);
         if (currentDialog.canOnlyBeTriggeredOnce)
-            currentDialog.SetHasChated(true);
+            currentDialog.parentDialog.SetHasChated(true);//条件分支通过父对象引用完成一级状态回调
+    }
+    public void ForeceEndDialog()//强制结束的不会被记录到已交谈状态，例如谈话时被击飞到聊天范围外的情况
+    {
+        setDialogCanvas(false);
     }
     private bool MatchConditionsToStartDialog(DialogSO dialog)
     {
+
         {//对话角色限制
             HashSet<CharacterSO> needToTalk = new(dialog.requireCharacters);
 
@@ -94,7 +98,7 @@ public class DialogManager : MonoBehaviour
             if (needToTalk.Count > 0)
             {
 
-                StartRefuseDialoge(dialog, MyEnums.ChatType.RefuseChatByCharacter);
+                StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByCharacter);
 
                 return false;
             }
@@ -110,23 +114,33 @@ public class DialogManager : MonoBehaviour
                 int amount = item.Value;
                 if (!ItemHistoryManager.instance.HasPickedOverAmount(itemSO, amount))
                 {
-                    StartRefuseDialoge(dialog, MyEnums.ChatType.RefuseChatByItem);
+                    StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByItem);
 
                     return false;
                 }
 
             }
         }
-
+        Debug.Log(dialog.HasChated);
+        {//限定只能对话一次
+            if (dialog.HasChated)
+            {
+                StartRefuseDialog(dialog, MyEnums.ChatType.DefaultChat);
+                return false;
+            }
+        }
         return true;
     }
-    private void StartRefuseDialoge(DialogSO dialog, MyEnums.ChatType chatTypeToStart)
+    private void StartRefuseDialog(DialogSO dialog, MyEnums.ChatType chatTypeToStart)
     {
-        foreach (var characterRefuseDialog in dialog.refuseDialogs)
+        foreach (var characterRefuseDialog in dialog.refusingDialogs)
         {
             if (characterRefuseDialog.chatType == chatTypeToStart)
             {
-                StartDialog(characterRefuseDialog);
+                setDialogCanvas(true);
+                currentDialog = characterRefuseDialog;
+                currentLineIndex = 0;
+                ShowDialog();
                 break;
             }
         }

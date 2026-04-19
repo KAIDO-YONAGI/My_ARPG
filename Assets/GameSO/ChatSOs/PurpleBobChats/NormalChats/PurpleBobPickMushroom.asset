@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3702dda32becabe4b903f0c35e67d66e, type: 3}
   m_Name: PurpleBobPickMushroom
   m_EditorClassIdentifier: 
-  chatType: 0
-  canOnlyBeTriggeredOnce: 1
+  chatType: 1
+  canOnlyBeTriggeredOnce: 0
   mainCharacter: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
   dialogLines:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
@@ -25,9 +25,11 @@ MonoBehaviour:
     nextDialogNode: {fileID: 11400000, guid: 829a652cc8f329344b4c86fc9ee28187, type: 2}
   - optionText: Refuse
     nextDialogNode: {fileID: 11400000, guid: e8a3f8c8ded05534dbcf3f2db9de4830, type: 2}
+  parentDialog: {fileID: 0}
   requireCharacters: []
   requireItems:
   - itemSO: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
     quantity: 10
-  refuseDialogs:
+  refusingDialogs:
+  - {fileID: 11400000, guid: 589e62def54346d4e9735326e7c0e6f6, type: 2}
   - {fileID: 11400000, guid: 370549d5625597448bcfd6f5359c4990, type: 2}

@@ -12,10 +12,11 @@ public class DialogSO : ScriptableObject
     public DialogOption[] nextDialogOptions;
 
     [Header("Conditional Requirements")]
+    public DialogSO parentDialog;
     public List<CharacterSO> requireCharacters;
     public List<Item> requireItems;
 
-    public List<DialogSO> refuseDialogs;
+    public List<DialogSO> refusingDialogs;
 
     private bool hasChated=false;
     public bool HasChated=>hasChated;

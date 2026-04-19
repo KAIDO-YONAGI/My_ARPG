@@ -23,7 +23,7 @@ public class NPCChat : MonoBehaviour
     {
         rb.isKinematic = false;
         chatAnimator.Play("Idle");
-        DialogManager.instance.EndDialog();
+        DialogManager.instance.ForeceEndDialog();
     }
 
     private void Update()
