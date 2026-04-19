@@ -320,7 +320,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chatAnimator: {fileID: 8392977103527578678}
-  dialogSO: {fileID: 11400000, guid: 145bb21f968b76a4cb0eb695aa2e7127, type: 2}
+  dialogSO: {fileID: 0}
 --- !u!1 &2839708770821807694
 GameObject:
   m_ObjectHideFlags: 0

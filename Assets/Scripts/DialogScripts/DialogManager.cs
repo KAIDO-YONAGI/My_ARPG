@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System;
 using Unity.VisualScripting;
 using System.Collections.Generic;
+using System.Linq;
 public class DialogManager : MonoBehaviour
 {
     public static DialogManager instance;
@@ -42,6 +43,8 @@ public class DialogManager : MonoBehaviour
     }
     public void StartDialog(DialogSO dialog)
     {
+        if (dialog.HasChated)
+            return;
         if (!MatchConditionsToStartDialog(dialog))
             return;
 
@@ -50,12 +53,7 @@ public class DialogManager : MonoBehaviour
         currentLineIndex = 0;
         ShowDialog();
     }
-    public void EndDialog()
-    {
-        setDialogCanvas(false);
-        ConversationHistoryManager.instance.RecordCharacter(currentDialog.mainCharacter);
 
-    }
     public void AdvanceDialog()
     {
         if (currentLineIndex < currentDialog.dialogLines.Length)//防止越界
@@ -76,37 +74,62 @@ public class DialogManager : MonoBehaviour
         }
 
     }
-
+    public void EndDialog()
+    {
+        setDialogCanvas(false);
+        if (currentDialog != null)
+            ConversationHistoryManager.instance.RecordCharacter(currentDialog.mainCharacter);
+        if (currentDialog.canOnlyBeTriggeredOnce)
+            currentDialog.SetHasChated(true);
+    }
     private bool MatchConditionsToStartDialog(DialogSO dialog)
     {
-        HashSet<CharacterSO> needToTalk = new(dialog.requireCharacters);
+        {//对话角色限制
+            HashSet<CharacterSO> needToTalk = new(dialog.requireCharacters);
 
-        Debug.Log(needToTalk.Count);
+            // Debug.Log(needToTalk.Count);
 
-        needToTalk.ExceptWith(ConversationHistoryManager.instance.CharactersHasChated);
+            needToTalk.ExceptWith(ConversationHistoryManager.instance.CharactersHasChated);
 
-        if (needToTalk.Count > 0)
-        {
-            DialogSO characterRefuseDialog;
-
-            foreach (var d in dialog.refuseDialogs)
+            if (needToTalk.Count > 0)
             {
-                if (d.chatType == MyEnums.ChatType.RefuseChatByCharacter)
-                {
-                    characterRefuseDialog = d;
 
-                    StartDialog(characterRefuseDialog);
-                    
-                    break;
-                }
+                StartRefuseDialoge(dialog, MyEnums.ChatType.RefuseChatByCharacter);
+
+                return false;
             }
-
-            return false;
         }
 
+        {//拾取过的物品限制
+            Dictionary<ItemSO, int> needToPick = dialog.requireItems
+                    .ToDictionary(i => i.itemSO, i => i.quantity);
 
+            foreach (var item in needToPick)
+            {
+                ItemSO itemSO = item.Key;
+                int amount = item.Value;
+                if (!ItemHistoryManager.instance.HasPickedOverAmount(itemSO, amount))
+                {
+                    StartRefuseDialoge(dialog, MyEnums.ChatType.RefuseChatByItem);
+
+                    return false;
+                }
+
+            }
+        }
 
         return true;
+    }
+    private void StartRefuseDialoge(DialogSO dialog, MyEnums.ChatType chatTypeToStart)
+    {
+        foreach (var characterRefuseDialog in dialog.refuseDialogs)
+        {
+            if (characterRefuseDialog.chatType == chatTypeToStart)
+            {
+                StartDialog(characterRefuseDialog);
+                break;
+            }
+        }
     }
     private void ShowChoices()
     {

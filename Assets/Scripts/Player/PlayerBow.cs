@@ -12,7 +12,6 @@ public class PlayerBow : MonoBehaviour
     private Vector2 shootDirection = Vector2.right;
     public Animator anim;
     public PlayerMovement playerMovement;
-    //TODO:删除animator调用
 
     private float shootTimer;//防止多箭发射
     private void OnEnable()

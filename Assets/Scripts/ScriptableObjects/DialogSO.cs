@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,14 +6,20 @@ using UnityEngine;
 public class DialogSO : ScriptableObject
 {
     [SerializeField] public MyEnums.ChatType chatType;
+    public bool canOnlyBeTriggeredOnce;
     public CharacterSO mainCharacter;
     public DialogLine[] dialogLines;
     public DialogOption[] nextDialogOptions;
 
     [Header("Conditional Requirements")]
     public List<CharacterSO> requireCharacters;
+    public List<Item> requireItems;
+
     public List<DialogSO> refuseDialogs;
 
+    private bool hasChated=false;
+    public bool HasChated=>hasChated;
+    public void SetHasChated(bool state){hasChated=state;}
 }
 [System.Serializable]
 public class DialogLine
@@ -27,4 +32,10 @@ public class DialogOption
 {
     public string optionText;
     public DialogSO nextDialogNode;
+}
+[System.Serializable]
+public class Item
+{
+    public ItemSO itemSO;
+    public int quantity;
 }
