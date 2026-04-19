@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DialogSO", menuName = "Dialog/DialogNode", order = 1)]
 public class DialogSO : ScriptableObject
 {
+    public CharacterSO mainCharacter;
     public DialogLine[] dialogLines;
     public DialogOption[] nextDialogOptions;
 }

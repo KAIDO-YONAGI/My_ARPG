@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class ItemHistoryManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public static ItemHistoryManager instance;
+    private void Awake()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (instance == null)
+            instance = this;
+        else Destroy(gameObject);
     }
 }
