@@ -22,7 +22,6 @@ public class NPCWander : MonoBehaviour
     private Rigidbody2D rb;
     private bool isWaiting = false;
     private float threshold = 0;
-    //TODO: 完全去掉巡逻方框，使用单位向量随机函数随机取点和as寻路
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>(); //这里要早点获取组件，因为Start可能在OnEnable之后被调用，而OnEnable里需要用到rb，避免空引用错误

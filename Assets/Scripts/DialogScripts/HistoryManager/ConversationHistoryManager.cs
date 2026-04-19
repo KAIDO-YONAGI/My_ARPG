@@ -13,10 +13,10 @@ public class ConversationHistoryManager : MonoBehaviour
         else Destroy(gameObject);
     }
     private HashSet<CharacterSO> charactersHasChated = new();
+    public HashSet<CharacterSO> CharactersHasChated => charactersHasChated;
+
     public void RecordCharacter(CharacterSO character)
     {
-        if (charactersHasChated.Add(character))
-            Debug.Log(character);
+        charactersHasChated.Add(character);
     }
-    public HashSet<CharacterSO> CharactersHasChated=>charactersHasChated;
 }

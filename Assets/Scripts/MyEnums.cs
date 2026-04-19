@@ -42,6 +42,7 @@ namespace MyEnums
     }
     public enum ChatType
     {
+        DefaultChat,
         NormalChat,
         Option,
         RefuseChatByCharacter,

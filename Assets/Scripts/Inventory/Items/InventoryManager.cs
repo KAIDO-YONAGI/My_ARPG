@@ -64,14 +64,17 @@ public class InventoryManager : MonoBehaviour
 
     private void UpdateInvetorySlots(ItemSO item, int quantity, Loot lootObj = null)
     {
+        //金币
         if (item.isGold)
         {
-            if (!amountText) return;
             goldAmount += quantity;
+            ItemHistoryManager.instance.RecordItem(item, quantity);
+
             amountText.text = goldAmount.ToString();
             lootObj?.MarkAsDestroyed();
             return;
         }
+        //普通物品
         if (quantity < 0)//物品出售
         {
             if (slotBeenClicked == null)
@@ -81,6 +84,8 @@ public class InventoryManager : MonoBehaviour
             else if (slotBeenClicked.quantity > 0)
             {
                 slotBeenClicked.quantity += quantity;
+                ItemHistoryManager.instance.RecordItem(item, quantity);
+
                 slotBeenClicked.UpdateUI();
                 return;
             }
@@ -97,6 +102,7 @@ public class InventoryManager : MonoBehaviour
 
                     slot.quantity += amount;
                     quantity -= amount;
+                    ItemHistoryManager.instance.RecordItem(item, amount);
 
                     slot.UpdateUI();
 
@@ -117,13 +123,16 @@ public class InventoryManager : MonoBehaviour
 
                     slot.itemSO = item;
                     slot.quantity = amount;
+                    ItemHistoryManager.instance.RecordItem(item, amount);
+                    //TODO 这里能靠反复买卖刷获取次数，待修复，可以给购买物品加上绑定冷却？
+
                     slot.UpdateUI();
                     lootObj?.MarkAsDestroyed();
                     return;
                 }
             }
 
-            DropLoot(item, quantity, lootObj);
+            DropLoot(item, quantity, lootObj);//减剩下的quantity丢掉
         }
 
     }
@@ -188,6 +197,8 @@ public class InventoryManager : MonoBehaviour
         {
             useItem.ApplyItemEffects(slot.itemSO);//使用效果
             slot.quantity--;
+            ItemHistoryManager.instance.RecordItem(slot.itemSO, -1);
+
             if (slot.quantity <= 0)
             {
                 slot.itemSO = null;
