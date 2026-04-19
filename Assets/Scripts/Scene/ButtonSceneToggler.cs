@@ -20,13 +20,11 @@ public class ButtonSceneToggler : MonoBehaviour
         if (sceneToLoad.sceneName != "Retry")
         {
             loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
-            Debug.Log("1");
         }
         else
         {
             TimeManager.instance.ForceResumeGame();
             retryEventSO.OnEventRaised();//RetryManager位于每个场景内
-            Debug.Log("2");
         }
     }
 

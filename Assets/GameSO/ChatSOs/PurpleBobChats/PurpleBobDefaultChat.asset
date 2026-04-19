@@ -22,7 +22,10 @@ MonoBehaviour:
     text: I am fine.
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
     text: Have a nice day!
+  - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
+    text: Just wait a moment.
   nextDialogOptions: []
+  parentDialog: {fileID: 0}
   requireCharacters: []
   requireItems: []
-  refuseDialogs: []
+  refusingDialogs: []

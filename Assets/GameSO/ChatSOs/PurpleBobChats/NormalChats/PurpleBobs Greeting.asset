@@ -31,5 +31,5 @@ MonoBehaviour:
   requireCharacters:
   - {fileID: 11400000, guid: 7f3cc91fdcfd4a14984d0ec96da48d7f, type: 2}
   requireItems: []
-  refuseDialogs:
+  refusingDialogs:
   - {fileID: 11400000, guid: 2640f05e292840349a9a8455b45e0cd1, type: 2}
