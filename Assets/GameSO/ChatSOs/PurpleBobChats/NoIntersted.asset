@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3702dda32becabe4b903f0c35e67d66e, type: 3}
   m_Name: NoIntersted
   m_EditorClassIdentifier: 
+  chatType: 1
   mainCharacter: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
   dialogLines:
   - speaker: {fileID: 11400000, guid: e69c09f810cffc64bb4ecc29855d9d11, type: 2}
@@ -19,5 +20,7 @@ MonoBehaviour:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
     text: Well, good luck!
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
-    text: Well, good luck2
+    text: 114514
   nextDialogOptions: []
+  requireCharacters: []
+  refuseDialogs: []

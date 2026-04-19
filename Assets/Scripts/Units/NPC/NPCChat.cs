@@ -36,7 +36,7 @@ public class NPCChat : MonoBehaviour
             }
             else if (DialogManager.instance.isDialogActive)
             {
-                DialogManager.instance.EndDialog();
+                DialogManager.instance.AdvanceDialog();
             }
 
         }

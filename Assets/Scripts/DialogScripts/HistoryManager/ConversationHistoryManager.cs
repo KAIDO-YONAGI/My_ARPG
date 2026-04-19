@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,18 +12,11 @@ public class ConversationHistoryManager : MonoBehaviour
             instance = this;
         else Destroy(gameObject);
     }
-    private HashSet<CharacterSO> charactersHasChated = new HashSet<CharacterSO>();
+    private HashSet<CharacterSO> charactersHasChated = new();
     public void RecordCharacter(CharacterSO character)
     {
         if (charactersHasChated.Add(character))
-            Debug.Log(character.characterName);
+            Debug.Log(character);
     }
-    public bool CheckChated(CharacterSO character)
-    {
-        if (charactersHasChated.Contains(character))
-        {
-            return true;
-        }
-        return false;
-    }
+    public HashSet<CharacterSO> CharactersHasChated=>charactersHasChated;
 }
