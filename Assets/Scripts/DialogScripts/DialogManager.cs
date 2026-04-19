@@ -49,6 +49,8 @@ public class DialogManager : MonoBehaviour
     public void EndDialog()
     {
         setDialogCanvas(false);
+        ConversationHistoryManager.instance.RecordCharacter(currentDialog.mainCharacter);
+
     }
     public void AdvanceDialog()
     {

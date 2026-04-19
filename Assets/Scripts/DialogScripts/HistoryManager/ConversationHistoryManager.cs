@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class ConversationHistoryManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public static ConversationHistoryManager instance;
+    private void Awake()
     {
-        
+        if (instance == null)
+            instance = this;
+        else Destroy(gameObject);
     }
-
-    // Update is called once per frame
-    void Update()
+    private HashSet<CharacterSO> charactersHasChated = new HashSet<CharacterSO>();
+    public void RecordCharacter(CharacterSO character)
     {
-        
+        if (charactersHasChated.Add(character))
+            Debug.Log(character.characterName);
+    }
+    public bool CheckChated(CharacterSO character)
+    {
+        if (charactersHasChated.Contains(character))
+        {
+            return true;
+        }
+        return false;
     }
 }
