@@ -3,47 +3,74 @@ using UnityEngine;
 public class NPCChat : MonoBehaviour
 {
     private Rigidbody2D rb;
-    // public Animator moveAnimator;
     public Animator chatAnimator;
     public DialogSO dialogSO;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        DialogManager.instance.DisableButtons();
+
+        if (DialogManager.instance != null)
+        {
+            DialogManager.instance.DisableButtons();
+        }
     }
+
     private void OnEnable()
     {
-        rb.velocity = Vector2.zero;
-        rb.isKinematic = true;
-        chatAnimator.Play("Chat");
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.isKinematic = true;
+        }
 
+        if (chatAnimator != null)
+        {
+            chatAnimator.Play("Chat");
+        }
     }
+
     private void OnDisable()
     {
-        rb.isKinematic = false;
-        chatAnimator.Play("Idle");
-        DialogManager.instance.ForeceEndDialog();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+        }
+
+        if (chatAnimator != null)
+        {
+            chatAnimator.Play("Idle");
+        }
+
+        if (DialogManager.instance != null)
+        {
+            DialogManager.instance.ForeceEndDialog();
+        }
     }
 
     private void Update()
     {
+        DialogManager dialogManager = DialogManager.instance;
+
+        if (dialogManager == null)
+        {
+            return;
+        }
+
         if (Input.GetButtonDown("NPCInteract"))
         {
-            if (dialogSO != null && !DialogManager.instance.isDialogActive)
+            if (dialogSO != null && !dialogManager.isDialogActive)
             {
-                DialogManager.instance.StartDialog(dialogSO);
+                dialogManager.StartDialog(dialogSO);
             }
-            else if (DialogManager.instance.isDialogActive)
+            else if (dialogManager.isDialogActive)
             {
-                DialogManager.instance.AdvanceDialog();
+                dialogManager.AdvanceDialog();
             }
-
         }
-        else if (Input.GetMouseButtonDown(0) && DialogManager.instance.isDialogActive)
+        else if (Input.GetMouseButtonDown(0) && dialogManager.isDialogActive)
         {
-            DialogManager.instance.AdvanceDialog();
+            dialogManager.AdvanceDialog();
         }
-
     }
 }

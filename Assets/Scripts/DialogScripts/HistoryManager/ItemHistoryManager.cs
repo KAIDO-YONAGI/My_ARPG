@@ -23,9 +23,9 @@ public class ItemHistoryManager : MonoBehaviour
             itemHasPicked[item] += quantity;
         }
         else itemHasPicked.Add(item, quantity);
-        Debug.Log(item.itemName);
-        Debug.Log(itemHasPicked.Count);
-        Debug.Log(itemHasPicked[item]);
+        // Debug.Log(item.itemName);
+        // Debug.Log(itemHasPicked.Count);
+        // Debug.Log(itemHasPicked[item]);
 
     }
 
