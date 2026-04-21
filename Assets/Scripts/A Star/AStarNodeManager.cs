@@ -10,8 +10,6 @@ using UnityEngine.Tilemaps;
 /// 
 public class AStarNodeManager : MonoBehaviour
 {
-
-
     public static AStarNodeManager instance;
 
     private void Awake()
