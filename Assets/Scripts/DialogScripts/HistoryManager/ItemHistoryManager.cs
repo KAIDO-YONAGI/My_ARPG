@@ -31,9 +31,15 @@ public class ItemHistoryManager : MonoBehaviour
 
     public bool HasPickedOverAmount(ItemSO item, int amount)//实际上会记录是否捡过和数量，当前数量归零的并不会删除
     {
-        if (itemHasPicked.ContainsKey(item)&&itemHasPicked[item] >= amount)
+        if (itemHasPicked.ContainsKey(item) && itemHasPicked[item] >= amount)
             return true;
 
         return false;
+    }
+    public int GetItemQuantity(ItemSO item)
+    {
+        if (itemHasPicked.TryGetValue(item, out int amount))
+            return amount;
+        return -1;
     }
 }
