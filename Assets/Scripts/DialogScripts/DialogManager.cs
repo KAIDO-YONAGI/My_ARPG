@@ -139,36 +139,43 @@ public class DialogManager : MonoBehaviour
             ? ConversationHistoryManager.instance.CharactersHasChated
             : new HashSet<CharacterSO>();
 
-        needToTalk.ExceptWith(charactersHasChated);
+        {//角色对话拒绝策略
+            needToTalk.ExceptWith(charactersHasChated);
 
-        if (needToTalk.Count > 0)
-        {
-            StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByCharacter);
-            return false;
-        }
-
-        Dictionary<ItemSO, int> needToPick = dialog.requireItems
-            .ToDictionary(i => i.itemSO, i => i.quantity);
-
-        foreach (var item in needToPick)
-        {
-            ItemSO itemSO = item.Key;
-            int amount = item.Value;
-
-            if (ItemHistoryManager.instance == null ||
-                !ItemHistoryManager.instance.HasPickedOverAmount(itemSO, amount))
+            if (needToTalk.Count > 0)
             {
-                StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByItem);
+                StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByCharacter);
                 return false;
             }
         }
 
-        Debug.Log(dialog.HasChated);
+        {//物品对话拒绝策略
+            Dictionary<ItemSO, int> needToPick = dialog.requireItems
+                    .ToDictionary(i => i.itemSO, i => i.quantity);
 
-        if (dialog.HasChated)
-        {
-            StartRefuseDialog(dialog, MyEnums.ChatType.DefaultChat);
-            return false;
+            foreach (var item in needToPick)
+            {
+                ItemSO itemSO = item.Key;
+                int amount = item.Value;
+
+                if (ItemHistoryManager.instance == null ||
+                    !ItemHistoryManager.instance.HasPickedOverAmount(itemSO, amount))
+                {
+                    StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByItem);
+                    return false;
+                }
+            }
+        }
+
+        {//主分支结束后默认对话
+        //TODO HasChated需要改为非SO存储
+            Debug.Log(dialog.HasChated);
+
+            if (dialog.HasChated)
+            {
+                StartRefuseDialog(dialog, MyEnums.ChatType.DefaultChat);
+                return false;
+            }
         }
 
         return true;

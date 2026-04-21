@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,18 +11,13 @@ public class QuestSO : ScriptableObject
 
     public List<QuestObjective> questObjectives;
 }
-
-
-
-[System.Serializable]
+[Serializable]
 public class QuestObjective
 {
     public string description;
-
-    [SerializeField] private Object target;
-    public ItemSO TargetItem=>target as ItemSO;
-    public CharacterSO TargetCharactertarget=>target as CharacterSO;
-    public LocationSO TargetLocationtarget=>target as LocationSO;
+    public ItemSO targetItem;
+    public CharacterSO targetCharacter;
+    public LocationSO targetLocation;
 
 
     public int requiredAmount;
