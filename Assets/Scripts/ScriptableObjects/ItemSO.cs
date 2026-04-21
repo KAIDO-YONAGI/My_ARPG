@@ -11,6 +11,8 @@ public class ItemSO : ScriptableObject
     public Sprite icon;
 
     public bool isGold;
+    public bool isEXP;
+
     public int stackableSize;
 
     [Header("Stats")]

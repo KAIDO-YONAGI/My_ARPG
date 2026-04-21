@@ -1,12 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor.Experimental.GraphView;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager instance;
+
+
     private void Awake()
     {
         if (instance == null)
@@ -17,6 +17,29 @@ public class QuestManager : MonoBehaviour
         {
             Destroy(gameObject);
             return;
+        }
+    }
+
+    public CanvasGroup questCanvaGroup;
+    private bool canvasIsActive;
+    private void Update()
+    {
+        if (Input.GetButtonDown("OpenQuestList"))
+        {
+            if (!canvasIsActive)
+            {
+                questCanvaGroup.alpha = 1;
+                questCanvaGroup.blocksRaycasts = true;
+                questCanvaGroup.interactable = true;
+                canvasIsActive = true;
+            }
+            else
+            {
+                questCanvaGroup.alpha = 0;
+                questCanvaGroup.blocksRaycasts = false;
+                questCanvaGroup.interactable = false;
+                canvasIsActive = false;
+            }
         }
     }
     private Dictionary<QuestSO, Dictionary<QuestObjective, int>> questProgress = new();
@@ -42,7 +65,7 @@ public class QuestManager : MonoBehaviour
     }
     public string GetProgressText(QuestSO quest, QuestObjective obj)
     {
-        int currentAmount = GetCurrentAmount(quest,obj);
+        int currentAmount = GetCurrentAmount(quest, obj);
 
         if (currentAmount >= obj.requiredAmount)
             return "√";

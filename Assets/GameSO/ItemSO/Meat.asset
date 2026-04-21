@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Meat
   itemDescription: Raw but yammy...?
-  icon: {fileID: -1236631724, guid: 5413690fabe4dec4fa693e34fc9a38bb, type: 3}
+  icon: {fileID: -1236631724, guid: 23efda5836f30dd4985ebc0051f8f0b1, type: 3}
   isGold: 0
+  isEXP: 0
   stackableSize: 3
   currentHealth: 2
   maxHealth: 0
