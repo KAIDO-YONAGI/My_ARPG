@@ -8,6 +8,8 @@ public class QuestLogUI : MonoBehaviour
     [SerializeField] private TMP_Text questNameText;
     [SerializeField] private TMP_Text questDescriptionText;
     [SerializeField] private QuestObjectiveSlot[] objectiveSlots;//任务条目槽位
+    [SerializeField] private QuestRewardsSlot[] questRewardsSlot;//任务条目槽位
+
 
     private QuestSO currnetQuestSO;
 
@@ -17,6 +19,7 @@ public class QuestLogUI : MonoBehaviour
         questNameText.text = quest.questName;
         questDescriptionText.text = quest.questDescription;
         DisPlayObjectives();
+        DisplayRewards();
     }
 
 
@@ -39,6 +42,24 @@ public class QuestLogUI : MonoBehaviour
             else
             {
                 objectiveSlots[i].gameObject.SetActive(false);
+            }
+        }
+    }
+    private void DisplayRewards()
+    {
+        for(int i = 0; i < questRewardsSlot.Length; i++)
+        {
+            if (i < currnetQuestSO.rewards.Count)
+            {
+                var reward=currnetQuestSO.rewards[i];
+                questRewardsSlot[i].DisplayReward(reward.rewardItem.icon,reward.quantity);
+
+                questRewardsSlot[i].gameObject.SetActive(true);
+                
+            }
+            else
+            {
+                questRewardsSlot[i].gameObject.SetActive(false);
             }
         }
     }

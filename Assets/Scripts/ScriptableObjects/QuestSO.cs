@@ -10,6 +10,14 @@ public class QuestSO : ScriptableObject
     [TextArea] public string questDescription;
 
     public List<QuestObjective> questObjectives;
+    public List<Reward> rewards;
+}
+
+[Serializable]
+public class Reward
+{
+    public ItemSO rewardItem;
+    public int quantity;
 }
 [Serializable]
 public class QuestObjective

@@ -10,21 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 77e2c7a0c6dc67342b3911caff9afca2, type: 3}
-  m_Name: NoobQuest
+  m_Name: Shopping
   m_EditorClassIdentifier: 
-  questName: Noob Quest
-  lv: 0
-  questDescription: Quest For Noob
+  questName: Shopping
+  lv: 1
+  questDescription: Talk with Shopkeeper And Buy Some Meat
   questObjectives:
-  - description: Collect 3 mushrooms
-    targetItem: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
+  - description: Buy Some Meat
+    targetItem: {fileID: 11400000, guid: c905cf70e8dcc7b448c30320d5875878, type: 2}
     targetCharacter: {fileID: 0}
     targetLocation: {fileID: 0}
     requiredAmount: 3
     currentAmount: 0
-  - description: Talk with Purple Bob
-    targetItem: {fileID: 0}
-    targetCharacter: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
-    targetLocation: {fileID: 0}
-    requiredAmount: 1
-    currentAmount: 0
+  rewards:
+  - rewardItem: {fileID: 11400000, guid: e0fc862ae13f8bb41bedb94ba6d68c17, type: 2}
+    quantity: 10

@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e60c7d9dc6193e45803445b5892dfbb, type: 3}
   m_Name: EXP
   m_EditorClassIdentifier: 
-  itemName: Gold
-  itemDescription: It contains some coins.
-  icon: {fileID: 21300000, guid: 17926253293f28c479f199998c9fbab9, type: 3}
-  isGold: 1
-  stackableSize: 0
+  itemName: EXP
+  itemDescription: Help you to get level up.
+  icon: {fileID: -398743610, guid: 042db71f2a5f9f944b39a735a5bdca44, type: 3}
+  isGold: 0
+  isEXP: 1
+  stackableSize: 10000000
   currentHealth: 0
   maxHealth: 0
   speed: 0
