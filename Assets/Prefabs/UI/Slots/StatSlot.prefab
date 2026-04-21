@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2438288524995308605}
   - component: {fileID: 1913862927206108976}
   m_Layer: 5
-  m_Name: Stats
+  m_Name: StatSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,7 +147,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdd9c8aff9b35342a8815d1b46938f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 0}
+  shopManager: {fileID: 0}
+  shopInfo: {fileID: 0}
   itemNameText: {fileID: 0}
   priceText: {fileID: 0}
   itemImage: {fileID: 0}

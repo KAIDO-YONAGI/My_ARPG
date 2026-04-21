@@ -19,4 +19,8 @@ public class ConversationHistoryManager : MonoBehaviour
     {
         charactersHasChated.Add(character);
     }
+    public bool HasChatedWith(CharacterSO character)
+    {
+        return charactersHasChated.Contains(character);
+    }
 }
