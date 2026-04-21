@@ -1,18 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class QuestObjectiveSlot : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private TMP_Text objectiveText;
+    [SerializeField] private TMP_Text trackingText;
+    public void RefreshObjectives(string description, string progress, bool isCompleted)
     {
-        
-    }
+        objectiveText.text = description;
+        trackingText.text = progress;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Color color = isCompleted ? Color.gray : Color.white;
+        objectiveText.color = color;
+        trackingText.color = color;
     }
 }

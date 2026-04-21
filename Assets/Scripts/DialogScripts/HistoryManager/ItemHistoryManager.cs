@@ -40,6 +40,6 @@ public class ItemHistoryManager : MonoBehaviour
     {
         if (itemHasPicked.TryGetValue(item, out int amount))
             return amount;
-        return -1;
+        return 0;
     }
 }

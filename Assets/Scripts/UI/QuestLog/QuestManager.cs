@@ -45,7 +45,7 @@ public class QuestManager : MonoBehaviour
         int currentAmount = GetCurrentAmount(quest,obj);
 
         if (currentAmount >= obj.requiredAmount)
-            return "Completed";
+            return "√";
         else if (obj != null)
             return $"{currentAmount}/{obj.requiredAmount}";
         else
@@ -56,6 +56,6 @@ public class QuestManager : MonoBehaviour
         if (questProgress.TryGetValue(quest, out var objectiveDictionary))
             if (objectiveDictionary.TryGetValue(obj, out int amount))
                 return amount;
-        return -1;
+        return 0;
     }
 }
