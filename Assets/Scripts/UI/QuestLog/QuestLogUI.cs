@@ -13,6 +13,11 @@ public class QuestLogUI : MonoBehaviour
 
     private QuestSO currnetQuestSO;
 
+    public void ShowQuestOffer(QuestSO incomingQuestSO)
+    {
+        HandleQuestClicked(incomingQuestSO);
+    }
+
     public void HandleQuestClicked(QuestSO quest)
     {
         currnetQuestSO = quest;

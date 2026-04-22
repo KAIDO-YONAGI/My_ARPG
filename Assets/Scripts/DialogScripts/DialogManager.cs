@@ -169,7 +169,6 @@ public class DialogManager : MonoBehaviour
 
         {//主分支结束后默认对话
         //TODO HasChated需要改为非SO存储
-            Debug.Log(dialog.HasChated);
 
             if (dialog.HasChated)
             {

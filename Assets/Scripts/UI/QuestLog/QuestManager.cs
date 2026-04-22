@@ -5,6 +5,11 @@ using UnityEngine;
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager instance;
+    public CanvasGroup questCanvaGroup;
+    public VoidEventSO openQuestEvent;
+
+    private bool canvasIsActive;
+    private Dictionary<QuestSO, Dictionary<QuestObjective, int>> questProgress = new();
 
 
     private void Awake()
@@ -18,31 +23,38 @@ public class QuestManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+
     }
 
-    public CanvasGroup questCanvaGroup;
-    private bool canvasIsActive;
-    private void Update()
+    private void OnEnable()
     {
-        if (Input.GetButtonDown("OpenQuestList"))
+        openQuestEvent.VoidEvent += OnOpenQuestBoard;
+    }
+
+    private void OnDisable()
+    {
+        openQuestEvent.VoidEvent -= OnOpenQuestBoard;
+
+    }
+    private void OnOpenQuestBoard()
+    {
+        if (!canvasIsActive)
         {
-            if (!canvasIsActive)
-            {
-                questCanvaGroup.alpha = 1;
-                questCanvaGroup.blocksRaycasts = true;
-                questCanvaGroup.interactable = true;
-                canvasIsActive = true;
-            }
-            else
-            {
-                questCanvaGroup.alpha = 0;
-                questCanvaGroup.blocksRaycasts = false;
-                questCanvaGroup.interactable = false;
-                canvasIsActive = false;
-            }
+            questCanvaGroup.alpha = 1;
+            questCanvaGroup.blocksRaycasts = true;
+            questCanvaGroup.interactable = true;
+            canvasIsActive = true;
+        }
+        else
+        {
+            questCanvaGroup.alpha = 0;
+            questCanvaGroup.blocksRaycasts = false;
+            questCanvaGroup.interactable = false;
+            canvasIsActive = false;
         }
     }
-    private Dictionary<QuestSO, Dictionary<QuestObjective, int>> questProgress = new();
+
     public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)
     {
         if (!questProgress.ContainsKey(quest))
