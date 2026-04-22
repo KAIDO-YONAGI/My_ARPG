@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -6,19 +7,45 @@ public class QuestManager : MonoBehaviour
 {
     public static QuestManager instance;
     public CanvasGroup questCanvaGroup;
+
+    [Header("Events")]
+
     public VoidEventSO openQuestEvent;
+    public LoadQuestEventSO loadQuestEventSO;
+
 
     [Header("Options")]
     public CanvasGroup acceptCanvaGroup;
     public CanvasGroup declineCanvaGroup;
     public CanvasGroup completeCanvaGroup;
 
-    private MyEnums.QuestState currentuestState = MyEnums.QuestState.Idle;
+
+    [Header("QuestLogSlots")]
+
+    public QuestLogSlot[] questLogSlots;
+    [Header("Canvas To Operate While No Quests")]
+    public CanvasGroup detailsCanvaGroup;
+    public CanvasGroup promptCanvaGroup;
+
+    private MyEnums.QuestState currentQuestState = MyEnums.QuestState.Idle;
 
     private bool canvasIsActive;
-    private Dictionary<QuestSO, Dictionary<QuestObjective, int>> questProgress = new();
+    //（任务（任务状态，任务要求（要求条目）））
+    private Dictionary<QuestSO, QuestProgressData> questProgress = new();
+    private QuestSO currnetQuestSO;
 
-
+    class QuestProgressData
+    {
+        public QuestProgressData(List<QuestObjective> objectives)
+        {
+            foreach (var obj in objectives)
+            {
+                this.objectives[obj] = 0;
+            }
+        }
+        public MyEnums.QuestState questState = MyEnums.QuestState.Idle;
+        public Dictionary<QuestObjective, int> objectives = new();
+    }
     private void Awake()
     {
         if (instance == null)
@@ -30,22 +57,19 @@ public class QuestManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-
     }
 
     private void OnEnable()
     {
         openQuestEvent.VoidEvent += OnOpenQuestBoard;
+        loadQuestEventSO.LoadQuestEvent += ReFreshQuestStates;
 
-        SetCanvaState(acceptCanvaGroup, false);
-        SetCanvaState(declineCanvaGroup, false);
-        SetCanvaState(completeCanvaGroup, false);
     }
 
     private void OnDisable()
     {
         openQuestEvent.VoidEvent -= OnOpenQuestBoard;
+        loadQuestEventSO.LoadQuestEvent -= ReFreshQuestStates;
 
     }
     private void OnOpenQuestBoard()
@@ -63,46 +87,104 @@ public class QuestManager : MonoBehaviour
             canvasIsActive = false;
         }
     }
-    private void SetCanvaState(CanvasGroup canva, bool state)
+    private void ReFreshQuestStates(List<QuestSO> quests)
     {
-        canva.alpha = state ? 1 : 0;
-        canva.blocksRaycasts = state;
-        canva.interactable = state;
-    }
-    public void OnCurrentQuestStateChanged(MyEnums.QuestState state)
-    {
-        currentuestState = state;
+        InitiateQuestSlots(quests);
 
-        if (currentuestState == MyEnums.QuestState.Idle)
+        if (quests.Count == 0)
+        {
+            DealNoQuests(true);
+            return;
+        }
+        else
+            DealNoQuests(false);
+
+        foreach (var quest in quests)
+        {
+            if (!questProgress.ContainsKey(quest))
+            {
+                questProgress.Add(quest, new QuestProgressData(quest.questObjectives));
+            }
+            if (IsQuestDone(quest))
+            {
+                OnQuestStateChanged(quest, MyEnums.QuestState.Complete);
+            }
+            // if ()
+        }
+    }
+    private void DealNoQuests(bool isOpenWhiteUI)
+    {
+        SetCanvaState(detailsCanvaGroup, !isOpenWhiteUI);
+        SetCanvaState(promptCanvaGroup, isOpenWhiteUI);
+    }
+    private void InitiateQuestSlots(List<QuestSO> quests)
+    {
+        foreach (var questSlot in questLogSlots)
+        {
+            questSlot.SetQuestActive(false);
+        }
+
+        int length = Math.Min(questLogSlots.Length, quests.Count);
+        for (int i = 0; i < length; i++)
+        {
+            questLogSlots[i].SetQuest(quests[i]);
+        }
+    }
+    public void SetCurrentQuest(QuestSO quest)
+    {
+        currnetQuestSO = quest;
+    }
+    public QuestSO GetCurrentQuestSO()
+    {
+        return currnetQuestSO;
+    }
+    public MyEnums.QuestState GetQuestStateFromProgress(QuestSO quest)
+    {
+        return questProgress[quest].questState;
+    }
+    public void OnQuestStateChanged(QuestSO quest, MyEnums.QuestState state)
+    {
+        if (!questProgress.ContainsKey(quest)) return;
+
+        SetCanvaState(acceptCanvaGroup, false);
+        SetCanvaState(declineCanvaGroup, false);
+        SetCanvaState(completeCanvaGroup, false);
+
+        currentQuestState = state;
+        
+        if (questProgress[quest].questState == MyEnums.QuestState.Complete)
+            return;
+        else
+            questProgress[quest].questState = currentQuestState;
+
+
+        if (currentQuestState == MyEnums.QuestState.Idle)
         {
             SetCanvaState(acceptCanvaGroup, true);
             SetCanvaState(declineCanvaGroup, true);
 
         }
-        else if (currentuestState == MyEnums.QuestState.Accepted)
+        else if (currentQuestState == MyEnums.QuestState.Accepted)
         {
-            SetCanvaState(acceptCanvaGroup, false);
-            SetCanvaState(completeCanvaGroup, false);
+            SetCanvaState(declineCanvaGroup, true);
+
         }
-        else if (currentuestState == MyEnums.QuestState.Decline)
+        else if (currentQuestState == MyEnums.QuestState.Decline)
         {
             SetCanvaState(acceptCanvaGroup, true);
             SetCanvaState(declineCanvaGroup, true);
-            //TODO 完成任务逻辑
+
+            //TODO 取消任务逻辑
         }
-        else if (currentuestState == MyEnums.QuestState.Complete)
+        else if (currentQuestState == MyEnums.QuestState.Complete)
         {
-            SetCanvaState(completeCanvaGroup,true);
             //TODO 完成任务逻辑
         }
+
     }
-    public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)
+    public void UpdateObjectiveProgress(QuestObjective obj)
     {
-        if (!questProgress.ContainsKey(quest))
-        {
-            questProgress.Add(quest, new Dictionary<QuestObjective, int>());
-        }
-        var progressDictionary = questProgress[quest];
+        var progressDictionary = questProgress[currnetQuestSO].objectives;
         int newAmount = 0;
 
         if (obj.targetItem != null)
@@ -118,20 +200,45 @@ public class QuestManager : MonoBehaviour
     }
     public string GetProgressText(QuestSO quest, QuestObjective obj)
     {
-        int currentAmount = GetCurrentAmount(quest, obj);
+        int currentObjAmount = GetCurrentObjAmount(quest, obj);
 
-        if (currentAmount >= obj.requiredAmount)
+        if (IsObjDone(quest, obj))
             return "√";
         else if (obj != null)
-            return $"{currentAmount}/{obj.requiredAmount}";
+            return $"{currentObjAmount}/{obj.requiredAmount}";
         else
             return "In Progress";
     }
-    public int GetCurrentAmount(QuestSO quest, QuestObjective obj)
+    public int GetCurrentObjAmount(QuestSO quest, QuestObjective obj)
     {
-        if (questProgress.TryGetValue(quest, out var objectiveDictionary))
-            if (objectiveDictionary.TryGetValue(obj, out int amount))
+        if (questProgress.TryGetValue(quest, out var questProgressData))
+            if (questProgressData.objectives.TryGetValue(obj, out int amount))
                 return amount;
         return 0;
     }
+    private bool IsQuestDone(QuestSO quest)
+    {
+        foreach (var obj in quest.questObjectives)
+        {
+            if (!IsObjDone(quest, obj))
+                return false;
+        }
+        return true;
+    }
+
+
+    private bool IsObjDone(QuestSO quest, QuestObjective obj)
+    {
+        if (GetCurrentObjAmount(quest, obj) < obj.requiredAmount)
+            return false;
+        else
+            return true;
+    }
+    private void SetCanvaState(CanvasGroup canva, bool state)
+    {
+        canva.alpha = state ? 1 : 0;
+        canva.blocksRaycasts = state;
+        canva.interactable = state;
+    }
+
 }

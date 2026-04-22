@@ -6,51 +6,50 @@ using UnityEngine;
 
 public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
 {
-
-
     [SerializeField] private TMP_Text questNameText;
     [SerializeField] private TMP_Text questDescriptionText;
     [SerializeField] private QuestObjectiveSlot[] objectiveSlots;//任务条目槽位
     [SerializeField] private QuestRewardsSlot[] questRewardsSlot;//任务奖励槽位
-    [SerializeField] private QuestSO defaultQuest;
-
-    private QuestSO currnetQuestSO;
-
-    private void OnEnable()
-    {
-        ShowQuestOffer(defaultQuest);
-    }
-
+    private QuestSO CurrentQuestSOInstance => QuestManager.instance.GetCurrentQuestSO();
     public void ShowQuestOffer(QuestSO incomingQuestSO)
     {
         HandleQuestClicked(incomingQuestSO);
     }
 
-    public void HandleQuestClicked(QuestSO quest)
+    public void HandleQuestClicked(QuestSO quest)//绑定了按钮事件
     {
-        currnetQuestSO = quest;
-        questNameText.text = quest.questName;
-        questDescriptionText.text = quest.questDescription;
+        QuestManager.instance.SetCurrentQuest(quest);
+        questNameText.text = CurrentQuestSOInstance.questName;
+        questDescriptionText.text = CurrentQuestSOInstance.questDescription;
 
-        QuestManager.instance.OnCurrentQuestStateChanged(MyEnums.QuestState.Idle);
+        QuestManager.instance.OnQuestStateChanged(CurrentQuestSOInstance, MyEnums.QuestState.Idle);
         DisPlayObjectives();
         DisplayRewards();
     }
-
 
     private void DisPlayObjectives()
     {
         for (int i = 0; i < objectiveSlots.Length; i++)
         {
-            if (i < currnetQuestSO.questObjectives.Count)
+            if (i < CurrentQuestSOInstance.questObjectives.Count)
             {
-                var obj = currnetQuestSO.questObjectives[i];
-                QuestManager.instance.UpdateObjectiveProgress(currnetQuestSO, obj);
-                int currentAmount = QuestManager.instance.GetCurrentAmount(currnetQuestSO, obj);
-                string progress = QuestManager.instance.GetProgressText(currnetQuestSO, obj);
+                var obj = CurrentQuestSOInstance.questObjectives[i];
+
+                if (QuestManager.instance.GetQuestStateFromProgress(CurrentQuestSOInstance)
+                        == MyEnums.QuestState.Complete)//完成状态就不更新了
+                    continue;
+                QuestManager.instance.UpdateObjectiveProgress(obj);
+
+                int currentAmount =
+                    QuestManager.instance.GetCurrentObjAmount(CurrentQuestSOInstance, obj);
+
+                string progress =
+                    QuestManager.instance.GetProgressText(CurrentQuestSOInstance, obj);
+
                 bool isCompleted = currentAmount >= obj.requiredAmount;
 
                 objectiveSlots[i].gameObject.SetActive(true);
+
                 objectiveSlots[i].RefreshObjectives(obj.description, progress, isCompleted);
 
             }
@@ -64,9 +63,9 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
     {
         for (int i = 0; i < questRewardsSlot.Length; i++)
         {
-            if (i < currnetQuestSO.rewards.Count)
+            if (i < CurrentQuestSOInstance.rewards.Count)
             {
-                var reward = currnetQuestSO.rewards[i];
+                var reward = CurrentQuestSOInstance.rewards[i];
                 questRewardsSlot[i].DisplayReward(reward.rewardItem.icon, reward.quantity);
 
                 questRewardsSlot[i].gameObject.SetActive(true);
