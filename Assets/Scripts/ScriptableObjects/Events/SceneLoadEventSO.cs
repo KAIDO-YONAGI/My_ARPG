@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-[CreateAssetMenu(fileName = "SceneLoadEventSO", menuName = "GameSceneSO/SceneLoadEventSO", order = 0)]
+[CreateAssetMenu(fileName = "SceneLoadEventSO", menuName = "Events/SceneLoadEventSO", order = 0)]
 public class SceneLoadEventSO : ScriptableObject
 {
     public UnityAction<GameSceneSO, Vector3, bool> LoadRequestEvent;
