@@ -29,11 +29,11 @@ public class QuestManager : MonoBehaviour
 
     private MyEnums.QuestState currentQuestState = MyEnums.QuestState.Idle;
 
-    private bool canvasIsActive;
     //（任务（任务状态，任务要求（要求条目）））
     private Dictionary<QuestSO, QuestProgressData> questProgress = new();
-    private QuestSO currnetQuestSO;
-
+    private bool canvasIsActive;
+    private List<QuestSO> currentBoardLoadQuests;
+    public bool CanvasIsActive => canvasIsActive;
     class QuestProgressData
     {
         public QuestProgressData(List<QuestObjective> objectives)
@@ -90,6 +90,7 @@ public class QuestManager : MonoBehaviour
     private void ReFreshQuestStates(List<QuestSO> quests)
     {
         InitiateQuestSlots(quests);
+        currentBoardLoadQuests = quests;
 
         if (quests.Count == 0)
         {
@@ -107,9 +108,11 @@ public class QuestManager : MonoBehaviour
             }
             if (IsQuestDone(quest))
             {
-                OnQuestStateChanged(quest, MyEnums.QuestState.Complete);
+                OnQuestStateChanged(quest, MyEnums.QuestState.IsToComplete);
+                Debug.Log("IsToComplete");
+
             }
-            // if ()
+            else Debug.Log("not done");
         }
     }
     private void DealNoQuests(bool isOpenWhiteUI)
@@ -130,13 +133,14 @@ public class QuestManager : MonoBehaviour
             questLogSlots[i].SetQuest(quests[i]);
         }
     }
-    public void SetCurrentQuest(QuestSO quest)
+    public QuestSO GetFirstIncompletedQuest()
     {
-        currnetQuestSO = quest;
-    }
-    public QuestSO GetCurrentQuestSO()
-    {
-        return currnetQuestSO;
+        foreach (var quest in currentBoardLoadQuests)
+        {
+            if (questProgress[quest].questState != MyEnums.QuestState.Completed)
+                return quest;
+        }
+        return null;
     }
     public MyEnums.QuestState GetQuestStateFromProgress(QuestSO quest)
     {
@@ -151,8 +155,8 @@ public class QuestManager : MonoBehaviour
         SetCanvaState(completeCanvaGroup, false);
 
         currentQuestState = state;
-        
-        if (questProgress[quest].questState == MyEnums.QuestState.Complete)
+
+        if (questProgress[quest].questState == MyEnums.QuestState.Completed)
             return;
         else
             questProgress[quest].questState = currentQuestState;
@@ -176,15 +180,15 @@ public class QuestManager : MonoBehaviour
 
             //TODO 取消任务逻辑
         }
-        else if (currentQuestState == MyEnums.QuestState.Complete)
+        else if (currentQuestState == MyEnums.QuestState.IsToComplete)
         {
-            //TODO 完成任务逻辑
+            //TODO 完成任务逻辑 以后点按钮后进入Completed,将任务固定
         }
 
     }
-    public void UpdateObjectiveProgress(QuestObjective obj)
+    public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)
     {
-        var progressDictionary = questProgress[currnetQuestSO].objectives;
+        var progressDictionary = questProgress[quest].objectives;
         int newAmount = 0;
 
         if (obj.targetItem != null)
@@ -203,7 +207,10 @@ public class QuestManager : MonoBehaviour
         int currentObjAmount = GetCurrentObjAmount(quest, obj);
 
         if (IsObjDone(quest, obj))
+        {
             return "√";
+        }
+
         else if (obj != null)
             return $"{currentObjAmount}/{obj.requiredAmount}";
         else

@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-//TODO 任务板里存它特定的任务，每次请求打开任务的时候向管理器广播这个信号，让它选择性刷新相应任务，能确保刷新时机正确
 //TODO 进阶：弄一个已完成任务面板
 public class QuestBoardManager : MonoBehaviour
 {
 
-    [SerializeField] private List<QuestSO> questsOnBoard;
+    [SerializeField] private List<QuestSO> questsOnBoard;//TODO如果要区分任务实例，则需要深拷贝类包装
 
     [Header("Events")]
     public VoidEventSO openQuestEvent;
@@ -35,6 +34,11 @@ public class QuestBoardManager : MonoBehaviour
         {
             loadQuestEventSO.OnLoadQuestEventRaised(questsOnBoard);//初始化之后再打开面板
             openQuestEvent.OnEventRaised();
+
+            foreach (var item in questsOnBoard)
+            {
+                Debug.Log(item.GetInstanceID());
+            }
         }
     }
 }
