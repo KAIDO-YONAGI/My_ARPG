@@ -6,7 +6,9 @@ public class ShopKeeper : MonoBehaviour
 {
     public static ShopKeeper currentShopKeeper;
     public CanvasGroup shopCanvasGroup;
-    public Animator animator;
+    public Animator logoAnimator;
+    public Animator shopKeeperAnimator;
+
     public ShopManager shopManager;
     public static event Action<ShopManager, bool> OnShopStateChanged;
     [SerializeField] private List<ShopItems> shopItems;
@@ -19,6 +21,7 @@ public class ShopKeeper : MonoBehaviour
     void Start()
     {
         shopIsOpen = false;
+        shopKeeperAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
 
         if (shopCanvasGroup != null)
         {
@@ -77,7 +80,7 @@ public class ShopKeeper : MonoBehaviour
         if (collider.CompareTag("Player"))
         {
             playerInRange = true;
-            animator.SetBool("playerInRange", true);
+            logoAnimator.SetBool("playerInRange", true);
         }
     }
 
@@ -86,7 +89,7 @@ public class ShopKeeper : MonoBehaviour
         if (collider.CompareTag("Player"))
         {
             playerInRange = false;
-            animator.SetBool("playerInRange", false);
+            logoAnimator.SetBool("playerInRange", false);
         }
     }
 }

@@ -3301,6 +3301,7 @@ GameObject:
   - component: {fileID: 543324039}
   - component: {fileID: 543324038}
   - component: {fileID: 543324037}
+  - component: {fileID: 543324040}
   m_Layer: 0
   m_Name: Accept
   m_TagString: Untagged
@@ -3410,6 +3411,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 543324035}
   m_CullTransparentMesh: 1
+--- !u!225 &543324040
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543324035}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &548963471
 GameObject:
   m_ObjectHideFlags: 0
@@ -3786,7 +3799,7 @@ PrefabInstance:
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
-      objectReference: {fileID: 637119099}
+      objectReference: {fileID: 870103893}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -4168,7 +4181,6 @@ GameObject:
   - component: {fileID: 637119097}
   - component: {fileID: 637119096}
   - component: {fileID: 637119098}
-  - component: {fileID: 637119099}
   m_Layer: 0
   m_Name: QuestLog
   m_TagString: Untagged
@@ -4247,32 +4259,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &637119099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 637119094}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 853a01e409811d049a485f9c0006acb2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  questNameText: {fileID: 921485474}
-  questDescriptionText: {fileID: 208019023}
-  objectiveSlots:
-  - {fileID: 115734311065699662}
-  - {fileID: 1449329772}
-  - {fileID: 337227596}
-  - {fileID: 2079387605}
-  questRewardsSlot:
-  - {fileID: 8711781493217923651}
-  - {fileID: 1081834225}
-  - {fileID: 418279402}
-  - {fileID: 2113814654}
-  - {fileID: 424110731}
-  - {fileID: 1717027667}
 --- !u!1 &666307402
 GameObject:
   m_ObjectHideFlags: 0
@@ -4963,6 +4949,7 @@ GameObject:
   - component: {fileID: 797604021}
   - component: {fileID: 797604020}
   - component: {fileID: 797604019}
+  - component: {fileID: 797604022}
   m_Layer: 0
   m_Name: Decline
   m_TagString: Untagged
@@ -5072,6 +5059,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 797604017}
   m_CullTransparentMesh: 1
+--- !u!225 &797604022
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797604017}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &816548056
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5082,12 +5081,12 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_text
-      value: Noob Quest
+      value: Pick And Chat
       objectReference: {fileID: 0}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
-      objectReference: {fileID: 637119099}
+      objectReference: {fileID: 870103893}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: currentQuest
       value: 
@@ -5375,8 +5374,9 @@ GameObject:
   - component: {fileID: 870103889}
   - component: {fileID: 870103888}
   - component: {fileID: 870103887}
-  - component: {fileID: 870103891}
   - component: {fileID: 870103892}
+  - component: {fileID: 870103891}
+  - component: {fileID: 870103893}
   m_Layer: 0
   m_Name: QuestCanvas
   m_TagString: Untagged
@@ -5482,6 +5482,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questCanvaGroup: {fileID: 870103892}
   openQuestEvent: {fileID: 11400000, guid: 1f4dc831c8a864d44a39c1e76db3d595, type: 2}
+  acceptCanvaGroup: {fileID: 543324040}
+  declineCanvaGroup: {fileID: 797604022}
+  completeCanvaGroup: {fileID: 1913595889}
 --- !u!225 &870103892
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5494,6 +5497,33 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &870103893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870103885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 853a01e409811d049a485f9c0006acb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questNameText: {fileID: 921485474}
+  questDescriptionText: {fileID: 208019023}
+  objectiveSlots:
+  - {fileID: 115734311065699662}
+  - {fileID: 1449329772}
+  - {fileID: 337227596}
+  - {fileID: 2079387605}
+  questRewardsSlot:
+  - {fileID: 8711781493217923651}
+  - {fileID: 1081834225}
+  - {fileID: 418279402}
+  - {fileID: 2113814654}
+  - {fileID: 424110731}
+  - {fileID: 1717027667}
+  defaultQuest: {fileID: 11400000, guid: de49a71495b4d4c418ed7b9e0ef1e4ad, type: 2}
 --- !u!1 &906968760
 GameObject:
   m_ObjectHideFlags: 0
@@ -6687,7 +6717,7 @@ PrefabInstance:
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
-      objectReference: {fileID: 637119099}
+      objectReference: {fileID: 870103893}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -9701,7 +9731,7 @@ PrefabInstance:
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
-      objectReference: {fileID: 637119099}
+      objectReference: {fileID: 870103893}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -10140,7 +10170,7 @@ PrefabInstance:
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
-      objectReference: {fileID: 637119099}
+      objectReference: {fileID: 870103893}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -10408,6 +10438,7 @@ GameObject:
   - component: {fileID: 1913595888}
   - component: {fileID: 1913595887}
   - component: {fileID: 1913595886}
+  - component: {fileID: 1913595889}
   m_Layer: 0
   m_Name: Complete
   m_TagString: Untagged
@@ -10517,6 +10548,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1913595884}
   m_CullTransparentMesh: 1
+--- !u!225 &1913595889
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1913595884}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1919138916
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10753,10 +10796,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1006575481}
     m_Modifications:
+    - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_text
+      value: Shopping
+      objectReference: {fileID: 0}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
-      objectReference: {fileID: 637119099}
+      objectReference: {fileID: 870103893}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: currentQuest
       value: 
@@ -10864,6 +10911,10 @@ PrefabInstance:
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_text
+      value: Lv.1
       objectReference: {fileID: 0}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_Name

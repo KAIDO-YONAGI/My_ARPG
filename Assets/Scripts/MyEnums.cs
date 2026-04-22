@@ -50,4 +50,12 @@ namespace MyEnums
         RefuseChatByVisited
 
     }
+    public enum QuestState
+    {
+        Idle,
+        Accepted,
+        Decline,
+        Complete
+
+    }
 }
