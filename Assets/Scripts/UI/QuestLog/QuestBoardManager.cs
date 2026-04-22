@@ -2,17 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-//TODO 任务板里存储任务及其完成状态的列表，打开任务栏的时候广播这个列表，UI接收之后初始化对应信息，以及Details自动打开第一个,如果为空，关闭Details
+//TODO 任务板里存它特定的任务，每次请求打开任务的时候向管理器广播这个信号，让它选择性刷新相应任务，能确保刷新时机正确
 //TODO 进阶：弄一个已完成任务面板
 public class QuestBoardManager : MonoBehaviour
 {
-    public VoidEventSO openQuestEvent;
 
-    [SerializeField] bool isInRange = false;
+    [SerializeField] private List<QuestSO> questsOnBoard;
+
+    [Header("Events")]
+    public VoidEventSO openQuestEvent;
+    public LoadQuestEventSO loadQuestEventSO;
+
+
+    private bool isInRange = false;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
+        {
             isInRange = true;
+        }
     }
     private void OnTriggerExit2D(Collider2D other)
     {
@@ -24,6 +33,7 @@ public class QuestBoardManager : MonoBehaviour
     {
         if (Input.GetButtonDown("OpenQuestList") && isInRange)
         {
+            loadQuestEventSO.OnLoadQuestEventRaised(questsOnBoard);//初始化之后再打开面板
             openQuestEvent.OnEventRaised();
         }
     }
