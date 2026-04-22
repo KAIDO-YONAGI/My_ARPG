@@ -55,7 +55,8 @@ namespace MyEnums
         Idle,
         Accepted,
         Decline,
-        Complete
+        IsToComplete,
+        Completed
 
     }
 }

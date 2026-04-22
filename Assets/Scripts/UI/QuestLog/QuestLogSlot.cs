@@ -15,7 +15,7 @@ public class QuestLogSlot : MonoBehaviour
         gameObject.SetActive(false);
         if (currentQuest != null)
             SetQuest(currentQuest);
-
+        
     }
 
     public void SetQuest(QuestSO quest)

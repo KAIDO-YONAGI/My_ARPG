@@ -5556,6 +5556,7 @@ MonoBehaviour:
   - {fileID: 2113814654}
   - {fileID: 424110731}
   - {fileID: 1717027667}
+  openQuestEvent: {fileID: 11400000, guid: 1f4dc831c8a864d44a39c1e76db3d595, type: 2}
 --- !u!1 &906968760
 GameObject:
   m_ObjectHideFlags: 0

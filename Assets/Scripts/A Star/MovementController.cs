@@ -31,7 +31,6 @@ public class MovementController : MonoBehaviour
     /// <param name="endPos"> 一直传入相同值即可</param>
     /// <returns></returns> <summary>
 
-    //TODO:用事件系统解耦controller和movement，controller只负责提供路径点，movement负责移动和告知controller到达节点，并只由controller负责操作（重建）路径
     public Vector3 GetPosToGo(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         // 更新计时器
