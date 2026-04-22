@@ -1,17 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class QuestLogUI : MonoBehaviour
+public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
 {
+
+
     [SerializeField] private TMP_Text questNameText;
     [SerializeField] private TMP_Text questDescriptionText;
     [SerializeField] private QuestObjectiveSlot[] objectiveSlots;//任务条目槽位
-    [SerializeField] private QuestRewardsSlot[] questRewardsSlot;//任务条目槽位
-
+    [SerializeField] private QuestRewardsSlot[] questRewardsSlot;//任务奖励槽位
+    [SerializeField] private QuestSO defaultQuest;
 
     private QuestSO currnetQuestSO;
+
+    private void OnEnable()
+    {
+        ShowQuestOffer(defaultQuest);
+    }
 
     public void ShowQuestOffer(QuestSO incomingQuestSO)
     {
@@ -23,6 +31,8 @@ public class QuestLogUI : MonoBehaviour
         currnetQuestSO = quest;
         questNameText.text = quest.questName;
         questDescriptionText.text = quest.questDescription;
+
+        QuestManager.instance.OnCurrentQuestStateChanged(MyEnums.QuestState.Idle);
         DisPlayObjectives();
         DisplayRewards();
     }
@@ -36,12 +46,12 @@ public class QuestLogUI : MonoBehaviour
             {
                 var obj = currnetQuestSO.questObjectives[i];
                 QuestManager.instance.UpdateObjectiveProgress(currnetQuestSO, obj);
-                int currentAmount=QuestManager.instance.GetCurrentAmount(currnetQuestSO,obj);
-                string progress=QuestManager.instance.GetProgressText(currnetQuestSO,obj);
-                bool isCompleted=currentAmount>=obj.requiredAmount;
+                int currentAmount = QuestManager.instance.GetCurrentAmount(currnetQuestSO, obj);
+                string progress = QuestManager.instance.GetProgressText(currnetQuestSO, obj);
+                bool isCompleted = currentAmount >= obj.requiredAmount;
 
                 objectiveSlots[i].gameObject.SetActive(true);
-                objectiveSlots[i].RefreshObjectives(obj.description,progress,isCompleted);
+                objectiveSlots[i].RefreshObjectives(obj.description, progress, isCompleted);
 
             }
             else
@@ -52,15 +62,15 @@ public class QuestLogUI : MonoBehaviour
     }
     private void DisplayRewards()
     {
-        for(int i = 0; i < questRewardsSlot.Length; i++)
+        for (int i = 0; i < questRewardsSlot.Length; i++)
         {
             if (i < currnetQuestSO.rewards.Count)
             {
-                var reward=currnetQuestSO.rewards[i];
-                questRewardsSlot[i].DisplayReward(reward.rewardItem.icon,reward.quantity);
+                var reward = currnetQuestSO.rewards[i];
+                questRewardsSlot[i].DisplayReward(reward.rewardItem.icon, reward.quantity);
 
                 questRewardsSlot[i].gameObject.SetActive(true);
-                
+
             }
             else
             {

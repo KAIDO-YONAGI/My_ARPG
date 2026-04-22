@@ -8,6 +8,13 @@ public class QuestManager : MonoBehaviour
     public CanvasGroup questCanvaGroup;
     public VoidEventSO openQuestEvent;
 
+    [Header("Options")]
+    public CanvasGroup acceptCanvaGroup;
+    public CanvasGroup declineCanvaGroup;
+    public CanvasGroup completeCanvaGroup;
+
+    private MyEnums.QuestState currentuestState = MyEnums.QuestState.Idle;
+
     private bool canvasIsActive;
     private Dictionary<QuestSO, Dictionary<QuestObjective, int>> questProgress = new();
 
@@ -30,6 +37,10 @@ public class QuestManager : MonoBehaviour
     private void OnEnable()
     {
         openQuestEvent.VoidEvent += OnOpenQuestBoard;
+
+        SetCanvaState(acceptCanvaGroup, false);
+        SetCanvaState(declineCanvaGroup, false);
+        SetCanvaState(completeCanvaGroup, false);
     }
 
     private void OnDisable()
@@ -41,20 +52,50 @@ public class QuestManager : MonoBehaviour
     {
         if (!canvasIsActive)
         {
-            questCanvaGroup.alpha = 1;
-            questCanvaGroup.blocksRaycasts = true;
-            questCanvaGroup.interactable = true;
+            SetCanvaState(questCanvaGroup, true);
+
             canvasIsActive = true;
         }
         else
         {
-            questCanvaGroup.alpha = 0;
-            questCanvaGroup.blocksRaycasts = false;
-            questCanvaGroup.interactable = false;
+            SetCanvaState(questCanvaGroup, false);
+
             canvasIsActive = false;
         }
     }
+    private void SetCanvaState(CanvasGroup canva, bool state)
+    {
+        canva.alpha = state ? 1 : 0;
+        canva.blocksRaycasts = state;
+        canva.interactable = state;
+    }
+    public void OnCurrentQuestStateChanged(MyEnums.QuestState state)
+    {
+        currentuestState = state;
 
+        if (currentuestState == MyEnums.QuestState.Idle)
+        {
+            SetCanvaState(acceptCanvaGroup, true);
+            SetCanvaState(declineCanvaGroup, true);
+
+        }
+        else if (currentuestState == MyEnums.QuestState.Accepted)
+        {
+            SetCanvaState(acceptCanvaGroup, false);
+            SetCanvaState(completeCanvaGroup, false);
+        }
+        else if (currentuestState == MyEnums.QuestState.Decline)
+        {
+            SetCanvaState(acceptCanvaGroup, true);
+            SetCanvaState(declineCanvaGroup, true);
+            //TODO 完成任务逻辑
+        }
+        else if (currentuestState == MyEnums.QuestState.Complete)
+        {
+            SetCanvaState(completeCanvaGroup,true);
+            //TODO 完成任务逻辑
+        }
+    }
     public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)
     {
         if (!questProgress.ContainsKey(quest))

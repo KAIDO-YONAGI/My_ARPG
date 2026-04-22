@@ -225,7 +225,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shopCanvasGroup: {fileID: 0}
-  animator: {fileID: 7250176339750171359}
+  logoAnimator: {fileID: 7250176339750171359}
+  shopKeeperAnimator: {fileID: 3971748871566898795}
   shopManager: {fileID: 0}
   shopItems:
   - item: {fileID: 11400000, guid: c905cf70e8dcc7b448c30320d5875878, type: 2}
