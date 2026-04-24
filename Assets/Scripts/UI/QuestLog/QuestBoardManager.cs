@@ -35,10 +35,10 @@ public class QuestBoardManager : MonoBehaviour
             loadQuestEventSO.OnLoadQuestEventRaised(questsOnBoard);//初始化之后再打开面板
             openQuestEvent.OnEventRaised();
 
-            foreach (var item in questsOnBoard)
-            {
-                Debug.Log(item.GetInstanceID());
-            }
+            // foreach (var item in questsOnBoard)
+            // {
+            //     Debug.Log(item.GetInstanceID());
+            // }
         }
     }
 }

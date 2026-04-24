@@ -11,7 +11,7 @@ public class ButtonSceneToggler : MonoBehaviour
     public bool isToFade = true;
     [Header("Retry Event")]
     public VoidEventSO retryEventSO;
-    public void RaiseLoadRequestEvent()
+    public void HandleSceneToggle()//editor内由button组件绑定
     {
         ButtonCanvas.alpha = 0;
         ButtonCanvas.interactable = false;
@@ -24,7 +24,7 @@ public class ButtonSceneToggler : MonoBehaviour
         else
         {
             TimeManager.instance.ForceResumeGame();
-            retryEventSO.OnEventRaised();//RetryManager位于每个场景内
+            retryEventSO.OnEventRaised();//事件引用位于每个场景内RetryManager
         }
     }
 
