@@ -33,7 +33,7 @@ public class TimeManager : MonoBehaviour
             isGamePaused = false;
         }
     }
-    public void ForceResumeGame()//强制恢复游戏，重置暂停次数
+    public void ForceResumeGame()//强制恢复游戏，重置暂停次数，注意此时要配合画布组的状态变化来调用
     {
         numberOfPauses = 0;
         Time.timeScale = 1;

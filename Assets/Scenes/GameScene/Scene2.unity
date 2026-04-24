@@ -569,6 +569,88 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
   m_PrefabInstance: {fileID: 344553468}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &389389042
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1435749825}
+    m_Modifications:
+    - target: {fileID: 3014821173497722426, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_Name
+      value: QuestBoard
+      objectReference: {fileID: 0}
+    - target: {fileID: 3014821173497722426, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: loadQuestEventSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 5c89b7f268260c849b378b0313b48689, type: 2}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: de49a71495b4d4c418ed7b9e0ef1e4ad, type: 2}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 84853ae3e6bf9844c83101a648a09d85, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+--- !u!4 &389389043 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+  m_PrefabInstance: {fileID: 389389042}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &401170128
 GameObject:
   m_ObjectHideFlags: 0
@@ -1022,6 +1104,88 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
   m_PrefabInstance: {fileID: 715668288}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &813985690
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1435749825}
+    m_Modifications:
+    - target: {fileID: 3014821173497722426, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_Name
+      value: QuestBoard
+      objectReference: {fileID: 0}
+    - target: {fileID: 3014821173497722426, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.23
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: loadQuestEventSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 5c89b7f268260c849b378b0313b48689, type: 2}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 84853ae3e6bf9844c83101a648a09d85, type: 2}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: c02a25e22c284924aa766432635dfba7, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+--- !u!4 &813985691 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+  m_PrefabInstance: {fileID: 813985690}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &818051435
 PrefabInstance:
@@ -1513,6 +1677,88 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
   m_PrefabInstance: {fileID: 1095194021}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1104806229
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1435749825}
+    m_Modifications:
+    - target: {fileID: 3014821173497722426, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_Name
+      value: QuestBoard
+      objectReference: {fileID: 0}
+    - target: {fileID: 3014821173497722426, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: loadQuestEventSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 5c89b7f268260c849b378b0313b48689, type: 2}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 84853ae3e6bf9844c83101a648a09d85, type: 2}
+    - target: {fileID: 7601350229076793713, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+      propertyPath: questsOnBoard.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: de49a71495b4d4c418ed7b9e0ef1e4ad, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+--- !u!4 &1104806230 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
+  m_PrefabInstance: {fileID: 1104806229}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1184283276
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1697,6 +1943,40 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa92cd2683b802441b522847136bd25d, type: 3}
+--- !u!1 &1435749824
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1435749825}
+  m_Layer: 0
+  m_Name: QuestsBoards
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1435749825
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435749824}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 813985691}
+  - {fileID: 389389043}
+  - {fileID: 1104806230}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1460631722
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15677,6 +15957,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 145547981}
+  - {fileID: 1435749825}
   - {fileID: 1859474615}
   - {fileID: 1628418293}
   - {fileID: 2468199099309312816}

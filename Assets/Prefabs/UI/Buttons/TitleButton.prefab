@@ -124,7 +124,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2881503552460185895}
         m_TargetAssemblyTypeName: ButtonSceneToggler, Assembly-CSharp
-        m_MethodName: RaiseLoadRequestEvent
+        m_MethodName: HandleSceneToggle
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -151,6 +151,7 @@ MonoBehaviour:
   ButtonCanvas: {fileID: 0}
   newPosition: {x: 0, y: 0, z: 0}
   isToFade: 1
+  retryEventSO: {fileID: 0}
 --- !u!1 &7468271172517241251
 GameObject:
   m_ObjectHideFlags: 0
