@@ -10,8 +10,9 @@ public class QuestManager : MonoBehaviour
 
     [Header("Events")]
 
-    public VoidEventSO openQuestEvent;
+    public VoidEventSO openQuestEventSO;
     public LoadQuestEventSO loadQuestEventSO;
+    public QuestOptionsEventSO questOptionsEventSO;
 
 
     [Header("Options")]
@@ -33,6 +34,12 @@ public class QuestManager : MonoBehaviour
     private Dictionary<QuestSO, QuestProgressData> questProgress = new();
     private bool canvasIsActive;
     private List<QuestSO> currentBoardLoadQuests;
+    private QuestSO currentQuest;
+
+    public void SetCurrentQuest(QuestSO quest)
+    {
+        currentQuest = quest;
+    }
     public bool CanvasIsActive => canvasIsActive;
     class QuestProgressData
     {
@@ -61,15 +68,32 @@ public class QuestManager : MonoBehaviour
 
     private void OnEnable()
     {
-        openQuestEvent.VoidEvent += OnOpenQuestBoard;
-        loadQuestEventSO.LoadQuestEvent += ReFreshQuestStates;
+        openQuestEventSO.VoidEvent += OnOpenQuestBoard;
+        loadQuestEventSO.LoadQuestEvent += OnReFreshQuestState;
+        questOptionsEventSO.questOptionsEvent += OnQuestOptionChose;
 
     }
 
     private void OnDisable()
     {
-        openQuestEvent.VoidEvent -= OnOpenQuestBoard;
-        loadQuestEventSO.LoadQuestEvent -= ReFreshQuestStates;
+        openQuestEventSO.VoidEvent -= OnOpenQuestBoard;
+        loadQuestEventSO.LoadQuestEvent -= OnReFreshQuestState;
+        questOptionsEventSO.questOptionsEvent -= OnQuestOptionChose;
+
+    }
+
+    private void OnQuestOptionChose(MyEnums.QuestState questStateToShift)
+    {
+
+        if (questStateToShift == MyEnums.QuestState.Completed)
+        {
+            if (IsQuestDone(currentQuest))
+            {
+                OnQuestStateChanged(currentQuest, questStateToShift);
+            }
+            else Debug.Log("Quest Not Done");
+        }
+        else OnQuestStateChanged(currentQuest, questStateToShift);
 
     }
     private void OnOpenQuestBoard()
@@ -87,7 +111,7 @@ public class QuestManager : MonoBehaviour
             canvasIsActive = false;
         }
     }
-    private void ReFreshQuestStates(List<QuestSO> quests)
+    private void OnReFreshQuestState(List<QuestSO> quests)
     {
         InitiateQuestSlots(quests);
         currentBoardLoadQuests = quests;
@@ -156,10 +180,7 @@ public class QuestManager : MonoBehaviour
 
         currentQuestState = state;
 
-        if (questProgress[quest].questState == MyEnums.QuestState.Completed)
-            return;
-        else
-            questProgress[quest].questState = currentQuestState;
+        questProgress[quest].questState = currentQuestState;
 
 
         if (currentQuestState == MyEnums.QuestState.Idle)
@@ -171,6 +192,8 @@ public class QuestManager : MonoBehaviour
         else if (currentQuestState == MyEnums.QuestState.Accepted)
         {
             SetCanvaState(declineCanvaGroup, true);
+            SetCanvaState(completeCanvaGroup, true);
+
 
         }
         else if (currentQuestState == MyEnums.QuestState.Decline)
@@ -182,6 +205,8 @@ public class QuestManager : MonoBehaviour
         }
         else if (currentQuestState == MyEnums.QuestState.IsToComplete)
         {
+            SetCanvaState(completeCanvaGroup, true);
+
             //TODO 完成任务逻辑 以后点按钮后进入Completed,将任务固定
         }
 
@@ -225,6 +250,9 @@ public class QuestManager : MonoBehaviour
     }
     private bool IsQuestDone(QuestSO quest)
     {
+        if (questProgress[quest].questState == MyEnums.QuestState.IsToComplete)
+            return true;
+
         foreach (var obj in quest.questObjectives)
         {
             if (!IsObjDone(quest, obj))

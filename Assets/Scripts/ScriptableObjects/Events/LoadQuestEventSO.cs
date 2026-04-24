@@ -6,8 +6,8 @@ using UnityEngine.Events;
 public class LoadQuestEventSO : ScriptableObject
 {
     public UnityAction<List<QuestSO>> LoadQuestEvent;
-    public void OnLoadQuestEventRaised(List<QuestSO> questsOnBoard)
+    public void OnLoadQuestEventRaised(List<QuestSO> quests)
     {
-        LoadQuestEvent?.Invoke(questsOnBoard);
+        LoadQuestEvent?.Invoke(quests);
     }
 }
