@@ -22,11 +22,14 @@ public class QuestManager : MonoBehaviour
 
 
     [Header("QuestLogSlots")]
-
     public QuestLogSlot[] questLogSlots;
+
     [Header("Canvas To Operate While No Quests")]
     public CanvasGroup detailsCanvaGroup;
     public CanvasGroup promptCanvaGroup;
+
+    [Header("QuestLogUI")]
+    public QuestLogUI questLogUI;
 
     private MyEnums.QuestState currentQuestState = MyEnums.QuestState.Idle;
 
@@ -103,6 +106,7 @@ public class QuestManager : MonoBehaviour
             SetCanvaState(questCanvaGroup, true);
 
             canvasIsActive = true;
+            questLogUI.DisPlayObjectives();
         }
         else
         {
@@ -130,7 +134,7 @@ public class QuestManager : MonoBehaviour
             {
                 questProgress.Add(quest, new QuestProgressData(quest.questObjectives));
             }
-            if (IsQuestDone(quest))
+            if (IsQuestDone(quest)&&GetQuestStateFromProgress(quest)==MyEnums.QuestState.Accepted)
             {
                 OnQuestStateChanged(quest, MyEnums.QuestState.IsToComplete);
                 Debug.Log("IsToComplete");
@@ -186,27 +190,30 @@ public class QuestManager : MonoBehaviour
         if (currentQuestState == MyEnums.QuestState.Idle)
         {
             SetCanvaState(acceptCanvaGroup, true);
-            SetCanvaState(declineCanvaGroup, true);
 
         }
         else if (currentQuestState == MyEnums.QuestState.Accepted)
         {
             SetCanvaState(declineCanvaGroup, true);
             SetCanvaState(completeCanvaGroup, true);
-
+            questLogUI.DisPlayObjectives();
 
         }
         else if (currentQuestState == MyEnums.QuestState.Decline)
         {
             SetCanvaState(acceptCanvaGroup, true);
             SetCanvaState(declineCanvaGroup, true);
-
             //TODO 取消任务逻辑
         }
         else if (currentQuestState == MyEnums.QuestState.IsToComplete)
         {
             SetCanvaState(completeCanvaGroup, true);
 
+            //TODO 完成任务逻辑 以后点按钮后进入Completed,将任务固定
+        }
+        else if (currentQuestState == MyEnums.QuestState.Completed)
+        {
+            questLogUI.DisPlayObjectives();
             //TODO 完成任务逻辑 以后点按钮后进入Completed,将任务固定
         }
 
