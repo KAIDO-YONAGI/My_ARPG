@@ -25,9 +25,6 @@ public class SceneChanger : MonoBehaviour
     public SceneLoadEventSO loadEventSO;
     public Animator[] transitionImagesDuringFade;
     public Object[] objectsToUnableWhileGameReset;
-    /// <summary>要重置的画布组数组 </summary>
-    public CanvasGroup[] canvasToResetWhileGameReset;
-
     private GameSceneSO sceneToLoad;
 
     private GameSceneSO currentScene;
@@ -108,6 +105,7 @@ public class SceneChanger : MonoBehaviour
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
         ForbidInput();
+        StatsManager.instance.ResetHealth();//回血
         TimeManager.instance.PauseGame();
         sceneToLoad = scene;
         this.newPosition = newPosition == Vector3.zero ? sceneToLoad.initialPosition : newPosition;
@@ -158,7 +156,6 @@ public class SceneChanger : MonoBehaviour
             var loadingOption = sceneToLoad.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
             loadingOption.Completed += OnLoadCompleted;
         }
-        ResetCanvas();
     }
     private void SetObjects(bool state)
     {
@@ -170,22 +167,7 @@ public class SceneChanger : MonoBehaviour
             }
         }
     }
-    private void ResetCanvas()
-    {
-        foreach (var canvas in canvasToResetWhileGameReset)
-        {
-            if (canvas.GetComponent<CanvasGroup>() != null)
-            {
-                canvas.alpha = 0;
-                canvas.interactable = false;
-                canvas.blocksRaycasts = false;
-            }
-            else
-            {
-                Debug.LogWarning($"CanvasGroup component not found on {canvas.name}");
-            }
-        }
-    }
+
     /// <summary>
     /// 场景加载完成回调
     /// 更新当前场景引用，播放淡出动画
