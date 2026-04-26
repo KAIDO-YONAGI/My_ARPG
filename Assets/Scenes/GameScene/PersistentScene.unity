@@ -11898,6 +11898,7 @@ MonoBehaviour:
   player: {fileID: 5360259125137984082}
   goldAmount: 0
   InventoryUpdateRequest: {fileID: 11400000, guid: 9288ed250bdecb643afeabf9ce4ba424, type: 2}
+  lootEvent: {fileID: 11400000, guid: 2df8d406342501048a2adc57a2ee2d20, type: 2}
 --- !u!114 &432747330827997248
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -135,6 +135,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
   sr: {fileID: 3585452789567456799}
   animator: {fileID: 4029621694285017975}
+  lootEvent: {fileID: 11400000, guid: 2df8d406342501048a2adc57a2ee2d20, type: 2}
   quantity: 2
   canBePick: 1
   hasBeenPicked: 0

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,7 +7,7 @@ public class Loot : MonoBehaviour, ISaveable
     public ItemSO item;
     public SpriteRenderer sr;
     public Animator animator;
-    public static event Action<ItemSO, int, Loot> OnItemLooted;
+    public LootEventSO lootEvent;
     public int quantity = 10;
     public bool canBePick = true;
     public bool hasBeenPicked = false;
@@ -67,7 +66,7 @@ public class Loot : MonoBehaviour, ISaveable
         {
             animator.Play("Pickup");
             animator.SetBool("isPicked", true);
-            OnItemLooted?.Invoke(item, quantity, this);
+            lootEvent.OnEventRaised(item, quantity, this);
             hasBeenPicked = true;
             saveDataEvent.OnEventRaised();
         }
