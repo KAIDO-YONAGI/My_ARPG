@@ -5300,6 +5300,7 @@ MonoBehaviour:
   openQuestEventSO: {fileID: 11400000, guid: 1f4dc831c8a864d44a39c1e76db3d595, type: 2}
   loadQuestEventSO: {fileID: 11400000, guid: 5c89b7f268260c849b378b0313b48689, type: 2}
   questOptionsEventSO: {fileID: 11400000, guid: 710e8fe3cbf31ca4a95087439ec4a693, type: 2}
+  QuestRewardRequest: {fileID: 11400000, guid: 42a47779888eeb04487dcce0ad1c8ce3, type: 2}
   acceptCanvaGroup: {fileID: 543324040}
   declineCanvaGroup: {fileID: 797604022}
   completeCanvaGroup: {fileID: 1913595889}
@@ -5762,7 +5763,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2.6228943, y: -45}
+  m_AnchoredPosition: {x: -2.6228027, y: -45}
   m_SizeDelta: {x: -361.9669, y: -520}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1006575482
@@ -11897,7 +11898,8 @@ MonoBehaviour:
   lootPrefab: {fileID: 4449130243353109343, guid: 96f2efcecf1a358409f694adadbddbed, type: 3}
   player: {fileID: 5360259125137984082}
   goldAmount: 0
-  InventoryUpdateRequest: {fileID: 11400000, guid: 9288ed250bdecb643afeabf9ce4ba424, type: 2}
+  ShoppingRequest: {fileID: 11400000, guid: 297fdc8f0156ec44fb152533792d96b2, type: 2}
+  QuestRewardRequest: {fileID: 11400000, guid: 42a47779888eeb04487dcce0ad1c8ce3, type: 2}
   lootEvent: {fileID: 11400000, guid: 2df8d406342501048a2adc57a2ee2d20, type: 2}
 --- !u!114 &432747330827997248
 MonoBehaviour:

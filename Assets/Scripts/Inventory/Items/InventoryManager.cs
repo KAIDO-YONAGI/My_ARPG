@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -14,7 +15,9 @@ public class InventoryManager : MonoBehaviour
 
 
     [Header("Events")]
-    public InventorySlotsStatsSO InventoryUpdateRequest;
+    public InventorySlotsStatsSO ShoppingRequest;
+    public InventorySlotsStatsSO QuestRewardRequest;
+
     public LootEventSO lootEvent;
 
 
@@ -30,13 +33,23 @@ public class InventoryManager : MonoBehaviour
     private void OnEnable()
     {
         lootEvent.LootEvent += OnItemLootedHandler;
-        InventoryUpdateRequest.InventoryUpdateRequestEvent += HandleShopping;
+        ShoppingRequest.InventoryUpdateRequestEvent += HandleShopping;
+        QuestRewardRequest.InventoryUpdateRequestEvent += HandleQuestReward;
 
     }
+
+
     private void OnDisable()
     {
         lootEvent.LootEvent -= OnItemLootedHandler;
-        InventoryUpdateRequest.InventoryUpdateRequestEvent -= HandleShopping;
+        ShoppingRequest.InventoryUpdateRequestEvent -= HandleShopping;
+        QuestRewardRequest.InventoryUpdateRequestEvent -= HandleQuestReward;
+
+    }
+
+    private void HandleQuestReward(ItemSO item, int price, int amount)
+    {
+        UpdateInvetorySlots(item, amount);
     }
 
     private void OnItemLootedHandler(ItemSO item, int quantity, Loot lootObj)
@@ -72,6 +85,11 @@ public class InventoryManager : MonoBehaviour
 
             amountText.text = goldAmount.ToString();
             lootObj?.MarkAsDestroyed();
+            return;
+        }
+        if (item.isEXP)//TODO 经验的逻辑
+        {
+            ExpManager.instance.GainExp(quantity);
             return;
         }
         //普通物品
