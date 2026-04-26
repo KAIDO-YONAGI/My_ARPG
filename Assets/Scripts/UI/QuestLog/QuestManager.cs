@@ -89,7 +89,7 @@ public class QuestManager : MonoBehaviour
 
         if (questStateToShift == MyEnums.QuestState.Completed)
         {
-            if (IsQuestDone(currentQuest))
+            if (IsQuestObjDone(currentQuest))
             {
                 OnQuestStateChanged(currentQuest, questStateToShift);
             }
@@ -120,7 +120,7 @@ public class QuestManager : MonoBehaviour
         currentBoardLoadQuests = quests;
 
         if (quests.Count == 0
-        //  || IsAllQuestsDone(quests)
+         || IsAllQuestsCompleted(quests)
         )
         {
             SetNoQuestsState(true);
@@ -135,7 +135,7 @@ public class QuestManager : MonoBehaviour
             {
                 questProgress.Add(quest, new QuestProgressData(quest.questObjectives));
             }
-            if (IsQuestDone(quest) && GetQuestStateFromProgress(quest) == MyEnums.QuestState.Accepted)
+            if (IsQuestObjDone(quest) && GetQuestStateFromProgress(quest) == MyEnums.QuestState.Accepted)
             {
                 OnQuestStateChanged(quest, MyEnums.QuestState.IsToComplete);
                 Debug.Log("IsToComplete");
@@ -258,11 +258,14 @@ public class QuestManager : MonoBehaviour
                 return amount;
         return 0;
     }
-    private bool IsAllQuestsDone(List<QuestSO> quests)
+    private bool IsAllQuestsCompleted(List<QuestSO> quests)
     {
         foreach (var quest in quests)
         {
-            if (!IsQuestDone(quest))
+            if (!questProgress.ContainsKey(quest)) return false;
+            MyEnums.QuestState questState = questProgress[quest].questState;
+
+            if (questState != MyEnums.QuestState.Completed)
                 return false;
         }
 
@@ -274,20 +277,20 @@ public class QuestManager : MonoBehaviour
         {
             if (questSlot.currentQuest == quest)
             {
-                CanvasGroup questSlotCanvas=questSlot.GetComponent<CanvasGroup>();
-                questSlotCanvas.alpha=.2f;
-                questSlotCanvas.interactable=false;
-                questSlotCanvas.blocksRaycasts=false;
+                CanvasGroup questSlotCanvas = questSlot.GetComponent<CanvasGroup>();
+                questSlotCanvas.alpha = .2f;
+                questSlotCanvas.interactable = false;
+                questSlotCanvas.blocksRaycasts = false;
 
             }
         }
     }
-    private bool IsQuestDone(QuestSO quest)
+    private bool IsQuestObjDone(QuestSO quest)
     {
         if (!questProgress.ContainsKey(quest)) return false;
 
         MyEnums.QuestState questState = questProgress[quest].questState;
-        if (questState == MyEnums.QuestState.IsToComplete)
+        if (questState == MyEnums.QuestState.Completed)
             return true;
 
         foreach (var obj in quest.questObjectives)
