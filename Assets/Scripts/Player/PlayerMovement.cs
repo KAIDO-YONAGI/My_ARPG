@@ -12,9 +12,16 @@ public class PlayerMovement : MonoBehaviour
     private int facingDirection = 1;//默认朝向为右
     private bool canBeInterrupted = true;//是否可以被打断，攻击和射击动画期间不可被打断
 
-    private float timer = 0;//计时器，暂时未使用        
+    private float timer = 0;//计时器，暂时未使用
 
     private PlayerState playerState = PlayerState.Idle;
+
+    private void OnEnable()
+    {
+        canBeInterrupted = true;
+        playerState = PlayerState.Idle;
+        timer = 0;
+    }
 
     public void AnimatorSM(PlayerState newState)//用于切换动画
     {
