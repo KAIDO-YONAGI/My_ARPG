@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -16,6 +15,7 @@ public class InventoryManager : MonoBehaviour
 
     [Header("Events")]
     public InventorySlotsStatsSO InventoryUpdateRequest;
+    public LootEventSO lootEvent;
 
 
     private InventorySlot slotBeenClicked;
@@ -29,13 +29,13 @@ public class InventoryManager : MonoBehaviour
     }
     private void OnEnable()
     {
-        Loot.OnItemLooted += OnItemLootedHandler;
+        lootEvent.LootEvent += OnItemLootedHandler;
         InventoryUpdateRequest.InventoryUpdateRequestEvent += HandleShopping;
 
     }
     private void OnDisable()
     {
-        Loot.OnItemLooted -= OnItemLootedHandler;
+        lootEvent.LootEvent -= OnItemLootedHandler;
         InventoryUpdateRequest.InventoryUpdateRequestEvent -= HandleShopping;
     }
 
