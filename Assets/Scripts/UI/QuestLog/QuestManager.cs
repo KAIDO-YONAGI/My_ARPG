@@ -12,6 +12,8 @@ public class QuestManager : MonoBehaviour
     public VoidEventSO openQuestEventSO;
     public LoadQuestEventSO loadQuestEventSO;
     public QuestOptionsEventSO questOptionsEventSO;
+    public InventorySlotsStatsSO QuestRewardRequest;
+
 
 
     [Header("Options")]
@@ -144,6 +146,15 @@ public class QuestManager : MonoBehaviour
             else Debug.Log("not done");
         }
     }
+    private void RaiseRewardEvent(QuestSO quest)
+    {
+        foreach (var reward in quest.rewards)
+        {
+            ItemSO item = reward.rewardItem;
+            int quantity = reward.quantity;
+            QuestRewardRequest.RaiseInventoryUpdateRequest(item, 0, quantity);
+        }
+    }
     private void SetNoQuestsState(bool isOpenWhiteUI)
     {
         SetCanvaState(detailsCanvaGroup, !isOpenWhiteUI);
@@ -215,7 +226,7 @@ public class QuestManager : MonoBehaviour
         else if (currentQuestState == MyEnums.QuestState.Completed)
         {
             SetQuestSlotToDoneState(quest);
-
+            RaiseRewardEvent(quest);
             //TODO 完成任务逻辑 以后点按钮后进入Completed,将任务固定
         }
 
