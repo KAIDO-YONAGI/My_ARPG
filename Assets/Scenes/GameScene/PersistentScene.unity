@@ -15373,6 +15373,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   combat: {fileID: 4064602683770510385}
   bow: {fileID: 3336911475324704280}
+  playerMovement: {fileID: 5523715633723475569}
 --- !u!224 &7484387645037530445 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7953370996453584490, guid: ad6c571997aade34da41c92faf999008, type: 3}
