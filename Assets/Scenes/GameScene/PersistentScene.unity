@@ -12803,9 +12803,9 @@ RectTransform:
   - {fileID: 3940097199473459083}
   m_Father: {fileID: 5637238511006152163}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 960, y: 540}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 960, y: -540}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2585504869475741606 stripped
@@ -13761,7 +13761,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
   fadeDuration: 1
-  initScene: {fileID: 11400000, guid: 2a6c9a782e8ae9c458ddf8f2ded4ac6b, type: 2}
+  initScene: {fileID: 11400000, guid: 7c55136055a6e324ba090da1c0385003, type: 2}
   player: {fileID: 6166002366618250803}
   fadeCanva: {fileID: 1424539692}
   loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
@@ -14750,7 +14750,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 1.5523987, y: 5.1413}
+  m_AnchoredPosition: {x: 1.5524292, y: 5.1413}
   m_SizeDelta: {x: -189.6963, y: 43.296}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &6708193449306426752
@@ -15356,7 +15356,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.2532043, y: 0.62669945}
+  m_AnchoredPosition: {x: -1.2531738, y: 0.62669945}
   m_SizeDelta: {x: 25.0648, y: 23.8114}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7448284780504051485
@@ -16212,9 +16212,9 @@ RectTransform:
   - {fileID: 32279426}
   m_Father: {fileID: 5637238511006152163}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 960, y: 540}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -960, y: -540}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &8376443829537401629
