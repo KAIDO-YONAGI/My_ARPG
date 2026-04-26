@@ -215,13 +215,14 @@ public class QuestManager : MonoBehaviour
         else if (currentQuestState == MyEnums.QuestState.Completed)
         {
             SetQuestSlotToDoneState(quest);
+
             //TODO 完成任务逻辑 以后点按钮后进入Completed,将任务固定
         }
 
         questLogUI.DisPlayObjectives();
 
     }
-    public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)
+    public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)//更新完成条件
     {
         var progressDictionary = questProgress[quest].questObjectives;
         int newAmount = 0;
