@@ -282,6 +282,7 @@ GameObject:
   - component: {fileID: 4736408316785942452}
   - component: {fileID: 4724368167983436214}
   - component: {fileID: 3427144831810185516}
+  - component: {fileID: 6857904263809971714}
   m_Layer: 0
   m_Name: QuestSlot
   m_TagString: Untagged
@@ -446,3 +447,15 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!225 &6857904263809971714
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8263330321890586448}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
