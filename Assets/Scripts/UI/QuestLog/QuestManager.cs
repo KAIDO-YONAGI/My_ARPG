@@ -118,8 +118,9 @@ public class QuestManager : MonoBehaviour
     }
     private void OnReFreshQuestState(List<QuestSO> quests)
     {
-        InitiateQuestSlots(quests);
         currentBoardLoadQuests = quests;
+        InitializeQuestProgress(quests);
+        InitiateQuestSlots(quests);
 
         if (quests.Count == 0
          || IsAllQuestsCompleted(quests)
@@ -133,10 +134,6 @@ public class QuestManager : MonoBehaviour
 
         foreach (var quest in quests)
         {
-            if (!questProgress.ContainsKey(quest))
-            {
-                questProgress.Add(quest, new QuestProgressData(quest.questObjectives));
-            }
             if (IsQuestObjDone(quest) && GetQuestStateFromProgress(quest) == MyEnums.QuestState.Accepted)
             {
                 OnQuestStateChanged(quest, MyEnums.QuestState.IsToComplete);
@@ -160,6 +157,16 @@ public class QuestManager : MonoBehaviour
         SetCanvaState(detailsCanvaGroup, !isOpenWhiteUI);
         SetCanvaState(promptCanvaGroup, isOpenWhiteUI);
     }
+    private void InitializeQuestProgress(List<QuestSO> quests)
+    {
+        foreach (var quest in quests)
+        {
+            if (!questProgress.ContainsKey(quest))
+            {
+                questProgress.Add(quest, new QuestProgressData(quest.questObjectives));
+            }
+        }
+    }
     private void InitiateQuestSlots(List<QuestSO> quests)
     {
         foreach (var questSlot in questLogSlots)
@@ -170,7 +177,13 @@ public class QuestManager : MonoBehaviour
         int length = Math.Min(questLogSlots.Length, quests.Count);
         for (int i = 0; i < length; i++)
         {
-            questLogSlots[i].SetQuest(quests[i]);
+            QuestSO quest = quests[i];
+            questLogSlots[i].SetQuest(quest);
+
+            if (GetQuestStateFromProgress(quest) == MyEnums.QuestState.Completed)
+            {
+                SetQuestSlotToDoneState(quest);
+            }
         }
     }
     public QuestSO GetFirstIncompletedQuest()

@@ -22,6 +22,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c05660eb38f8aa4a98d04c4d4a79e13
+    m_Address: Assets/Prefabs/Scene/ShopSystem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1c702d393669d4f4790d43f08612badc
     m_Address: Assets/Prefabs/Grid/Tree.prefab
     m_ReadOnly: 0
@@ -32,13 +37,33 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 82d439faaeaf7f9419d2ae16d7a2901a
+    m_Address: Assets/Prefabs/Scene/NodeMapManager.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8dc757da0b93d2b4c8f53b809bbe3842
     m_Address: Assets/Prefabs/Grid/Rocks/Rock_1.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fe45f65f3fdc1849917eef240aaa959
+    m_Address: Assets/Prefabs/Grid/QuestBoard.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c3135ebdcf15da94ca183bc0979b9f64
     m_Address: Assets/Prefabs/Grid/Rocks/Rock_3.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d32678e832dfec34bb8d1f6ff1be164a
+    m_Address: Assets/Prefabs/Scene/Teleport.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ddb8247686e2dc0489a0f36af57c6bba
+    m_Address: Assets/Prefabs/Scene/RetryManager.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

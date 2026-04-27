@@ -17,6 +17,11 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: e39f43e90125e434f8cbc53b742595d1
   m_SerializeEntries:
+  - m_GUID: 00ebeb4052f9802448d184eef3aa4d23
+    m_Address: Assets/Prefabs/Units/NPCs/YellowPawn_NPC.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4b5e5d3ef5b9cae41996eacc4aab65e1
     m_Address: Assets/Prefabs/Units/ShopKeeper.prefab
     m_ReadOnly: 0

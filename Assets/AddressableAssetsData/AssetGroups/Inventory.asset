@@ -17,6 +17,11 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: ccf29f2eefd22b843b335a9afe9e3b1b
   m_SerializeEntries:
+  - m_GUID: 96f2efcecf1a358409f694adadbddbed
+    m_Address: Assets/Prefabs/Inventory/Loot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b81abb055519ff5439495c48b134a0ee
     m_Address: Assets/Prefabs/Inventory/Gold.prefab
     m_ReadOnly: 0

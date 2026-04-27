@@ -17,8 +17,28 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 98bc1bd6329cfaa4caa70a31fe795b45
   m_SerializeEntries:
+  - m_GUID: 1e636cbacd0d121439b8a68f60bfb275
+    m_Address: Assets/Prefabs/UI/Slots/QOSlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1ec101896b25f6a41ad61282d65749e6
+    m_Address: Assets/Prefabs/UI/Buttons/QuestOptionsButton.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53a08f0680c0d814b977185e5573fed6
+    m_Address: Assets/Prefabs/UI/Slots/RewardSlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5f9c694f2cf92844b8ec92657b680da8
     m_Address: Assets/Prefabs/UI/StatsSlot.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b87f82fd68ab0f40b9f99515133ac6d
+    m_Address: Assets/Prefabs/UI/Buttons/Start.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -29,6 +49,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a28c895636a44e04585eb69925200290
     m_Address: Assets/Prefabs/UI/Stats.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac90f926d0d8c0c4aa24f377beb2306f
+    m_Address: Assets/Prefabs/UI/Slots/QuestSlot.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
