@@ -37,16 +37,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 82d439faaeaf7f9419d2ae16d7a2901a
-    m_Address: Assets/Prefabs/Scene/NodeMapManager.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d32678e832dfec34bb8d1f6ff1be164a
-    m_Address: Assets/Prefabs/Scene/Teleport.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 279c495c53e18d5449c50909fc7c77bb, type: 2}
   m_SchemaSet:
