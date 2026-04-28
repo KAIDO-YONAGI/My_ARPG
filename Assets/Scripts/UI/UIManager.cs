@@ -53,7 +53,7 @@ public class UIManager : MonoBehaviour
 
     //TODO 需要订阅一个空事件用于超出范围关闭画布组
 
-    
+
     private void ToggleCanvas()
     {
         if (CanvasToToggle == MyEnums.CanvasToToggle.Default && Input.GetButtonDown("ESC"))//默认界面ESC弹出ESC面板
@@ -71,21 +71,27 @@ public class UIManager : MonoBehaviour
             if (Input.GetButtonDown("ToggleSkillTree"))//打开技能树
             {
                 CanvasToToggle = MyEnums.CanvasToToggle.Skills;
-                IsToToggleCanvas();
             }
             else if (Input.GetButtonDown("ToggleStats"))//打开状态面板
             {
                 CanvasToToggle = MyEnums.CanvasToToggle.Stats;
-                IsToToggleCanvas();
             }
             else if (Input.GetButtonDown("NPCInteract"))//和NPC对话
             {
                 CanvasToToggle = MyEnums.CanvasToToggle.Dialog;
-                IsToToggleCanvas();
+            }
+            else if (Input.GetButtonDown("OpenQuestList"))//打开商店
+            {
+                CanvasToToggle = MyEnums.CanvasToToggle.Quest;
             }
             else if (Input.GetButtonDown("Interact"))//打开商店
             {
                 CanvasToToggle = MyEnums.CanvasToToggle.Shop;
+            }
+
+
+            if (CanvasToToggle!=MyEnums.CanvasToToggle.Default)
+            {
                 IsToToggleCanvas();
             }
         }

@@ -22,7 +22,7 @@ public class ShopManager : MonoBehaviour
 
 
     private bool isShopOpen = false;
-    public bool IsShopOpen => isShopOpen;
+    public bool IsShopOpen => isShopOpen;//物品栏会根据这个bool变量选择是出售还是使用物品
     
     private void Awake()
     {
