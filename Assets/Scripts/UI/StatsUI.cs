@@ -8,9 +8,36 @@ public class StatsUI : MonoBehaviour
     public GameObject[] statsSlots;
     public CanvasGroup statsCanvas;
 
-    private bool statsIsOpen = false;
+    public ToggleCanvasEventSO toggleStatsEvent;
+    private void OnEnable()
+    {
+        toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
+    }
+    private void OnDisable()
+    {
+        toggleStatsEvent.toggleCanvasEvent -= OnToggleStatsEvent;
 
+    }
+    private void OnToggleStatsEvent(bool state)
+    {
 
+        if (state)
+        {
+            TimeManager.instance.PauseGame();
+            statsCanvas.alpha = 1;
+            statsCanvas.interactable = true;
+            statsCanvas.blocksRaycasts = true;
+
+        }
+        else
+        {
+            TimeManager.instance.ResumeGame();
+            statsCanvas.alpha = 0;
+            statsCanvas.interactable = false;
+            statsCanvas.blocksRaycasts = false;
+        }
+        UpdateAllStats();
+    }
     private void Awake()//对象实例化就会进行，先于Start()
     {
         statsCanvas.alpha = 0; ;
@@ -19,28 +46,7 @@ public class StatsUI : MonoBehaviour
     {
         UpdateAllStats();
     }
-    private void Update()
-    {
-        if (Input.GetButtonDown("ToggleStats"))
-        {
-            if (statsIsOpen)
-            {
-                TimeManager.instance.ResumeGame();
-                statsCanvas.alpha = 0;//组件alpha值设置为0，依赖父对象的canvasGroup组件来实现，需要在unity中实现绑定
-                statsCanvas.blocksRaycasts = false;
-                statsIsOpen = false;
-            }
-            else
-            {
-                TimeManager.instance.PauseGame();
-                statsCanvas.alpha = 1;
-                statsCanvas.blocksRaycasts = true;
-                statsIsOpen = true;
-            }
-            UpdateAllStats();
 
-        }
-    }
     public void UpdateDamage()
     {
         statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.instance.GetDamage();

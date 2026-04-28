@@ -427,3 +427,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chatAnimator: {fileID: 245929698277191774}
   dialogSO: {fileID: 0}
+  toggleDialogEvent: {fileID: 11400000, guid: 955f6dbe397714a4ebb6c61eb71272a4, type: 2}

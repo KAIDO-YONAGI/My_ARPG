@@ -321,6 +321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chatAnimator: {fileID: 8392977103527578678}
   dialogSO: {fileID: 0}
+  toggleDialogEvent: {fileID: 11400000, guid: 955f6dbe397714a4ebb6c61eb71272a4, type: 2}
 --- !u!1 &2839708770821807694
 GameObject:
   m_ObjectHideFlags: 0

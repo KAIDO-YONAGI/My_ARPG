@@ -19,7 +19,7 @@ public class TimeManager : MonoBehaviour
         Time.timeScale = 0;
         numberOfPauses++;
         isGamePaused = true;
-
+        Debug.Log("Paused");
     }
 
     public void ResumeGame()
