@@ -1,79 +1,41 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShopKeeper : MonoBehaviour
 {
-    public static ShopKeeper currentShopKeeper;
-    public CanvasGroup shopCanvasGroup;
     public Animator logoAnimator;
     public Animator shopKeeperAnimator;
 
-    public ShopManager shopManager;
-    public static event Action<ShopManager, bool> OnShopStateChanged;
+    [Header("Events")]
+
+    public ShopLoadEventSO shopLoadEvent;
+
+
+
     [SerializeField] private List<ShopItems> shopItems;
     [SerializeField] private List<ShopItems> shopWeapon;
     [SerializeField] private List<ShopItems> shopArmour;
     private bool playerInRange;
-
-    private bool shopIsOpen = false;
-
-    void Start()
+    private void OnEnable()
     {
-        shopIsOpen = false;
-        shopKeeperAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
-
-        if (shopCanvasGroup != null)
-        {
-            shopCanvasGroup.alpha = 0;
-            shopCanvasGroup.interactable = false;
-            shopCanvasGroup.blocksRaycasts = false;
-        }
+        shopLoadEvent.ShopLoadEvent += OnShopLoad;
     }
 
-    void Update()
+    private void OnDisable()
     {
-        if (Input.GetButtonDown("Interact") && playerInRange)
-        {
-            if (shopIsOpen)
-            {
-                TimeManager.instance.ResumeGame();
-                OnShopStateChanged?.Invoke(shopManager, false);
-                currentShopKeeper = null;
-                shopCanvasGroup.alpha = 0;
-                shopCanvasGroup.interactable = false;
-                shopCanvasGroup.blocksRaycasts = false;
-                shopIsOpen = false;
-            }
-            else
-            {
-                TimeManager.instance.PauseGame();
-                OnShopStateChanged?.Invoke(shopManager, true);
-                currentShopKeeper = this;
+        shopLoadEvent.ShopLoadEvent -= OnShopLoad;
 
-                shopCanvasGroup.alpha = 1;
-                shopCanvasGroup.interactable = true;
-                shopCanvasGroup.blocksRaycasts = true;
-                shopIsOpen = true;
-                OpenItemShop();
-            }
-        }
+    }
+    
+    private void OnShopLoad(List<ShopItems> arg0, List<ShopItems> arg1, List<ShopItems> arg2)
+    {
+        throw new NotImplementedException();
     }
 
-    public void OpenItemShop()
-    {
-        shopManager.PopulateShopItems(shopItems);
-    }
 
-    public void OpenWeaponShop()
-    {
-        shopManager.PopulateShopItems(shopWeapon);
-    }
 
-    public void OpenArmourShop()
-    {
-        shopManager.PopulateShopItems(shopArmour);
-    }
 
     private void OnTriggerEnter2D(Collider2D collider)
     {

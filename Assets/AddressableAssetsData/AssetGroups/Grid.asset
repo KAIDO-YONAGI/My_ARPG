@@ -22,11 +22,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1c05660eb38f8aa4a98d04c4d4a79e13
-    m_Address: Assets/Prefabs/Scene/ShopSystem.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1c702d393669d4f4790d43f08612badc
     m_Address: Assets/Prefabs/Grid/Tree.prefab
     m_ReadOnly: 0
