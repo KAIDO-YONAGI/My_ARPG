@@ -13,13 +13,14 @@ public class UIManager : MonoBehaviour
     public SceneLoadEventSO loadEventSO;
     public List<ToggleCanvasEventSO> toggleCanvasEvents;
 
-    [SerializeField] private GameObject fatherOfCanvasToManager;
+    [SerializeField] private GameObject fatherOfCanvasToManage;
     [SerializeField] private GameObject playerUI;
     [SerializeField] private List<CanvasGroup> integretedUICanvas = new();
     [SerializeField] private List<Button> integretedButtons = new();
 
     private MyEnums.CanvasToToggle currentCanvasState = MyEnums.CanvasToToggle.Default;
     private readonly List<CanvasGroup> uiCanvasList = new();
+    private bool isAnyCanvasOpen;
 
     private void Awake()
     {
@@ -58,19 +59,19 @@ public class UIManager : MonoBehaviour
 
     private void ToggleCanvas()
     {
-        bool isAnyCanvasOpen = IsAnyManagedCanvasOpen();
 
-        if (!isAnyCanvasOpen)
-        {
-            currentCanvasState = MyEnums.CanvasToToggle.Default;
-        }
-
-        bool esc = Input.GetButtonDown("ESC");
+        bool esc=Input.GetButtonDown("ESC");
         bool skillTree = Input.GetButtonDown("ToggleSkillTree");
         bool stats = Input.GetButtonDown("ToggleStats");
-        bool npcInteract = Input.GetButtonDown("NPCInteract");
-        bool questList = Input.GetButtonDown("OpenQuestList");
-        bool interact = Input.GetButtonDown("Interact");
+        bool dialog = Input.GetButtonDown("NPCInteract");
+        bool quest = Input.GetButtonDown("OpenQuestList");
+        bool shop = Input.GetButtonDown("Interact");
+
+        
+        isAnyCanvasOpen = IsAnyManagedCanvasOpen();
+
+        if (!isAnyCanvasOpen)
+            currentCanvasState = MyEnums.CanvasToToggle.Default;
 
         if (esc)
         {
@@ -82,35 +83,23 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (isAnyCanvasOpen)
-        {
+        if (isAnyCanvasOpen)//如果正打开，那就不执行切换
             return;
-        }
+
 
         if (skillTree)
-        {
             currentCanvasState = MyEnums.CanvasToToggle.Skills;
-        }
         else if (stats)
-        {
             currentCanvasState = MyEnums.CanvasToToggle.Stats;
-        }
-        else if (npcInteract)
-        {
+        else if (dialog)
             currentCanvasState = MyEnums.CanvasToToggle.Dialog;
-        }
-        else if (questList)
-        {
+        else if (quest)
             currentCanvasState = MyEnums.CanvasToToggle.Quest;
-        }
-        else if (interact)
-        {
+        else if (shop)
             currentCanvasState = MyEnums.CanvasToToggle.Shop;
-        }
         else
-        {
             currentCanvasState = MyEnums.CanvasToToggle.Default;
-        }
+
 
         if (currentCanvasState != MyEnums.CanvasToToggle.Default)
         {
@@ -120,8 +109,7 @@ public class UIManager : MonoBehaviour
 
     private void IsToToggleCanvas(MyEnums.CanvasToToggle target)
     {
-        Debug.Log("isToTo");
-        Debug.Log(target.ToString());
+        // Debug.Log(target.ToString());
 
         foreach (var eventSO in toggleCanvasEvents)
         {
@@ -138,7 +126,7 @@ public class UIManager : MonoBehaviour
 
     private void InitiateUICanvasList()
     {
-        foreach (Transform child in fatherOfCanvasToManager.transform)
+        foreach (Transform child in fatherOfCanvasToManage.transform)
         {
             CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
             if (canvasGroup != null)
