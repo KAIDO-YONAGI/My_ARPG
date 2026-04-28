@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,13 +9,30 @@ public class QuestBoardManager : MonoBehaviour
 
     [SerializeField] private List<QuestSO> questsOnBoard;//TODO如果要区分任务实例，则需要深拷贝类包装
 
-    [Header("Events")]
+    [Header("Events To Trigge")]
     public VoidEventSO openQuestEvent;
     public LoadQuestEventSO loadQuestEventSO;
-
-
+    [Header("Events To Receive")]
+    public ToggleCanvasEventSO toggleQuestEvent;
     private bool isInRange = false;
 
+
+    private void OnEnable()
+    {
+        toggleQuestEvent.toggleCanvasEvent += OnToggleQuestCanvas;
+    }
+    private void OnDisable()
+    {
+        toggleQuestEvent.toggleCanvasEvent -= OnToggleQuestCanvas;
+    }
+    private void OnToggleQuestCanvas(bool state)
+    {
+        if (isInRange)
+        {
+            loadQuestEventSO.OnLoadQuestEventRaised(questsOnBoard);//初始化之后再打开面板
+            openQuestEvent.OnEventRaised();
+        }
+    }
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -26,19 +44,5 @@ public class QuestBoardManager : MonoBehaviour
     {
         if (other.CompareTag("Player"))
             isInRange = false;
-    }
-
-    private void Update()
-    {
-        if (Input.GetButtonDown("OpenQuestList") && isInRange)
-        {
-            loadQuestEventSO.OnLoadQuestEventRaised(questsOnBoard);//初始化之后再打开面板
-            openQuestEvent.OnEventRaised();
-
-            // foreach (var item in questsOnBoard)
-            // {
-            //     Debug.Log(item.GetInstanceID());
-            // }
-        }
     }
 }

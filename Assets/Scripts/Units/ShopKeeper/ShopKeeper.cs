@@ -13,8 +13,6 @@ public class ShopKeeper : MonoBehaviour
     public ShopLoadEventSO shopLoadEvent;
     public ToggleCanvasEventSO toggleShopCanvasEvent;
 
-
-
     [SerializeField] private List<ShopItems> shopItems;
     [SerializeField] private List<ShopItems> shopWeapon;
     [SerializeField] private List<ShopItems> shopArmor;
