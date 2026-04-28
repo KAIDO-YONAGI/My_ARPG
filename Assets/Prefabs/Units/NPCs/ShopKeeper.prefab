@@ -224,10 +224,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 353fff25d34fbf4459f61f411f803f8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopCanvasGroup: {fileID: 0}
   logoAnimator: {fileID: 7250176339750171359}
   shopKeeperAnimator: {fileID: 3971748871566898795}
-  shopManager: {fileID: 0}
+  shopLoadEvent: {fileID: 11400000, guid: 2b0721e2583502d4aa99e6fc96519ae4, type: 2}
+  toggleShopCanvasEvent: {fileID: 11400000, guid: 588067e2f797b0743a94619245e8896c, type: 2}
   shopItems:
   - item: {fileID: 11400000, guid: c905cf70e8dcc7b448c30320d5875878, type: 2}
     price: 3

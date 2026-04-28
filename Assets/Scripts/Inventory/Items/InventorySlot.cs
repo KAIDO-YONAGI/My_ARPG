@@ -9,26 +9,6 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
     public Image itemImage;
     public TMP_Text quantityText;
     public InventoryManager inventoryManager;
-
-
-    private static ShopManager activeShop;
-
-
-    private void OnEnable()
-    {
-        ShopKeeper.OnShopStateChanged += HandleShopStateChanged;
-    }
-
-    private void OnDisable()
-    {
-        ShopKeeper.OnShopStateChanged -= HandleShopStateChanged;
-
-    }
-
-    private void HandleShopStateChanged(ShopManager shopManager, bool isOpen)
-    {
-        activeShop = isOpen ? shopManager : null;
-    }
     private void Start()
     {
         inventoryManager = GetComponentInParent<InventoryManager>();
@@ -39,10 +19,10 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
         {
             if (eventData.button == PointerEventData.InputButton.Left)
             {
-                if (activeShop != null)//如果检测到商店活跃，那就出售物品
+                if (ShopManager.instance.IsShopOpen)//如果检测到商店活跃，那就出售物品
                 {
                     inventoryManager.SetSlotBeenClicked(this);
-                    activeShop.SellItem(itemSO);
+                    ShopManager.instance.SellItem(itemSO);
                 }
                 else
                 {
