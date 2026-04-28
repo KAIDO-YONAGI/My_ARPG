@@ -3837,7 +3837,7 @@ GameObject:
   m_Component:
   - component: {fileID: 423031461}
   m_Layer: 0
-  m_Name: UICanvasNeedToReset
+  m_Name: UICanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6370,7 +6370,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bb5ccf70ac2b9954ba49cbcd636f01e1, type: 2}
   - {fileID: 11400000, guid: 7323168f056471047bd7cec1a6e84e10, type: 2}
   - {fileID: 11400000, guid: 588067e2f797b0743a94619245e8896c, type: 2}
-  fatherObjOfUICanvasNeedToReset: {fileID: 423031460}
+  fatherObjectOfCanvasToManager: {fileID: 423031460}
   playerUI: {fileID: 3301067351944860768}
   integretedUICanvas:
   - {fileID: 512097847646187518}
