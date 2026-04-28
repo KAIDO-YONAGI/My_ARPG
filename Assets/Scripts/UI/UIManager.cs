@@ -67,11 +67,18 @@ public class UIManager : MonoBehaviour
         bool quest = Input.GetButtonDown("OpenQuestList");
         bool shop = Input.GetButtonDown("Interact");
 
-        
-        isAnyCanvasOpen = IsAnyManagedCanvasOpen();
 
-        if (!isAnyCanvasOpen)
+        isAnyCanvasOpen = IsAnyManagedCanvasOpen();//根据透明度判断是不是打开
+
+        if (!isAnyCanvasOpen && currentCanvasState != MyEnums.CanvasToToggle.Default)//这个状态组合说明面板被其它地方关了，因为此时不是default状态
+        {
             currentCanvasState = MyEnums.CanvasToToggle.Default;
+            IsToToggleCanvas(currentCanvasState);
+        }
+        else if (!isAnyCanvasOpen)
+        {
+            currentCanvasState = MyEnums.CanvasToToggle.Default;
+        }
 
         if (esc)
         {

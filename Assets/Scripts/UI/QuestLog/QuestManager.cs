@@ -95,8 +95,11 @@ public class QuestManager : MonoBehaviour
 
     private void OnToggleQuest(bool state)
     {
-        SetCanvaState(questCanvaGroup, state);
-        canvasIsActive = state;
+        //只负责关闭，打开逻辑在boardmanager按范围执行
+        if (!state)
+        {
+            CloseQuestBoard();
+        }
     }
     private void OnQuestOptionChose(MyEnums.QuestState questStateToShift)
     {
@@ -120,6 +123,20 @@ public class QuestManager : MonoBehaviour
             canvasIsActive = true;
         }
     }
+
+    public void CloseQuestBoard()
+    {
+        SetCanvaState(questCanvaGroup, false);
+        canvasIsActive = false;
+        currentBoardLoadQuests = null;
+        currentQuest = null;
+    }
+
+    public bool IsDisplayingQuestBoard(List<QuestSO> quests)
+    {
+        return canvasIsActive && currentBoardLoadQuests == quests;
+    }
+
     private void OnReFreshQuestState(List<QuestSO> quests)
     {
         currentBoardLoadQuests = quests;

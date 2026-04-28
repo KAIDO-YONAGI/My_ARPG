@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class NPCChat : MonoBehaviour
@@ -8,10 +7,26 @@ public class NPCChat : MonoBehaviour
     public DialogSO dialogSO;
     public ToggleCanvasEventSO toggleDialogEvent;
 
-    private bool chatState;
+    private bool openDialogRequested;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+
+        if (DialogManager.instance != null)
+        {
+            DialogManager.instance.DisableButtons();
+        }
+    }
+
     private void OnEnable()
     {
-        toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
+        openDialogRequested = false;
+
+        if (toggleDialogEvent != null)
+        {
+            toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
+        }
 
         if (rb != null)
         {
@@ -27,7 +42,12 @@ public class NPCChat : MonoBehaviour
 
     private void OnDisable()
     {
-        toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
+        openDialogRequested = false;
+
+        if (toggleDialogEvent != null)
+        {
+            toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
+        }
 
         if (rb != null)
         {
@@ -50,39 +70,36 @@ public class NPCChat : MonoBehaviour
         {
             return;
         }
-        chatState = state;
+
+        if (!state)
+        {
+            openDialogRequested = false;
+            DialogManager.instance.ForeceEndDialog();
+            return;
+        }
+
+        openDialogRequested = true;
     }
     private void Update()
     {
-
-        if (chatState)
+        if (DialogManager.instance == null)
         {
+            return;
+        }
+
+        if (openDialogRequested)
+        {
+            openDialogRequested = false;
+
             if (dialogSO != null && !DialogManager.instance.isDialogActive)
             {
                 DialogManager.instance.StartDialog(dialogSO);
             }
-            else if (Input.GetMouseButtonDown(0) && DialogManager.instance.isDialogActive)
-            {
-                DialogManager.instance.AdvanceDialog();
-            }
-            else
-            {
-                return;
-            }
         }
-        else if (!chatState)
-        {
-            DialogManager.instance.ForeceEndDialog();
-        }
-        chatState = DialogManager.instance.isDialogActive;
-    }
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
 
-        if (DialogManager.instance != null)
+        if (DialogManager.instance.isDialogActive && Input.GetMouseButtonDown(0))
         {
-            DialogManager.instance.DisableButtons();
+            DialogManager.instance.AdvanceDialog();
         }
     }
 }

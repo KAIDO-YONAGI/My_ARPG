@@ -24,6 +24,7 @@ public class QuestBoardManager : MonoBehaviour
     private void OnDisable()
     {
         toggleQuestEvent.toggleCanvasEvent -= OnToggleQuestCanvas;
+        CloseQuestBoardIfShowing();
     }
     private void OnToggleQuestCanvas(bool state)
     {
@@ -43,6 +44,18 @@ public class QuestBoardManager : MonoBehaviour
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
+        {
             isInRange = false;
+            CloseQuestBoardIfShowing();
+        }
+    }
+
+    private void CloseQuestBoardIfShowing()
+    {
+        if (QuestManager.instance != null &&
+            QuestManager.instance.IsDisplayingQuestBoard(questsOnBoard))
+        {
+            QuestManager.instance.CloseQuestBoard();
+        }
     }
 }
