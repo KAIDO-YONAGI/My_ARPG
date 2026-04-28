@@ -96,6 +96,7 @@ public class QuestManager : MonoBehaviour
     private void OnToggleQuest(bool state)
     {
         SetCanvaState(questCanvaGroup, state);
+        canvasIsActive = state;
     }
     private void OnQuestOptionChose(MyEnums.QuestState questStateToShift)
     {
@@ -116,15 +117,7 @@ public class QuestManager : MonoBehaviour
         if (!canvasIsActive)
         {
             SetCanvaState(questCanvaGroup, true);
-
             canvasIsActive = true;
-            questLogUI.ShowQuestOffer();
-        }
-        else
-        {
-            SetCanvaState(questCanvaGroup, false);
-
-            canvasIsActive = false;
         }
     }
     private void OnReFreshQuestState(List<QuestSO> quests)
