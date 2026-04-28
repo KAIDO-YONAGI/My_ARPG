@@ -5,6 +5,8 @@ using UnityEngine;
 public class ShopManager : MonoBehaviour
 {
     [SerializeField] private ShopSlot[] shopSlots;
+    [SerializeField] private CanvasGroup shopCanvasGroup;
+
 
     [Header("Events")]
     public InventorySlotsStatsSO InventoryUpdateRequest;
@@ -14,7 +16,7 @@ public class ShopManager : MonoBehaviour
 
     private List<ShopItems> shopItems;
     private List<ShopItems> shopWeapon;
-    private List<ShopItems> shopArmour;
+    private List<ShopItems> shopArmor;
 
     public static ShopManager instance;
 
@@ -44,33 +46,34 @@ public class ShopManager : MonoBehaviour
     }
     private void OnShopToggle(bool state)
     {
-        // if (state)
-        // {
-        //     TimeManager.instance.PauseGame();
-
-        //     shopCanvasGroup.alpha = 1;
-        //     shopCanvasGroup.interactable = true;
-        //     shopCanvasGroup.blocksRaycasts = true;
-        //     OpenItemShop();
-        // }
-        // else
-        // {
-        //     TimeManager.instance.ResumeGame();
-        //     shopCanvasGroup.alpha = 0;
-        //     shopCanvasGroup.interactable = false;
-        //     shopCanvasGroup.blocksRaycasts = false;
-
-        // }
+        if (state)
+        {
+            TimeManager.instance.PauseGame();
+            shopCanvasGroup.alpha = 1;
+            shopCanvasGroup.interactable = true;
+            shopCanvasGroup.blocksRaycasts = true;
+            isShopOpen=true;
+        }
+        else
+        {
+            TimeManager.instance.ResumeGame();
+            shopCanvasGroup.alpha = 0;
+            shopCanvasGroup.interactable = false;
+            shopCanvasGroup.blocksRaycasts = false;
+            isShopOpen=false;
+        }
     }
-    private void OnShopLoad(List<ShopItems> shopItems, List<ShopItems> shopWeapon, List<ShopItems> shopArmour)
+    private void OnShopLoad(List<ShopItems> shopItems, List<ShopItems> shopWeapon, List<ShopItems> shopArmor)
     {
         this.shopItems = shopItems;
         this.shopWeapon = shopWeapon;
-        this.shopArmour = shopArmour;
+        this.shopArmor = shopArmor;
+        OpenItemShop();
     }
 
     private void PopulateShopItems(List<ShopItems> shopItems)
     {
+        if (shopItems == null) return;
         for (int i = 0; i < shopItems.Count && i < shopSlots.Length; i++)
         {
             ShopItems shopItem = shopItems[i];
@@ -113,9 +116,9 @@ public class ShopManager : MonoBehaviour
         PopulateShopItems(shopWeapon);
     }
 
-    public void OpenArmourShop()
+    public void OpenArmorShop()
     {
-        PopulateShopItems(shopArmour);
+        PopulateShopItems(shopArmor);
     }
 }
 [System.Serializable]

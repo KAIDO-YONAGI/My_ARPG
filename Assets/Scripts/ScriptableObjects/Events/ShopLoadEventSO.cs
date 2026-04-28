@@ -7,9 +7,9 @@ using UnityEngine.Events;
 public class ShopLoadEventSO : ScriptableObject
 {
     public UnityAction<List<ShopItems>, List<ShopItems>, List<ShopItems>> ShopLoadEvent;
-    public void RaiseShopLoadRequest(List<ShopItems> shopItems, List<ShopItems> shopWeapon, List<ShopItems> shopArmour)
+    public void RaiseShopLoadRequest(List<ShopItems> shopItems, List<ShopItems> shopWeapon, List<ShopItems> shopArmor)
     {
-        ShopLoadEvent?.Invoke(shopItems, shopWeapon, shopArmour);
+        ShopLoadEvent?.Invoke(shopItems, shopWeapon, shopArmor);
     }
 
 }

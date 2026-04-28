@@ -277,6 +277,38 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopWeapon.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: c905cf70e8dcc7b448c30320d5875878, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[1].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[0].price
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[1].price
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopWeapon.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: c8ecb006185903f4097848777dcd30cd, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopWeapon.Array.data[0].price
+      value: 50
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -711,16 +743,60 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
-      propertyPath: shopLoadEvent
-      value: 
-      objectReference: {fileID: 11400000, guid: 2b0721e2583502d4aa99e6fc96519ae4, type: 2}
+      propertyPath: shopArmor.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
-      propertyPath: toggleShopCanvasEvent
+      propertyPath: shopItems.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopArmour.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopWeapon.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopArmor.Array.data[0].item
       value: 
-      objectReference: {fileID: 11400000, guid: 588067e2f797b0743a94619245e8896c, type: 2}
+      objectReference: {fileID: 11400000, guid: c8ecb006185903f4097848777dcd30cd, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: c905cf70e8dcc7b448c30320d5875878, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[1].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopArmor.Array.data[0].price
+      value: 114514
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopArmour.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: c8ecb006185903f4097848777dcd30cd, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[0].price
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopItems.Array.data[1].price
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopWeapon.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: c8ecb006185903f4097848777dcd30cd, type: 2}
+    - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
+      propertyPath: shopArmour.Array.data[0].price
+      value: 114514
+      objectReference: {fileID: 0}
     - target: {fileID: 6831617344548052322, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
       propertyPath: shopWeapon.Array.data[0].price
-      value: 50
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4531,7 +4607,7 @@ Tilemap:
       - {fileID: -1181679728, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -942080833, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -78580845, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 9, y: -22, z: 0}
@@ -4831,7 +4907,7 @@ Tilemap:
       - {fileID: 437032537, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1999780338, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1609477170, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 15, y: -21, z: 0}
@@ -6796,7 +6872,7 @@ Tilemap:
       - {fileID: 437032537, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1999780338, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1609477170, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -2, y: 2, z: 0}
@@ -7501,7 +7577,7 @@ Tilemap:
       - {fileID: 437032537, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1999780338, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1609477170, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 1, y: 6, z: 0}
@@ -7651,7 +7727,7 @@ Tilemap:
       - {fileID: -1181679728, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -942080833, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -78580845, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 12, y: 6, z: 0}
