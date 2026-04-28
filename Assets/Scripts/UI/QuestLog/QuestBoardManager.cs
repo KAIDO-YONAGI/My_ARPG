@@ -9,7 +9,7 @@ public class QuestBoardManager : MonoBehaviour
 
     [SerializeField] private List<QuestSO> questsOnBoard;//TODO如果要区分任务实例，则需要深拷贝类包装
 
-    [Header("Events To Trigge")]
+    [Header("Events To Trigger")]
     public VoidEventSO openQuestEvent;
     public LoadQuestEventSO loadQuestEventSO;
     [Header("Events To Receive")]
@@ -27,7 +27,7 @@ public class QuestBoardManager : MonoBehaviour
     }
     private void OnToggleQuestCanvas(bool state)
     {
-        if (isInRange)
+        if (isInRange&&state)
         {
             loadQuestEventSO.OnLoadQuestEventRaised(questsOnBoard);//初始化之后再打开面板
             openQuestEvent.OnEventRaised();
