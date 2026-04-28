@@ -11,27 +11,30 @@ public class ShopKeeper : MonoBehaviour
     [Header("Events")]
 
     public ShopLoadEventSO shopLoadEvent;
+    public ToggleCanvasEventSO toggleShopCanvasEvent;
 
 
 
     [SerializeField] private List<ShopItems> shopItems;
     [SerializeField] private List<ShopItems> shopWeapon;
-    [SerializeField] private List<ShopItems> shopArmour;
+    [SerializeField] private List<ShopItems> shopArmor;
     private bool playerInRange;
     private void OnEnable()
     {
-        shopLoadEvent.ShopLoadEvent += OnShopLoad;
+        toggleShopCanvasEvent.toggleCanvasEvent += OnToggleShopCanvas;
     }
 
     private void OnDisable()
     {
-        shopLoadEvent.ShopLoadEvent -= OnShopLoad;
-
+        toggleShopCanvasEvent.toggleCanvasEvent -= OnToggleShopCanvas;
     }
     
-    private void OnShopLoad(List<ShopItems> arg0, List<ShopItems> arg1, List<ShopItems> arg2)
+    private void OnToggleShopCanvas(bool state)
     {
-        throw new NotImplementedException();
+        if (playerInRange&&state)
+        {
+            shopLoadEvent.RaiseShopLoadRequest(shopItems,shopWeapon,shopArmor);
+        }
     }
 
 

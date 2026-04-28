@@ -228,14 +228,8 @@ MonoBehaviour:
   shopKeeperAnimator: {fileID: 3971748871566898795}
   shopLoadEvent: {fileID: 11400000, guid: 2b0721e2583502d4aa99e6fc96519ae4, type: 2}
   toggleShopCanvasEvent: {fileID: 11400000, guid: 588067e2f797b0743a94619245e8896c, type: 2}
-  shopItems:
-  - item: {fileID: 11400000, guid: c905cf70e8dcc7b448c30320d5875878, type: 2}
-    price: 3
-  - item: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
-    price: 2
-  shopWeapon:
-  - item: {fileID: 11400000, guid: c8ecb006185903f4097848777dcd30cd, type: 2}
-    price: 100
+  shopItems: []
+  shopWeapon: []
   shopArmour: []
 --- !u!1 &4921139100446789027
 GameObject:
