@@ -23,7 +23,6 @@ public class StatsUI : MonoBehaviour
 
         if (state)
         {
-            TimeManager.instance.PauseGame();
             statsCanvas.alpha = 1;
             statsCanvas.interactable = true;
             statsCanvas.blocksRaycasts = true;

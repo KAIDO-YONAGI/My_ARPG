@@ -20,7 +20,6 @@ public class ToggleSkillTree : MonoBehaviour
 
         if (state)
         {
-            TimeManager.instance.PauseGame();
             skillsCanvas.alpha = 1;
             skillsCanvas.interactable = true;
             skillsCanvas.blocksRaycasts = true;

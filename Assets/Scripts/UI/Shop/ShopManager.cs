@@ -57,13 +57,16 @@ public class ShopManager : MonoBehaviour
             isShopOpen=false;
         }
     }
-    private void OnShopLoad(List<ShopItems> shopItems, List<ShopItems> shopWeapon, List<ShopItems> shopArmor)
+    private void OnShopLoad(
+        List<ShopItems> shopItems,
+        List<ShopItems> shopWeapon,
+        List<ShopItems> shopArmor,
+        Transform portraitTarget)
     {
         this.shopItems = shopItems;
         this.shopWeapon = shopWeapon;
         this.shopArmor = shopArmor;
         OpenItemShop();
-        TimeManager.instance.PauseGame();
         shopCanvasGroup.alpha = 1;
         shopCanvasGroup.interactable = true;
         shopCanvasGroup.blocksRaycasts = true;

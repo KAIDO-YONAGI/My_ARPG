@@ -6,10 +6,14 @@ using UnityEngine.Events;
 
 public class ShopLoadEventSO : ScriptableObject
 {
-    public UnityAction<List<ShopItems>, List<ShopItems>, List<ShopItems>> ShopLoadEvent;
-    public void RaiseShopLoadRequest(List<ShopItems> shopItems, List<ShopItems> shopWeapon, List<ShopItems> shopArmor)
-    {
-        ShopLoadEvent?.Invoke(shopItems, shopWeapon, shopArmor);
-    }
+    public UnityAction<List<ShopItems>, List<ShopItems>, List<ShopItems>, Transform> ShopLoadEvent;
 
+    public void RaiseShopLoadRequest(
+        List<ShopItems> shopItems,
+        List<ShopItems> shopWeapon,
+        List<ShopItems> shopArmor,
+        Transform portraitTarget)
+    {
+        ShopLoadEvent?.Invoke(shopItems, shopWeapon, shopArmor, portraitTarget);
+    }
 }
