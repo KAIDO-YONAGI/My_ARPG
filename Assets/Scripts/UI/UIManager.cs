@@ -43,6 +43,7 @@ public class UIManager : MonoBehaviour
     }
     private void Update()
     {
+
         ToggleCanvas();
     }
     // private void Start()
@@ -56,53 +57,50 @@ public class UIManager : MonoBehaviour
 
     private void ToggleCanvas()
     {
-        if (CanvasToToggle == MyEnums.CanvasToToggle.Default && Input.GetButtonDown("ESC"))//默认界面ESC弹出ESC面板
-        {
-            CanvasToToggle = MyEnums.CanvasToToggle.ESC;
-            IsToToggleCanvas();
-        }
-        else if (CanvasToToggle != MyEnums.CanvasToToggle.Default && Input.GetButtonDown("ESC"))//非默认界面则设为Default并且退出界面
-        {
-            CanvasToToggle = MyEnums.CanvasToToggle.Default;
-            IsToToggleCanvas();
-        }
-        else if (CanvasToToggle == MyEnums.CanvasToToggle.Default)//默认状态才能按面板按钮
-        {
-            if (Input.GetButtonDown("ToggleSkillTree"))//打开技能树
-            {
-                CanvasToToggle = MyEnums.CanvasToToggle.Skills;
-            }
-            else if (Input.GetButtonDown("ToggleStats"))//打开状态面板
-            {
-                CanvasToToggle = MyEnums.CanvasToToggle.Stats;
-            }
-            else if (Input.GetButtonDown("NPCInteract"))//和NPC对话
-            {
-                CanvasToToggle = MyEnums.CanvasToToggle.Dialog;
-            }
-            else if (Input.GetButtonDown("OpenQuestList"))//打开商店
-            {
-                CanvasToToggle = MyEnums.CanvasToToggle.Quest;
-            }
-            else if (Input.GetButtonDown("Interact"))//打开商店
-            {
-                CanvasToToggle = MyEnums.CanvasToToggle.Shop;
-            }
+        // 暂存本帧输入
+        bool esc = Input.GetButtonDown("ESC");
+        bool skillTree = Input.GetButtonDown("ToggleSkillTree");
+        bool stats = Input.GetButtonDown("ToggleStats");
+        bool npcInteract = Input.GetButtonDown("NPCInteract");
+        bool questList = Input.GetButtonDown("OpenQuestList");
+        bool interact = Input.GetButtonDown("Interact");
 
+        // ESC：在非Default时统一关闭回到Default
+        if (esc)
+        {
+            if (CanvasToToggle == MyEnums.CanvasToToggle.Default)
+                CanvasToToggle = MyEnums.CanvasToToggle.ESC;
+            else
+                CanvasToToggle = MyEnums.CanvasToToggle.Default;
 
-            if (CanvasToToggle!=MyEnums.CanvasToToggle.Default)
-            {
-                IsToToggleCanvas();
-            }
+            IsToToggleCanvas(CanvasToToggle);
+            return;
+        }
+
+        // 只有Default状态才能通过按键打开面板
+        if (CanvasToToggle != MyEnums.CanvasToToggle.Default)
+            return;
+
+        if (skillTree) CanvasToToggle = MyEnums.CanvasToToggle.Skills;
+        else if (stats) CanvasToToggle = MyEnums.CanvasToToggle.Stats;
+        else if (npcInteract) CanvasToToggle = MyEnums.CanvasToToggle.Dialog;
+        else if (questList) CanvasToToggle = MyEnums.CanvasToToggle.Quest;
+        else if (interact) CanvasToToggle = MyEnums.CanvasToToggle.Shop;
+
+        if (CanvasToToggle != MyEnums.CanvasToToggle.Default)
+        {
+            IsToToggleCanvas(CanvasToToggle);
         }
     }
 
-    private void IsToToggleCanvas()
+    private void IsToToggleCanvas(MyEnums.CanvasToToggle target)
     {
+        Debug.Log("isToTo");
+        Debug.Log(target.ToString());
 
         foreach (var eventSO in toggleCanvasEvents)
         {
-            if (eventSO.canvasToToggle == CanvasToToggle)
+            if (eventSO.canvasToToggle == target)
             {
                 eventSO.RaiseToggleCanvasEvent(true);
             }

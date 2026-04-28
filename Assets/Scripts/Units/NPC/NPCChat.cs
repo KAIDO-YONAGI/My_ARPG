@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class NPCChat : MonoBehaviour
@@ -6,6 +7,8 @@ public class NPCChat : MonoBehaviour
     public Animator chatAnimator;
     public DialogSO dialogSO;
     public ToggleCanvasEventSO toggleDialogEvent;
+
+    private bool chatState;
     private void OnEnable()
     {
         toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
@@ -42,32 +45,36 @@ public class NPCChat : MonoBehaviour
         }
     }
     private void OnToggleDialogEvent(bool state)
-    { 
+    {
         if (DialogManager.instance == null)
         {
             return;
         }
+        chatState = state;
+    }
+    private void Update()
+    {
 
-        if (state)
+        if (chatState)
         {
             if (dialogSO != null && !DialogManager.instance.isDialogActive)
             {
                 DialogManager.instance.StartDialog(dialogSO);
             }
-            else if (DialogManager.instance.isDialogActive)
+            else if (Input.GetMouseButtonDown(0) && DialogManager.instance.isDialogActive)
             {
                 DialogManager.instance.AdvanceDialog();
             }
+            else
+            {
+                return;
+            }
         }
-        else if (!state)
+        else if (!chatState)
         {
             DialogManager.instance.ForeceEndDialog();
-            
         }
-        else if (Input.GetMouseButtonDown(0) && DialogManager.instance.isDialogActive)
-        {
-            DialogManager.instance.AdvanceDialog();
-        }
+        chatState = DialogManager.instance.isDialogActive;
     }
     private void Awake()
     {

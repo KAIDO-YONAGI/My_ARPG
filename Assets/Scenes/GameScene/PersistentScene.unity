@@ -7458,6 +7458,7 @@ MonoBehaviour:
   openQuestEventSO: {fileID: 11400000, guid: 1f4dc831c8a864d44a39c1e76db3d595, type: 2}
   loadQuestEventSO: {fileID: 11400000, guid: 5c89b7f268260c849b378b0313b48689, type: 2}
   questOptionsEventSO: {fileID: 11400000, guid: 710e8fe3cbf31ca4a95087439ec4a693, type: 2}
+  toggleQuestEvent: {fileID: 11400000, guid: 981c401ba718ed348ac5d29d44888098, type: 2}
   QuestRewardRequest: {fileID: 11400000, guid: 42a47779888eeb04487dcce0ad1c8ce3, type: 2}
   acceptCanvaGroup: {fileID: 543324040}
   declineCanvaGroup: {fileID: 797604022}
@@ -17681,7 +17682,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a36e42a95efa7b43a41f2656db7eb7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  combat: {fileID: 0}
+  combat: {fileID: 4064602683770510385}
 --- !u!114 &3384889951754387008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20610,10 +20611,10 @@ GameObject:
   - component: {fileID: 8319328744856602724}
   - component: {fileID: 8236846056480173290}
   - component: {fileID: 7882727558828594662}
+  - component: {fileID: 1081069818152936524}
   - component: {fileID: 8325153660692683575}
   - component: {fileID: 3372432897075479029}
   - component: {fileID: 1367044983711649685}
-  - component: {fileID: 1081069818152936524}
   m_Layer: 0
   m_Name: SkillsCanvas
   m_TagString: Untagged

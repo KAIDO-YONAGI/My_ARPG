@@ -38,7 +38,7 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
         questNameText.text = currentQuest.questName;
         questDescriptionText.text = currentQuest.questDescription;
 
-        QuestManager.instance.OnQuestStateChanged(currentQuest, QuestManager.instance.GetQuestStateFromProgress(currentQuest));
+        QuestManager.instance.QuestStateChanged(currentQuest, QuestManager.instance.GetQuestStateFromProgress(currentQuest));
         DisPlayObjectives();
         DisplayRewards();
     }

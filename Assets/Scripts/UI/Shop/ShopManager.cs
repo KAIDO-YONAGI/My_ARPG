@@ -8,8 +8,10 @@ public class ShopManager : MonoBehaviour
     [SerializeField] private CanvasGroup shopCanvasGroup;
 
 
-    [Header("Events")]
+    [Header("Events To Trigger")]
     public InventorySlotsStatsSO InventoryUpdateRequest;
+    [Header("Events To Receive")]
+
     public ShopLoadEventSO shopLoadEvent;
     public ToggleCanvasEventSO toggleShopCanvasEvent;
 
@@ -46,15 +48,7 @@ public class ShopManager : MonoBehaviour
     }
     private void OnShopToggle(bool state)
     {
-        if (state)
-        {
-            TimeManager.instance.PauseGame();
-            shopCanvasGroup.alpha = 1;
-            shopCanvasGroup.interactable = true;
-            shopCanvasGroup.blocksRaycasts = true;
-            isShopOpen=true;
-        }
-        else
+        if (!state)
         {
             TimeManager.instance.ResumeGame();
             shopCanvasGroup.alpha = 0;
@@ -69,6 +63,11 @@ public class ShopManager : MonoBehaviour
         this.shopWeapon = shopWeapon;
         this.shopArmor = shopArmor;
         OpenItemShop();
+        TimeManager.instance.PauseGame();
+        shopCanvasGroup.alpha = 1;
+        shopCanvasGroup.interactable = true;
+        shopCanvasGroup.blocksRaycasts = true;
+        isShopOpen=true;
     }
 
     private void PopulateShopItems(List<ShopItems> shopItems)

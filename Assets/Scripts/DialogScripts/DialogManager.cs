@@ -31,7 +31,7 @@ public class DialogManager : MonoBehaviour
             return;
         }
 
-        setDialogCanvas(false);
+        SetDialogCanvas(false);
         DisableButtons();
     }
 
@@ -43,7 +43,7 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    public void setDialogCanvas(bool state)
+    public void SetDialogCanvas(bool state)
     {
         if (dialogCanvasGroup == null)
         {
@@ -69,7 +69,7 @@ public class DialogManager : MonoBehaviour
             return;
         }
 
-        setDialogCanvas(true);
+        SetDialogCanvas(true);
         DisableButtons();
         currentDialog = dialog;
         currentLineIndex = 0;
@@ -104,7 +104,7 @@ public class DialogManager : MonoBehaviour
 
     public void EndDialog()
     {
-        setDialogCanvas(false);
+        SetDialogCanvas(false);
         DisableButtons();
 
         if (currentDialog != null)
@@ -126,7 +126,7 @@ public class DialogManager : MonoBehaviour
 
     public void ForeceEndDialog()
     {
-        setDialogCanvas(false);
+        SetDialogCanvas(false);
         DisableButtons();
         currentDialog = null;
         currentLineIndex = 0;
@@ -189,7 +189,7 @@ public class DialogManager : MonoBehaviour
                 continue;
             }
 
-            setDialogCanvas(true);
+            SetDialogCanvas(true);
             DisableButtons();
             currentDialog = characterRefuseDialog;
             currentLineIndex = 0;
