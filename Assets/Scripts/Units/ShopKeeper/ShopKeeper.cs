@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShopKeeper : MonoBehaviour
@@ -9,50 +7,92 @@ public class ShopKeeper : MonoBehaviour
     public Animator shopKeeperAnimator;
 
     [Header("Events")]
-
     public ShopLoadEventSO shopLoadEvent;
     public ToggleCanvasEventSO toggleShopCanvasEvent;
 
     [SerializeField] private List<ShopItems> shopItems;
     [SerializeField] private List<ShopItems> shopWeapon;
     [SerializeField] private List<ShopItems> shopArmor;
+
     private bool playerInRange;
+
+    public Transform PortraitTarget => shopKeeperAnimator != null
+        ? shopKeeperAnimator.transform
+        : transform;
+
     private void OnEnable()
     {
-        toggleShopCanvasEvent.toggleCanvasEvent += OnToggleShopCanvas;
+        if (toggleShopCanvasEvent != null)
+        {
+            toggleShopCanvasEvent.toggleCanvasEvent += OnToggleShopCanvas;
+        }
     }
 
     private void OnDisable()
     {
-        toggleShopCanvasEvent.toggleCanvasEvent -= OnToggleShopCanvas;
+        if (toggleShopCanvasEvent != null)
+        {
+            toggleShopCanvasEvent.toggleCanvasEvent -= OnToggleShopCanvas;
+        }
+
+        CloseShopIfOpen();
     }
-    
+
     private void OnToggleShopCanvas(bool state)
     {
-        if (playerInRange&&state)
+        if (!playerInRange || !state || shopLoadEvent == null)
         {
-            shopLoadEvent.RaiseShopLoadRequest(shopItems,shopWeapon,shopArmor);
+            return;
         }
+
+        shopLoadEvent.RaiseShopLoadRequest(
+            shopItems,
+            shopWeapon,
+            shopArmor,
+            PortraitTarget);
     }
-
-
-
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.CompareTag("Player"))
+        if (!collider.CompareTag("Player"))
         {
-            playerInRange = true;
+            return;
+        }
+
+        playerInRange = true;
+
+        if (logoAnimator != null)
+        {
             logoAnimator.SetBool("playerInRange", true);
         }
     }
 
     private void OnTriggerExit2D(Collider2D collider)
     {
-        if (collider.CompareTag("Player"))
+        if (!collider.CompareTag("Player"))
         {
-            playerInRange = false;
+            return;
+        }
+
+        playerInRange = false;
+
+        if (logoAnimator != null)
+        {
             logoAnimator.SetBool("playerInRange", false);
         }
+
+        CloseShopIfOpen();
+    }
+
+    private void CloseShopIfOpen()
+    {
+        if (toggleShopCanvasEvent == null ||
+            ShopManager.instance == null ||
+            !ShopManager.instance.IsShopOpen)
+        {
+            return;
+        }
+
+        toggleShopCanvasEvent.RaiseToggleCanvasEvent(false);
     }
 }
