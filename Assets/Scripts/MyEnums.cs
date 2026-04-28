@@ -59,4 +59,14 @@ namespace MyEnums
         Completed
 
     }
+    public enum CanvasToToggle
+    {
+        ESC,
+        GameOver,
+        Stats,
+        Skills,
+        Dialog,
+        Quest,
+        Default
+    }
 }

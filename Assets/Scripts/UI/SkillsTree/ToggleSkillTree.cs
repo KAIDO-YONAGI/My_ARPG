@@ -5,29 +5,33 @@ using UnityEngine;
 public class ToggleSkillTree : MonoBehaviour
 {
     public CanvasGroup skillsCanvas;
-    private bool skillTreeIsOpen=false;
-
-    private void Update()
+    public ToggleCanvasEventSO toggleSkillEvent;
+    private void OnEnable()
     {
-        if (Input.GetButtonDown("ToggleSkillTree"))
-        {
-            if(skillTreeIsOpen)
-            {
-                TimeManager.instance.ResumeGame();
-                skillsCanvas.alpha = 0;
-                skillsCanvas.blocksRaycasts = false; 
-                skillsCanvas.interactable = false;
-                skillTreeIsOpen=false;
-            }
-            else
-            {
-                TimeManager.instance.PauseGame();
-                skillsCanvas.alpha = 1;
-                skillsCanvas.blocksRaycasts = true;
-                skillsCanvas.interactable = true;
-                skillTreeIsOpen=true;
+        toggleSkillEvent.toggleCanvasEvent += OnToggleSkillEvent;
+    }
+    private void OnDisable()
+    {
+        toggleSkillEvent.toggleCanvasEvent -= OnToggleSkillEvent;
 
-            }
+    }
+    private void OnToggleSkillEvent(bool state)
+    {
+
+        if (state)
+        {
+            TimeManager.instance.PauseGame();
+            skillsCanvas.alpha = 1;
+            skillsCanvas.interactable = true;
+            skillsCanvas.blocksRaycasts = true;
+
+        }
+        else
+        {
+            TimeManager.instance.ResumeGame();
+            skillsCanvas.alpha = 0;
+            skillsCanvas.interactable = false;
+            skillsCanvas.blocksRaycasts = false;
         }
     }
 }

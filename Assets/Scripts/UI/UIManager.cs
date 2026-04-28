@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,8 +17,17 @@ public class UIManager : MonoBehaviour
     }
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
+    public List<ToggleCanvasEventSO> toggleCanvasEvents;
+
+
     [SerializeField] private GameObject fatherObjOfUICanvasNeedToReset;
     [SerializeField] private GameObject playerUI;
+    [SerializeField] private List<CanvasGroup> integretedUICanvas = new();
+    [SerializeField] private List<CanvasGroup> toggleUICanvas = new();
+    [SerializeField] private List<Button> integretedButtons = new();
+
+    private MyEnums.CanvasToToggle CanvasToToggle = MyEnums.CanvasToToggle.Default;
+
 
     private List<CanvasGroup> UICanvasList = new();
 
@@ -34,7 +44,60 @@ public class UIManager : MonoBehaviour
     {
         ResetCanvas();
     }
+    private void Update()
+    {
+        ToggleCanvas();
+    }
+    private void ToggleCanvas()
+    {
+        if (CanvasToToggle == MyEnums.CanvasToToggle.Default && Input.GetButtonDown("ESC"))//默认界面ESC弹出ESC面板
+        {
+            CanvasToToggle = MyEnums.CanvasToToggle.ESC;
+            IsToToggleCanvas();
+        }
+        else if (CanvasToToggle != MyEnums.CanvasToToggle.Default && Input.GetButtonDown("ESC"))//非默认界面则设为Default并且退出界面
+        {
+            CanvasToToggle = MyEnums.CanvasToToggle.Default;
+            IsToToggleCanvas();
+        }
+        else if (CanvasToToggle == MyEnums.CanvasToToggle.Default)//默认状态才能按面板按钮
+        {
+            if (Input.GetButtonDown("ToggleSkillTree"))
+            {
+                CanvasToToggle = MyEnums.CanvasToToggle.Skills;
+                IsToToggleCanvas();
 
+            }
+            else if (Input.GetButtonDown("ToggleStats"))
+            {
+                CanvasToToggle = MyEnums.CanvasToToggle.Stats;
+                IsToToggleCanvas();
+
+            }
+            else if (Input.GetButtonDown("NPCInteract"))
+            {
+                CanvasToToggle = MyEnums.CanvasToToggle.Dialog;
+                IsToToggleCanvas();
+
+            }
+        }
+
+    }
+    private void IsToToggleCanvas()
+    {
+
+        foreach (var eventSO in toggleCanvasEvents)
+        {
+            if (eventSO.canvasToToggle == CanvasToToggle)
+            {
+                eventSO.RaiseToggleCanvasEvent(true);
+            }
+            else
+            {
+                eventSO.RaiseToggleCanvasEvent(false);
+            }
+        }
+    }
     private void InitiateUICanvasList()
     {
         // 遍历所有子对象

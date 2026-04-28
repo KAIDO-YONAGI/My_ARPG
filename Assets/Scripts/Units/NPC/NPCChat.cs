@@ -5,19 +5,11 @@ public class NPCChat : MonoBehaviour
     private Rigidbody2D rb;
     public Animator chatAnimator;
     public DialogSO dialogSO;
-
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-
-        if (DialogManager.instance != null)
-        {
-            DialogManager.instance.DisableButtons();
-        }
-    }
-
+    public ToggleCanvasEventSO toggleDialogEvent;
     private void OnEnable()
     {
+        toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
+
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
@@ -32,6 +24,8 @@ public class NPCChat : MonoBehaviour
 
     private void OnDisable()
     {
+        toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
+
         if (rb != null)
         {
             rb.isKinematic = false;
@@ -47,30 +41,41 @@ public class NPCChat : MonoBehaviour
             DialogManager.instance.ForeceEndDialog();
         }
     }
-
-    private void Update()
-    {
-        DialogManager dialogManager = DialogManager.instance;
-
-        if (dialogManager == null)
+    private void OnToggleDialogEvent(bool state)
+    { 
+        if (DialogManager.instance == null)
         {
             return;
         }
 
-        if (Input.GetButtonDown("NPCInteract"))
+        if (state)
         {
-            if (dialogSO != null && !dialogManager.isDialogActive)
+            if (dialogSO != null && !DialogManager.instance.isDialogActive)
             {
-                dialogManager.StartDialog(dialogSO);
+                DialogManager.instance.StartDialog(dialogSO);
             }
-            else if (dialogManager.isDialogActive)
+            else if (DialogManager.instance.isDialogActive)
             {
-                dialogManager.AdvanceDialog();
+                DialogManager.instance.AdvanceDialog();
             }
         }
-        else if (Input.GetMouseButtonDown(0) && dialogManager.isDialogActive)
+        else if (!state)
         {
-            dialogManager.AdvanceDialog();
+            DialogManager.instance.ForeceEndDialog();
+            
+        }
+        else if (Input.GetMouseButtonDown(0) && DialogManager.instance.isDialogActive)
+        {
+            DialogManager.instance.AdvanceDialog();
+        }
+    }
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+
+        if (DialogManager.instance != null)
+        {
+            DialogManager.instance.DisableButtons();
         }
     }
 }
