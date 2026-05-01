@@ -15,7 +15,7 @@ public class UIManager : MonoBehaviour
     public SceneLoadEventSO loadEventSO;
     public List<ToggleCanvasEventSO> toggleCanvasEvents;//画布组对应的manager也会各自绑定他们的事件
 
-    [SerializeField] private GameObject fatherOfCanvasToManage;
+    [SerializeField] private List<CanvasGroup> canvasToManage;
     [SerializeField] private GameObject playerUI;
 
 
@@ -35,8 +35,6 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        InitiateUICanvasList();
     }
 
     private void OnEnable()
@@ -71,9 +69,9 @@ public class UIManager : MonoBehaviour
             shopClick = false;
         }
     }
-    private UIInputState inputState=new();
+    private UIInputState inputState = new();
     public void SetInput(MyEnums.CanvasToToggle canvas, bool state)
-    //配合枚举类、封装类、状态机来统一进入点
+    //配合枚举类、封装类、状态机来提供外部操作的进入点
     {
         switch (canvas)
         {
@@ -95,6 +93,7 @@ public class UIManager : MonoBehaviour
             case MyEnums.CanvasToToggle.Shop:
                 inputState.shopClick = state;
                 break;
+            
         }
     }
     public List<ToggleCanvasEventSO> GetToggleCanvasEventsList()
@@ -116,12 +115,13 @@ public class UIManager : MonoBehaviour
         inputState.questClick = inputState.questClick || Input.GetButtonDown("OpenQuestList");
         inputState.shopClick = inputState.shopClick || Input.GetButtonDown("Interact");
 
-        isAnyCanvasOpen = IsAnyManagedCanvasOpen();//根据透明度判断是不是打开
+        isAnyCanvasOpen = IsAnyManagedCanvasOpen();
+        //根据透明度判断是不是打开,可以利用这个来同步其它画布在其它地方打开的情况的状态
 
-        if (!isAnyCanvasOpen && currentCanvasState != MyEnums.CanvasToToggle.Default)//这个状态组合说明面板被其它地方关了，因为此时不是default状态
+        if (!isAnyCanvasOpen && currentCanvasState != MyEnums.CanvasToToggle.Default)
+        //这个状态组合说明面板被其它地方关了，因为此时不是default状态
         {
             currentCanvasState = MyEnums.CanvasToToggle.Default;
-            IsToToggleCanvas(currentCanvasState);
         }
         else if (!isAnyCanvasOpen)
         {
@@ -177,21 +177,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void InitiateUICanvasList()
-    {
-        foreach (Transform child in fatherOfCanvasToManage.transform)
-        {
-            CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
-            if (canvasGroup != null)
-            {
-                uiCanvasList.Add(canvasGroup);
-            }
-        }
-    }
+
 
     private bool IsAnyManagedCanvasOpen()
     {
-        foreach (var canvas in uiCanvasList)
+        foreach (var canvas in canvasToManage)
         {
             if (canvas == null || !canvas.gameObject.activeInHierarchy)
             {
