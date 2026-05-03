@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,15 +35,10 @@ public class DialogManager : MonoBehaviour
         SetDialogCanvas(false);
         DisableButtons();
     }
-
-    private void OnDestroy()
+    private void OnDisable()
     {
-        if (instance == this)
-        {
-            instance = null;
-        }
+        DisableButtons();
     }
-
     public void SetDialogCanvas(bool state)
     {
         if (dialogCanvasGroup == null)
@@ -168,7 +164,7 @@ public class DialogManager : MonoBehaviour
         }
 
         {//主分支结束后默认对话
-        //TODO HasChated需要改为非SO存储
+         //TODO HasChated需要改为非SO存储
 
             if (dialog.HasChated)
             {
