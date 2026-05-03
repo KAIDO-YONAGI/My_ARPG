@@ -1,0 +1,220 @@
+@startuml ScriptableObjects_and_Events
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam padding 2
+skinparam wrapWidth 120
+
+title ScriptableObjects & Event System
+
+enum SceneType {
+    Location
+    Menu
+}
+
+enum CanvasToToggle {
+    ESC
+    GameOver
+    Stats
+    Skills
+    Dialog
+    Quest
+    Shop
+    Integreted
+    Default
+}
+
+enum QuestState {
+    Idle
+    Accepted
+    Decline
+    IsToComplete
+    Completed
+}
+
+package "Data SO" #E8F5E9 {
+    together {
+        class GuidSO <<ScriptableObject>> {
+            - guid : string
+            + Guid : string
+        }
+
+        class CharacterSO <<ScriptableObject>> {
+            + characterName : string
+            + characterPortrait : Sprite
+        }
+
+        class ItemSO <<ScriptableObject>> {
+            + itemName : string
+            + itemDescription : string
+            + icon : Sprite
+            + isGold : bool
+            + isEXP : bool
+            + stackableSize : int
+            + currentHealth : int
+            + maxHealth : int
+            + speed : int
+            + damage : int
+            + duration : float
+        }
+
+        class SkillSO <<ScriptableObject>> {
+            + skillName : string
+            + maxLevel : int = 5
+            + skillIcon : Sprite
+        }
+
+        class GameSceneSO <<ScriptableObject>> {
+            + sceneName : string
+            + sceneReference : AssetReference
+            + sceneType : SceneType
+            + initialPosition : Vector3
+        }
+
+        class LocationSO <<ScriptableObject>> {
+            + locationID : string
+            + locationName : string
+        }
+    }
+}
+
+package "Dialog & Quest SO" #E3F2FD {
+    together {
+        class DialogSO <<ScriptableObject>> {
+            + chatType : ChatType
+            + canOnlyBeTriggeredOnce : bool
+            + mainCharacter : CharacterSO
+            + dialogLines : DialogLine[]
+            + nextDialogOptions : DialogOption[]
+            + parentDialog : DialogSO
+            + requireCharacters : List<CharacterSO>
+            + requireItems : List<Item>
+            + refusingDialogs : List<DialogSO>
+            - hasChated : bool = false
+            + SetHasChated(state : bool) : void
+        }
+
+        class QuestSO <<ScriptableObject>> {
+            + questName : string
+            + lv : int
+            + questDescription : string
+            + questObjectives : List<QuestObjective>
+            + rewards : List<Reward>
+        }
+    }
+
+    together {
+        class DialogLine <<serializable>> {
+            + speaker : CharacterSO
+            + text : string
+        }
+
+        class DialogOption <<serializable>> {
+            + optionText : string
+            + nextDialogNode : DialogSO
+        }
+
+        class Item <<serializable>> {
+            + itemSO : ItemSO
+            + quantity : int
+        }
+
+        class Reward <<serializable>> {
+            + rewardItem : ItemSO
+            + quantity : int
+        }
+
+        class QuestObjective <<serializable>> {
+            + description : string
+            + targetItem : ItemSO
+            + targetCharacter : CharacterSO
+            + targetLocation : LocationSO
+            + requiredAmount : int
+            + currentAmount : int
+        }
+
+        class ShopItems <<serializable>> {
+            + item : ItemSO
+            + price : int
+        }
+    }
+}
+
+package "Event SO" #FFF3E0 {
+    together {
+        class VoidEventSO <<ScriptableObject>> {
+            + VoidEvent : UnityAction
+            + OnEventRaised() : void
+        }
+
+        class SceneLoadEventSO <<ScriptableObject>> {
+            + LoadRequestEvent : UnityAction<GameSceneSO, Vector3, bool>
+            + RaiseLoadRequestEvent(scene : GameSceneSO, position : Vector3, isToFade : bool) : void
+        }
+
+        class LootEventSO <<ScriptableObject>> {
+            + LootEvent : UnityAction<ItemSO, int, Loot>
+            + OnEventRaised(item : ItemSO, quantity : int, loot : Loot) : void
+        }
+
+        class InventorySlotsStatsSO <<ScriptableObject>> {
+            + InventoryUpdateRequestEvent : UnityAction<ItemSO, int, int>
+            + InventoryRespondEvent : UnityAction<bool[]>
+            + RaiseInventoryUpdateRequest(item : ItemSO, price : int, amount : int) : void
+        }
+
+        class ToggleCanvasEventSO <<ScriptableObject>> {
+            + toggleCanvasEvent : UnityAction<bool>
+            + canvasToToggle : CanvasToToggle
+            + RaiseToggleCanvasEvent(state : bool) : void
+        }
+    }
+
+    together {
+        class ShopLoadEventSO <<ScriptableObject>> {
+            + ShopLoadEvent : UnityAction<List<ShopItems>, List<ShopItems>, List<ShopItems>, Transform>
+            + RaiseShopLoadRequest(shopItems : List, shopWeapon : List, shopArmor : List, portraitTarget : Transform) : void
+        }
+
+        class QuestOptionsEventSO <<ScriptableObject>> {
+            + questOptionsEvent : UnityAction<QuestState>
+            + OnQuestOptionsEventRaised(questState : QuestState) : void
+        }
+
+        class LoadQuestEventSO <<ScriptableObject>> {
+            + LoadQuestEvent : UnityAction<List<QuestSO>>
+            + OnLoadQuestEventRaised(quests : List<QuestSO>) : void
+        }
+
+        class VoidBidirecChannelSO <<ScriptableObject>> {
+            + OnEventRaised : VoidBidirecEvent
+            + RaiseEvent() : void
+        }
+    }
+}
+
+CharacterSO --|> GuidSO
+DialogSO *-- DialogLine : dialogLines
+DialogSO *-- DialogOption : nextDialogOptions
+DialogSO --> CharacterSO : mainCharacter
+DialogSO --> Item : requireItems
+DialogSO --> DialogSO : parentDialog/refusingDialogs
+DialogOption --> DialogSO : nextDialogNode
+DialogLine --> CharacterSO : speaker
+Item --> ItemSO : itemSO
+QuestSO *-- QuestObjective : questObjectives
+QuestSO *-- Reward : rewards
+QuestObjective --> ItemSO : targetItem
+QuestObjective --> CharacterSO : targetCharacter
+QuestObjective --> LocationSO : targetLocation
+Reward --> ItemSO : rewardItem
+ShopItems --> ItemSO : item
+GameSceneSO --> SceneType : sceneType
+ToggleCanvasEventSO --> CanvasToToggle : canvasToToggle
+
+@enduml

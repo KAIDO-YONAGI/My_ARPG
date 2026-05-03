@@ -1,0 +1,332 @@
+@startuml UI_System
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam padding 2
+skinparam wrapWidth 120
+
+title UI System
+
+enum CanvasToToggle {
+    ESC
+    GameOver
+    Stats
+    Skills
+    Dialog
+    Quest
+    Shop
+    Integreted
+    Default
+}
+
+enum QuestState {
+    Idle
+    Accepted
+    Decline
+    IsToComplete
+    Completed
+}
+
+package "Core UI" #E3F2FD {
+    together {
+        class UIManager <<singleton>> {
+            - {static} instance : UIManager
+            + loadEventSO : SceneLoadEventSO
+            + toggleCanvasEvents : List<ToggleCanvasEventSO>
+            - canvasToManage : List<CanvasGroup>
+            - currentCanvasState : CanvasToToggle
+            - isAnyCanvasOpen : bool
+            + SetInput(canvas : CanvasToToggle, state : bool) : void
+            - ToggleCanvas() : void
+            - IsToToggleCanvas(target : CanvasToToggle) : void
+        }
+
+        class UIInputState {
+            + escClick : bool
+            + skillTreeClick : bool
+            + statsClick : bool
+            + dialogClick : bool
+            + questClick : bool
+            + shopClick : bool
+            + Reset() : void
+        }
+
+        class ESCButton {
+            + escButton : Button
+            - OnESC() : void
+        }
+
+        class ESCMenuManager {
+            + ESCGroup : CanvasGroup
+            + toggleESCEvent : ToggleCanvasEventSO
+            - OnESC(state : bool) : void
+        }
+
+        class IntegretedUICanvasManager <<singleton>> {
+            - {static} instance : IntegretedUICanvasManager
+            - canvasToToggle : List<CanvasToToggle>
+            - UICanvasPanel : CanvasGroup
+            - toggleIntegretedCanvasEventSO : ToggleCanvasEventSO
+            - currentPageNum : int = 0
+            - isMenuOpen : bool = false
+            + OnClickMenuToggleButton() : void
+            + OnClickNextButton() : void
+            + OnClickPrevutton() : void
+            - OnToggleIntegretedCnavas(state : bool) : void
+            - InitiateButtons() : void
+            - ShiftPage(page : int) : bool
+            - OnIntegretedButtonClick(canvasToToggle : CanvasToToggle) : void
+        }
+    }
+}
+
+package "Shop" #FFF3E0 {
+    together {
+        class ShopManager <<singleton>> {
+            - {static} instance : ShopManager
+            - shopSlots : ShopSlot[]
+            + InventoryUpdateRequest : InventorySlotsStatsSO
+            + shopLoadEvent : ShopLoadEventSO
+            + toggleShopCanvasEvent : ToggleCanvasEventSO
+            - shopItems : List<ShopItems>
+            - shopWeapon : List<ShopItems>
+            - shopArmor : List<ShopItems>
+            - isShopOpen : bool = false
+            + TryBuyItem(item : ItemSO, price : int) : void
+            + SellItem(item : ItemSO) : void
+            + OpenItemShop() : void
+            + OpenWeaponShop() : void
+            + OpenArmorShop() : void
+            - PopulateShopItems(shopItems : List<ShopItems>) : void
+            - OnShopLoad(shopItems : List, shopWeapon : List, shopArmor : List, portraitTarget : Transform) : void
+        }
+
+        class ShopSlot {
+            - item : ItemSO
+            - price : int
+            + Initialize(item : ItemSO, price : int) : void
+            + OnBuyButtonClick() : void
+            + OnPointerEnter(eventData : PointerEventData) : void
+            + OnPointerMove(eventData : PointerEventData) : void
+        }
+
+        class ShopInfo {
+            + infoPanel : CanvasGroup
+            + ShowItemInfo(item : ItemSO) : void
+            + HideItemInfo() : void
+        }
+
+        class ShopToggles {
+            + OpenItemShop() : void
+            + OpenWeaponShop() : void
+            + OpenArmorShop() : void
+        }
+
+        class ShopKeeper {
+            + logoAnimator : Animator
+            + shopLoadEvent : ShopLoadEventSO
+            - shopItems : List<ShopItems>
+            + PortraitTarget : Transform
+        }
+
+        class ShopPortraitCameraController {
+            - shopLoadEvent : ShopLoadEventSO
+            - hideWhenNoShopKeeper : bool = true
+            - OnShopLoaded(shopItems : List, shopWeapon : List, shopArmor : List, portraitTarget : Transform) : void
+            - SetCameraState(state : bool) : void
+        }
+    }
+}
+
+package "Stats & Skills" #E8F5E9 {
+    together {
+        class ExpManager <<singleton>> {
+            - {static} instance : ExpManager
+            + level : int = 0
+            + currentExp : int
+            + expToUpgrade : int = 10
+            + mutiplier : float = 1.2f
+            + {static} OnLevelUp : Action<int>
+            + GainExp(amount : int) : void
+            - LevelUp() : void
+        }
+
+        class StatsUI {
+            + statsCanvas : CanvasGroup
+            + toggleStatsEvent : ToggleCanvasEventSO
+            + UpdateDamage() : void
+            + UpdateSpeed() : void
+            + UpdateAllStats() : void
+        }
+
+        class SkillSlot {
+            + skillSO : SkillSO
+            + preRiquriedForSkillUnlock_List : List<SkillSlot>
+            + currentLevel : int
+            + isUnlocked : bool = false
+            + {static} OnAbilityPointSpent : Action<SkillSlot>
+            + {static} OnMaxSkillLevel : Action<SkillSlot>
+            + TryUpgradeSkill() : void
+            + Unlock() : void
+            + CanUnlockSkill() : bool
+        }
+
+        class SkillTreeManager {
+            + skillSlots : SkillSlot[]
+            + availablePoints : int
+            - HandleAbilityPointSpent(skillSlot : SkillSlot) : void
+            - HandleSkillMaxed(skillSlot : SkillSlot) : void
+            + UpdateAbilityPoints(amount : int) : void
+        }
+
+        class ToggleSkillTree {
+            + skillsCanvas : CanvasGroup
+            + toggleSkillEvent : ToggleCanvasEventSO
+            - OnToggleSkillEvent(state : bool) : void
+        }
+    }
+}
+
+package "Quest" #F3E5F5 {
+    together {
+        class QuestManager <<singleton>> {
+            - {static} instance : QuestManager
+            + questCanvaGroup : CanvasGroup
+            + openQuestEventSO : VoidEventSO
+            + loadQuestEventSO : LoadQuestEventSO
+            + questOptionsEventSO : QuestOptionsEventSO
+            + toggleQuestEvent : ToggleCanvasEventSO
+            + QuestRewardRequest : InventorySlotsStatsSO
+            - currentQuestState : QuestState
+            - questProgress : Dictionary<QuestSO, QuestProgressData>
+            - currentQuest : QuestSO
+            + SetCurrentQuest(quest : QuestSO) : void
+            + QuestStateChanged(quest : QuestSO, state : QuestState) : void
+            + UpdateObjectiveProgress(quest : QuestSO, obj : QuestObjective) : void
+            + CloseQuestBoard() : void
+            - RaiseRewardEvent(quest : QuestSO) : void
+            - InitializeQuestProgress(quests : List<QuestSO>) : void
+            - InitiateQuestSlots(quests : List<QuestSO>) : void
+            - IsAllQuestsCompleted(quests : List<QuestSO>) : bool
+        }
+
+        class QuestLogUI {
+            - objectiveSlots : QuestObjectiveSlot[]
+            - questRewardsSlot : QuestRewardsSlot[]
+            + openQuestEvent : VoidEventSO
+            - currentQuest : QuestSO
+            + ShowQuestOffer() : void
+            + HandleQuestClicked(quest : QuestSO) : void
+            + DisPlayObjectives() : void
+            - DisplayRewards() : void
+        }
+
+        class QuestLogSlot {
+            + currentQuest : QuestSO
+            + SetQuest(quest : QuestSO) : void
+            + OnSlotClicked() : void
+        }
+
+        class QuestObjectiveSlot {
+            + RefreshObjectives(description : string, progress : string, isCompleted : bool) : void
+        }
+
+        class QuestRewardsSlot {
+            + DisplayReward(sprite : Sprite, quantity : int) : void
+        }
+
+        class QuestOptionsButton {
+            - questStateToShift : QuestState
+            + questOptionsEventSO : QuestOptionsEventSO
+            + OnOptionButtonClicked() : void
+        }
+
+        class QuestBoardManager {
+            - questsOnBoard : List<QuestSO>
+            + loadQuestEventSO : LoadQuestEventSO
+            - isInRange : bool = false
+        }
+    }
+}
+
+package "Misc" #ECEFF1 {
+    together {
+        class ExitManager {
+            + QuitGame() : void
+        }
+
+        class Joystick {
+            + backgroundRect : RectTransform
+            + handleRect : RectTransform
+            + Horizontal : float
+            + Vertical : float
+            - handleRange : float = 1f
+            + OnPointerDown(eventData : PointerEventData) : void
+            + OnDrag(eventData : PointerEventData) : void
+            + OnPointerUp(eventData : PointerEventData) : void
+        }
+    }
+}
+
+UIManager --> CanvasToToggle : currentCanvasState
+UIManager *-- UIInputState : inputState
+UIManager --> ToggleCanvasEventSO : toggleCanvasEvents
+UIManager --> SceneLoadEventSO : loadEventSO
+ESCButton --> UIManager : uses
+ESCMenuManager --> ToggleCanvasEventSO : toggleESCEvent
+ESCMenuManager --> TimeManager : uses
+IntegretedUICanvasManager --> ToggleCanvasEventSO : toggleIntegretedCanvasEventSO
+IntegretedUICanvasManager --> UIManager : uses
+IntegretedUICanvasManager --> CanvasToToggle : canvasToToggle
+
+ShopManager o-- ShopSlot : shopSlots
+ShopManager --> ShopLoadEventSO : shopLoadEvent
+ShopManager --> ToggleCanvasEventSO : toggleShopCanvasEvent
+ShopManager --> InventorySlotsStatsSO : InventoryUpdateRequest
+ShopSlot --> ShopInfo : shopInfo
+ShopSlot --> ItemSO : item
+ShopPortraitCameraController --> ShopLoadEventSO : shopLoadEvent
+ShopToggles --> ShopManager : uses
+ShopKeeper --> ShopLoadEventSO : shopLoadEvent
+ShopKeeper --> ShopManager : uses
+
+ExpManager --> EnemyHealth : subscribes OnDefeated
+StatsUI --> ToggleCanvasEventSO : toggleStatsEvent
+StatsUI --> StatsManager : uses
+StatsUI --> TimeManager : uses
+SkillTreeManager o-- SkillSlot : skillSlots
+SkillTreeManager --> ExpManager : subscribes OnLevelUp
+SkillSlot --> SkillSO : skillSO
+SkillSlot --> SkillSlot : preRequired
+ToggleSkillTree --> ToggleCanvasEventSO : toggleSkillEvent
+
+QuestManager --> QuestState : currentQuestState
+QuestManager --> QuestSO : currentQuest
+QuestManager o-- QuestLogSlot : questLogSlots
+QuestManager --> QuestLogUI : questLogUI
+QuestManager --> VoidEventSO : openQuestEventSO
+QuestManager --> LoadQuestEventSO : loadQuestEventSO
+QuestManager --> QuestOptionsEventSO : questOptionsEventSO
+QuestManager --> ToggleCanvasEventSO : toggleQuestEvent
+QuestManager --> InventorySlotsStatsSO : QuestRewardRequest
+QuestManager --> ItemHistoryManager : uses
+QuestManager --> ConversationHistoryManager : uses
+QuestLogUI o-- QuestObjectiveSlot : objectiveSlots
+QuestLogUI o-- QuestRewardsSlot : questRewardsSlot
+QuestLogUI --> QuestManager : uses
+QuestLogUI --> VoidEventSO : openQuestEvent
+QuestLogSlot --> QuestSO : currentQuest
+QuestLogSlot --> QuestLogUI : questLogUI
+QuestOptionsButton --> QuestOptionsEventSO : questOptionsEventSO
+QuestOptionsButton --> QuestState : questStateToShift
+QuestBoardManager --> QuestSO : questsOnBoard
+QuestBoardManager --> QuestManager : uses
+
+PlayerMovement --> Joystick : joystick
+
+@enduml

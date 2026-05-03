@@ -1,0 +1,120 @@
+@startuml Dialog_Inventory_System
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam padding 2
+skinparam wrapWidth 120
+
+title Dialog & Inventory System
+
+package "Dialog" #E3F2FD {
+    class DialogManager <<singleton>> {
+        - {static} instance : DialogManager
+        + dialogCanvasGroup : CanvasGroup
+        + speakerPortrait : Image
+        + isDialogActive : bool
+        + optionButtons : Button[]
+        - currentLineIndex : int = 0
+        - currentDialog : DialogSO
+        + StartDialog(dialog : DialogSO) : void
+        + AdvanceDialog() : void
+        + EndDialog() : void
+        + ForeceEndDialog() : void
+        - MatchConditionsToStartDialog(dialog : DialogSO) : bool
+        - StartRefuseDialog(dialog : DialogSO, chatTypeToStart : ChatType) : void
+        - ShowChoices() : void
+        - ShowDialog() : void
+        - OnOptionSelected(nextDialog : DialogSO) : void
+    }
+
+    together {
+        class ConversationHistoryManager <<singleton>> {
+            - {static} instance : ConversationHistoryManager
+            - charactersHasChated : HashSet<CharacterSO>
+            + RecordCharacter(character : CharacterSO) : void
+            + HasChatedWith(character : CharacterSO) : bool
+        }
+
+        class ItemHistoryManager <<singleton>> {
+            - {static} instance : ItemHistoryManager
+            - itemHasPicked : Dictionary<ItemSO, int>
+            + RecordItem(item : ItemSO, quantity : int) : void
+            + HasPickedOverAmount(item : ItemSO, amount : int) : bool
+        }
+
+        class VisitedHistoryManager <<singleton>> {
+            - {static} instance : VisitedHistoryManager
+        }
+    }
+}
+
+package "Inventory" #E8F5E9 {
+    class InventoryManager {
+        + itemSlots : InventorySlot[]
+        + goldAmount : int
+        + lootEvent : LootEventSO
+        + ShoppingRequest : InventorySlotsStatsSO
+        + QuestRewardRequest : InventorySlotsStatsSO
+        + DropByClick(slot : InventorySlot) : void
+        + UseItem(slot : InventorySlot) : void
+        + UpdateGold(price : int) : void
+        - HandleQuestReward(item : ItemSO, price : int, amount : int) : void
+        - OnItemLootedHandler(item : ItemSO, quantity : int, lootObj : Loot) : void
+        - HandleShopping(item : ItemSO, price : int, amount : int) : void
+        - UpdateInvetorySlots(item : ItemSO, quantity : int, lootObj : Loot) : void
+        - HasSpaceForItem(item : ItemSO) : bool
+        - DropLoot(item : ItemSO, quantity : int, existingLoot : Loot) : void
+    }
+
+    together {
+        class Loot {
+            + item : ItemSO
+            + lootEvent : LootEventSO
+            + quantity : int = 10
+            + canBePick : bool = true
+            + hasBeenPicked : bool = false
+            + Initialize(item : ItemSO, quantity : int) : void
+            + MarkAsDestroyed() : void
+            + SaveData(data : Data) : void
+            + LoadData(data : Data) : void
+        }
+
+        class InventorySlot {
+            + itemSO : ItemSO
+            + quantity : int
+            + inventoryManager : InventoryManager
+            + OnPointerClick(eventData : PointerEventData) : void
+        }
+
+        class UseItem {
+            + ApplyItemEffects(item : ItemSO) : void
+            - EffectTimer(item : ItemSO, duration : float) : IEnumerator
+        }
+    }
+}
+
+Loot ..|> ISaveable
+Loot --> ItemSO : item
+Loot --> LootEventSO : lootEvent
+InventoryManager o-- InventorySlot : itemSlots
+InventoryManager --> UseItem : useItem
+InventoryManager --> Loot : creates/uses
+InventoryManager --> LootEventSO : lootEvent
+InventoryManager --> InventorySlotsStatsSO : ShoppingRequest/QuestRewardRequest
+InventoryManager --> ItemHistoryManager : uses
+InventoryManager --> StatsManager : uses
+InventorySlot --> ItemSO : itemSO
+InventorySlot --> ShopManager : checks
+UseItem --> StatsManager : uses
+DialogManager --> DialogSO : currentDialog
+DialogManager --> ConversationHistoryManager : uses
+DialogManager --> ItemHistoryManager : uses
+ConversationHistoryManager --> CharacterSO : tracks
+ItemHistoryManager --> ItemSO : tracks
+
+@enduml

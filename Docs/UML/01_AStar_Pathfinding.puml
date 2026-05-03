@@ -1,0 +1,90 @@
+@startuml AStar_Pathfinding
+
+left to right direction
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam padding 2
+skinparam wrapWidth 120
+
+title A* Pathfinding System
+
+enum AStarNodeType {
+    Obstacle
+    Walkable
+}
+
+package "Managers" #E3F2FD {
+    class AStarNodeManager <<singleton>> {
+        - {static} instance : AStarNodeManager
+        + tilemaps : Tilemap[]
+        + obstacleLayers : LayerMask
+        - cellSize : float = 1f
+        - safetyMargin : float = 0.3f
+        - nodeCellMap : Dictionary<Vector3, AStarNode>
+        - InitMapInfo() : void
+        - InitiateNodes() : void
+        - ProcessColliderObstacles() : void
+        - ProcessTileWithSubdivision(layerName : string, cellPos : Vector3, subdivision : int) : void
+        - ProcessTile(layerName : string, cellPos : Vector3) : void
+    }
+
+    class AStarPathFinder <<singleton>> {
+        - {static} instance : AStarPathFinder
+        + FindPath(optPos : Vector3, startPos : Vector3, endPos : Vector3) : Stack<PathFinderDetails>
+        - NoCoverObstacleNodes(startCellPos : Vector3, optCellPos : Vector3) : bool
+        - RetracePath(endNode : PathFinderDetails) : Stack<PathFinderDetails>
+        - SearchCheapestCost(openDic : Dictionary<Vector3, PathFinderDetails>) : Vector3
+        - AddNodeToOpen(currentPos : Vector3, endPos : Vector3, openDic : Dictionary, closeSet : HashSet, current : PathFinderDetails) : void
+        - CanWalkDiagonally(x : float, y : float, dx : float, dy : float) : bool
+    }
+
+    class MovementController {
+        - path : Stack<PathFinderDetails>
+        - threshold : float = 0.5f
+        - pathRebuildDistance : float = 0.5f
+        - pathRebuildCooldown : float = 0.5f
+        - hasValidPath : bool = false
+        + GetPosToGo(optPos : Vector3, startPos : Vector3, endPos : Vector3) : Vector3
+        + ArrivedPos() : void
+        + ResetPath() : void
+        - FindWay(optPos : Vector3, startPos : Vector3, endPos : Vector3) : bool
+        - ReFindWay(optPos : Vector3, startPos : Vector3, endPos : Vector3) : void
+    }
+}
+
+package "Data" #E8F5E9 {
+    class AStarNode {
+        - nodePos : Vector3
+        - nodeType : AStarNodeType
+        + AStarNode(nodePos : Vector3, nodeType : AStarNodeType)
+        + SetNodeType(newType : AStarNodeType) : void
+        - CanOverride(existing : AStarNodeType, newType : AStarNodeType) : bool
+    }
+
+    class PathFinderDetails {
+        - nodePos : Vector3
+        - cost : float
+        - disToBeg : float
+        - disToEnd : float
+        - fatherNode : PathFinderDetails
+        + PathFinderDetails(nodePos : Vector3, endPos : Vector3, fatherNode : PathFinderDetails)
+        + SetFatherNode(fatherNode : PathFinderDetails) : void
+        - CalDistance(startPos : Vector3, endPos : Vector3) : float
+    }
+}
+
+AStarNodeManager *-- AStarNode : nodeCellMap
+AStarPathFinder --> AStarNodeManager : delegates to
+AStarPathFinder *-- PathFinderDetails : creates Stack
+MovementController --> AStarPathFinder : uses FindPath
+MovementController --> AStarNodeManager : uses GetCellSize
+AStarNode --> AStarNodeType : nodeType
+PathFinderDetails --> PathFinderDetails : fatherNode
+
+@enduml

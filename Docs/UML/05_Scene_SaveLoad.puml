@@ -1,0 +1,145 @@
+@startuml Scene_SaveLoad_System
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam padding 2
+skinparam wrapWidth 120
+
+title Scene Management & Save/Load System
+
+enum PersistentType {
+    ReadWrite
+    DontPersist
+}
+
+enum SceneType {
+    Location
+    Menu
+}
+
+package "Save/Load Core" #E8F5E9 {
+    class DataManager <<singleton>> {
+        - {static} instance : DataManager
+        - saveables : List<ISaveable>
+        - dataToSave : Data
+        + saveDataEvent : VoidEventSO
+        + loadDataEvent : VoidEventSO
+        - Save() : void
+        - Load() : void
+    }
+
+    together {
+        interface ISaveable {
+            + GetDataID() : DataDefinition
+            + SaveData(data : Data) : void
+            + LoadData(data : Data) : void
+        }
+
+        class DataDefinition {
+            + persistentType : PersistentType
+            + ID : string
+        }
+
+        class Data {
+            + characterPosDic : Dictionary<string, Vector3>
+            + lootsStatsDic : Dictionary<string, (Vector3, bool)>
+        }
+    }
+}
+
+package "Scene Management" #E3F2FD {
+    class SceneChanger <<singleton>> {
+        - {static} instance : SceneChanger
+        + initialPosition : Vector3
+        + fadeDuration : float = 1f
+        + initScene : GameSceneSO
+        + player : GameObject
+        + loadEventSO : SceneLoadEventSO
+        - sceneToLoad : GameSceneSO
+        - currentScene : GameSceneSO
+        - isInitialScene : bool = true
+        - OnLoadRequestEvent(scene : GameSceneSO, newPosition : Vector3, isToFade : bool) : void
+        - UnloadCurrentScene(sceneToLoad : GameSceneSO) : IEnumerator
+        - LoadScene(sceneToLoad : GameSceneSO) : void
+        - OnLoadCompleted(handle : AsyncOperationHandle) : void
+        - ForbidInput() : void
+        - AllowInput() : void
+    }
+
+    class SceneToggler {
+        + sceneToLoad : GameSceneSO
+        + newPosition : Vector3
+        + isToFade : bool = true
+        - OnTriggerEnter2D(collider : Collider2D) : void
+    }
+
+    class ConfinerFinder {
+        - confiner : CinemachineConfiner2D
+        - OnSceneLoaded(scene : Scene, mode : LoadSceneMode) : void
+    }
+}
+
+package "Scene Utilities" #FFF3E0 {
+    together {
+        class RetryManager {
+            - instance : RetryManager
+            + currentScene : GameSceneSO
+            + loadEventSO : SceneLoadEventSO
+            + retryEventSO : VoidEventSO
+            - OnReTry() : void
+        }
+
+        class ButtonSceneToggler {
+            + sceneToLoad : GameSceneSO
+            + ButtonCanvas : CanvasGroup
+            + newPosition : Vector3
+            + isToFade : bool = true
+            + HandleSceneToggle() : void
+        }
+
+        class InitialLoad {
+            + persistentScene : AssetReference
+            - Awake() : void
+        }
+
+        class Elevation_Entry {
+            + mountainColliders : Collider2D[]
+            + edgeColliders : Collider2D[]
+            - OnTriggerEnter2D(collision : Collider2D) : void
+        }
+
+        class Elevation_Exit {
+            + mountainColliders : Collider2D[]
+            + edgeColliders : Collider2D[]
+            - OnTriggerEnter2D(collision : Collider2D) : void
+        }
+    }
+}
+
+ISaveable ..> DataDefinition : uses
+ISaveable ..> DataManager : registers to
+ISaveable ..> Data : reads/writes
+DataManager o-- ISaveable : saveables
+DataManager *-- Data : dataToSave
+DataManager --> VoidEventSO : saveDataEvent/loadDataEvent
+DataDefinition --> PersistentType : persistentType
+SceneToggler --> SceneLoadEventSO : loadEventSO
+SceneToggler --> GameSceneSO : sceneToLoad
+SceneChanger --> SceneLoadEventSO : loadEventSO
+SceneChanger --> GameSceneSO : initScene/currentScene
+SceneChanger --> PlayerMovement : uses
+RetryManager --> GameSceneSO : currentScene
+RetryManager --> SceneLoadEventSO : loadEventSO
+RetryManager --> VoidEventSO : retryEventSO
+RetryManager --> StatsManager : uses
+ButtonSceneToggler --> SceneLoadEventSO : loadEventSO
+ButtonSceneToggler --> GameSceneSO : sceneToLoad
+ButtonSceneToggler --> TimeManager : uses
+GameSceneSO --> SceneType : sceneType
+
+@enduml

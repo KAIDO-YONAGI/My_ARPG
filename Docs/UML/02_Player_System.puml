@@ -1,0 +1,132 @@
+@startuml Player_System
+
+left to right direction
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam padding 2
+skinparam wrapWidth 120
+
+title Player System
+
+enum PlayerState {
+    Idle
+    Running
+    Attacking
+    Shooting
+    KnockBack
+}
+
+package "Managers" #FFF3E0 {
+    class StatsManager <<singleton>> {
+        - {static} instance : StatsManager
+        - damage : int
+        - weaponRange : float
+        - knockBackForce : float
+        - stunTime : float
+        - coolDown : float
+        - speed : float
+        - maxHealth : int
+        - currentHealth : int
+        + UpdateMaxHealth(amount : int) : void
+        + UpdateHealth(amount : int) : void
+        + UpdateSpeed(amount : float) : void
+        + UpdateDamage(amount : int) : void
+        + ResetHealth() : void
+    }
+
+    class TimeManager <<singleton>> {
+        - {static} instance : TimeManager
+        - isGamePaused : bool
+        - numberOfPauses : int = 0
+        + PauseGame() : void
+        + ResumeGame() : void
+        + ForceResumeGame() : void
+    }
+}
+
+package "Player Core" #E3F2FD {
+    class PlayerMovement {
+        + rb : Rigidbody2D
+        + animator : Animator
+        + playerCombat : PlayerCombat
+        + playerBow : PlayerBow
+        + joystick : Joystick
+        - facingDirection : int = 1
+        - canBeInterrupted : bool = true
+        - playerState : PlayerState = Idle
+        + AnimatorSM(newState : PlayerState) : void
+        + KonckBack(enemy : Transform, force : float, stunTime : float) : void
+        - MovementSM() : void
+        - HandleKnockBackState() : void
+        - HandleShootingState() : void
+        - HandleAttackingState() : void
+        - HandleRunningState() : void
+        - SetMovement(horizontal : float, vertical : float) : void
+        - Flip() : void
+    }
+
+    class PlayerCombat {
+        + attackPoint : Transform
+        + enemyMask : LayerMask
+        + DealDamage() : void
+        - StrengthBUff() : void
+        + FinshCombat() : void
+    }
+
+    class PlayerBow {
+        + launchPoint : Transform
+        + arrowPrefab : GameObject
+        - aimDirection : Vector2 = right
+        + anim : Animator
+        + HandleAiming() : void
+        + HandleShootingAiming() : void
+        + Shoot() : void
+        + ShootingDone() : void
+    }
+}
+
+package "Player Related" #E8F5E9 {
+    class PlayerHealth {
+        + GameOverCanvas : CanvasGroup
+        + ChangeHealth(amount : int) : void
+    }
+
+    class ShiftEquipment {
+        + combat : PlayerCombat
+        + bow : PlayerBow
+        - shiftCooldown : float = 0.3f
+    }
+
+    class Arrow {
+        + direction : Vector2 = right
+        + enemyLayer : LayerMask
+        + obstacleLayer : LayerMask
+        + buriedSprite : Sprite
+        + speed : float = 2
+        + damage : int = 1
+        + knockBackForce : float = 2
+        - OnCollisionEnter2D(collision : Collision2D) : void
+        - AttachToTarget(target : Transform) : void
+    }
+}
+
+PlayerMovement --> PlayerState : playerState
+PlayerMovement o-- PlayerCombat
+PlayerMovement o-- PlayerBow
+PlayerMovement --> StatsManager : uses
+PlayerCombat --> StatsManager : uses
+PlayerBow --> StatsManager : uses
+PlayerBow --> Arrow : creates
+ShiftEquipment o-- PlayerCombat
+ShiftEquipment o-- PlayerBow
+ShiftEquipment --> PlayerMovement : uses
+PlayerHealth --> StatsManager : uses
+Arrow --> StatsManager : uses
+
+@enduml
