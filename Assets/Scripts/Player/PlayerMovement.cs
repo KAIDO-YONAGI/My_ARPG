@@ -4,10 +4,11 @@ using MyEnums;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Rigidbody2D rb;//刚体对象，在unity中拖动绑定
-    public Animator animator;//动画状态机对象，同上
+    public Rigidbody2D rb;
+    public Animator animator;
     public PlayerCombat playerCombat;
     public PlayerBow playerBow;
+    public Joystick joystick;
 
     private int facingDirection = 1;//默认朝向为右
     private bool canBeInterrupted = true;//是否可以被打断，攻击和射击动画期间不可被打断
@@ -124,6 +125,8 @@ public class PlayerMovement : MonoBehaviour
     }
     private bool IsToRunning()
     {
+        if (joystick != null && (Mathf.Abs(joystick.Horizontal) > 0.1f || Mathf.Abs(joystick.Vertical) > 0.1f))
+            return true;
         return Mathf.Abs(Input.GetAxis("Horizontal")) > 0 || Mathf.Abs(Input.GetAxis("Vertical")) > 0;
     }
 
@@ -150,9 +153,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleRunningState()
     {
-        //获取输入值，正负代表方向
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        float horizontal, vertical;
+        if (joystick != null && (Mathf.Abs(joystick.Horizontal) > 0.1f || Mathf.Abs(joystick.Vertical) > 0.1f))
+        {
+            horizontal = joystick.Horizontal;
+            vertical = joystick.Vertical;
+        }
+        else
+        {
+            horizontal = Input.GetAxis("Horizontal");
+            vertical = Input.GetAxis("Vertical");
+        }
 
         //判断（仅）水平输入值和当前角色朝向的符号是否一致，否（意味着玩家将要转向）则调用翻转
         if (horizontal * transform.localScale.x < 0)
