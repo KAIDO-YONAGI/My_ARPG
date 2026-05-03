@@ -1,0 +1,130 @@
+@startuml Enemy_NPC_System
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam padding 2
+skinparam wrapWidth 120
+
+title Enemy & NPC System
+
+enum EnemyState {
+    Idle
+    Chasing
+    Attacking
+    KnockBack
+}
+
+enum NPCState {
+    Idle
+    Wander
+    Patrol
+    Chat
+}
+
+package "Enemy" #FFEBEE {
+    class EnemyMovement {
+        - rb : Rigidbody2D
+        - player : Transform
+        - enemyState : EnemyState
+        + speed : int = 5
+        + attackDetectRange : float = 2
+        + attackCoolDown : float = 1
+        + playerDetectRange : float = 5
+        + aStarController : MovementController
+        + AnimatorSM(newState : EnemyState) : void
+        - CheckForPlayer() : void
+        - Chase() : void
+        - SetVelocity(direction : Vector2, speed : float) : void
+        - Flip() : void
+    }
+
+    together {
+        class EnemyHealth {
+            + currentHealth : int
+            + maxHealth : int
+            + expReward : int = 2
+            + {static} OnDefeated : MonsterDefeated
+            + ChangeHealth(amount : int) : void
+        }
+
+        class EnemyKnockBack {
+            - rb : Rigidbody2D
+            - enemyMovement : EnemyMovement
+            + Knockback(forceTransform : Transform, knockBackForce : float, stunTime : float, knockBackTime : float) : void
+        }
+
+        class EnemyCombat {
+            + damage : int = 1
+            + attackPoint : Transform
+            + weaponRange : float
+            + konckBackForce : float = 5
+            + stunTime : float = 0.3f
+            + Attack() : void
+        }
+    }
+}
+
+package "NPC" #E3F2FD {
+    class NPCStateController {
+        + wanderScript : NPCWander
+        + chatScript : NPCChat
+        + patrolScript : NPCPatrol
+        + DefaultState : NPCState = Patrol
+        - currentState : NPCState
+        + SwitchState(newState : NPCState) : void
+    }
+
+    together {
+        class NPCPatrol {
+            + patrolSize : Vector2
+            + clockwise : bool = true
+            + speed : float = 2f
+            + aStarController : MovementController
+            - cornerPositions : Vector3[]
+            - currentCornerIndex : int = 0
+            - CalculateCornerPositions() : void
+            - GetNearestCornerIndex() : int
+            - Flip() : void
+            - WaitAndMoveToNextCorner() : IEnumerator
+        }
+
+        class NPCWander {
+            + speed : float = 2f
+            + patrolRadius : int = 5
+            + aStarController : MovementController
+            - circleCenter : Vector3
+            - Flip() : void
+            - WaitAndContinue() : IEnumerator
+            - randomDirection() : Vector3
+        }
+
+        class NPCChat {
+            + chatAnimator : Animator
+            + dialogSO : DialogSO
+            + toggleDialogEvent : ToggleCanvasEventSO
+            + OnToggleDialogEvent(state : bool) : void
+        }
+    }
+}
+
+EnemyMovement --> EnemyState : enemyState
+EnemyMovement --> MovementController : aStarController
+EnemyKnockBack --> EnemyMovement : uses
+EnemyCombat --> PlayerHealth : uses
+EnemyCombat --> PlayerMovement : uses
+NPCStateController --> NPCState : currentState
+NPCStateController o-- NPCWander
+NPCStateController o-- NPCChat
+NPCStateController o-- NPCPatrol
+NPCPatrol --> MovementController : aStarController
+NPCWander --> MovementController : aStarController
+NPCChat --> DialogSO : dialogSO
+NPCChat --> ToggleCanvasEventSO : toggleDialogEvent
+NPCChat --> DialogManager : uses
+
+@enduml
