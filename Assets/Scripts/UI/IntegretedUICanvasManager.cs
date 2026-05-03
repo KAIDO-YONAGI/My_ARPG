@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class IntegretedUICanvasManager : MonoBehaviour
 {
     public static IntegretedUICanvasManager instance;
-    [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;
+    [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
     [SerializeField] private CanvasGroup UICanvasPanel;
     [SerializeField] private List<Button> integretedButtons;
     [SerializeField] private Button toggleMenuButton;
@@ -37,16 +37,22 @@ public class IntegretedUICanvasManager : MonoBehaviour
 
         pageNumText.text = "1";
 
-        InitiateButtons();
     }
     private void OnEnable()
     {
+        InitiateButtons();
+
         toggleIntegretedCanvasEventSO.toggleCanvasEvent += OnToggleIntegretedCnavas;
+        //此处事件在UIManager里仅索引到editor里，没有在代码层编写
+        //特别地，将开闭功能都放在当前这个脚本里
+        //最终效果就是UIManger里可以依靠alpha值检测来实现互斥关闭集成面板，而这个脚本直接实现开关
     }
     private void OnDisable()
     {
         toggleIntegretedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegretedCnavas;
-
+        toggleMenuButton.onClick.RemoveAllListeners();
+        nextPageButton.onClick.RemoveAllListeners();
+        prevPageButton.onClick.RemoveAllListeners();
     }
     private void OnToggleIntegretedCnavas(bool state)
     {
@@ -115,7 +121,7 @@ public class IntegretedUICanvasManager : MonoBehaviour
     }
     private void InitiatePage(int startNum, int canvasNum)
     {
-        pageNumText.text = ((startNum / 4) + 1).ToString();
+        pageNumText.text = ((startNum / buttonsEachPage) + 1).ToString();
         foreach (var button in integretedButtons)
         {
             button.gameObject.SetActive(false);
