@@ -86,17 +86,18 @@ package "Data SO" #E8F5E9 {
 package "Dialog & Quest SO" #E3F2FD {
     together {
         class DialogSO <<ScriptableObject>> {
-            + chatType : ChatType
-            + canOnlyBeTriggeredOnce : bool
             + mainCharacter : CharacterSO
             + dialogLines : DialogLine[]
             + nextDialogOptions : DialogOption[]
+            + refuseDialogs : List<RefuseDialogSO>
+            + onlyTriggeredOnce : bool
             + parentDialog : DialogSO
+        }
+
+        class RefuseDialogSO <<ScriptableObject>> {
+            + isDefaultChat : bool
             + requireCharacters : List<CharacterSO>
             + requireItems : List<Item>
-            + refusingDialogs : List<DialogSO>
-            - hasChated : bool = false
-            + SetHasChated(state : bool) : void
         }
 
         class QuestSO <<ScriptableObject>> {
@@ -146,64 +147,63 @@ package "Dialog & Quest SO" #E3F2FD {
 }
 
 package "Event SO" #FFF3E0 {
-    together {
-        class VoidEventSO <<ScriptableObject>> {
-            + VoidEvent : UnityAction
-            + OnEventRaised() : void
+    package "Send" #FFE0B2 {
+        together {
+            class VoidEventSO <<ScriptableObject>> {
+                + VoidEvent : UnityAction
+                + OnEventRaised() : void
+            }
+
+            class SceneLoadEventSO <<ScriptableObject>> {
+                + LoadRequestEvent : UnityAction<GameSceneSO, Vector3, bool>
+                + RaiseLoadRequestEvent(scene : GameSceneSO, position : Vector3, isToFade : bool) : void
+            }
+
+            class LootEventSO <<ScriptableObject>> {
+                + LootEvent : UnityAction<ItemSO, int, Loot>
+                + OnEventRaised(item : ItemSO, quantity : int, loot : Loot) : void
+            }
+
+            class InventorySlotsStatsSO <<ScriptableObject>> {
+                + InventoryUpdateRequestEvent : UnityAction<ItemSO, int, int>
+                + RaiseInventoryUpdateRequest(item : ItemSO, price : int, amount : int) : void
+            }
+
+            class ToggleCanvasEventSO <<ScriptableObject>> {
+                + toggleCanvasEvent : UnityAction<bool>
+                + canvasToToggle : CanvasToToggle
+                + RaiseToggleCanvasEvent(state : bool) : void
+            }
         }
 
-        class SceneLoadEventSO <<ScriptableObject>> {
-            + LoadRequestEvent : UnityAction<GameSceneSO, Vector3, bool>
-            + RaiseLoadRequestEvent(scene : GameSceneSO, position : Vector3, isToFade : bool) : void
-        }
+        together {
+            class ShopLoadEventSO <<ScriptableObject>> {
+                + ShopLoadEvent : UnityAction<List<ShopItems>, List<ShopItems>, List<ShopItems>, Transform>
+                + RaiseShopLoadRequest(shopItems : List, shopWeapon : List, shopArmor : List, portraitTarget : Transform) : void
+            }
 
-        class LootEventSO <<ScriptableObject>> {
-            + LootEvent : UnityAction<ItemSO, int, Loot>
-            + OnEventRaised(item : ItemSO, quantity : int, loot : Loot) : void
-        }
+            class QuestOptionsEventSO <<ScriptableObject>> {
+                + questOptionsEvent : UnityAction<QuestState>
+                + OnQuestOptionsEventRaised(questState : QuestState) : void
+            }
 
-        class InventorySlotsStatsSO <<ScriptableObject>> {
-            + InventoryUpdateRequestEvent : UnityAction<ItemSO, int, int>
-            + InventoryRespondEvent : UnityAction<bool[]>
-            + RaiseInventoryUpdateRequest(item : ItemSO, price : int, amount : int) : void
-        }
-
-        class ToggleCanvasEventSO <<ScriptableObject>> {
-            + toggleCanvasEvent : UnityAction<bool>
-            + canvasToToggle : CanvasToToggle
-            + RaiseToggleCanvasEvent(state : bool) : void
-        }
-    }
-
-    together {
-        class ShopLoadEventSO <<ScriptableObject>> {
-            + ShopLoadEvent : UnityAction<List<ShopItems>, List<ShopItems>, List<ShopItems>, Transform>
-            + RaiseShopLoadRequest(shopItems : List, shopWeapon : List, shopArmor : List, portraitTarget : Transform) : void
-        }
-
-        class QuestOptionsEventSO <<ScriptableObject>> {
-            + questOptionsEvent : UnityAction<QuestState>
-            + OnQuestOptionsEventRaised(questState : QuestState) : void
-        }
-
-        class LoadQuestEventSO <<ScriptableObject>> {
-            + LoadQuestEvent : UnityAction<List<QuestSO>>
-            + OnLoadQuestEventRaised(quests : List<QuestSO>) : void
-        }
-
-        class VoidBidirecChannelSO <<ScriptableObject>> {
-            + OnEventRaised : VoidBidirecEvent
-            + RaiseEvent() : void
+            class LoadQuestEventSO <<ScriptableObject>> {
+                + LoadQuestEvent : UnityAction<List<QuestSO>>
+                + OnLoadQuestEventRaised(quests : List<QuestSO>) : void
+            }
         }
     }
 }
 
 CharacterSO --|> GuidSO
+RefuseDialogSO --|> DialogSO
 DialogSO *-- DialogLine : dialogLines
 DialogSO *-- DialogOption : nextDialogOptions
 DialogSO --> CharacterSO : mainCharacter
-DialogSO --> Item : requireItems
-DialogSO --> DialogSO : parentDialog/refusingDialogs
+DialogSO --> RefuseDialogSO : refuseDialogs
+DialogSO --> DialogSO : parentDialog
+RefuseDialogSO --> CharacterSO : requireCharacters
+RefuseDialogSO --> Item : requireItems
 DialogOption --> DialogSO : nextDialogNode
 DialogLine --> CharacterSO : speaker
 Item --> ItemSO : itemSO

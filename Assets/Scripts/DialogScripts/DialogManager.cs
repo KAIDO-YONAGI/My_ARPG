@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -155,22 +154,19 @@ public class DialogManager : MonoBehaviour
 
     private bool MeetsRefuseConditions(RefuseDialogSO refuse)
     {
-        if (refuse.requireCharacters != null && refuse.requireCharacters.Count > 0)
+        if (refuse.requireCharacters != null && refuse.requireCharacters.Count > 0)//检测角色对话
         {
-            HashSet<CharacterSO> charactersHasChated = ConversationHistoryManager.instance != null
-                ? ConversationHistoryManager.instance.CharactersHasChated
-                : new HashSet<CharacterSO>();
-
             foreach (var character in refuse.requireCharacters)
             {
-                if (!charactersHasChated.Contains(character))
+                if (ConversationHistoryManager.instance == null ||
+                    !ConversationHistoryManager.instance.HasChatedWith(character))
                 {
                     return false;
                 }
             }
         }
 
-        if (refuse.requireItems != null && refuse.requireItems.Count > 0)
+        if (refuse.requireItems != null && refuse.requireItems.Count > 0)//检测物品捡到没有
         {
             foreach (var item in refuse.requireItems)
             {
@@ -181,6 +177,7 @@ public class DialogManager : MonoBehaviour
                 }
             }
         }
+        //TODO 添加检测位置有没有去过的逻辑
 
         return true;
     }

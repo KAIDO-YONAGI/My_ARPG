@@ -14,7 +14,6 @@ public class ItemHistoryManager : MonoBehaviour
     }
 
     private Dictionary<ItemSO, int> itemHasPicked = new();
-    public Dictionary<ItemSO, int> ItemHasPicked => itemHasPicked;
 
     public void RecordItem(ItemSO item, int quantity)
     {
