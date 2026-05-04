@@ -5,22 +5,18 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DialogSO", menuName = "Dialog/DialogNode", order = 1)]
 public class DialogSO : ScriptableObject
 {
-    [SerializeField] public MyEnums.ChatType chatType;
-    public bool canOnlyBeTriggeredOnce;
     public CharacterSO mainCharacter;
     public DialogLine[] dialogLines;
     public DialogOption[] nextDialogOptions;
 
-    [Header("Conditional Requirements")]
-    public DialogSO parentDialog;
-    public List<CharacterSO> requireCharacters;
-    public List<Item> requireItems;
+    [Header("Refuse Requirements For Main")]
 
-    public List<DialogSO> refusingDialogs;
+    public List<RefuseDialogSO> refuseDialogs;
 
-    private bool hasChated=false;
-    public bool HasChated=>hasChated;
-    public void SetHasChated(bool state){hasChated=state;}
+    [Header("Conditional Requirements For Sub")]
+    public bool onlyTriggeredOnce;//用于在子对话设置该分支只能进入一次
+    public DialogSO parentDialog;//在子对话（option）设置，用于标记已完成的对话，会阻止进入主分支
+
 }
 [System.Serializable]
 public class DialogLine

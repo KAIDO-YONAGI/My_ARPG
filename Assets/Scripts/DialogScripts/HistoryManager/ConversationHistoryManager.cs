@@ -15,6 +15,8 @@ public class ConversationHistoryManager : MonoBehaviour
     private HashSet<CharacterSO> charactersHasChated = new();
     public HashSet<CharacterSO> CharactersHasChated => charactersHasChated;
 
+    private HashSet<int> dialogsHasChated = new();
+
     public void RecordCharacter(CharacterSO character)
     {
         charactersHasChated.Add(character);
@@ -22,5 +24,14 @@ public class ConversationHistoryManager : MonoBehaviour
     public bool HasChatedWith(CharacterSO character)
     {
         return charactersHasChated.Contains(character);
+    }
+
+    public void RecordDialogHasChated(DialogSO dialog)
+    {
+        dialogsHasChated.Add(dialog.GetInstanceID());
+    }
+    public bool HasDialogChated(DialogSO dialog)
+    {
+        return dialogsHasChated.Contains(dialog.GetInstanceID());
     }
 }
