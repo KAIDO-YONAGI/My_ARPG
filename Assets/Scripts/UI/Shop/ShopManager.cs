@@ -50,7 +50,6 @@ public class ShopManager : MonoBehaviour
     {
         if (!state)
         {
-            TimeManager.instance.ResumeGame();
             shopCanvasGroup.alpha = 0;
             shopCanvasGroup.interactable = false;
             shopCanvasGroup.blocksRaycasts = false;
