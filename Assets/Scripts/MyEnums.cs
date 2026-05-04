@@ -40,16 +40,7 @@ namespace MyEnums
         Patrol,
         Chat
     }
-    public enum ChatType
-    {
-        DefaultChat,
-        NormalChat,
-        Option,
-        RefuseChatByCharacter,
-        RefuseChatByItem,
-        RefuseChatByVisited
 
-    }
     public enum QuestState
     {
         Idle,

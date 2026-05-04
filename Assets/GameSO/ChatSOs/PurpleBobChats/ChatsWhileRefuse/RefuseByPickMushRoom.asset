@@ -9,17 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3702dda32becabe4b903f0c35e67d66e, type: 3}
+  m_Script: {fileID: 11500000, guid: 4263192a13dbe7a45abfd053b0f86cf8, type: 3}
   m_Name: RefuseByPickMushRoom
   m_EditorClassIdentifier: 
-  chatType: 4
-  canOnlyBeTriggeredOnce: 0
   mainCharacter: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
   dialogLines:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
-    text: Can you help me pick some mushroom? (10)
+    text: Can you help me pick some mushroom(5) and buy meat(3)?
   nextDialogOptions: []
-  parentDialog: {fileID: 0}
-  requireCharacters: []
-  requireItems: []
   refuseDialogs: []
+  onlyTriggeredOnce: 0
+  parentDialog: {fileID: 0}
+  isDefaultChat: 0
+  requireCharacters: []
+  requireItems:
+  - itemSO: {fileID: 11400000, guid: 7ced96647c1940841813bdce5b4f0076, type: 2}
+    quantity: 5
+  - itemSO: {fileID: 11400000, guid: c905cf70e8dcc7b448c30320d5875878, type: 2}
+    quantity: 3

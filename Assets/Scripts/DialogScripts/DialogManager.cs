@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -110,9 +108,10 @@ public class DialogManager : MonoBehaviour
                 ConversationHistoryManager.instance.RecordCharacter(currentDialog.mainCharacter);
             }
 
-            if (currentDialog.canOnlyBeTriggeredOnce)
+            if (currentDialog.onlyTriggeredOnce &&
+                currentDialog.parentDialog != null)
             {
-                currentDialog.parentDialog.SetHasChated(true);
+                ConversationHistoryManager.instance.RecordDialogHasChated(currentDialog.parentDialog);
             }
         }
 
@@ -130,45 +129,23 @@ public class DialogManager : MonoBehaviour
 
     private bool MatchConditionsToStartDialog(DialogSO dialog)
     {
-        HashSet<CharacterSO> needToTalk = new(dialog.requireCharacters);
-        HashSet<CharacterSO> charactersHasChated = ConversationHistoryManager.instance != null
-            ? ConversationHistoryManager.instance.CharactersHasChated
-            : new HashSet<CharacterSO>();
+        foreach (var refuse in dialog.refuseDialogs)
+        {
+            bool shouldRefuse;
 
-        {//角色对话拒绝策略
-            needToTalk.ExceptWith(charactersHasChated);
-
-            if (needToTalk.Count > 0)
+            if (refuse.isDefaultChat)
             {
-                StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByCharacter);
-                return false;
+                shouldRefuse = ConversationHistoryManager.instance != null &&
+                               ConversationHistoryManager.instance.HasDialogChated(dialog);
             }
-        }
-
-        {//物品对话拒绝策略
-            Dictionary<ItemSO, int> needToPick = dialog.requireItems
-                    .ToDictionary(i => i.itemSO, i => i.quantity);
-
-            foreach (var item in needToPick)
+            else
             {
-                ItemSO itemSO = item.Key;
-                int amount = item.Value;
-
-                if (ItemHistoryManager.instance == null ||
-                    !ItemHistoryManager.instance.HasPickedOverAmount(itemSO, amount))
-                {
-                    StartRefuseDialog(dialog, MyEnums.ChatType.RefuseChatByItem);
-                    return false;
-                }
+                shouldRefuse = !MeetsRefuseConditions(refuse);
             }
-        }
 
-        {//主分支结束后默认对话
-         //TODO HasChated需要改为非SO存储
-
-            if (dialog.HasChated)
+            if (shouldRefuse)
             {
-                StartRefuseDialog(dialog, MyEnums.ChatType.DefaultChat);
+                StartRefuseDialog(refuse);
                 return false;
             }
         }
@@ -176,22 +153,45 @@ public class DialogManager : MonoBehaviour
         return true;
     }
 
-    private void StartRefuseDialog(DialogSO dialog, MyEnums.ChatType chatTypeToStart)
+    private bool MeetsRefuseConditions(RefuseDialogSO refuse)
     {
-        foreach (var characterRefuseDialog in dialog.refusingDialogs)
+        if (refuse.requireCharacters != null && refuse.requireCharacters.Count > 0)
         {
-            if (characterRefuseDialog.chatType != chatTypeToStart)
-            {
-                continue;
-            }
+            HashSet<CharacterSO> charactersHasChated = ConversationHistoryManager.instance != null
+                ? ConversationHistoryManager.instance.CharactersHasChated
+                : new HashSet<CharacterSO>();
 
-            SetDialogCanvas(true);
-            DisableButtons();
-            currentDialog = characterRefuseDialog;
-            currentLineIndex = 0;
-            ShowDialog();
-            break;
+            foreach (var character in refuse.requireCharacters)
+            {
+                if (!charactersHasChated.Contains(character))
+                {
+                    return false;
+                }
+            }
         }
+
+        if (refuse.requireItems != null && refuse.requireItems.Count > 0)
+        {
+            foreach (var item in refuse.requireItems)
+            {
+                if (ItemHistoryManager.instance == null ||
+                    !ItemHistoryManager.instance.HasPickedOverAmount(item.itemSO, item.quantity))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private void StartRefuseDialog(RefuseDialogSO refuse)
+    {
+        SetDialogCanvas(true);
+        DisableButtons();
+        currentDialog = refuse;
+        currentLineIndex = 0;
+        ShowDialog();
     }
 
     private void ShowChoices()

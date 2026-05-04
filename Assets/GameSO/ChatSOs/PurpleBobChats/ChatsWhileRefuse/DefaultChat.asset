@@ -9,15 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3702dda32becabe4b903f0c35e67d66e, type: 3}
-  m_Name: AgreeToGiveMushroom
+  m_Script: {fileID: 11500000, guid: 4263192a13dbe7a45abfd053b0f86cf8, type: 3}
+  m_Name: DefaultChat
   m_EditorClassIdentifier: 
   mainCharacter: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
   dialogLines:
   - speaker: {fileID: 11400000, guid: f05890e8cc1e8e145adeafa4f5052be4, type: 2}
-    text: Thanks! In return for your help, I will give you some pot a few days later.
-      Just be patient!
+    text: Hello!
   nextDialogOptions: []
   refuseDialogs: []
-  onlyTriggeredOnce: 1
-  parentDialog: {fileID: 11400000, guid: b2eb4ff5f23f2c6499119960fc3cdf6f, type: 2}
+  onlyTriggeredOnce: 0
+  parentDialog: {fileID: 0}
+  isDefaultChat: 1
+  requireCharacters: []
+  requireItems: []
