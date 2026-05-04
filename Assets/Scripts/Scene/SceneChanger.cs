@@ -105,9 +105,12 @@ public class SceneChanger : MonoBehaviour
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
         ForbidInput();
-        StatsManager.instance.ResetHealth();//回血
         TimeManager.instance.PauseGame();
         sceneToLoad = scene;
+
+        StatsManager.instance.Respwan();//回血
+
+
         this.newPosition = newPosition == Vector3.zero ? sceneToLoad.initialPosition : newPosition;
         //如果传入位置为零向量，则使用场景预设的初始位置
         this.isToFade = isToFade;

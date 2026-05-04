@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System;
 public class StatsManager : MonoBehaviour
 {
     public static StatsManager instance;//单例模式
@@ -33,9 +34,15 @@ public class StatsManager : MonoBehaviour
     public void SetKnockBackTime(float value) { knockBackTime = value; }
     public void SetStunTime(float value) { stunTime = value; }
     public void SetCoolDown(float value) { coolDown = value; }
-    public void ResetHealth()
+    public void SetHealth(int health)
     {
-        currentHealth = maxHealth;
+        currentHealth = Math.Min(health, maxHealth);
+        UpdateHealthText();
+    }
+    public void Respwan()
+    {
+        if (currentHealth <= 0)
+            currentHealth = maxHealth;
         UpdateHealthText();
     }
     private void Awake()//每次唤醒就检测单例，如果已有有就删除

@@ -30,7 +30,6 @@ public class StatsUI : MonoBehaviour
         }
         else
         {
-            TimeManager.instance.ResumeGame();
             statsCanvas.alpha = 0;
             statsCanvas.interactable = false;
             statsCanvas.blocksRaycasts = false;

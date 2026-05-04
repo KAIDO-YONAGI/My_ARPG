@@ -43,10 +43,10 @@ package "Managers" #FFF3E0 {
     class TimeManager <<singleton>> {
         - {static} instance : TimeManager
         - isGamePaused : bool
-        - numberOfPauses : int = 0
+        - pauseCount : int = 0
         + PauseGame() : void
         + ResumeGame() : void
-        + ForceResumeGame() : void
+        + ResumeGame() : void
     }
 }
 

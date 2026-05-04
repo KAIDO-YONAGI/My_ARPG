@@ -11,10 +11,6 @@ public class MovementController : MonoBehaviour
     private float pathRebuildCooldown = .5f;
     private float pathRebuildTimer;
     private bool showPath = true;
-    private Color pathColor = Color.yellow;
-    private Color startColor = Color.green;
-    private Color endColor = Color.red;
-    private float nodeRadius = 0.2f;
     private Vector3 startPos;
     private Vector3 endPos;
     private bool hasValidPath = false;
@@ -142,6 +138,10 @@ public class MovementController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Color pathColor = Color.yellow;
+        Color startColor = Color.green;
+        Color endColor = Color.red;
+        float nodeRadius = 0.2f;
         if (!showPath || path == null || path.Count == 0) return;
 
         PathFinderDetails[] pathArray = path.ToArray();
