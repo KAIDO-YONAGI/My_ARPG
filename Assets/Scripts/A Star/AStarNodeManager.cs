@@ -4,10 +4,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 [DefaultExecutionOrder(-101)]
 
-/// <summary>
-/// AStar 节点管理器，负责地图初始化和节点数据管理
-/// </summary>
-/// 
 public class AStarNodeManager : MonoBehaviour
 {
     public static AStarNodeManager instance;
@@ -25,39 +21,35 @@ public class AStarNodeManager : MonoBehaviour
     [Header("Tilemaps")]
     public Tilemap[] tilemaps;
     [Header("Grid Settings")]
-    public LayerMask obstacleLayers; // 需要识别为障碍物的层
+    public LayerMask obstacleLayers;
 
     private float cellSize = 1f;
-    private float safetyMargin = 0.3f; // 路径与障碍物的安全距离
-    private Dictionary<Vector3, AStarNode> nodeCellMap;
+    private float safetyMargin = 0.3f;
+    private Dictionary<(int x, int y), AStarNode> nodeCellMap;
 
-    public Dictionary<Vector3, AStarNode> GetNodeMap() => nodeCellMap;
+    public Dictionary<(int x, int y), AStarNode> GetNodeMap() => nodeCellMap;
     public float GetCellSize() => cellSize;
 
-    public Vector3 WorldToCell(Vector3 worldPos)
+    public (int x, int y) WorldToCell(Vector3 worldPos)
     {
         int x = Mathf.FloorToInt(worldPos.x / cellSize);
         int y = Mathf.FloorToInt(worldPos.y / cellSize);
-        return new Vector3(x, y);
+        return (x, y);
     }
 
-    public Vector3 CellToWorld(Vector3 cellPos)
+    public Vector3 CellToWorld(int cx, int cy)
     {
         Vector3 basePos = new Vector3(
-            cellPos.x * cellSize + cellSize * 0.5f,
-            cellPos.y * cellSize + cellSize * 0.5f,
+            cx * cellSize + cellSize * 0.5f,
+            cy * cellSize + cellSize * 0.5f,
             0
         );
-
-        // 应用安全边距
-        return ApplySafetyMargin(cellPos, basePos);
+        return ApplySafetyMargin(cx, cy, basePos);
     }
 
-    private Vector3 ApplySafetyMargin(Vector3 cellPos, Vector3 worldPos)//为了让路径与障碍物保持一定距离，避免贴边行走导致的卡顿或碰撞问题，添加了安全边距的计算
+    private Vector3 ApplySafetyMargin(int cx, int cy, Vector3 worldPos)
     {
         if (safetyMargin <= 0) return worldPos;
-
-        // 检查是否有障碍物
 
         int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
         int[] dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
@@ -65,8 +57,8 @@ public class AStarNodeManager : MonoBehaviour
 
         for (int i = 0; i < 8; i++)
         {
-            Vector3 neighborPos = new Vector3(cellPos.x + dx[i], cellPos.y + dy[i]);
-            if (nodeCellMap.TryGetValue(neighborPos, out AStarNode neighbor))
+            var neighborKey = (cx + dx[i], cy + dy[i]);
+            if (nodeCellMap.TryGetValue(neighborKey, out AStarNode neighbor))
             {
                 if (neighbor.GetNodeType() == AStarNodeType.Obstacle)
                 {
@@ -79,14 +71,15 @@ public class AStarNodeManager : MonoBehaviour
             }
         }
         Vector3 optNode = new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
-        if (nodeCellMap[WorldToCell(optNode)].GetNodeType() != AStarNodeType.Obstacle)
+        var optCell = WorldToCell(optNode);
+        if (nodeCellMap[optCell].GetNodeType() != AStarNodeType.Obstacle)
             return optNode;
         else return worldPos;
     }
 
     private void InitMapInfo()
     {
-        nodeCellMap = new Dictionary<Vector3, AStarNode>();
+        nodeCellMap = new Dictionary<(int x, int y), AStarNode>();
     }
 
     private void InitiateNodes()
@@ -116,7 +109,6 @@ public class AStarNodeManager : MonoBehaviour
             }
         }
 
-        // 处理带有Collider的障碍物
         ProcessColliderObstacles();
     }
 
@@ -127,12 +119,11 @@ public class AStarNodeManager : MonoBehaviour
 
         foreach (Collider2D col in colliders)
         {
-            // 检查层是否在障碍层中
             if ((obstacleLayers.value & (1 << col.gameObject.layer)) == 0) continue;
 
             Vector3 worldPos = col.transform.position;
-            Vector3 cellPos = WorldToCell(worldPos);
-            Vector3 key = new Vector3(cellPos.x, cellPos.y);
+            var (cx, cy) = WorldToCell(worldPos);
+            var key = (cx, cy);
 
             if (nodeCellMap.TryGetValue(key, out AStarNode node))
             {
@@ -140,32 +131,29 @@ public class AStarNodeManager : MonoBehaviour
             }
             else
             {
-                nodeCellMap[key] = new AStarNode(cellPos, AStarNodeType.Obstacle);
+                nodeCellMap[key] = new AStarNode(cx, cy, AStarNodeType.Obstacle);
             }
             obstacleCount++;
         }
-
-        // Debug.Log($"A* 寻路地图已录入 {obstacleCount} 个Collider障碍物");
     }
 
-    private void ProcessTileWithSubdivision(string layerName, Vector3 cellPos, int subdivision)
+    private void ProcessTileWithSubdivision(string layerName, Vector3Int cellPos, int subdivision)
     {
-        float startX = cellPos.x * subdivision;
-        float startY = cellPos.y * subdivision;
+        int startX = cellPos.x * subdivision;
+        int startY = cellPos.y * subdivision;
 
         for (int i = 0; i < subdivision; i++)
         {
             for (int j = 0; j < subdivision; j++)
             {
-                Vector3 subCellPos = new(startX + i, startY + j);
-                ProcessTile(layerName, subCellPos);
+                ProcessTile(layerName, startX + i, startY + j);
             }
         }
     }
 
-    private void ProcessTile(string layerName, Vector3 cellPos)
+    private void ProcessTile(string layerName, int cx, int cy)
     {
-        Vector3 key = new Vector3(cellPos.x, cellPos.y);
+        var key = (cx, cy);
 
         switch (layerName)
         {
@@ -176,7 +164,7 @@ public class AStarNodeManager : MonoBehaviour
                 }
                 else
                 {
-                    nodeCellMap[key] = new AStarNode(cellPos, AStarNodeType.Obstacle);
+                    nodeCellMap[key] = new AStarNode(cx, cy, AStarNodeType.Obstacle);
                 }
                 break;
 
@@ -187,7 +175,7 @@ public class AStarNodeManager : MonoBehaviour
                 }
                 else
                 {
-                    nodeCellMap[key] = new AStarNode(cellPos, AStarNodeType.Walkable);
+                    nodeCellMap[key] = new AStarNode(cx, cy, AStarNodeType.Walkable);
                 }
                 break;
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MyEnums;
 using UnityEngine;
 
-//可能的优化：小顶堆存开启列表，动态A*，距离算法的优化
+//TODO 可能的优化：小顶堆存开启列表，动态A*，距离算法的优化
 //关于网格和世界坐标的转化 由于转化关系，需要先导航到这个网格中心点才能开始导航
 //地图数据获取也可以优化，用以解决稀疏地图的遍历问题
 //可以用带权路径替换开根计算
@@ -22,72 +22,76 @@ public class AStarPathFinder : MonoBehaviour
             Destroy(gameObject);
     }
 
-    public Dictionary<Vector3, AStarNode> GetNodeMap() => AStarNodeManager.instance.GetNodeMap();
-    public Vector3 WorldToCell(Vector3 worldPos) => AStarNodeManager.instance.WorldToCell(worldPos);
-    public Vector3 CellToWorld(Vector3 cellPos) => AStarNodeManager.instance.CellToWorld(cellPos);
+    public Dictionary<(int x, int y), AStarNode> GetNodeMap() => AStarNodeManager.instance.GetNodeMap();
+    public (int x, int y) WorldToCell(Vector3 worldPos) => AStarNodeManager.instance.WorldToCell(worldPos);
+    public Vector3 CellToWorld(int cx, int cy) => AStarNodeManager.instance.CellToWorld(cx, cy);
     public float GetCellSize() => AStarNodeManager.instance.GetCellSize();
 
-    private Dictionary<Vector3, AStarNode> NodeCellMap => AStarNodeManager.instance.GetNodeMap();
+    private Dictionary<(int x, int y), AStarNode> NodeCellMap => AStarNodeManager.instance.GetNodeMap();
 
     public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         if (optPos == Vector3.zero) optPos = startPos;
-        Dictionary<Vector3, PathFinderDetails> openDic = new();
+        Dictionary<(int x, int y), PathFinderDetails> openDic = new();
 
-        Vector3 startCellPos = WorldToCell(startPos);
-        Vector3 endCellPos = WorldToCell(endPos);
-        Vector3 optCellPos = WorldToCell(optPos);
+        var startCell = WorldToCell(startPos);
+        var endCell = WorldToCell(endPos);
+        var optCell = WorldToCell(optPos);
 
 
-        if (startCellPos!= optCellPos
-            && NodeCellMap.ContainsKey(optCellPos)
-            && NodeCellMap[optCellPos].GetNodeType() == AStarNodeType.Walkable
-            && NoCoverObstacleNodes(startCellPos,optCellPos))
+        if (startCell != optCell
+            && NodeCellMap.ContainsKey(optCell)
+            && NodeCellMap[optCell].GetNodeType() == AStarNodeType.Walkable
+            && NoCoverObstacleNodes(startCell, optCell))
         {
-            startCellPos = optCellPos;
+            startCell = optCell;
         }
 
-        HashSet<Vector3> closeSet = new();
-        if ((!NodeCellMap.ContainsKey(startCellPos)) || (!NodeCellMap.ContainsKey(endCellPos)) || startCellPos == endCellPos)
+        HashSet<(int x, int y)> closeSet = new();
+        if ((!NodeCellMap.ContainsKey(startCell)) || (!NodeCellMap.ContainsKey(endCell)) || startCell == endCell)
         {
-            // Debug.Log($"[FindPath] 路径检查失败 - 起点存在:{NodeCellMap.ContainsKey(startCellPos)}, 终点存在:{NodeCellMap.ContainsKey(endCellPos)}, 相同:{startCellPos == endCellPos}");
             return null;
         }
-        PathFinderDetails startNode = MakePathFinderDetails(startCellPos, endCellPos, null);
-        openDic.Add(startCellPos, startNode);
+        PathFinderDetails startNode = new PathFinderDetails(startCell.x, startCell.y, endCell.x, endCell.y, null);
+        openDic.Add(startCell, startNode);
 
         while (openDic.Count > 0)
         {
-            Vector3 currentPos = SearchCheapestCost(openDic);
+            var currentPos = SearchCheapestCost(openDic);
             PathFinderDetails current = openDic[currentPos];
 
             openDic.Remove(currentPos);
             closeSet.Add(currentPos);
 
-            if (currentPos == endCellPos) return RetracePath(current);
+            if (currentPos == endCell) return RetracePath(current);
 
-            AddNodeToOpen(currentPos, endCellPos, openDic, closeSet, current);
+            AddNodeToOpen(currentPos, endCell, openDic, closeSet, current);
         }
 
         return null;
     }
-    private bool NoCoverObstacleNodes(Vector3 startCellPos, Vector3 optCellPos)
+    private bool NoCoverObstacleNodes((int x, int y) startCell, (int x, int y) optCell)
     {
-        // 计算两点之间的距离
-        float distance = Vector3.Distance(startCellPos, optCellPos);
+        float distance = Mathf.Sqrt(
+            (optCell.x - startCell.x) * (optCell.x - startCell.x) +
+            (optCell.y - startCell.y) * (optCell.y - startCell.y));
 
-        // 使用射线检测方式检查两点之间的路径
-        Vector3 direction = (optCellPos - startCellPos).normalized;
-        float step = 1*GetCellSize(); // 步长，根据需要调整
+        float dirX = optCell.x - startCell.x;
+        float dirY = optCell.y - startCell.y;
+        float len = Mathf.Sqrt(dirX * dirX + dirY * dirY);
+        if (len > 0) { dirX /= len; dirY /= len; }
+
+        float step = 1 * GetCellSize();
 
         for (float threshold = step; threshold < distance; threshold += step)
         {
-            Vector3 checkPos = startCellPos + direction * threshold;
-            Vector3 cellPos = new Vector3(Mathf.Round(checkPos.x), Mathf.Round(checkPos.y), Mathf.Round(checkPos.z));
+            int cx = (int)Math.Round(startCell.x + dirX * threshold);
+            int cy = (int)Math.Round(startCell.y + dirY * threshold);
 
-            if (NodeCellMap.ContainsKey(cellPos))
+            var key = (cx, cy);
+            if (NodeCellMap.TryGetValue(key, out AStarNode node))
             {
-                if (NodeCellMap[cellPos].GetNodeType() == AStarNodeType.Obstacle)
+                if (node.GetNodeType() == AStarNodeType.Obstacle)
                 {
                     return false;
                 }
@@ -100,7 +104,6 @@ public class AStarPathFinder : MonoBehaviour
     {
         Stack<PathFinderDetails> path = new Stack<PathFinderDetails>();
         PathFinderDetails current = endNode;
-        // PathFinderDetails lastNodeWorldNode;
 
         while (current != null)
         {
@@ -111,53 +114,55 @@ public class AStarPathFinder : MonoBehaviour
         return path;
     }
 
-    private Vector3 SearchCheapestCost(Dictionary<Vector3, PathFinderDetails> openDic)
+    private (int x, int y) SearchCheapestCost(Dictionary<(int x, int y), PathFinderDetails> openDic)
     {
         float minCost = float.MaxValue;
-        Vector3 minCostCellPos = new();
+        (int x, int y) minCostPos = default;
         foreach (var node in openDic)
         {
             float currentCost = node.Value.GetCost();
             if (minCost > currentCost)
             {
                 minCost = currentCost;
-                minCostCellPos = node.Key;
+                minCostPos = node.Key;
             }
         }
-        return minCostCellPos;
+        return minCostPos;
     }
 
     private void AddNodeToOpen(
-        Vector3 currentPos,
-        Vector3 endPos,
-        Dictionary<Vector3, PathFinderDetails> openDic,
-        HashSet<Vector3> closeSet,
+        (int x, int y) currentPos,
+        (int x, int y) endPos,
+        Dictionary<(int x, int y), PathFinderDetails> openDic,
+        HashSet<(int x, int y)> closeSet,
         PathFinderDetails current)
     {
-        float x = currentPos.x;
-        float y = currentPos.y;
+        int cx = currentPos.x;
+        int cy = currentPos.y;
 
         int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
         int[] dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
 
         for (int i = 0; i < 8; i++)
         {
-            Vector3 neighborPos = new Vector3(x + dx[i], y + dy[i]);
+            int nx = cx + dx[i];
+            int ny = cy + dy[i];
+            var neighborPos = (x: nx, y: ny);
 
-            if (closeSet.Contains(neighborPos)) continue;//已经在关闭列表中
-            if (!NodeCellMap.ContainsKey(neighborPos)) continue;//节点不在地图中
-            if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;//节点不可行走
-            if (NodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(x, y, dx[i], dy[i])) continue;//判断能不能走对角线
+            if (closeSet.Contains(neighborPos)) continue;
+            if (!NodeCellMap.ContainsKey(neighborPos)) continue;
+            if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
+            if (NodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(cx, cy, dx[i], dy[i])) continue;
 
-            PathFinderDetails newNode = MakePathFinderDetails(neighborPos, endPos, current);
+            PathFinderDetails newNode = new PathFinderDetails(nx, ny, endPos.x, endPos.y, current);
 
-            if (!openDic.ContainsKey(neighborPos))//不含临近节点
+            if (!openDic.ContainsKey(neighborPos))
             {
                 openDic.Add(neighborPos, newNode);
             }
             else
             {
-                if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())//如果新节点到起点的距离更短，更新父节点和距离
+                if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())
                 {
                     openDic[neighborPos] = newNode;
                 }
@@ -165,25 +170,19 @@ public class AStarPathFinder : MonoBehaviour
         }
     }
 
-    private bool CanWalkDiagonally(float x, float y, float dx, float dy)
+    private bool CanWalkDiagonally(int x, int y, int dx, int dy)
     {
         if (Math.Abs(dx * dy) == 1)
         {
-            Vector3 pos = new Vector3(x + dx, y + dy);
-            Vector3 xOffset = new Vector3(dx, 0);
-            Vector3 yOffset = new Vector3(0, dy);
+            var xOffset = (x + dx, y);
+            var yOffset = (x, y + dy);
 
-            if (!(NodeCellMap[pos - xOffset].GetNodeType() == AStarNodeType.Walkable) &&
-            !(NodeCellMap[pos - yOffset].GetNodeType() == AStarNodeType.Walkable))
+            if (NodeCellMap[xOffset].GetNodeType() != AStarNodeType.Walkable &&
+                NodeCellMap[yOffset].GetNodeType() != AStarNodeType.Walkable)
             {
                 return false;
             }
         }
         return true;
-    }
-
-    private PathFinderDetails MakePathFinderDetails(Vector3 nodePos, Vector3 endPos, PathFinderDetails fatherNode)
-    {
-        return new PathFinderDetails(nodePos, endPos, fatherNode);
     }
 }

@@ -3,11 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-//TODO 进阶：弄一个已完成任务面板
 public class QuestBoardManager : MonoBehaviour
 {
 
-    [SerializeField] private List<QuestSO> questsOnBoard;//TODO如果要区分任务实例，则需要深拷贝类包装
+    [SerializeField] private List<QuestSO> questsOnBoard;//如果要区分任务实例，则需要深拷贝类包装
 
     [Header("Events To Trigger")]
     public VoidEventSO openQuestEvent;
