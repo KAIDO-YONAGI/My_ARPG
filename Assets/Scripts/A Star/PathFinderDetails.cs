@@ -1,8 +1,7 @@
-using UnityEngine;
-
 public class PathFinderDetails
 {
-    private Vector3 nodePos;
+    private int x;
+    private int y;
     private float cost;
     private float disToBeg;
     private float disToEnd;
@@ -10,17 +9,15 @@ public class PathFinderDetails
 
     public float GetCost() => cost;
     public float GetDisToBeg() => disToBeg;
-    public float GetDisToEnd() => disToEnd;
-    public Vector3 GetNodePos() => nodePos;
+    public int GetX() => x;
+    public int GetY() => y;
 
     public PathFinderDetails GetFatherNode() => fatherNode;
-    public void SetFatherNode(PathFinderDetails fatherNode)
+
+    public PathFinderDetails(int x, int y, int endX, int endY, PathFinderDetails fatherNode)
     {
-        this.fatherNode = fatherNode;
-    }
-    public PathFinderDetails(Vector3 nodePos, Vector3 endPos, PathFinderDetails fatherNode)
-    {
-        this.nodePos = nodePos;
+        this.x = x;
+        this.y = y;
         this.fatherNode = fatherNode;
 
         if (fatherNode == null)
@@ -30,16 +27,18 @@ public class PathFinderDetails
         else
         {
             disToBeg = fatherNode.disToBeg +
-                CalDistance(nodePos, fatherNode.nodePos);
+                CalDistance(x, y, fatherNode.x, fatherNode.y);
         }
 
-        disToEnd = CalDistance(nodePos, endPos);
+        disToEnd = CalDistance(x, y, endX, endY);
         cost = disToBeg + disToEnd;
     }
 
-    private float CalDistance(Vector3 startPos, Vector3 endPos)
+    private float CalDistance(int ax, int ay, int bx, int by)
     {
-        float distance = Mathf.Abs(endPos.x - startPos.x) + Mathf.Abs(endPos.y - startPos.y);
-        return distance >= 2 ? 1.414f : 1;//曼哈顿距离。遇到大于二的就赋斜线值，精度更高
+        int distance = Abs(bx - ax) + Abs(by - ay);
+        return distance >= 2 ? 1.414f : 1;
     }
+
+    private static int Abs(int v) => v < 0 ? -v : v;
 }

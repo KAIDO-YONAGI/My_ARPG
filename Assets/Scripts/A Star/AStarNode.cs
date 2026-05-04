@@ -2,22 +2,19 @@ using UnityEngine;
 using MyEnums;
 public class AStarNode
 {
-    private float x;
-    private float y;
+    private int x;
+    private int y;
     private AStarNodeType nodeType;
-    Vector3 nodePos;
 
-    public AStarNode(Vector3 nodePos, AStarNodeType nodeType)
+    public AStarNode(int x, int y, AStarNodeType nodeType)
     {
-        x = nodePos.x;
-        y = nodePos.y;
-        this.nodePos = new Vector3(x, y, 0);
+        this.x = x;
+        this.y = y;
         this.nodeType = nodeType;
     }
 
-    public float GetX() => x;
-    public float GetY() => y;
-    public Vector3 GetNodePos() => nodePos;
+    public int GetX() => x;
+    public int GetY() => y;
     public AStarNodeType GetNodeType() => nodeType;
 
     public void SetNodeType(AStarNodeType newType)
@@ -30,12 +27,8 @@ public class AStarNode
 
     private bool CanOverride(AStarNodeType existing, AStarNodeType newType)
     {
-        // Obstacle 永远最高优先级
         if (newType == AStarNodeType.Obstacle) return true;
-
-        // 已经是 Obstacle，不能被覆盖
         if (existing == AStarNodeType.Obstacle) return false;
-
         return true;
     }
 }

@@ -87,7 +87,7 @@ public class InventoryManager : MonoBehaviour
             lootObj?.MarkAsDestroyed();
             return;
         }
-        if (item.isEXP)//TODO 经验的逻辑
+        if (item.isEXP)
         {
             ExpManager.instance.GainExp(quantity);
             return;
@@ -142,7 +142,6 @@ public class InventoryManager : MonoBehaviour
                     slot.itemSO = item;
                     slot.quantity = amount;
                     ItemHistoryManager.instance.RecordItem(item, amount);
-                    //TODO 这里能靠反复买卖刷获取次数，待修复，可以给购买物品加上绑定冷却？
 
                     slot.UpdateUI();
                     lootObj?.MarkAsDestroyed();
