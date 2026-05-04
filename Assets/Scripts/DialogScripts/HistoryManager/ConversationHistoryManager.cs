@@ -13,7 +13,6 @@ public class ConversationHistoryManager : MonoBehaviour
         else Destroy(gameObject);
     }
     private HashSet<CharacterSO> charactersHasChated = new();
-    public HashSet<CharacterSO> CharactersHasChated => charactersHasChated;
 
     private HashSet<int> dialogsHasChated = new();
 
