@@ -9,8 +9,9 @@ public class IntegratedUICanvasManager : MonoBehaviour
 {
     public static IntegratedUICanvasManager instance;
     [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
+    [SerializeField] private List<Button> integratedButtons;
     [SerializeField] private CanvasGroup UICanvasPanel;
-    [SerializeField] private List<Button> integretedButtons;
+
     [SerializeField] private Button toggleMenuButton;
     [SerializeField] private Button nextPageButton;
     [SerializeField] private Button prevPageButton;
@@ -19,7 +20,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
 
 
     private TMP_Text toggleMenuText;
-    private List<TMP_Text> integretedButtonTexts = new();
+    private List<TMP_Text> integratedButtonTexts = new();
     private int currentPageNum = 0;
     private int buttonsEachPage;//用来模拟初始化多页的Panel
     private bool isMenuOpen = false;
@@ -33,7 +34,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
 
         InitiateUICanvasPanel(false);
 
-        buttonsEachPage = integretedButtons.Count;
+        buttonsEachPage = integratedButtons.Count;
 
         pageNumText.text = "1";
 
@@ -74,7 +75,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
         toggleMenuText.text = "Open";
         for (int i = 0; i < buttonsEachPage; i++)
         {
-            integretedButtonTexts.Add(integretedButtons[i].GetComponentInChildren<TMP_Text>());
+            integratedButtonTexts.Add(integratedButtons[i].GetComponentInChildren<TMP_Text>());
         }
     }
 
@@ -122,7 +123,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
     private void InitiatePage(int startNum, int canvasNum)
     {
         pageNumText.text = ((startNum / buttonsEachPage) + 1).ToString();
-        foreach (var button in integretedButtons)
+        foreach (var button in integratedButtons)
         {
             button.gameObject.SetActive(false);
             button.onClick.RemoveAllListeners();
@@ -132,9 +133,9 @@ public class IntegratedUICanvasManager : MonoBehaviour
         {
             int pageButtonNum = i % buttonsEachPage;
             MyEnums.CanvasToToggle canvasToToggle = this.canvasToToggle[i];
-            Button button = integretedButtons[pageButtonNum];
+            Button button = integratedButtons[pageButtonNum];
 
-            integretedButtonTexts[pageButtonNum].text = canvasToToggle.ToString();
+            integratedButtonTexts[pageButtonNum].text = canvasToToggle.ToString();
 
             button.gameObject.SetActive(true);
             button.onClick.AddListener(() => OnIntegratedButtonClick(canvasToToggle));

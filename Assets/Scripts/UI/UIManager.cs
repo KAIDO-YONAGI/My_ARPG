@@ -16,8 +16,6 @@ public class UIManager : MonoBehaviour
     public List<ToggleCanvasEventSO> toggleCanvasEvents;//画布组对应的manager也会各自绑定他们的事件
 
     [SerializeField] private List<CanvasGroup> canvasToManage;
-    [SerializeField] private GameObject playerUI;
-
 
     private MyEnums.CanvasToToggle currentCanvasState
         = MyEnums.CanvasToToggle.Default;

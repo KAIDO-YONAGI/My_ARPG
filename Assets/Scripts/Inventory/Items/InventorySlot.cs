@@ -13,6 +13,9 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
     {
         inventoryManager = GetComponentInParent<InventoryManager>();
     }
+    private void OnEnable() {
+        UpdateUI();
+    }
     public void OnPointerClick(PointerEventData eventData)
     {
         if (quantity > 0)
