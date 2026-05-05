@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class InventoryManager : MonoBehaviour
 {
+    public static InventoryManager instance;
+
     public InventorySlot[] itemSlots;
     public UseItem useItem;
     public TMP_Text amountText;
@@ -22,6 +24,16 @@ public class InventoryManager : MonoBehaviour
 
 
     private InventorySlot slotBeenClicked;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+    }
 
     private void Start()
     {
@@ -103,7 +115,10 @@ public class InventoryManager : MonoBehaviour
             {
                 slotBeenClicked.quantity += quantity;
                 ItemHistoryManager.instance.RecordItem(item, quantity);
-
+                if (slotBeenClicked.quantity <= 0)
+                {
+                    slotBeenClicked.itemSO = null;
+                }
                 slotBeenClicked.UpdateUI();
                 return;
             }
