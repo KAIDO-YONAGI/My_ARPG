@@ -139,7 +139,7 @@ public class DialogManager : MonoBehaviour
             }
             else
             {
-                shouldRefuse = !MeetsRefuseConditions(refuse);
+                shouldRefuse = !HasRefuseConditions(refuse);
             }
 
             if (shouldRefuse)
@@ -152,7 +152,7 @@ public class DialogManager : MonoBehaviour
         return true;
     }
 
-    private bool MeetsRefuseConditions(RefuseDialogSO refuse)
+    private bool HasRefuseConditions(RefuseDialogSO refuse)
     {
         if (refuse.requireCharacters != null && refuse.requireCharacters.Count > 0)//检测角色对话
         {

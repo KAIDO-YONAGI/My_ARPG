@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2985009009315348781}
   - component: {fileID: 7588955011701395019}
   m_Layer: 0
-  m_Name: IntegretedMenuButtons
+  m_Name: IntegratedMenuButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,7 +87,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5825678795662553422, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_Name
-      value: IntegretedMenuButton (1)
+      value: IntegratedMenuButton
       objectReference: {fileID: 0}
     - target: {fileID: 6183383951007157398, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_Pivot.x
@@ -189,11 +189,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5825678795662553422, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_Name
-      value: IntegretedMenuButton
-      objectReference: {fileID: 0}
-    - target: {fileID: 5825678795662553422, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
-      propertyPath: m_IsActive
-      value: 1
+      value: IntegratedMenuButton
       objectReference: {fileID: 0}
     - target: {fileID: 6183383951007157398, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_Pivot.x
@@ -295,7 +291,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5825678795662553422, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_Name
-      value: IntegretedMenuButton (2)
+      value: IntegratedMenuButton
       objectReference: {fileID: 0}
     - target: {fileID: 6183383951007157398, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_Pivot.x
@@ -397,7 +393,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5825678795662553422, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_Name
-      value: IntegretedMenuButton (3)
+      value: IntegratedMenuButton
       objectReference: {fileID: 0}
     - target: {fileID: 5825678795662553422, guid: 194b68dfd3dcff7478b97aaa9a5b8e2c, type: 3}
       propertyPath: m_IsActive
