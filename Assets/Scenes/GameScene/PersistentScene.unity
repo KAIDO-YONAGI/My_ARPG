@@ -8827,7 +8827,7 @@ GameObject:
   - component: {fileID: 995318738}
   - component: {fileID: 995318740}
   m_Layer: 0
-  m_Name: IntegretedUIPanel
+  m_Name: IntegratedUIPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20240,7 +20240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1886909085649397430, guid: d953d9d5b874a304c8364a76aa403890, type: 3}
       propertyPath: m_Name
-      value: IntegretedMenuButtons
+      value: IntegratedMenuButton
       objectReference: {fileID: 0}
     - target: {fileID: 5203570903135815494, guid: d953d9d5b874a304c8364a76aa403890, type: 3}
       propertyPath: m_AnchorMax.y

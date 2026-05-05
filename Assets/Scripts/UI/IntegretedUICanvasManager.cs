@@ -5,9 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class IntegretedUICanvasManager : MonoBehaviour
+public class IntegratedUICanvasManager : MonoBehaviour
 {
-    public static IntegretedUICanvasManager instance;
+    public static IntegratedUICanvasManager instance;
     [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
     [SerializeField] private CanvasGroup UICanvasPanel;
     [SerializeField] private List<Button> integretedButtons;
@@ -15,7 +15,7 @@ public class IntegretedUICanvasManager : MonoBehaviour
     [SerializeField] private Button nextPageButton;
     [SerializeField] private Button prevPageButton;
     [SerializeField] private TMP_Text pageNumText;
-    [SerializeField] private ToggleCanvasEventSO toggleIntegretedCanvasEventSO;
+    [SerializeField] private ToggleCanvasEventSO toggleIntegratedCanvasEventSO;
 
 
     private TMP_Text toggleMenuText;
@@ -42,19 +42,19 @@ public class IntegretedUICanvasManager : MonoBehaviour
     {
         InitiateButtons();
 
-        toggleIntegretedCanvasEventSO.toggleCanvasEvent += OnToggleIntegretedCnavas;
+        toggleIntegratedCanvasEventSO.toggleCanvasEvent += OnToggleIntegratedCnavas;
         //此处事件在UIManager里仅索引到editor里，没有在代码层编写
         //特别地，将开闭功能都放在当前这个脚本里
         //最终效果就是UIManger里可以依靠alpha值检测来实现互斥关闭集成面板，而这个脚本直接实现开关
     }
     private void OnDisable()
     {
-        toggleIntegretedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegretedCnavas;
+        toggleIntegratedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegratedCnavas;
         toggleMenuButton.onClick.RemoveAllListeners();
         nextPageButton.onClick.RemoveAllListeners();
         prevPageButton.onClick.RemoveAllListeners();
     }
-    private void OnToggleIntegretedCnavas(bool state)
+    private void OnToggleIntegratedCnavas(bool state)
     {
         SetCanvaState(UICanvasPanel, state);
 
@@ -137,12 +137,12 @@ public class IntegretedUICanvasManager : MonoBehaviour
             integretedButtonTexts[pageButtonNum].text = canvasToToggle.ToString();
 
             button.gameObject.SetActive(true);
-            button.onClick.AddListener(() => OnIntegretedButtonClick(canvasToToggle));
+            button.onClick.AddListener(() => OnIntegratedButtonClick(canvasToToggle));
 
         }
     }
     private bool isAnyCanvasOpen = false;
-    private void OnIntegretedButtonClick(MyEnums.CanvasToToggle canvasToToggle)
+    private void OnIntegratedButtonClick(MyEnums.CanvasToToggle canvasToToggle)
     {
         UIManager.instance.SetInput(canvasToToggle, true);
         isAnyCanvasOpen = !isAnyCanvasOpen;

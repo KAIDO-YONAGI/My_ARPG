@@ -25,7 +25,7 @@ enum CanvasToToggle {
     Dialog
     Quest
     Shop
-    Integreted
+    Integrated
     Default
 }
 

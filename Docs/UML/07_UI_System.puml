@@ -20,7 +20,7 @@ enum CanvasToToggle {
     Dialog
     Quest
     Shop
-    Integreted
+    Integrated
     Default
 }
 
@@ -67,20 +67,20 @@ package "Core UI" #E3F2FD {
             - OnESC(state : bool) : void
         }
 
-        class IntegretedUICanvasManager <<singleton>> {
-            - {static} instance : IntegretedUICanvasManager
+        class IntegratedUICanvasManager <<singleton>> {
+            - {static} instance : IntegratedUICanvasManager
             - canvasToToggle : List<CanvasToToggle>
             - UICanvasPanel : CanvasGroup
-            - toggleIntegretedCanvasEventSO : ToggleCanvasEventSO
+            - toggleIntegratedCanvasEventSO : ToggleCanvasEventSO
             - currentPageNum : int = 0
             - isMenuOpen : bool = false
             + OnClickMenuToggleButton() : void
             + OnClickNextButton() : void
             + OnClickPrevutton() : void
-            - OnToggleIntegretedCnavas(state : bool) : void
+            - OnToggleIntegratedCnavas(state : bool) : void
             - InitiateButtons() : void
             - ShiftPage(page : int) : bool
-            - OnIntegretedButtonClick(canvasToToggle : CanvasToToggle) : void
+            - OnIntegratedButtonClick(canvasToToggle : CanvasToToggle) : void
         }
     }
 }
@@ -280,9 +280,9 @@ UIManager --> SceneLoadEventSO : loadEventSO
 ESCButton --> UIManager : uses
 ESCMenuManager --> ToggleCanvasEventSO : toggleESCEvent
 ESCMenuManager --> TimeManager : uses
-IntegretedUICanvasManager --> ToggleCanvasEventSO : toggleIntegretedCanvasEventSO
-IntegretedUICanvasManager --> UIManager : uses
-IntegretedUICanvasManager --> CanvasToToggle : canvasToToggle
+IntegratedUICanvasManager --> ToggleCanvasEventSO : toggleIntegratedCanvasEventSO
+IntegratedUICanvasManager --> UIManager : uses
+IntegratedUICanvasManager --> CanvasToToggle : canvasToToggle
 
 ShopManager o-- ShopSlot : shopSlots
 ShopManager --> ShopLoadEventSO : shopLoadEvent
