@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,7 +8,8 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
 
-    public InventorySlot[] itemSlots;
+    public Transform[] slotParents;
+    private readonly List<InventorySlot> inventorySlotsList = new();
     public UseItem useItem;
     public TMP_Text amountText;
     public GameObject lootPrefab;
@@ -37,7 +39,11 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        foreach (InventorySlot slot in itemSlots)
+        foreach (Transform parent in slotParents)
+        {
+            inventorySlotsList.AddRange(parent.GetComponentsInChildren<InventorySlot>());
+        }
+        foreach (InventorySlot slot in inventorySlotsList)
         {
             slot.UpdateUI();
         }
@@ -126,7 +132,7 @@ public class InventoryManager : MonoBehaviour
         else if (quantity > 0)//物品拾取以及购买
         {
 
-            foreach (InventorySlot slot in itemSlots)//物品堆叠逻辑
+            foreach (InventorySlot slot in inventorySlotsList)//物品堆叠逻辑
             {
                 if (slot.itemSO == item && slot.quantity < item.stackableSize)
                 {
@@ -148,7 +154,7 @@ public class InventoryManager : MonoBehaviour
                 }
             }
 
-            foreach (InventorySlot slot in itemSlots)//寻找可堆叠的格子
+            foreach (InventorySlot slot in inventorySlotsList)//寻找可堆叠的格子
             {
                 if (slot.itemSO == null)
                 {
@@ -170,7 +176,7 @@ public class InventoryManager : MonoBehaviour
     }
     private bool HasSpaceForItem(ItemSO item)
     {
-        foreach (var slot in itemSlots)
+        foreach (var slot in inventorySlotsList)
         {
             if ((slot.itemSO == item && slot.quantity < item.stackableSize)
                 || slot.itemSO == null) return true;
