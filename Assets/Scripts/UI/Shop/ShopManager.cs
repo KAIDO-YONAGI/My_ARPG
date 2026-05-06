@@ -1,30 +1,34 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 public class ShopManager : MonoBehaviour
 {
     [SerializeField] private ShopSlot[] shopSlots;
     [SerializeField] private CanvasGroup shopCanvasGroup;
 
-
     [Header("Events To Trigger")]
     public InventorySlotsStatsSO InventoryUpdateRequest;
     [Header("Events To Receive")]
-
-    public ShopLoadEventSO shopLoadEvent;
     public ToggleCanvasEventSO toggleShopCanvasEvent;
 
+    public static ShopManager instance;
 
     private List<ShopItems> shopItems;
     private List<ShopItems> shopWeapon;
     private List<ShopItems> shopArmor;
+    private ShopKeeper activeShopKeeper;
 
-    public static ShopManager instance;
-
-
+    public Transform CurrentPortraitTarget
+    {
+        get
+        {
+            if (activeShopKeeper != null)
+                return activeShopKeeper.PortraitTarget;
+            return null;
+        }
+    }
     private bool isShopOpen = false;
-    public bool IsShopOpen => isShopOpen;//物品栏会根据这个bool变量选择是出售还是使用物品
+    public bool IsShopOpen => isShopOpen;
 
     private void Awake()
     {
@@ -34,47 +38,68 @@ public class ShopManager : MonoBehaviour
         }
         else Destroy(gameObject);
     }
+
     private void OnEnable()
     {
-        shopLoadEvent.ShopLoadEvent += OnShopLoad;
         toggleShopCanvasEvent.toggleCanvasEvent += OnShopToggle;
-
     }
+
     private void OnDisable()
     {
-        shopLoadEvent.ShopLoadEvent -= OnShopLoad;
         toggleShopCanvasEvent.toggleCanvasEvent -= OnShopToggle;
-
     }
+
+    public void RegisterActiveShopKeeper(ShopKeeper keeper)
+    {
+        activeShopKeeper = keeper;
+    }
+
+    public void UnregisterActiveShopKeeper()
+    {
+        activeShopKeeper = null;
+    }
+
     private void OnShopToggle(bool state)
     {
-        if (!state)
-        //拒绝管理器打开请求，由店主触发OnShopLoad后才打开画布
-        //只接收离开店主检测范围、管理器的关闭请求
+        if (state)
         {
-            shopCanvasGroup.alpha = 0;
-            shopCanvasGroup.interactable = false;
-            shopCanvasGroup.blocksRaycasts = false;
-            isShopOpen = false;
-            UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, false);
+            if (activeShopKeeper != null)
+            {
+                OpenShop(
+                    activeShopKeeper.ShopItems,
+                    activeShopKeeper.ShopWeapon,
+                    activeShopKeeper.ShopArmor);
+            }
+        }
+        else
+        {
+            CloseShop();
         }
     }
-    private void OnShopLoad(
-        List<ShopItems> shopItems,
-        List<ShopItems> shopWeapon,
-        List<ShopItems> shopArmor,
-        Transform portraitTarget)// 只负责接收场景中的店主信息并且打开面板
+
+    public void OpenShop(
+        List<ShopItems> items,
+        List<ShopItems> weapon,
+        List<ShopItems> armor)
     {
-        this.shopItems = shopItems;
-        this.shopWeapon = shopWeapon;
-        this.shopArmor = shopArmor;
+        shopItems = items;
+        shopWeapon = weapon;
+        shopArmor = armor;
         OpenItemShop();
         shopCanvasGroup.alpha = 1;
         shopCanvasGroup.interactable = true;
         shopCanvasGroup.blocksRaycasts = true;
         isShopOpen = true;
         UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, true);
+    }
 
+    public void CloseShop()
+    {
+        shopCanvasGroup.alpha = 0;
+        shopCanvasGroup.interactable = false;
+        shopCanvasGroup.blocksRaycasts = false;
+        isShopOpen = false;
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, false);
     }
 
     private void PopulateShopItems(List<ShopItems> shopItems)
