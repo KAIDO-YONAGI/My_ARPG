@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1671433213103277534}
   - component: {fileID: 1560998131232184162}
   - component: {fileID: 2660610945912791993}
-  - component: {fileID: 3950413209274824859}
   m_Layer: 0
   m_Name: ToggleMenuButton
   m_TagString: Untagged
@@ -122,18 +121,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!225 &3950413209274824859
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2352733637193725608}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &6335307200838470221
 GameObject:
   m_ObjectHideFlags: 0

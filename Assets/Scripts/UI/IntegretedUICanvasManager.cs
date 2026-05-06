@@ -78,24 +78,25 @@ public class IntegratedUICanvasManager : MonoBehaviour
             integratedButtonTexts.Add(integratedButtons[i].GetComponentInChildren<TMP_Text>());
         }
     }
-
-    public void OnClickMenuToggleButton()
-    {
-        InitiateUICanvasPanel(!isMenuOpen);
-        toggleMenuText.text = !isMenuOpen ? "Open" : "Close";
-    }
     private void InitiateUICanvasPanel(bool state)
     {
         isMenuOpen = state;
         SetCanvaState(UICanvasPanel, isMenuOpen);
         if (isMenuOpen) ShiftPage(0);
     }
-    public void OnClickNextButton()
+    private void OnClickMenuToggleButton()
+    {
+        InitiateUICanvasPanel(!isMenuOpen);
+        toggleMenuText.text = !isMenuOpen ? "Open" : "Close";
+        Debug.Log("toggle");
+    }
+
+    private void OnClickNextButton()
     {
         ShiftPage(currentPageNum + 1);
     }
 
-    public void OnClickPrevutton()
+    private void OnClickPrevutton()
     {
         ShiftPage(currentPageNum - 1);
     }
@@ -145,7 +146,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
     private bool isAnyCanvasOpen = false;
     private void OnIntegratedButtonClick(MyEnums.CanvasToToggle canvasToToggle)
     {
-        UIManager.instance.SetInput(canvasToToggle, true);
+        UIManager.instance.SetCanvasToggle(canvasToToggle, true);
         isAnyCanvasOpen = !isAnyCanvasOpen;
     }
 

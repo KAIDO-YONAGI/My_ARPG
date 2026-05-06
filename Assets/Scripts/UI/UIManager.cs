@@ -13,15 +13,16 @@ public class UIManager : MonoBehaviour
 
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
-    public List<ToggleCanvasEventSO> toggleCanvasEvents;//画布组对应的manager也会各自绑定他们的事件
+    public List<ToggleCanvasEventSO> toggleCanvasEvents;
 
-    [SerializeField] private List<CanvasGroup> canvasToManage;
+    [Header("Input Bindings")]
+    public List<CanvasInputBinding> inputBindings;
 
-    private MyEnums.CanvasToToggle currentCanvasState
+    private MyEnums.CanvasToToggle canvasToToggle
         = MyEnums.CanvasToToggle.Default;
-    private readonly List<CanvasGroup> uiCanvasList = new();
     private bool isAnyCanvasOpen;
-
+    private Dictionary<MyEnums.CanvasToToggle, bool> inputState;
+    //利用枚举字典来匹配行为，取消代码配置
     private void Awake()
     {
         if (instance == null)
@@ -32,6 +33,12 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
             return;
+        }
+
+        inputState = new Dictionary<MyEnums.CanvasToToggle, bool>();
+        foreach (MyEnums.CanvasToToggle canvas in Enum.GetValues(typeof(MyEnums.CanvasToToggle)))
+        {
+            inputState[canvas] = false;//初始化枚举字典
         }
     }
 
@@ -54,117 +61,59 @@ public class UIManager : MonoBehaviour
         ToggleCanvas();
     }
 
-    private class UIInputState
+    public void SetCanvasToggle(MyEnums.CanvasToToggle canvas, bool state)
+    //留给那些会自己打开并且关掉画布组的画布来报告已关闭，如果需要跨场景可以换成一个依赖枚举的事件彻底解耦
     {
-        public bool escClick;
-        public bool skillTreeClick;
-        public bool statsClick;
-        public bool dialogClick;
-        public bool questClick;
-        public bool shopClick;
-        public bool backpackClick;
-        public void Reset()
-        {
-            escClick = false;
-            skillTreeClick = false;
-            statsClick = false;
-            dialogClick = false;
-            questClick = false;
-            shopClick = false;
-            backpackClick = false;
-        }
-    }
-    private UIInputState inputState = new();
-    public void SetInput(MyEnums.CanvasToToggle canvas, bool state)
-    //配合枚举类、封装类、状态机来提供外部操作的进入点
-    {
-        switch (canvas)
-        {
-            case MyEnums.CanvasToToggle.ESC:
-                inputState.escClick = state;
-                break;
-            case MyEnums.CanvasToToggle.Skills:
-                inputState.skillTreeClick = state;
-                break;
-            case MyEnums.CanvasToToggle.Stats:
-                inputState.statsClick = state;
-                break;
-            case MyEnums.CanvasToToggle.Dialog:
-                inputState.dialogClick = state;
-                break;
-            case MyEnums.CanvasToToggle.Quest:
-                inputState.questClick = state;
-                break;
-            case MyEnums.CanvasToToggle.Shop:
-                inputState.shopClick = state;
-                break;
-            case MyEnums.CanvasToToggle.Backpack:
-                inputState.backpackClick = state;
-                break;
-        }
-    }
 
+        if (!state)
+        {
+            isAnyCanvasOpen = false;
+            canvasToToggle = MyEnums.CanvasToToggle.Default;
+            //先设置为Default，状态接着会在Update里被刷新
+        }
+
+        inputState[canvas] = state;
+    }
 
     private void ToggleCanvas()
     {
-        inputState.escClick = inputState.escClick || Input.GetButtonDown("ESC");
-        inputState.skillTreeClick = inputState.skillTreeClick || Input.GetButtonDown("ToggleSkillTree");
-        inputState.statsClick = inputState.statsClick || Input.GetButtonDown("ToggleStats");
-        inputState.dialogClick = inputState.dialogClick || Input.GetButtonDown("NPCInteract");
-        inputState.questClick = inputState.questClick || Input.GetButtonDown("OpenQuestList");
-        inputState.shopClick = inputState.shopClick || Input.GetButtonDown("Interact");
-        inputState.backpackClick = inputState.backpackClick || Input.GetButtonDown("OpenBackpack");
-
-        isAnyCanvasOpen = IsAnyManagedCanvasOpen();
-        //根据透明度判断是不是打开,可以利用这个来同步其它画布在其它地方打开的情况的状态
-
-        if (!isAnyCanvasOpen && currentCanvasState != MyEnums.CanvasToToggle.Default)
-        //这个状态组合说明面板被其它地方关了，因为此时不是default状态
+        foreach (var binding in inputBindings)
+        //获取注册在inputBindings的画布组的按钮绑定的激活状态，如果不注册，则仅使用SetCanvasToggle调度
         {
-            currentCanvasState = MyEnums.CanvasToToggle.Default;
-        }
-        else if (!isAnyCanvasOpen)
-        {
-            currentCanvasState = MyEnums.CanvasToToggle.Default;
+            bool pressed = Input.GetButtonDown(binding.buttonName);
+            inputState[binding.canvas] = inputState[binding.canvas] || pressed;
+            //外部输入和点按钮均可
         }
 
-        if (inputState.escClick)
+        if (inputState[MyEnums.CanvasToToggle.ESC])
         {
-            currentCanvasState = isAnyCanvasOpen
+            canvasToToggle = isAnyCanvasOpen
                 ? MyEnums.CanvasToToggle.Default
                 : MyEnums.CanvasToToggle.ESC;
 
-            IsToToggleCanvas(currentCanvasState);
-            inputState.Reset();
+            IsToToggleCanvas(canvasToToggle);
             return;
         }
 
-        if (inputState.skillTreeClick)
-            currentCanvasState = MyEnums.CanvasToToggle.Skills;
-        else if (inputState.statsClick)
-            currentCanvasState = MyEnums.CanvasToToggle.Stats;
-        else if (inputState.dialogClick)
-            currentCanvasState = MyEnums.CanvasToToggle.Dialog;
-        else if (inputState.questClick)
-            currentCanvasState = MyEnums.CanvasToToggle.Quest;
-        else if (inputState.shopClick)
-            currentCanvasState = MyEnums.CanvasToToggle.Shop;
-        else if (inputState.backpackClick)
-            currentCanvasState = MyEnums.CanvasToToggle.Backpack;
-        else
-            currentCanvasState = MyEnums.CanvasToToggle.Default;
-
-        if (currentCanvasState != MyEnums.CanvasToToggle.Default)
+        canvasToToggle = MyEnums.CanvasToToggle.Default;
+        foreach (var binding in inputBindings)
         {
-            IsToToggleCanvas(currentCanvasState);
+            if (inputState[binding.canvas])
+            {
+                canvasToToggle = binding.canvas;
+                break;//多个输入只处理第一个
+            }
         }
 
-        inputState.Reset();
+        if (canvasToToggle != MyEnums.CanvasToToggle.Default)
+        {
+            IsToToggleCanvas(canvasToToggle);
+        }
     }
 
     private void IsToToggleCanvas(MyEnums.CanvasToToggle target)
     {
-        // Debug.Log(target.ToString());
+        isAnyCanvasOpen = target != MyEnums.CanvasToToggle.Default;
 
         foreach (var eventSO in toggleCanvasEvents)
         {
@@ -177,44 +126,34 @@ public class UIManager : MonoBehaviour
                 eventSO.RaiseToggleCanvasEvent(false);
             }
         }
+        ResetInputState();//多个输入只处理第一个
+
     }
 
-
-
-    private bool IsAnyManagedCanvasOpen()
+    private void ResetInputState()
     {
-        foreach (var canvas in canvasToManage)
+        var keys = new List<MyEnums.CanvasToToggle>(inputState.Keys);
+        foreach (var key in keys)
         {
-            if (canvas == null || !canvas.gameObject.activeInHierarchy)
-            {
-                continue;
-            }
-
-            if (canvas.alpha > 0.01f || canvas.interactable || canvas.blocksRaycasts)
-            {
-                return true;
-            }
+            inputState[key] = false;
         }
-
-        return false;
     }
 
     private void ResetCanvas()
     {
-        currentCanvasState = MyEnums.CanvasToToggle.Default;
+        canvasToToggle = MyEnums.CanvasToToggle.Default;
+        isAnyCanvasOpen = false;
 
-        foreach (var canvas in uiCanvasList)
+        foreach (var eventSO in toggleCanvasEvents)
         {
-            if (canvas.GetComponent<CanvasGroup>() != null)
-            {
-                canvas.alpha = 0;
-                canvas.interactable = false;
-                canvas.blocksRaycasts = false;
-            }
-            else
-            {
-                Debug.LogWarning($"CanvasGroup component not found on {canvas.name}");
-            }
+            eventSO.RaiseToggleCanvasEvent(false);
         }
     }
+}
+
+[Serializable]
+public class CanvasInputBinding
+{
+    public MyEnums.CanvasToToggle canvas;
+    public string buttonName;
 }

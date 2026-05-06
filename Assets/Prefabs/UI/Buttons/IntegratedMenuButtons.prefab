@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6285004889563782356}
   - component: {fileID: 2985009009315348781}
-  - component: {fileID: 7588955011701395019}
   m_Layer: 0
   m_Name: IntegratedMenuButtons
   m_TagString: Untagged
@@ -65,18 +64,6 @@ MonoBehaviour:
   m_Spacing: {x: -10, y: -10}
   m_Constraint: 0
   m_ConstraintCount: 2
---- !u!225 &7588955011701395019
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1886909085649397430}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1001 &2159765037883460560
 PrefabInstance:
   m_ObjectHideFlags: 0

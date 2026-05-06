@@ -39,9 +39,9 @@ package "Core UI" #E3F2FD {
             + loadEventSO : SceneLoadEventSO
             + toggleCanvasEvents : List<ToggleCanvasEventSO>
             - canvasToManage : List<CanvasGroup>
-            - currentCanvasState : CanvasToToggle
+            - canvasToToggle : CanvasToToggle
             - isAnyCanvasOpen : bool
-            + SetInput(canvas : CanvasToToggle, state : bool) : void
+            + SetCanvasToggle(canvas : CanvasToToggle, state : bool) : void
             - ToggleCanvas() : void
             - IsToToggleCanvas(target : CanvasToToggle) : void
         }
@@ -273,7 +273,7 @@ package "Misc" #ECEFF1 {
     }
 }
 
-UIManager --> CanvasToToggle : currentCanvasState
+UIManager --> CanvasToToggle : canvasToToggle
 UIManager *-- UIInputState : inputState
 UIManager --> ToggleCanvasEventSO : toggleCanvasEvents
 UIManager --> SceneLoadEventSO : loadEventSO
