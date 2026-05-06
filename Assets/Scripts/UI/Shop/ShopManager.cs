@@ -25,7 +25,7 @@ public class ShopManager : MonoBehaviour
 
     private bool isShopOpen = false;
     public bool IsShopOpen => isShopOpen;//物品栏会根据这个bool变量选择是出售还是使用物品
-    
+
     private void Awake()
     {
         if (instance == null)
@@ -53,7 +53,8 @@ public class ShopManager : MonoBehaviour
             shopCanvasGroup.alpha = 0;
             shopCanvasGroup.interactable = false;
             shopCanvasGroup.blocksRaycasts = false;
-            isShopOpen=false;
+            isShopOpen = false;
+            UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, false);
         }
     }
     private void OnShopLoad(
@@ -69,7 +70,9 @@ public class ShopManager : MonoBehaviour
         shopCanvasGroup.alpha = 1;
         shopCanvasGroup.interactable = true;
         shopCanvasGroup.blocksRaycasts = true;
-        isShopOpen=true;
+        isShopOpen = true;
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, true);
+
     }
 
     private void PopulateShopItems(List<ShopItems> shopItems)

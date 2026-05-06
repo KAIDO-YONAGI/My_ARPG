@@ -143,11 +143,9 @@ public class IntegratedUICanvasManager : MonoBehaviour
 
         }
     }
-    private bool isAnyCanvasOpen = false;
     private void OnIntegratedButtonClick(MyEnums.CanvasToToggle canvasToToggle)
     {
-        UIManager.instance.SetCanvasToggle(canvasToToggle, true);
-        isAnyCanvasOpen = !isAnyCanvasOpen;
+        UIManager.instance.RequestCanvasToggle(canvasToToggle);
     }
 
     private void SetCanvaState(CanvasGroup canva, bool state)
@@ -155,5 +153,6 @@ public class IntegratedUICanvasManager : MonoBehaviour
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
         canva.interactable = state;
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Integrated, state);
     }
 }

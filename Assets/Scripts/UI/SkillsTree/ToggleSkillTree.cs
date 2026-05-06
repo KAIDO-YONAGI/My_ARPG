@@ -31,5 +31,7 @@ public class ToggleSkillTree : MonoBehaviour
             skillsCanvas.interactable = false;
             skillsCanvas.blocksRaycasts = false;
         }
+
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Skills, state);
     }
 }

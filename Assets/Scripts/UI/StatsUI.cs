@@ -34,6 +34,8 @@ public class StatsUI : MonoBehaviour
             statsCanvas.interactable = false;
             statsCanvas.blocksRaycasts = false;
         }
+
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Stats, state);
         UpdateAllStats();
     }
     private void Awake()//对象实例化就会进行，先于Start()

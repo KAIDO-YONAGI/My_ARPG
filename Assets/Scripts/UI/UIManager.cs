@@ -20,6 +20,8 @@ public class UIManager : MonoBehaviour
 
     private MyEnums.CanvasToToggle canvasToToggle
         = MyEnums.CanvasToToggle.Default;
+    private MyEnums.CanvasToToggle currentOpenCanvas
+        = MyEnums.CanvasToToggle.Default;
     private bool isAnyCanvasOpen;
     private Dictionary<MyEnums.CanvasToToggle, bool> inputState;
     //利用枚举字典来匹配行为，取消代码配置
@@ -38,7 +40,7 @@ public class UIManager : MonoBehaviour
         inputState = new Dictionary<MyEnums.CanvasToToggle, bool>();
         foreach (MyEnums.CanvasToToggle canvas in Enum.GetValues(typeof(MyEnums.CanvasToToggle)))
         {
-            inputState[canvas] = false;//初始化枚举字典
+            inputState[canvas] = false;
         }
     }
 
@@ -61,24 +63,42 @@ public class UIManager : MonoBehaviour
         ToggleCanvas();
     }
 
-    public void SetCanvasToggle(MyEnums.CanvasToToggle canvas, bool state)
-    //留给那些会自己打开并且关掉画布组的画布来报告已关闭，如果需要跨场景可以换成一个依赖枚举的事件彻底解耦
+    //用于外部切换需要的画布/默认状态
+    public void RequestCanvasToggle(MyEnums.CanvasToToggle canvas)
     {
-
-        if (!state)
+        if (!inputState.ContainsKey(canvas))
         {
-            isAnyCanvasOpen = false;
-            canvasToToggle = MyEnums.CanvasToToggle.Default;
-            //先设置为Default，状态接着会在Update里被刷新
+            return;
         }
 
-        inputState[canvas] = state;
+        inputState[canvas] = true;
+    }
+    //报告画布的真实开关状态
+    public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
+    {
+        if (state)
+        {
+            canvasToToggle = canvas;
+            currentOpenCanvas = canvas;
+            isAnyCanvasOpen = true;
+            return;
+        }
+        else
+        {
+            if (currentOpenCanvas == canvas)
+            {
+                canvasToToggle = MyEnums.CanvasToToggle.Default;
+                currentOpenCanvas = MyEnums.CanvasToToggle.Default;
+                isAnyCanvasOpen = false;
+            }
+        }
     }
 
     private void ToggleCanvas()
     {
+        if(isAnyCanvasOpen)return;
         foreach (var binding in inputBindings)
-        //获取注册在inputBindings的画布组的按钮绑定的激活状态，如果不注册，则仅使用SetCanvasToggle调度
+        //获取注册在inputBindings的画布组的按钮绑定的激活状态，如果不注册，则仅使用RequestCanvasToggle调度
         {
             bool pressed = Input.GetButtonDown(binding.buttonName);
             inputState[binding.canvas] = inputState[binding.canvas] || pressed;
@@ -94,27 +114,29 @@ public class UIManager : MonoBehaviour
             IsToToggleCanvas(canvasToToggle);
             return;
         }
-
-        canvasToToggle = MyEnums.CanvasToToggle.Default;
-        foreach (var binding in inputBindings)
+        else
         {
-            if (inputState[binding.canvas])
+
+            canvasToToggle = MyEnums.CanvasToToggle.Default;
+            foreach (var binding in inputBindings)
             {
-                canvasToToggle = binding.canvas;
-                break;//多个输入只处理第一个
-            }
-        }
+                if (inputState[binding.canvas])
+                {
+                    canvasToToggle = binding.canvas;
 
-        if (canvasToToggle != MyEnums.CanvasToToggle.Default)
-        {
-            IsToToggleCanvas(canvasToToggle);
+                    break;//只处理第一次的输入
+                }
+            }
+
+            if (canvasToToggle != MyEnums.CanvasToToggle.Default)
+            {
+                IsToToggleCanvas(canvasToToggle);
+            }
         }
     }
 
     private void IsToToggleCanvas(MyEnums.CanvasToToggle target)
     {
-        isAnyCanvasOpen = target != MyEnums.CanvasToToggle.Default;
-
         foreach (var eventSO in toggleCanvasEvents)
         {
             if (eventSO.canvasToToggle == target)
@@ -126,7 +148,8 @@ public class UIManager : MonoBehaviour
                 eventSO.RaiseToggleCanvasEvent(false);
             }
         }
-        ResetInputState();//多个输入只处理第一个
+
+        ResetInputState();//只处理第一次的输入
 
     }
 
@@ -142,6 +165,7 @@ public class UIManager : MonoBehaviour
     private void ResetCanvas()
     {
         canvasToToggle = MyEnums.CanvasToToggle.Default;
+        currentOpenCanvas = MyEnums.CanvasToToggle.Default;
         isAnyCanvasOpen = false;
 
         foreach (var eventSO in toggleCanvasEvents)
