@@ -96,7 +96,6 @@ public class UIManager : MonoBehaviour
 
     private void ToggleCanvas()
     {
-        if(isAnyCanvasOpen)return;
         foreach (var binding in inputBindings)
         //获取注册在inputBindings的画布组的按钮绑定的激活状态，如果不注册，则仅使用RequestCanvasToggle调度
         {
@@ -137,13 +136,15 @@ public class UIManager : MonoBehaviour
 
     private void IsToToggleCanvas(MyEnums.CanvasToToggle target)
     {
+        if (currentOpenCanvas == MyEnums.CanvasToToggle.ESC
+            && target != MyEnums.CanvasToToggle.Default) return;
         foreach (var eventSO in toggleCanvasEvents)
         {
             if (eventSO.canvasToToggle == target)
             {
                 eventSO.RaiseToggleCanvasEvent(true);
             }
-            else
+            else if (inputState[MyEnums.CanvasToToggle.ESC])
             {
                 eventSO.RaiseToggleCanvasEvent(false);
             }
