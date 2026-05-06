@@ -30,6 +30,8 @@ public class ESCMenuManager : MonoBehaviour
             ESCGroup.interactable = false;
             ESCGroup.blocksRaycasts = false;
         }
+
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.ESC, state);
     }
 }
 

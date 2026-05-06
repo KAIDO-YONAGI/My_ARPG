@@ -48,6 +48,7 @@ public class DialogManager : MonoBehaviour
         dialogCanvasGroup.interactable = state;
         dialogCanvasGroup.blocksRaycasts = state;
         isDialogActive = state;
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Dialog, state);
     }
 
     public void StartDialog(DialogSO dialog)

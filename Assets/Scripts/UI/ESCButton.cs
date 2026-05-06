@@ -16,6 +16,6 @@ public class ESCButton : MonoBehaviour
     }
     private void OnESC()
     {
-        UIManager.instance.SetCanvasToggle(MyEnums.CanvasToToggle.ESC,true);
+        UIManager.instance.RequestCanvasToggle(MyEnums.CanvasToToggle.ESC);
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class BackCanvasManager : MonoBehaviour
+public class BackpackCanvasManager : MonoBehaviour
 {
     public CanvasGroup currentCanvas;
     public ToggleCanvasEventSO toggleBackpackCanvasEventSO;
@@ -24,5 +24,10 @@ public class BackCanvasManager : MonoBehaviour
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
         canva.interactable = state;
+
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Backpack, state);
+        }
     }
 }

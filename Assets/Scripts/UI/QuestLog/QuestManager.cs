@@ -95,7 +95,7 @@ public class QuestManager : MonoBehaviour
 
     private void OnToggleQuest(bool state)
     {
-        //只负责关闭，打开逻辑在boardmanager按范围执行
+        // Only responsible for closing. Opening is handled by BoardManager.
         if (!state)
         {
             CloseQuestBoard();
@@ -119,15 +119,13 @@ public class QuestManager : MonoBehaviour
     {
         if (!canvasIsActive)
         {
-            SetCanvaState(questCanvaGroup, true);
-            canvasIsActive = true;
+            SetQuestCanvasState(true);
         }
     }
 
     public void CloseQuestBoard()
     {
-        SetCanvaState(questCanvaGroup, false);
-        canvasIsActive = false;
+        SetQuestCanvasState(false);
         currentBoardLoadQuests = null;
         currentQuest = null;
     }
@@ -263,7 +261,8 @@ public class QuestManager : MonoBehaviour
         questLogUI.DisPlayObjectives();
 
     }
-    public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)//更新完成条件
+    //更新完成条件
+    public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)
     {
         var progressDictionary = questProgress[quest].questObjectives;
         int newAmount = 0;
@@ -285,7 +284,7 @@ public class QuestManager : MonoBehaviour
 
         if (IsObjDone(quest, obj))
         {
-            return "√";
+            return "\u221A";
         }
 
         else if (obj != null)
@@ -350,6 +349,12 @@ public class QuestManager : MonoBehaviour
             return false;
         else
             return true;
+    }
+    private void SetQuestCanvasState(bool state)
+    {
+        SetCanvaState(questCanvaGroup, state);
+        canvasIsActive = state;
+        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Quest, state);
     }
     private void SetCanvaState(CanvasGroup canva, bool state)
     {
