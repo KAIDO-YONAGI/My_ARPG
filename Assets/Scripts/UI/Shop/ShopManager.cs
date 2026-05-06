@@ -49,6 +49,8 @@ public class ShopManager : MonoBehaviour
     private void OnShopToggle(bool state)
     {
         if (!state)
+        //拒绝管理器打开请求，由店主触发OnShopLoad后才打开画布
+        //只接收离开店主检测范围、管理器的关闭请求
         {
             shopCanvasGroup.alpha = 0;
             shopCanvasGroup.interactable = false;
@@ -61,7 +63,7 @@ public class ShopManager : MonoBehaviour
         List<ShopItems> shopItems,
         List<ShopItems> shopWeapon,
         List<ShopItems> shopArmor,
-        Transform portraitTarget)
+        Transform portraitTarget)// 只负责接收场景中的店主信息并且打开面板
     {
         this.shopItems = shopItems;
         this.shopWeapon = shopWeapon;

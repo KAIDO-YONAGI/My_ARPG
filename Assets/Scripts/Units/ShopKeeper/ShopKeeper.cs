@@ -22,25 +22,17 @@ public class ShopKeeper : MonoBehaviour
 
     private void OnEnable()
     {
-        if (toggleShopCanvasEvent != null)
-        {
-            toggleShopCanvasEvent.toggleCanvasEvent += OnToggleShopCanvas;
-        }
+        toggleShopCanvasEvent.toggleCanvasEvent += OnToggleShopCanvas;
     }
 
     private void OnDisable()
     {
-        if (toggleShopCanvasEvent != null)
-        {
-            toggleShopCanvasEvent.toggleCanvasEvent -= OnToggleShopCanvas;
-        }
-
-        CloseShopIfOpen();
+        toggleShopCanvasEvent.toggleCanvasEvent -= OnToggleShopCanvas;
     }
 
-    private void OnToggleShopCanvas(bool state)
+    private void OnToggleShopCanvas(bool state)//收到面板管理器请求之后发信息初始化商店
     {
-        if (!playerInRange || !state || shopLoadEvent == null)
+        if (!playerInRange || !state)//如果不在范围内或者收到false就不执行
         {
             return;
         }
