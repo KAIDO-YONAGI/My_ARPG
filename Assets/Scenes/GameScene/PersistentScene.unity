@@ -23524,8 +23524,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ceee0a037ca4232a445de5f0c93b66a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopLoadEvent: {fileID: 11400000, guid: 2b0721e2583502d4aa99e6fc96519ae4, type: 2}
-  toggleShopCanvasEvent: {fileID: 11400000, guid: 588067e2f797b0743a94619245e8896c, type: 2}
   followOffset: {x: 0, y: 0, z: -2}
   hideWhenNoShopKeeper: 1
 --- !u!1001 &1855734671
@@ -25439,7 +25437,6 @@ MonoBehaviour:
   - {fileID: 260345585}
   shopCanvasGroup: {fileID: 2012965572}
   InventoryUpdateRequest: {fileID: 11400000, guid: 297fdc8f0156ec44fb152533792d96b2, type: 2}
-  shopLoadEvent: {fileID: 11400000, guid: 2b0721e2583502d4aa99e6fc96519ae4, type: 2}
   toggleShopCanvasEvent: {fileID: 11400000, guid: 588067e2f797b0743a94619245e8896c, type: 2}
 --- !u!225 &2012965572
 CanvasGroup:
@@ -30695,7 +30692,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
   fadeDuration: 1
-  initScene: {fileID: 11400000, guid: 2a6c9a782e8ae9c458ddf8f2ded4ac6b, type: 2}
+  initScene: {fileID: 11400000, guid: 7c55136055a6e324ba090da1c0385003, type: 2}
   player: {fileID: 6166002366618250803}
   fadeCanva: {fileID: 1424539692}
   loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
