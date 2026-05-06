@@ -8,8 +8,11 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
 
-    public Transform[] slotParents;
-    private readonly List<InventorySlot> inventorySlotsList = new();
+    public Transform hotbarParent;
+    public Transform backpackParent;
+    private readonly List<InventorySlot> hotbarSlotsList = new();
+    private readonly List<InventorySlot> backpackSlotsList = new();
+    private List<InventorySlot> inventorySlotsList = new();
     public UseItem useItem;
     public TMP_Text amountText;
     public GameObject lootPrefab;
@@ -39,10 +42,10 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        foreach (Transform parent in slotParents)
-        {
-            inventorySlotsList.AddRange(parent.GetComponentsInChildren<InventorySlot>());
-        }
+
+        inventorySlotsList.AddRange(hotbarParent.GetComponentsInChildren<InventorySlot>());
+        inventorySlotsList.AddRange(backpackParent.GetComponentsInChildren<InventorySlot>());
+
         foreach (InventorySlot slot in inventorySlotsList)
         {
             slot.UpdateUI();
@@ -131,10 +134,25 @@ public class InventoryManager : MonoBehaviour
         }
         else if (quantity > 0)//物品拾取以及购买
         {
-
-            foreach (InventorySlot slot in inventorySlotsList)//物品堆叠逻辑
+            foreach (InventorySlot slot in inventorySlotsList)
             {
-                if (slot.itemSO == item && slot.quantity < item.stackableSize)
+                if (slot.itemSO == null)//找空格子
+                {
+                    int amount = Mathf.Min(item.stackableSize, quantity);
+
+                    slot.itemSO = item;
+                    slot.quantity = amount;
+                    quantity-=amount;
+                    ItemHistoryManager.instance.RecordItem(item, amount);
+
+                    slot.UpdateUI();
+                    if (quantity <= 0)
+                    {
+                        lootObj?.MarkAsDestroyed();
+                        return;
+                    }
+                }
+                if (slot.itemSO == item && slot.quantity < item.stackableSize)//寻找可堆叠的格子
                 {
                     int availableSize = item.stackableSize - slot.quantity;
                     int amount = Mathf.Min(availableSize, quantity);
@@ -154,23 +172,8 @@ public class InventoryManager : MonoBehaviour
                 }
             }
 
-            foreach (InventorySlot slot in inventorySlotsList)//寻找可堆叠的格子
-            {
-                if (slot.itemSO == null)
-                {
-                    int amount = Mathf.Min(item.stackableSize, quantity);
-
-                    slot.itemSO = item;
-                    slot.quantity = amount;
-                    ItemHistoryManager.instance.RecordItem(item, amount);
-
-                    slot.UpdateUI();
-                    lootObj?.MarkAsDestroyed();
-                    return;
-                }
-            }
-
-            DropLoot(item, quantity, lootObj);//减剩下的quantity丢掉
+            if (quantity > 0)
+                DropLoot(item, quantity, lootObj);//减剩下的quantity丢掉
         }
 
     }

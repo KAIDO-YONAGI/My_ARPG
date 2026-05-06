@@ -49,6 +49,11 @@ public class UIManager : MonoBehaviour
     {
         ResetCanvas();
     }
+    private void Update()
+    {
+        ToggleCanvas();
+    }
+
     private class UIInputState
     {
         public bool escClick;
@@ -57,6 +62,7 @@ public class UIManager : MonoBehaviour
         public bool dialogClick;
         public bool questClick;
         public bool shopClick;
+        public bool backpackClick;
         public void Reset()
         {
             escClick = false;
@@ -65,6 +71,7 @@ public class UIManager : MonoBehaviour
             dialogClick = false;
             questClick = false;
             shopClick = false;
+            backpackClick = false;
         }
     }
     private UIInputState inputState = new();
@@ -91,16 +98,10 @@ public class UIManager : MonoBehaviour
             case MyEnums.CanvasToToggle.Shop:
                 inputState.shopClick = state;
                 break;
-            
+            case MyEnums.CanvasToToggle.Backpack:
+                inputState.backpackClick = state;
+                break;
         }
-    }
-    public List<ToggleCanvasEventSO> GetToggleCanvasEventsList()
-    {
-        return toggleCanvasEvents;
-    }
-    private void Update()
-    {
-        ToggleCanvas();
     }
 
 
@@ -112,6 +113,7 @@ public class UIManager : MonoBehaviour
         inputState.dialogClick = inputState.dialogClick || Input.GetButtonDown("NPCInteract");
         inputState.questClick = inputState.questClick || Input.GetButtonDown("OpenQuestList");
         inputState.shopClick = inputState.shopClick || Input.GetButtonDown("Interact");
+        inputState.backpackClick = inputState.backpackClick || Input.GetButtonDown("OpenBackpack");
 
         isAnyCanvasOpen = IsAnyManagedCanvasOpen();
         //根据透明度判断是不是打开,可以利用这个来同步其它画布在其它地方打开的情况的状态
@@ -147,6 +149,8 @@ public class UIManager : MonoBehaviour
             currentCanvasState = MyEnums.CanvasToToggle.Quest;
         else if (inputState.shopClick)
             currentCanvasState = MyEnums.CanvasToToggle.Shop;
+        else if (inputState.backpackClick)
+            currentCanvasState = MyEnums.CanvasToToggle.Backpack;
         else
             currentCanvasState = MyEnums.CanvasToToggle.Default;
 
