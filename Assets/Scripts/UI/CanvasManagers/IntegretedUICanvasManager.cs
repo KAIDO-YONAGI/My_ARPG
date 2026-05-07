@@ -5,7 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class IntegratedUICanvasManager : MonoBehaviour
+public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
 {
     public static IntegratedUICanvasManager instance;
     [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
@@ -16,7 +16,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
     [SerializeField] private Button prevPageButton;
     [SerializeField] private TMP_Text pageNumText;
     [SerializeField] private ToggleCanvasEventSO toggleIntegratedCanvasEventSO;
-
+    public ToggleCanvasEventSO ToggleCanvasEvent => toggleIntegratedCanvasEventSO;
     private List<Button> integratedButtons = new();
 
     private TMP_Text toggleMenuText;

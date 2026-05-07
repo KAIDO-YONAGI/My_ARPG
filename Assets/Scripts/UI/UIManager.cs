@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
+    public static int FOCUS_ORDER=90;
 
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
