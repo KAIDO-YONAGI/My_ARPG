@@ -9,15 +9,15 @@ public class IntegratedUICanvasManager : MonoBehaviour
 {
     public static IntegratedUICanvasManager instance;
     [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
-    [SerializeField] private List<Button> integratedButtons;
     [SerializeField] private CanvasGroup UICanvasPanel;
-
+    [SerializeField] private GameObject integratedButtonsParent;
     [SerializeField] private Button toggleMenuButton;
     [SerializeField] private Button nextPageButton;
     [SerializeField] private Button prevPageButton;
     [SerializeField] private TMP_Text pageNumText;
     [SerializeField] private ToggleCanvasEventSO toggleIntegratedCanvasEventSO;
 
+    private List<Button> integratedButtons = new();
 
     private TMP_Text toggleMenuText;
     private List<TMP_Text> integratedButtonTexts = new();
@@ -31,31 +31,29 @@ public class IntegratedUICanvasManager : MonoBehaviour
         else
             Destroy(gameObject);
 
-
-        InitiateUICanvasPanel(false);
-
+        integratedButtons.AddRange(integratedButtonsParent.GetComponentsInChildren<Button>());
         buttonsEachPage = integratedButtons.Count;
 
-        pageNumText.text = "1";
-
+        InitiateUICanvasPanel(false);
     }
     private void OnEnable()
     {
         InitiateButtons();
 
-        toggleIntegratedCanvasEventSO.toggleCanvasEvent += OnToggleIntegratedCnavas;
+        toggleIntegratedCanvasEventSO.toggleCanvasEvent += OnToggleIntegratedCanvas;
+
         //此处事件在UIManager里仅索引到editor里，没有在代码层编写
         //特别地，将开闭功能都放在当前这个脚本里
         //最终效果就是UIManger里可以依靠alpha值检测来实现互斥关闭集成面板，而这个脚本直接实现开关
     }
     private void OnDisable()
     {
-        toggleIntegratedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegratedCnavas;
+        toggleIntegratedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegratedCanvas;
         toggleMenuButton.onClick.RemoveAllListeners();
         nextPageButton.onClick.RemoveAllListeners();
         prevPageButton.onClick.RemoveAllListeners();
     }
-    private void OnToggleIntegratedCnavas(bool state)
+    private void OnToggleIntegratedCanvas(bool state)
     {
         SetCanvaState(UICanvasPanel, state);
 
@@ -67,6 +65,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
 
     private void InitiateButtons()
     {
+
         toggleMenuButton.onClick.AddListener(OnClickMenuToggleButton);
         nextPageButton.onClick.AddListener(OnClickNextButton);
         prevPageButton.onClick.AddListener(OnClickPrevutton);
@@ -80,6 +79,7 @@ public class IntegratedUICanvasManager : MonoBehaviour
     }
     private void InitiateUICanvasPanel(bool state)
     {
+        pageNumText.text = "1";
         isMenuOpen = state;
         SetCanvaState(UICanvasPanel, isMenuOpen);
         if (isMenuOpen) ShiftPage(0);

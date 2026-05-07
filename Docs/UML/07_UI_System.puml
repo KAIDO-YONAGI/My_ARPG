@@ -77,7 +77,7 @@ package "Core UI" #E3F2FD {
             + OnClickMenuToggleButton() : void
             + OnClickNextButton() : void
             + OnClickPrevutton() : void
-            - OnToggleIntegratedCnavas(state : bool) : void
+            - OnToggleIntegratedCanvas(state : bool) : void
             - InitiateButtons() : void
             - ShiftPage(page : int) : bool
             - OnIntegratedButtonClick(canvasToToggle : CanvasToToggle) : void

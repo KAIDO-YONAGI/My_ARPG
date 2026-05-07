@@ -24,6 +24,7 @@ public class UIManager : MonoBehaviour
         = MyEnums.CanvasToToggle.Default;
     private bool isAnyCanvasOpen;
     private Dictionary<MyEnums.CanvasToToggle, bool> inputState;
+    private LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder;
     //利用枚举字典来匹配行为，取消代码配置
     private void Awake()
     {
@@ -42,6 +43,8 @@ public class UIManager : MonoBehaviour
         {
             inputState[canvas] = false;
         }
+
+        canvasOpenOrder = new LinkedList<MyEnums.CanvasToToggle>();
     }
 
     private void OnEnable()
@@ -64,6 +67,7 @@ public class UIManager : MonoBehaviour
     }
 
     //用于外部切换需要的画布/默认状态
+
     public void RequestCanvasToggle(MyEnums.CanvasToToggle canvas)
     {
         if (!inputState.ContainsKey(canvas))
@@ -73,25 +77,32 @@ public class UIManager : MonoBehaviour
 
         inputState[canvas] = true;
     }
-    //报告画布的真实开关状态
-    public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
+
+    public void RequestCanvasClose(MyEnums.CanvasToToggle canvas)
     {
-        if (state)
+        if (canvas == MyEnums.CanvasToToggle.Default || !ContainsCanvas(canvas))
         {
-            canvasToToggle = canvas;
-            currentOpenCanvas = canvas;
-            isAnyCanvasOpen = true;
             return;
         }
-        else
+
+        RaiseCanvasEvent(canvas, false);
+    }
+    //报告画布的真实开关状态
+
+    public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
+    {
+        if (canvas == MyEnums.CanvasToToggle.Default)
         {
-            if (currentOpenCanvas == canvas)
-            {
-                canvasToToggle = MyEnums.CanvasToToggle.Default;
-                currentOpenCanvas = MyEnums.CanvasToToggle.Default;
-                isAnyCanvasOpen = false;
-            }
+            return;
         }
+
+        UpdateCanvasOpenOrder(canvas, state);
+
+        currentOpenCanvas = canvasOpenOrder.Last != null
+            ? canvasOpenOrder.Last.Value
+            : MyEnums.CanvasToToggle.Default;
+        canvasToToggle = currentOpenCanvas;
+        isAnyCanvasOpen = canvasOpenOrder.Count > 0;
     }
 
     private void ToggleCanvas()
@@ -106,52 +117,121 @@ public class UIManager : MonoBehaviour
 
         if (inputState[MyEnums.CanvasToToggle.ESC])
         {
-            canvasToToggle = isAnyCanvasOpen
-                ? MyEnums.CanvasToToggle.Default
-                : MyEnums.CanvasToToggle.ESC;
-
-            IsToToggleCanvas(canvasToToggle);
+            HandleESCInput();
+            ResetInputState();
             return;
         }
-        else
+
+        if (currentOpenCanvas == MyEnums.CanvasToToggle.ESC)
         {
+            ResetInputState();
+            return;
+        }
 
-            canvasToToggle = MyEnums.CanvasToToggle.Default;
-            foreach (var binding in inputBindings)
+        canvasToToggle = MyEnums.CanvasToToggle.Default;
+        foreach (var binding in inputBindings)
+        {
+            if (binding.canvas == MyEnums.CanvasToToggle.ESC)
             {
-                if (inputState[binding.canvas])
-                {
-                    canvasToToggle = binding.canvas;
-
-                    break;//只处理第一次的输入
-                }
+                continue;
             }
 
-            if (canvasToToggle != MyEnums.CanvasToToggle.Default)
+            if (inputState[binding.canvas])
             {
-                IsToToggleCanvas(canvasToToggle);
+                canvasToToggle = binding.canvas;
+
+                break;//只处理第一次的输入
             }
+        }
+
+        if (canvasToToggle != MyEnums.CanvasToToggle.Default)
+        {
+            RaiseCanvasEvent(canvasToToggle, true);
+
+        }
+
+        ResetInputState();
+    }
+
+    private void HandleESCInput()
+    {
+        if (!isAnyCanvasOpen)
+        {
+            RaiseCanvasEvent(MyEnums.CanvasToToggle.ESC, true);
+            return;
+        }
+
+        CloseLastCanvas();
+    }
+
+    private void CloseLastCanvas()
+    {
+        if (canvasOpenOrder.Last == null)
+        {
+            return;
+        }
+
+        RaiseCanvasEvent(canvasOpenOrder.Last.Value, false);
+    }
+
+    private void RaiseCanvasEvent(MyEnums.CanvasToToggle target, bool state)
+    {
+        foreach (var eventSO in toggleCanvasEvents)
+        {
+            if (eventSO.canvasToToggle != target)
+            {
+                continue;
+            }
+
+            eventSO.RaiseToggleCanvasEvent(state);
+            return;
         }
     }
 
-    private void IsToToggleCanvas(MyEnums.CanvasToToggle target)
+    private void UpdateCanvasOpenOrder(MyEnums.CanvasToToggle canvas, bool state)
     {
-        if (currentOpenCanvas == MyEnums.CanvasToToggle.ESC
-            && target != MyEnums.CanvasToToggle.Default) return;
-        foreach (var eventSO in toggleCanvasEvents)
+        RemoveCanvasNode(canvas);
+
+        if (state)
         {
-            if (eventSO.canvasToToggle == target)
+            canvasOpenOrder.AddLast(canvas);
+        }
+    }
+
+    private bool ContainsCanvas(MyEnums.CanvasToToggle canvas)
+    {
+        LinkedListNode<MyEnums.CanvasToToggle> currentNode = canvasOpenOrder.First;
+
+        while (currentNode != null)
+        {
+            if (currentNode.Value == canvas)
             {
-                eventSO.RaiseToggleCanvasEvent(true);
+                return true;
             }
-            else
-            {
-                eventSO.RaiseToggleCanvasEvent(false);
-            }
+
+            currentNode = currentNode.Next;
         }
 
-        ResetInputState();//只处理第一次的输入
+        return false;
+    }
 
+    private void RemoveCanvasNode(MyEnums.CanvasToToggle canvas)
+    {
+        LinkedListNode<MyEnums.CanvasToToggle> currentNode = canvasOpenOrder.First;
+
+        while (currentNode != null)
+        {
+            LinkedListNode<MyEnums.CanvasToToggle> nextNode = currentNode.Next;
+
+            if (currentNode.Value == canvas)
+            {
+                canvasOpenOrder.Remove(currentNode);
+
+                break;
+            }
+
+            currentNode = nextNode;
+        }
     }
 
     private void ResetInputState()
@@ -168,11 +248,14 @@ public class UIManager : MonoBehaviour
         canvasToToggle = MyEnums.CanvasToToggle.Default;
         currentOpenCanvas = MyEnums.CanvasToToggle.Default;
         isAnyCanvasOpen = false;
+        canvasOpenOrder.Clear();
 
         foreach (var eventSO in toggleCanvasEvents)
         {
             eventSO.RaiseToggleCanvasEvent(false);
         }
+
+        ResetInputState();
     }
 }
 
