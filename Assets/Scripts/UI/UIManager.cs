@@ -144,7 +144,7 @@ public class UIManager : MonoBehaviour
             {
                 eventSO.RaiseToggleCanvasEvent(true);
             }
-            else if (inputState[MyEnums.CanvasToToggle.ESC])
+            else
             {
                 eventSO.RaiseToggleCanvasEvent(false);
             }
