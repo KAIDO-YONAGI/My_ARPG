@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -7,6 +8,8 @@ using UnityEngine.UI;
 public class ESCButton : MonoBehaviour
 {
     public Button escButton;
+    [SerializeField] private MyEnums.CanvasToToggle canvasToESC
+ = MyEnums.CanvasToToggle.Default;
     private void OnEnable() {
         escButton.onClick.AddListener(OnESC);
     }
@@ -16,6 +19,13 @@ public class ESCButton : MonoBehaviour
     }
     private void OnESC()
     {
-        UIManager.instance.RequestCanvasToggle(MyEnums.CanvasToToggle.ESC);
+        if (UIManager.instance == null)
+        {
+            return;
+        }
+
+        UIManager.instance.RequestCanvasClose(canvasToESC);
     }
+
+
 }
