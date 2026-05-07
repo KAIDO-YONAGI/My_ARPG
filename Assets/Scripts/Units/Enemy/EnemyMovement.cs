@@ -23,6 +23,9 @@ public class EnemyMovement : MonoBehaviour
     private float velocityTimer;
     private Vector2 lastVelocity;
     float threshold;
+    private bool playerInRange;
+    private float detectInterval = 0.2f;
+    private float detectTimer;
 
 
 
@@ -60,7 +63,12 @@ public class EnemyMovement : MonoBehaviour
     {
         if (enemyState != EnemyState.KnockBack)
         {
-            CheckForPlayer();
+            detectTimer -= Time.deltaTime;
+            if (detectTimer <= 0)
+            {
+                CheckForPlayer();
+                detectTimer = detectInterval;
+            }
 
             if (attackCoolDownTimer > 0)
                 attackCoolDownTimer -= Time.deltaTime;//减去了实际的时间，保证间隔一致，不会因为游戏帧数/刷新率而变化
@@ -69,17 +77,18 @@ public class EnemyMovement : MonoBehaviour
                 Chase();
             else if (enemyState == EnemyState.Attacking)
                 rb.velocity = Vector2.zero;
-            else if (enemyState == EnemyState.Idle)
+            else if (enemyState == EnemyState.Idle && !playerInRange)
                 aStarController.ResetPath();
         }
     }
 
     private void CheckForPlayer()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, playerDetectRange, playerMask);
-        if (hits.Length > 0)
+        Collider2D hit = Physics2D.OverlapCircle(detectionPoint.position, playerDetectRange, playerMask);
+        if (hit != null)
         {
-            player = hits[0].transform;
+            playerInRange = true;
+            player = hit.transform;
             if ((player.position - transform.position).sqrMagnitude <= attackDetectRange * attackDetectRange && attackCoolDownTimer <= 0)
             {
                 AnimatorSM(EnemyState.Attacking);
@@ -87,14 +96,13 @@ public class EnemyMovement : MonoBehaviour
                 return;
             }
             else if ((player.position - transform.position).sqrMagnitude > attackDetectRange * attackDetectRange && enemyState == EnemyState.Idle)
-            {//if条件设置为只能从Idle状态进入chasing，这是因为攻击状态的末尾会执行状态切换，恰好可以作为一个保证攻击动画播放完成的条件
-             //但是需要注意的是，如果以后有其它状态的相关动画，一定也要注意把状态切换添加到动画末尾的位置
+            {
                 AnimatorSM(EnemyState.Chasing);
             }
-            //攻击完成后再unity动画添加脚本ChangeState()切换到Idle状态
         }
         else
         {
+            playerInRange = false;
             rb.velocity = Vector2.zero;
             AnimatorSM(EnemyState.Idle);
         }

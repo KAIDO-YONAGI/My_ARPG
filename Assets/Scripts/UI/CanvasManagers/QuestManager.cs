@@ -296,7 +296,7 @@ public class QuestManager : MonoBehaviour, ICanvasManager
 
         if (IsObjDone(quest, obj))
         {
-            return "\u221A";
+            return "\u221A";//打勾
         }
 
         else if (obj != null)
