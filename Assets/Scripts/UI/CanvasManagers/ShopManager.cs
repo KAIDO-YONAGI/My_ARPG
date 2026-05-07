@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-public class ShopManager : MonoBehaviour
+public class ShopManager : MonoBehaviour, ICanvasManager
 {
     [SerializeField] private ShopSlot[] shopSlots;
     [SerializeField] private CanvasGroup shopCanvasGroup;
@@ -10,6 +10,7 @@ public class ShopManager : MonoBehaviour
     public InventorySlotsStatsSO InventoryUpdateRequest;
     [Header("Events To Receive")]
     public ToggleCanvasEventSO toggleShopCanvasEvent;
+    public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
 
     public static ShopManager instance;
 
@@ -17,6 +18,7 @@ public class ShopManager : MonoBehaviour
     private List<ShopItems> shopWeapon;
     private List<ShopItems> shopArmor;
     private ShopKeeper activeShopKeeper;
+    private Canvas canvas;
 
     public Transform CurrentPortraitTarget
     {
@@ -37,6 +39,8 @@ public class ShopManager : MonoBehaviour
             instance = this;
         }
         else Destroy(gameObject);
+
+        canvas = shopCanvasGroup.GetComponent<Canvas>();
     }
 
     private void OnEnable()
@@ -63,13 +67,16 @@ public class ShopManager : MonoBehaviour
     {
         if (state)
         {
-            if (activeShopKeeper != null)
+            if (!isShopOpen && activeShopKeeper != null)
             {
                 OpenShop(
                     activeShopKeeper.ShopItems,
                     activeShopKeeper.ShopWeapon,
                     activeShopKeeper.ShopArmor);
+                return;
             }
+
+            RefreshCanvasOrder(isShopOpen);
         }
         else
         {
@@ -91,6 +98,7 @@ public class ShopManager : MonoBehaviour
         shopCanvasGroup.blocksRaycasts = true;
         isShopOpen = true;
         UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, true);
+        RefreshCanvasOrder(true);
     }
 
     public void CloseShop()
@@ -100,6 +108,16 @@ public class ShopManager : MonoBehaviour
         shopCanvasGroup.blocksRaycasts = false;
         isShopOpen = false;
         UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, false);
+        RefreshCanvasOrder(false);
+    }
+
+    private void RefreshCanvasOrder(bool state)
+    {
+        int order = state && UIManager.instance != null &&
+                    UIManager.instance.IsCanvasFocused(MyEnums.CanvasToToggle.Shop)
+            ? UIManager.FocusOrder
+            : UIManager.DefaultOrder;
+        ((ICanvasManager)this).SetCanvaOrder(canvas, order);
     }
 
     private void PopulateShopItems(List<ShopItems> shopItems)

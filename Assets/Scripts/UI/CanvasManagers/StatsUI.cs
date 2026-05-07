@@ -1,14 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class StatsUI : MonoBehaviour
+public class StatsUI : MonoBehaviour, ICanvasManager
 {
     public GameObject[] statsSlots;
     public CanvasGroup statsCanvas;
 
     public ToggleCanvasEventSO toggleStatsEvent;
+
+    public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
+    private int order = 0;
+    private Canvas canvas;
+    private void Start()
+    {
+        canvas = statsCanvas.GetComponent<Canvas>();
+        UpdateAllStats();
+    }
     private void OnEnable()
     {
         toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
@@ -37,16 +47,17 @@ public class StatsUI : MonoBehaviour
 
         UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Stats, state);
         UpdateAllStats();
+
+        int order = state && UIManager.instance != null &&
+                    UIManager.instance.IsCanvasFocused(MyEnums.CanvasToToggle.Stats)
+            ? UIManager.FocusOrder
+            : UIManager.DefaultOrder;
+        ((ICanvasManager)this).SetCanvaOrder(canvas, order);
     }
     private void Awake()//对象实例化就会进行，先于Start()
     {
         statsCanvas.alpha = 0; ;
     }
-    private void Start()
-    {
-        UpdateAllStats();
-    }
-
     public void UpdateDamage()
     {
         statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.instance.GetDamage();
