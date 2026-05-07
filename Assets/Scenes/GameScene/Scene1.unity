@@ -192,6 +192,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa92cd2683b802441b522847136bd25d, type: 3}
+--- !u!1001 &75680697
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (39)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &75680698 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 75680697}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &85065511
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,6 +515,130 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b81abb055519ff5439495c48b134a0ee, type: 3}
+--- !u!1001 &203454503
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (9)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &203454504 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 203454503}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &213999616
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (37)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &213999617 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 213999616}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &255589072
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -656,6 +842,254 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 691543179493864998, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
   m_PrefabInstance: {fileID: 305938072}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &314200868
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (14)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &314200869 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 314200868}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &361045781
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (55)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &361045782 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 361045781}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &385132676
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (25)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &385132677 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 385132676}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &451218938
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (41)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &451218939 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 451218938}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &465233402
 GameObject:
   m_ObjectHideFlags: 0
@@ -807,6 +1241,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 5187159070825970204, guid: 4b5e5d3ef5b9cae41996eacc4aab65e1, type: 3}
   m_PrefabInstance: {fileID: 479433297}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &491507722
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (27)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &491507723 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 491507722}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &517177594 stripped
 Transform:
@@ -4547,7 +5043,7 @@ Tilemap:
       - {fileID: 437032537, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1999780338, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1609477170, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 5, y: -22, z: 0}
@@ -4577,7 +5073,7 @@ Tilemap:
       - {fileID: -1181679728, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -942080833, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -78580845, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 7, y: -22, z: 0}
@@ -4607,7 +5103,7 @@ Tilemap:
       - {fileID: -1181679728, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -942080833, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -78580845, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 9, y: -22, z: 0}
@@ -4817,7 +5313,7 @@ Tilemap:
       - {fileID: -346975073, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 646656321, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 2067592089, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 9, y: -21, z: 0}
@@ -5012,7 +5508,7 @@ Tilemap:
       - {fileID: 169089070, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 2061823298, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 540741465, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 9, y: -20, z: 0}
@@ -5327,7 +5823,7 @@ Tilemap:
       - {fileID: -1181679728, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -942080833, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -78580845, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 11, y: -19, z: 0}
@@ -5357,7 +5853,7 @@ Tilemap:
       - {fileID: -1181679728, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -942080833, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -78580845, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 23, y: -19, z: 0}
@@ -5852,7 +6348,7 @@ Tilemap:
       - {fileID: 169089070, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 2061823298, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 540741465, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -7, y: -14, z: 0}
@@ -5927,7 +6423,7 @@ Tilemap:
       - {fileID: 437032537, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1999780338, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -1609477170, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -7, y: -13, z: 0}
@@ -6767,7 +7263,7 @@ Tilemap:
       - {fileID: 1691437010, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: -859652908, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 1733222288, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -5, y: 1, z: 0}
@@ -7652,7 +8148,7 @@ Tilemap:
       - {fileID: -346975073, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 646656321, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 2067592089, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 7, y: 6, z: 0}
@@ -7802,7 +8298,7 @@ Tilemap:
       - {fileID: -346975073, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 646656321, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
       - {fileID: 2067592089, guid: 99b9baec2d9475e498076225a15c4c01, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 21, y: 6, z: 0}
@@ -8173,6 +8669,130 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1001 &563870559
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (48)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &563870560 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 563870559}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &610936714
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (21)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &610936715 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 610936714}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &626280980
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8240,6 +8860,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 691543179493864998, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
   m_PrefabInstance: {fileID: 702106667}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &640607993
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (13)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &640607994 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 640607993}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &651542403
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8305,6 +8987,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa92cd2683b802441b522847136bd25d, type: 3}
+--- !u!1001 &661723880
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (18)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &661723881 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 661723880}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &702106667
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8366,6 +9110,192 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 691543179493864998, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
   m_PrefabInstance: {fileID: 1150756990}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &772654648
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (4)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &772654649 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 772654648}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &828422797
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (16)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &828422798 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 828422797}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &830175795
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (7)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &830175796 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 830175795}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &851611640 stripped
 Transform:
@@ -8434,6 +9364,192 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8055196918552914556, guid: e75b802fc615b8545a699751a55f02d5, type: 3}
   m_PrefabInstance: {fileID: 887011902}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &892087395
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (50)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &892087396 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 892087395}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &905194219
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (56)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &905194220 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 905194219}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &919891575
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (6)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &919891576 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 919891575}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &922960216
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8495,6 +9611,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
   m_PrefabInstance: {fileID: 922960216}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1000835761
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (42)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1000835762 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1000835761}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1046323080
 GameObject:
@@ -8586,6 +9764,68 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &1064190627
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (43)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1064190628 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1064190627}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1066451660
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8651,6 +9891,254 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa92cd2683b802441b522847136bd25d, type: 3}
+--- !u!1001 &1092285368
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (24)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1092285369 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1092285368}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1098338401
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (35)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1098338402 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1098338401}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1117578818
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (49)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1117578819 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1117578818}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1119313647
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (10)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1119313648 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1119313647}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1150756990
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8708,6 +10196,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
+--- !u!1001 &1159253913
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (40)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1159253914 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1159253913}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1223334258
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8789,6 +10339,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8551115239627395981, guid: cde43cc87679436439995d5bcc3afc0b, type: 3}
   m_PrefabInstance: {fileID: 1223334258}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1227540099
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (52)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1227540100 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1227540099}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1240776315
 PrefabInstance:
@@ -8982,6 +10594,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 691543179493864998, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
   m_PrefabInstance: {fileID: 1260769990}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1274650318
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (59)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1274650319 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1274650318}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1299321451
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9064,6 +10738,130 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
   m_PrefabInstance: {fileID: 1299321451}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1331937933
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (54)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1331937934 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1331937933}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1334677139
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (22)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1334677140 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1334677139}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1337814503
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9121,6 +10919,502 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
+--- !u!1001 &1349001784
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (32)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1349001785 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1349001784}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1349673580
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (26)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1349673581 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1349673580}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1356518064
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (3)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1356518065 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1356518064}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1392268465
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (11)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1392268466 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1392268465}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1393417573
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (15)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1393417574 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1393417573}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1393511367
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (34)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1393511368 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1393511367}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1415666813
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (17)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1415666814 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1415666813}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1425715691
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (36)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1425715692 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1425715691}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1439717190
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9182,6 +11476,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 691543179493864998, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
   m_PrefabInstance: {fileID: 1439717190}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1446356272
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1446356273 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1446356272}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1532712483
 PrefabInstance:
@@ -9302,6 +11658,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
+--- !u!1001 &1546551819
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (38)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1546551820 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1546551819}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1574698498
 GameObject:
   m_ObjectHideFlags: 0
@@ -9409,6 +11827,68 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1001 &1605659084
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (58)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1605659085 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1605659084}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1606706168
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9601,6 +12081,130 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa92cd2683b802441b522847136bd25d, type: 3}
+--- !u!1001 &1622363083
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (5)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1622363084 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1622363083}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1627573691
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (31)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1627573692 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1627573691}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1628418292
 GameObject:
   m_ObjectHideFlags: 0
@@ -9632,6 +12236,192 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1636645081
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (45)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1636645082 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1636645081}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1638591666
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (57)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1638591667 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1638591666}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1642905844
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (23)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1642905845 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1642905844}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1660410599
 GameObject:
   m_ObjectHideFlags: 0
@@ -9663,6 +12453,68 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1691579676
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (20)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1691579677 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1691579676}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1700690545
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9733,6 +12585,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 276042783920179956, guid: fa92cd2683b802441b522847136bd25d, type: 3}
   m_PrefabInstance: {fileID: 1700690545}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1715757307
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (29)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1715757308 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1715757307}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1727610980
 GameObject:
   m_ObjectHideFlags: 0
@@ -9766,6 +12680,68 @@ Transform:
   - {fileID: 1925393911}
   m_Father: {fileID: 4018501520652651161}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1742891149
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (19)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1742891150 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1742891149}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1801512836 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3465103433330211633, guid: 57c8bce743e1d2f4a81682e997f7a871, type: 3}
@@ -9836,6 +12812,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa92cd2683b802441b522847136bd25d, type: 3}
+--- !u!1001 &1832828922
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (12)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1832828923 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1832828922}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1848620303
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9897,6 +12935,130 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 691543179493864998, guid: 1c702d393669d4f4790d43f08612badc, type: 3}
   m_PrefabInstance: {fileID: 1848620303}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1874656273
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (44)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1874656274 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1874656273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1883054667
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (46)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1883054668 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1883054667}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1891316675 stripped
 Transform:
@@ -10008,6 +13170,130 @@ Transform:
   - {fileID: 8551115239475210074}
   m_Father: {fileID: 1727610981}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1934561128
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (33)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1934561129 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1934561128}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1936569421
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (53)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1936569422 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1936569421}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1950918090
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10090,6 +13376,254 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7594888081370199846, guid: 9fe45f65f3fdc1849917eef240aaa959, type: 3}
   m_PrefabInstance: {fileID: 1950918090}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1952795392
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (51)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1952795393 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1952795392}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1983324390
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (8)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &1983324391 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 1983324390}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2029964516
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (30)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &2029964517 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 2029964516}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2030718969
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (28)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &2030718970 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 2030718969}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2078806194
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10151,6 +13685,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8055196918552914556, guid: e75b802fc615b8545a699751a55f02d5, type: 3}
   m_PrefabInstance: {fileID: 2078806194}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2145137843
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 782848809971285038}
+    m_Modifications:
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395274551889381215, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+      propertyPath: m_Name
+      value: TorchGoblin_Red (47)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+--- !u!4 &2145137844 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4414708773720522193, guid: c1fa93511c3a71d429f0211868d41e08, type: 3}
+  m_PrefabInstance: {fileID: 2145137843}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &45652987887993040
 GameObject:
@@ -10408,7 +14004,65 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8693075798319138145}
+  - {fileID: 1446356273}
+  - {fileID: 772654649}
+  - {fileID: 919891576}
+  - {fileID: 1983324391}
+  - {fileID: 1119313648}
+  - {fileID: 1832828923}
+  - {fileID: 314200869}
+  - {fileID: 828422798}
+  - {fileID: 661723881}
+  - {fileID: 1691579677}
+  - {fileID: 1334677140}
+  - {fileID: 1092285369}
+  - {fileID: 1349673581}
+  - {fileID: 2030718970}
+  - {fileID: 2029964517}
+  - {fileID: 1349001785}
+  - {fileID: 1393511368}
+  - {fileID: 1425715692}
+  - {fileID: 1546551820}
+  - {fileID: 1159253914}
+  - {fileID: 1000835762}
+  - {fileID: 1874656274}
+  - {fileID: 1883054668}
+  - {fileID: 563870560}
+  - {fileID: 892087396}
+  - {fileID: 1227540100}
+  - {fileID: 1331937934}
+  - {fileID: 905194220}
+  - {fileID: 1605659085}
   - {fileID: 922960217}
+  - {fileID: 1356518065}
+  - {fileID: 1622363084}
+  - {fileID: 830175796}
+  - {fileID: 203454504}
+  - {fileID: 1392268466}
+  - {fileID: 640607994}
+  - {fileID: 1393417574}
+  - {fileID: 1415666814}
+  - {fileID: 1742891150}
+  - {fileID: 610936715}
+  - {fileID: 1642905845}
+  - {fileID: 385132677}
+  - {fileID: 491507723}
+  - {fileID: 1715757308}
+  - {fileID: 1627573692}
+  - {fileID: 1934561129}
+  - {fileID: 1098338402}
+  - {fileID: 213999617}
+  - {fileID: 75680698}
+  - {fileID: 451218939}
+  - {fileID: 1064190628}
+  - {fileID: 1636645082}
+  - {fileID: 2145137844}
+  - {fileID: 1117578819}
+  - {fileID: 1952795393}
+  - {fileID: 1936569422}
+  - {fileID: 361045782}
+  - {fileID: 1638591667}
+  - {fileID: 1274650319}
   m_Father: {fileID: 4018501520652651161}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &831567560204274732
@@ -23361,7 +27015,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -7,10 +7,11 @@ public interface ICanvasManager
         CanvasGroup canvasGroup,
         Canvas canvas,
         MyEnums.CanvasToToggle canvasToToggle,
-        bool state)//统一调用两个函数的接口函数
+        bool state)//统一调用两个函数的接口函数，用于回调画布状态和真正设置优先级 
     {
         SetCanvaState(canvasGroup, canvasToToggle, state);
         RefreshCanvaOrder(canvas, canvasToToggle, state);
+        Debug.Log("toggle&order");
     }
     void SetCanvaState(
           CanvasGroup canva,

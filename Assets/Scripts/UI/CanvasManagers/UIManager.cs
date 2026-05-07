@@ -15,17 +15,20 @@ public class UIManager : MonoBehaviour
 
     [Header("Input Bindings")]
     public List<CanvasInputBinding> inputBindings;
+    private bool isAnyCanvasOpen;
 
     private MyEnums.CanvasToToggle canvasToToggle
         = MyEnums.CanvasToToggle.Default;
-    private MyEnums.CanvasToToggle currentOpenCanvas
-        = MyEnums.CanvasToToggle.Default;
-    private bool isAnyCanvasOpen;
-    private Dictionary<MyEnums.CanvasToToggle, bool> inputState;
-    private LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder;
+    private MyEnums.CanvasToToggle LastOpenCanvas =>
+        canvasOpenOrder.Last != null
+            ? canvasOpenOrder.Last.Value
+            : MyEnums.CanvasToToggle.Default;
+    private Dictionary<MyEnums.CanvasToToggle, bool> inputState = new();
+    //用来合并外部（代码调用）输入
+    private LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder = new();
+    //用来存已打开画布的链表，顺序访问，但是可以依赖枚举任意删除节点
     private MyEnums.CanvasToToggle currentFocusCanvas
         = MyEnums.CanvasToToggle.Default;
-    // 使用枚举键字典驱动行为，而非硬编码路由。
     private void Awake()
     {
         if (instance == null)
@@ -38,13 +41,12 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        inputState = new Dictionary<MyEnums.CanvasToToggle, bool>();
-        foreach (MyEnums.CanvasToToggle canvas in Enum.GetValues(typeof(MyEnums.CanvasToToggle)))
+        foreach (MyEnums.CanvasToToggle canvas in
+            Enum.GetValues(typeof(MyEnums.CanvasToToggle)))
         {
             inputState[canvas] = false;
         }
 
-        canvasOpenOrder = new LinkedList<MyEnums.CanvasToToggle>();
     }
 
     private void OnEnable()
@@ -58,6 +60,10 @@ public class UIManager : MonoBehaviour
     }
 
     private void OnLoadScene(GameSceneSO arg0, Vector3 arg1, bool arg2)
+    //UIManager作为跨场景持久单例，不会随场景卸载而disable，因此需要订阅场景加载事件来主动重置画布状态。
+    //LoadRequestEvent是同步委托，UIManager的ExecutionOrder(-100)早于SceneChanger，所以OnLoadScene
+    //会在SceneChanger开始异步卸载/加载流程之前同步执行，确保所有UI面板在场景过渡动画和旧场景卸载前被关闭。
+    //另外也有异步等待操作能为这里争取时间，但是还是要注意可能会导致冲突的时序问题
     {
         ResetCanvas();
     }
@@ -65,17 +71,11 @@ public class UIManager : MonoBehaviour
     {
         ToggleCanvas();
     }
-    public void HandleFocus(MyEnums.CanvasToToggle canvas)
+    public void HandleDragFocus(MyEnums.CanvasToToggle canvas)//拖拽脚本的输入，用于完成focus调整
     {
-        if (canvas == MyEnums.CanvasToToggle.Default)
-        {
+        if (canvas == MyEnums.CanvasToToggle.Default ||
+                canvas == currentFocusCanvas && IsCanvasOpen(canvas))
             return;
-        }
-
-        if (canvas == currentFocusCanvas && ContainsCanvas(canvas))
-        {
-            return;
-        }
 
         ApplyFocusChange(canvas);
     }
@@ -93,7 +93,7 @@ public class UIManager : MonoBehaviour
 
     public void RequestCanvasClose(MyEnums.CanvasToToggle canvas)
     {
-        if (canvas == MyEnums.CanvasToToggle.Default || !ContainsCanvas(canvas))
+        if (canvas == MyEnums.CanvasToToggle.Default || !IsCanvasOpen(canvas))
         {
             return;
         }
@@ -101,7 +101,7 @@ public class UIManager : MonoBehaviour
         RaiseCanvasEvent(canvas, false);
         RefreshFocusAfterClose(canvas);
     }
-    // 报告画布的真实开启/关闭状态。
+    // 状态回调，画布报告的真实开启/关闭状态。
     public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
     {
         if (canvas == MyEnums.CanvasToToggle.Default)
@@ -111,10 +111,7 @@ public class UIManager : MonoBehaviour
 
         UpdateCanvasOpenOrder(canvas, state);
 
-        currentOpenCanvas = canvasOpenOrder.Last != null
-            ? canvasOpenOrder.Last.Value
-            : MyEnums.CanvasToToggle.Default;
-        canvasToToggle = currentOpenCanvas;
+        canvasToToggle = LastOpenCanvas;
         isAnyCanvasOpen = canvasOpenOrder.Count > 0;
     }
 
@@ -140,7 +137,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (currentOpenCanvas == MyEnums.CanvasToToggle.ESC)
+        if (LastOpenCanvas == MyEnums.CanvasToToggle.ESC)
         {
             ResetInputState();
             return;
@@ -209,18 +206,19 @@ public class UIManager : MonoBehaviour
 
     private void ApplyFocusChange(MyEnums.CanvasToToggle target)
     {
-        bool wasTargetOpen = ContainsCanvas(target);
+        bool wasTargetOpen = IsCanvasOpen(target);
         MyEnums.CanvasToToggle previousFocus = currentFocusCanvas;
         currentFocusCanvas = target;//标记当前focus，作为画布组设置优先、默认order的依据
 
-        if (previousFocus != MyEnums.CanvasToToggle.Default &&
+        if (previousFocus != MyEnums.CanvasToToggle.Default &&//Default意味着没有面板打开
             previousFocus != target &&
-            ContainsCanvas(previousFocus))
+            IsCanvasOpen(previousFocus))//不是当前目标，并且打开，再次发送true通知画布降低order
         {
             RaiseCanvasEvent(previousFocus, true);
         }
 
-        if (!wasTargetOpen || previousFocus != target)
+        if (!wasTargetOpen || wasTargetOpen && previousFocus != target)
+        //处理两种情况。首先是没打开的画布，在这打开。其次是已经打开但是不在顶层的提升到顶层
         {
             RaiseCanvasEvent(target, true);
         }
@@ -233,7 +231,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        currentFocusCanvas = currentOpenCanvas;
+        currentFocusCanvas = LastOpenCanvas;
 
         if (currentFocusCanvas != MyEnums.CanvasToToggle.Default)
         {
@@ -251,7 +249,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private bool ContainsCanvas(MyEnums.CanvasToToggle canvas)
+    private bool IsCanvasOpen(MyEnums.CanvasToToggle canvas)
     {
         LinkedListNode<MyEnums.CanvasToToggle> currentNode = canvasOpenOrder.First;
 
@@ -299,7 +297,6 @@ public class UIManager : MonoBehaviour
     private void ResetCanvas()
     {
         canvasToToggle = MyEnums.CanvasToToggle.Default;
-        currentOpenCanvas = MyEnums.CanvasToToggle.Default;
         currentFocusCanvas = MyEnums.CanvasToToggle.Default;
         isAnyCanvasOpen = false;
         canvasOpenOrder.Clear();

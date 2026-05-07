@@ -30233,8 +30233,8 @@ MonoBehaviour:
   stunTime: 0.2
   coolDown: 0.3
   speed: 5
-  maxHealth: 2
-  currentHealth: 2
+  maxHealth: 2147483647
+  currentHealth: 2147483647
 --- !u!222 &3410760494699495321
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -30965,7 +30965,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
   fadeDuration: 1
-  initScene: {fileID: 11400000, guid: 2a6c9a782e8ae9c458ddf8f2ded4ac6b, type: 2}
+  initScene: {fileID: 11400000, guid: a125d0b9260a7694aa262df3d13e6a97, type: 2}
   player: {fileID: 6166002366618250803}
   fadeCanva: {fileID: 1424539692}
   loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
