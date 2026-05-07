@@ -2833,7 +2833,6 @@ GameObject:
   - component: {fileID: 144643057}
   - component: {fileID: 144643056}
   - component: {fileID: 144643055}
-  - component: {fileID: 144643059}
   - component: {fileID: 144643058}
   m_Layer: 5
   m_Name: ShiftMenuCanvas
@@ -2939,20 +2938,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &144643059
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 144643053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e0914e289e59424a9366cd9ee598c89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dragTarget: {fileID: 1171897204}
-  canvasGroup: {fileID: 144643058}
 --- !u!1 &144697901
 GameObject:
   m_ObjectHideFlags: 0
@@ -3120,6 +3105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 590878786}
   canvasGroup: {fileID: 870103892}
+  dragCanvasType: 0
 --- !u!1001 &151214509
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6223,6 +6209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 1152246292}
   canvasGroup: {fileID: 2012965572}
+  dragCanvasType: 0
 --- !u!1001 &337227594
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13779,6 +13766,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 376066414}
   canvasGroup: {fileID: 2060990190}
+  dragCanvasType: 0
 --- !u!1 &870103885
 GameObject:
   m_ObjectHideFlags: 0
@@ -33178,6 +33166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 953548021}
   canvasGroup: {fileID: 1081069818152936524}
+  dragCanvasType: 0
 --- !u!222 &8033616665058249611
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -34191,6 +34180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 708706360}
   canvasGroup: {fileID: 512097847646187518}
+  dragCanvasType: 0
 --- !u!224 &8693535790022288313
 RectTransform:
   m_ObjectHideFlags: 0
