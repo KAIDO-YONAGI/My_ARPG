@@ -5,6 +5,7 @@ public class UIDrag : MonoBehaviour, IDragHandler, IPointerDownHandler
 {
     public RectTransform dragTarget;
     public CanvasGroup canvasGroup;
+    public MyEnums.CanvasToToggle dragCanvasType;
     private Vector2 offset;
     private Vector2 originPosition;
     private bool wasVisible;

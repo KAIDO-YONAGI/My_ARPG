@@ -2833,6 +2833,8 @@ GameObject:
   - component: {fileID: 144643057}
   - component: {fileID: 144643056}
   - component: {fileID: 144643055}
+  - component: {fileID: 144643059}
+  - component: {fileID: 144643058}
   m_Layer: 5
   m_Name: ShiftMenuCanvas
   m_TagString: Untagged
@@ -2925,6 +2927,32 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 50
   m_TargetDisplay: 0
+--- !u!225 &144643058
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144643053}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &144643059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144643053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e0914e289e59424a9366cd9ee598c89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dragTarget: {fileID: 1171897204}
+  canvasGroup: {fileID: 144643058}
 --- !u!1 &144697901
 GameObject:
   m_ObjectHideFlags: 0
