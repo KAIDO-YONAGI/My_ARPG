@@ -76,7 +76,10 @@ public class ShopManager : MonoBehaviour, ICanvasManager
                 return;
             }
 
-            RefreshCanvasOrder(isShopOpen);
+            ((ICanvasManager)this).RefreshCanvaOrder(
+                canvas,
+                MyEnums.CanvasToToggle.Shop,
+                isShopOpen);
         }
         else
         {
@@ -93,31 +96,22 @@ public class ShopManager : MonoBehaviour, ICanvasManager
         shopWeapon = weapon;
         shopArmor = armor;
         OpenItemShop();
-        shopCanvasGroup.alpha = 1;
-        shopCanvasGroup.interactable = true;
-        shopCanvasGroup.blocksRaycasts = true;
         isShopOpen = true;
-        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, true);
-        RefreshCanvasOrder(true);
+        ((ICanvasManager)this).ToggleCanvas(
+            shopCanvasGroup,
+            canvas,
+            MyEnums.CanvasToToggle.Shop,
+            true);
     }
 
     public void CloseShop()
     {
-        shopCanvasGroup.alpha = 0;
-        shopCanvasGroup.interactable = false;
-        shopCanvasGroup.blocksRaycasts = false;
         isShopOpen = false;
-        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Shop, false);
-        RefreshCanvasOrder(false);
-    }
-
-    private void RefreshCanvasOrder(bool state)
-    {
-        int order = state && UIManager.instance != null &&
-                    UIManager.instance.IsCanvasFocused(MyEnums.CanvasToToggle.Shop)
-            ? UIManager.FocusOrder
-            : UIManager.DefaultOrder;
-        ((ICanvasManager)this).SetCanvaOrder(canvas, order);
+        ((ICanvasManager)this).ToggleCanvas(
+            shopCanvasGroup,
+            canvas,
+            MyEnums.CanvasToToggle.Shop,
+            false);
     }
 
     private void PopulateShopItems(List<ShopItems> shopItems)
@@ -130,7 +124,7 @@ public class ShopManager : MonoBehaviour, ICanvasManager
             shopSlots[i].Initialize(shopItem.item, shopItem.price);
             shopSlots[i].gameObject.SetActive(true);
         }
-        for (int i = shopItems.Count; i < shopSlots.Length; i++)//置空剩余商店槽位
+        for (int i = shopItems.Count; i < shopSlots.Length; i++)// Clear leftover shop slots.
         {
             shopSlots[i].gameObject.SetActive(false);
 
@@ -144,11 +138,11 @@ public class ShopManager : MonoBehaviour, ICanvasManager
     public void SellItem(ItemSO item)
     {
         if (item == null) return;
-        foreach (var slot in shopSlots)//找到想卖出的物品
+        foreach (var slot in shopSlots)// Find the item the player wants to sell.
         {
             if (slot.GetItemSO() == item)
             {
-                //价格和数目均设置为负，出售
+                // Use negative price and quantity to represent selling.
                 InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, -slot.GetPrice(), -1);
                 return;
             }

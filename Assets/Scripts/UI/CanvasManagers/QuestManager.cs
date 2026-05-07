@@ -103,15 +103,15 @@ public class QuestManager : MonoBehaviour, ICanvasManager
         {
             if (canvasIsActive)
             {
-                RefreshCanvasOrder(true);
+                ((ICanvasManager)this).RefreshCanvaOrder(
+                    canvas,
+                    MyEnums.CanvasToToggle.Quest,
+                    true);
             }
             return;
         }
 
-        if (!state)
-        {
-            CloseQuestBoard();
-        }
+        CloseQuestBoard();
     }
     private void OnQuestOptionChose(MyEnums.QuestState questStateToShift)
     {
@@ -364,19 +364,12 @@ public class QuestManager : MonoBehaviour, ICanvasManager
     }
     private void SetQuestCanvasState(bool state)
     {
-        SetCanvaState(questCanvaGroup, state);
+        ((ICanvasManager)this).ToggleCanvas(
+            questCanvaGroup,
+            canvas,
+            MyEnums.CanvasToToggle.Quest,
+            state);
         canvasIsActive = state;
-        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Quest, state);
-        RefreshCanvasOrder(state);
-    }
-
-    private void RefreshCanvasOrder(bool state)
-    {
-        int order = state && UIManager.instance != null &&
-                    UIManager.instance.IsCanvasFocused(MyEnums.CanvasToToggle.Quest)
-            ? UIManager.FocusOrder
-            : UIManager.DefaultOrder;
-        ((ICanvasManager)this).SetCanvaOrder(canvas, order);
     }
     private void SetCanvaState(CanvasGroup canva, bool state)
     {
