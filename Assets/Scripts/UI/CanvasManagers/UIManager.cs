@@ -16,13 +16,16 @@ public class UIManager : MonoBehaviour
     [Header("Input Bindings")]
     public List<CanvasInputBinding> inputBindings;
 
-    private MyEnums.CanvasToToggle canvasToToggle = MyEnums.CanvasToToggle.Default;
-    private MyEnums.CanvasToToggle currentOpenCanvas = MyEnums.CanvasToToggle.Default;
-    private MyEnums.CanvasToToggle currentFocusCanvas = MyEnums.CanvasToToggle.Default;
+    private MyEnums.CanvasToToggle canvasToToggle
+        = MyEnums.CanvasToToggle.Default;
+    private MyEnums.CanvasToToggle currentOpenCanvas
+        = MyEnums.CanvasToToggle.Default;
     private bool isAnyCanvasOpen;
     private Dictionary<MyEnums.CanvasToToggle, bool> inputState;
     private LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder;
-
+    private MyEnums.CanvasToToggle currentFocusCanvas
+        = MyEnums.CanvasToToggle.Default;
+    // Uses an enum-keyed dictionary to drive behavior instead of hardcoded routing.
     private void Awake()
     {
         if (instance == null)
@@ -58,12 +61,10 @@ public class UIManager : MonoBehaviour
     {
         ResetCanvas();
     }
-
     private void Update()
     {
         ToggleCanvas();
     }
-
     public void HandleFocus(MyEnums.CanvasToToggle canvas)
     {
         if (canvas == MyEnums.CanvasToToggle.Default)
@@ -79,6 +80,7 @@ public class UIManager : MonoBehaviour
         ApplyFocusChange(canvas);
     }
 
+    // Used for externally toggling the requested canvas/default state.
     public void RequestCanvasToggle(MyEnums.CanvasToToggle canvas)
     {
         if (!inputState.ContainsKey(canvas))
@@ -99,12 +101,7 @@ public class UIManager : MonoBehaviour
         RaiseCanvasEvent(canvas, false);
         RefreshFocusAfterClose(canvas);
     }
-
-    public bool IsCanvasFocused(MyEnums.CanvasToToggle canvas)
-    {
-        return currentFocusCanvas == canvas;
-    }
-
+    // Reports the canvas's real open/close state.
     public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
     {
         if (canvas == MyEnums.CanvasToToggle.Default)
@@ -121,12 +118,19 @@ public class UIManager : MonoBehaviour
         isAnyCanvasOpen = canvasOpenOrder.Count > 0;
     }
 
+    public bool IsCanvasFocused(MyEnums.CanvasToToggle canvas)
+    {
+        return currentFocusCanvas == canvas;
+    }
+
     private void ToggleCanvas()
     {
+        // Reads registered input bindings; unregistered canvases can still use RequestCanvasToggle.
         foreach (var binding in inputBindings)
         {
             bool pressed = Input.GetButtonDown(binding.buttonName);
             inputState[binding.canvas] = inputState[binding.canvas] || pressed;
+            // Both external requests and button presses can trigger a toggle.
         }
 
         if (inputState[MyEnums.CanvasToToggle.ESC])
@@ -153,7 +157,8 @@ public class UIManager : MonoBehaviour
             if (inputState[binding.canvas])
             {
                 canvasToToggle = binding.canvas;
-                break;
+
+                break;// Only handle the first input in this frame.
             }
         }
 
@@ -274,6 +279,7 @@ public class UIManager : MonoBehaviour
             if (currentNode.Value == canvas)
             {
                 canvasOpenOrder.Remove(currentNode);
+
                 break;
             }
 

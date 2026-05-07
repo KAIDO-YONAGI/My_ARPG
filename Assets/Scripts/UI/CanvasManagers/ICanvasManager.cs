@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public interface ICanvasManager
 {
     ToggleCanvasEventSO ToggleCanvasEvent { get; }
+
     public void SetCanvaState(
            CanvasGroup canva,
            MyEnums.CanvasToToggle canvasToToggle,
@@ -13,25 +12,38 @@ public interface ICanvasManager
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
         canva.interactable = state;
-        UIManager.instance.ReportCanvasState(canvasToToggle, state);
+
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.ReportCanvasState(canvasToToggle, state);
+        }
     }
-    // private int order = 0;
-    // private Canvas canvas;
-    // private void Start()
-    // {
-    //     canvas = currentCanvas.GetComponent<Canvas>();
-    // }
-    //     int order = state && UIManager.instance != null &&
-    //             UIManager.instance.IsCanvasFocused(MyEnums.CanvasToToggle.Backpack)
-    //     ? UIManager.FocusOrder
-    //     : UIManager.DefaultOrder;
-    // ((ICanvasManager)this).SetCanvaOrder(canvas, order);
-    public void SetCanvaOrder(Canvas canvas, int order)
+
+    public void RefreshCanvaOrder(
+        Canvas canvas,
+        MyEnums.CanvasToToggle canvasToToggle,
+        bool state)
     {
+        int order = state && UIManager.instance != null &&
+                    UIManager.instance.IsCanvasFocused(canvasToToggle)
+            ? UIManager.FocusOrder
+            : UIManager.DefaultOrder;
         if (canvas == null)
         {
             return;
         }
+
         canvas.sortingOrder = order;
     }
+
+    public void ToggleCanvas(
+        CanvasGroup canvasGroup,
+        Canvas canvas,
+        MyEnums.CanvasToToggle canvasToToggle,
+        bool state)
+    {
+        SetCanvaState(canvasGroup, canvasToToggle, state);
+        RefreshCanvaOrder(canvas, canvasToToggle, state);
+    }
+
 }
