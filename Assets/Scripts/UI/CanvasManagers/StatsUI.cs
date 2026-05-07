@@ -13,7 +13,7 @@ public class StatsUI : MonoBehaviour, ICanvasManager
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
     private Canvas canvas;
 
-    private void Awake()// Runs on instantiation, before Start().
+    private void Awake()// 在实例化时运行，早于Start()。
     {
         statsCanvas.alpha = 0;
         canvas = statsCanvas.GetComponent<Canvas>();
@@ -37,17 +37,13 @@ public class StatsUI : MonoBehaviour, ICanvasManager
     private void OnToggleStatsEvent(bool state)
     {
         UpdateAllStats();
-        ((ICanvasManager)this).ToggleCanvas(
-            statsCanvas,
-            canvas,
-            MyEnums.CanvasToToggle.Stats,
-            state);
+        ((ICanvasManager)this).ToggleCanvas(statsCanvas, canvas, MyEnums.CanvasToToggle.Stats, state);
     }
 
     public void UpdateDamage()
     {
         statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.instance.GetDamage();
-        // Note: Components is plural and returns an array.
+        // 注意：Components是复数形式，返回的是数组。
     }
 
     public void UpdateSpeed()

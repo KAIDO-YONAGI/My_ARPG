@@ -25,10 +25,6 @@ public class BackpackCanvasManager : MonoBehaviour, ICanvasManager
 
     private void OnToggleBackpack(bool state)
     {
-        ((ICanvasManager)this).ToggleCanvas(
-            currentCanvas,
-            canvas,
-            MyEnums.CanvasToToggle.Backpack,
-            state);
+        ((ICanvasManager)this).ToggleCanvas(currentCanvas, canvas, MyEnums.CanvasToToggle.Backpack, state);
     }
 }

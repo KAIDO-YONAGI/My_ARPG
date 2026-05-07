@@ -364,11 +364,7 @@ public class QuestManager : MonoBehaviour, ICanvasManager
     }
     private void SetQuestCanvasState(bool state)
     {
-        ((ICanvasManager)this).ToggleCanvas(
-            questCanvaGroup,
-            canvas,
-            MyEnums.CanvasToToggle.Quest,
-            state);
+        ((ICanvasManager)this).ToggleCanvas(questCanvaGroup, canvas, MyEnums.CanvasToToggle.Quest, state);
         canvasIsActive = state;
     }
     private void SetCanvaState(CanvasGroup canva, bool state)

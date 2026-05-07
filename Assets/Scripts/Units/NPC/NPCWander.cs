@@ -110,14 +110,11 @@ public class NPCWander : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
-        // 脚本未启用时不绘制
-        if (!enabled)
+        if (!enabled)//非运行时不着色
             return;
         if (patrolRadius == 0)
             return;
         Gizmos.color = Color.yellow;
-
-        // 编辑器模式（未运行）：圆圈跟随角色
-        Gizmos.DrawWireSphere(transform.position, patrolRadius);
+        Gizmos.DrawWireSphere(Application.isPlaying ? circleCenter : transform.position, patrolRadius);//运行时着色取初始点
     }
 }

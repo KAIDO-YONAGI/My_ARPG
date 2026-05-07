@@ -97,21 +97,13 @@ public class ShopManager : MonoBehaviour, ICanvasManager
         shopArmor = armor;
         OpenItemShop();
         isShopOpen = true;
-        ((ICanvasManager)this).ToggleCanvas(
-            shopCanvasGroup,
-            canvas,
-            MyEnums.CanvasToToggle.Shop,
-            true);
+        ((ICanvasManager)this).ToggleCanvas(shopCanvasGroup, canvas, MyEnums.CanvasToToggle.Shop, true);
     }
 
     public void CloseShop()
     {
         isShopOpen = false;
-        ((ICanvasManager)this).ToggleCanvas(
-            shopCanvasGroup,
-            canvas,
-            MyEnums.CanvasToToggle.Shop,
-            false);
+        ((ICanvasManager)this).ToggleCanvas(shopCanvasGroup, canvas, MyEnums.CanvasToToggle.Shop, false);
     }
 
     private void PopulateShopItems(List<ShopItems> shopItems)
@@ -124,7 +116,7 @@ public class ShopManager : MonoBehaviour, ICanvasManager
             shopSlots[i].Initialize(shopItem.item, shopItem.price);
             shopSlots[i].gameObject.SetActive(true);
         }
-        for (int i = shopItems.Count; i < shopSlots.Length; i++)// Clear leftover shop slots.
+        for (int i = shopItems.Count; i < shopSlots.Length; i++)// 清除多余的商店槽位。
         {
             shopSlots[i].gameObject.SetActive(false);
 
@@ -138,11 +130,11 @@ public class ShopManager : MonoBehaviour, ICanvasManager
     public void SellItem(ItemSO item)
     {
         if (item == null) return;
-        foreach (var slot in shopSlots)// Find the item the player wants to sell.
+        foreach (var slot in shopSlots)// 查找玩家想要出售的物品。
         {
             if (slot.GetItemSO() == item)
             {
-                // Use negative price and quantity to represent selling.
+                // 使用负数价格和数量表示出售。
                 InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, -slot.GetPrice(), -1);
                 return;
             }

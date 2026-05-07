@@ -173,24 +173,6 @@ public class NPCPatrol : MonoBehaviour
         float halfWidth = patrolSize.x / 2f;
         float halfHeight = patrolSize.y / 2f;
 
-        Vector3[] drawCorners = new Vector3[4];
-        drawCorners[0] = center + new Vector3(halfWidth, -halfHeight, 0);
-        drawCorners[1] = center + new Vector3(-halfWidth, -halfHeight, 0);
-        drawCorners[2] = center + new Vector3(-halfWidth, halfHeight, 0);
-        drawCorners[3] = center + new Vector3(halfWidth, halfHeight, 0);
-
-        // 绘制矩形边框
-        for (int i = 0; i < 4; i++)
-        {
-            Gizmos.DrawLine(drawCorners[i], drawCorners[(i + 1) % 4]);
-        }
-
-        // 绘制角点
-        Gizmos.color = Color.green;
-        for (int i = 0; i < 4; i++)
-        {
-            Gizmos.DrawWireSphere(drawCorners[i], 0.2f);
-        }
 
         // 绘制当前目标角
         if (Application.isPlaying && currentCornerIndex < 4)
