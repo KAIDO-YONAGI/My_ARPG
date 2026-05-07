@@ -1,16 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 [DefaultExecutionOrder(-100)]
-
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
-    public static int FOCUS_ORDER=90;
+    public static int FocusOrder = 90;
+    public static int DefaultOrder = 5;
 
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
@@ -19,14 +16,13 @@ public class UIManager : MonoBehaviour
     [Header("Input Bindings")]
     public List<CanvasInputBinding> inputBindings;
 
-    private MyEnums.CanvasToToggle canvasToToggle
-        = MyEnums.CanvasToToggle.Default;
-    private MyEnums.CanvasToToggle currentOpenCanvas
-        = MyEnums.CanvasToToggle.Default;
+    private MyEnums.CanvasToToggle canvasToToggle = MyEnums.CanvasToToggle.Default;
+    private MyEnums.CanvasToToggle currentOpenCanvas = MyEnums.CanvasToToggle.Default;
+    private MyEnums.CanvasToToggle currentFocusCanvas = MyEnums.CanvasToToggle.Default;
     private bool isAnyCanvasOpen;
     private Dictionary<MyEnums.CanvasToToggle, bool> inputState;
     private LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder;
-    //利用枚举字典来匹配行为，取消代码配置
+
     private void Awake()
     {
         if (instance == null)
@@ -62,12 +58,26 @@ public class UIManager : MonoBehaviour
     {
         ResetCanvas();
     }
+
     private void Update()
     {
         ToggleCanvas();
     }
 
-    //用于外部切换需要的画布/默认状态
+    public void HandleFocus(MyEnums.CanvasToToggle canvas)
+    {
+        if (canvas == MyEnums.CanvasToToggle.Default)
+        {
+            return;
+        }
+
+        if (canvas == currentFocusCanvas && ContainsCanvas(canvas))
+        {
+            return;
+        }
+
+        ApplyFocusChange(canvas);
+    }
 
     public void RequestCanvasToggle(MyEnums.CanvasToToggle canvas)
     {
@@ -87,8 +97,13 @@ public class UIManager : MonoBehaviour
         }
 
         RaiseCanvasEvent(canvas, false);
+        RefreshFocusAfterClose(canvas);
     }
-    //报告画布的真实开关状态
+
+    public bool IsCanvasFocused(MyEnums.CanvasToToggle canvas)
+    {
+        return currentFocusCanvas == canvas;
+    }
 
     public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
     {
@@ -109,11 +124,9 @@ public class UIManager : MonoBehaviour
     private void ToggleCanvas()
     {
         foreach (var binding in inputBindings)
-        //获取注册在inputBindings的画布组的按钮绑定的激活状态，如果不注册，则仅使用RequestCanvasToggle调度
         {
             bool pressed = Input.GetButtonDown(binding.buttonName);
             inputState[binding.canvas] = inputState[binding.canvas] || pressed;
-            //外部输入和点按钮均可
         }
 
         if (inputState[MyEnums.CanvasToToggle.ESC])
@@ -140,15 +153,13 @@ public class UIManager : MonoBehaviour
             if (inputState[binding.canvas])
             {
                 canvasToToggle = binding.canvas;
-
-                break;//只处理第一次的输入
+                break;
             }
         }
 
         if (canvasToToggle != MyEnums.CanvasToToggle.Default)
         {
-            RaiseCanvasEvent(canvasToToggle, true);
-
+            ApplyFocusChange(canvasToToggle);
         }
 
         ResetInputState();
@@ -172,7 +183,9 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        RaiseCanvasEvent(canvasOpenOrder.Last.Value, false);
+        MyEnums.CanvasToToggle canvasToClose = canvasOpenOrder.Last.Value;
+        RaiseCanvasEvent(canvasToClose, false);
+        RefreshFocusAfterClose(canvasToClose);
     }
 
     private void RaiseCanvasEvent(MyEnums.CanvasToToggle target, bool state)
@@ -186,6 +199,40 @@ public class UIManager : MonoBehaviour
 
             eventSO.RaiseToggleCanvasEvent(state);
             return;
+        }
+    }
+
+    private void ApplyFocusChange(MyEnums.CanvasToToggle target)
+    {
+        bool wasTargetOpen = ContainsCanvas(target);
+        MyEnums.CanvasToToggle previousFocus = currentFocusCanvas;
+        currentFocusCanvas = target;
+
+        if (previousFocus != MyEnums.CanvasToToggle.Default &&
+            previousFocus != target &&
+            ContainsCanvas(previousFocus))
+        {
+            RaiseCanvasEvent(previousFocus, true);
+        }
+
+        if (!wasTargetOpen || previousFocus != target)
+        {
+            RaiseCanvasEvent(target, true);
+        }
+    }
+
+    private void RefreshFocusAfterClose(MyEnums.CanvasToToggle closedCanvas)
+    {
+        if (currentFocusCanvas != closedCanvas)
+        {
+            return;
+        }
+
+        currentFocusCanvas = currentOpenCanvas;
+
+        if (currentFocusCanvas != MyEnums.CanvasToToggle.Default)
+        {
+            RaiseCanvasEvent(currentFocusCanvas, true);
         }
     }
 
@@ -227,7 +274,6 @@ public class UIManager : MonoBehaviour
             if (currentNode.Value == canvas)
             {
                 canvasOpenOrder.Remove(currentNode);
-
                 break;
             }
 
@@ -248,6 +294,7 @@ public class UIManager : MonoBehaviour
     {
         canvasToToggle = MyEnums.CanvasToToggle.Default;
         currentOpenCanvas = MyEnums.CanvasToToggle.Default;
+        currentFocusCanvas = MyEnums.CanvasToToggle.Default;
         isAnyCanvasOpen = false;
         canvasOpenOrder.Clear();
 

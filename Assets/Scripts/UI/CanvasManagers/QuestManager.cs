@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestManager : MonoBehaviour
+public class QuestManager : MonoBehaviour, ICanvasManager
 {
     public static QuestManager instance;
     public CanvasGroup questCanvaGroup;
@@ -12,6 +12,7 @@ public class QuestManager : MonoBehaviour
     public LoadQuestEventSO loadQuestEventSO;
     public QuestOptionsEventSO questOptionsEventSO;
     public ToggleCanvasEventSO toggleQuestEvent;
+    public ToggleCanvasEventSO ToggleCanvasEvent => toggleQuestEvent;
 
 
     [Header("Events To Trigger")]
@@ -43,6 +44,7 @@ public class QuestManager : MonoBehaviour
     private bool canvasIsActive;
     private List<QuestSO> currentBoardLoadQuests;
     private QuestSO currentQuest;
+    private Canvas canvas;
 
     public void SetCurrentQuest(QuestSO quest)
     {
@@ -72,6 +74,8 @@ public class QuestManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        canvas = questCanvaGroup.GetComponent<Canvas>();
     }
 
     private void OnEnable()
@@ -95,7 +99,15 @@ public class QuestManager : MonoBehaviour
 
     private void OnToggleQuest(bool state)
     {
-        // Only responsible for closing. Opening is handled by BoardManager.
+        if (state)
+        {
+            if (canvasIsActive)
+            {
+                RefreshCanvasOrder(true);
+            }
+            return;
+        }
+
         if (!state)
         {
             CloseQuestBoard();
@@ -355,6 +367,16 @@ public class QuestManager : MonoBehaviour
         SetCanvaState(questCanvaGroup, state);
         canvasIsActive = state;
         UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Quest, state);
+        RefreshCanvasOrder(state);
+    }
+
+    private void RefreshCanvasOrder(bool state)
+    {
+        int order = state && UIManager.instance != null &&
+                    UIManager.instance.IsCanvasFocused(MyEnums.CanvasToToggle.Quest)
+            ? UIManager.FocusOrder
+            : UIManager.DefaultOrder;
+        ((ICanvasManager)this).SetCanvaOrder(canvas, order);
     }
     private void SetCanvaState(CanvasGroup canva, bool state)
     {

@@ -3105,7 +3105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 590878786}
   canvasGroup: {fileID: 870103892}
-  dragCanvasType: 0
+  dragCanvasType: 5
 --- !u!1001 &151214509
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6209,7 +6209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 1152246292}
   canvasGroup: {fileID: 2012965572}
-  dragCanvasType: 0
+  dragCanvasType: 6
 --- !u!1001 &337227594
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7684,7 +7684,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 421772636}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -13766,7 +13766,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 376066414}
   canvasGroup: {fileID: 2060990190}
-  dragCanvasType: 0
+  dragCanvasType: 8
 --- !u!1 &870103885
 GameObject:
   m_ObjectHideFlags: 0
@@ -13863,7 +13863,7 @@ Canvas:
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
@@ -25535,7 +25535,7 @@ Canvas:
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
@@ -26829,14 +26829,14 @@ Canvas:
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 50
+  m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &2060990194
 MonoBehaviour:
@@ -33166,7 +33166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 953548021}
   canvasGroup: {fileID: 1081069818152936524}
-  dragCanvasType: 0
+  dragCanvasType: 3
 --- !u!222 &8033616665058249611
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -33602,7 +33602,7 @@ Canvas:
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
@@ -33948,7 +33948,7 @@ Canvas:
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
@@ -34180,7 +34180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragTarget: {fileID: 708706360}
   canvasGroup: {fileID: 512097847646187518}
-  dragCanvasType: 0
+  dragCanvasType: 2
 --- !u!224 &8693535790022288313
 RectTransform:
   m_ObjectHideFlags: 0
