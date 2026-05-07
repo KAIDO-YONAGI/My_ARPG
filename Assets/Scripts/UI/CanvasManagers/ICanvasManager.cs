@@ -3,11 +3,19 @@ using UnityEngine;
 public interface ICanvasManager
 {
     ToggleCanvasEventSO ToggleCanvasEvent { get; }
-
-    public void SetCanvaState(
-           CanvasGroup canva,
-           MyEnums.CanvasToToggle canvasToToggle,
-           bool state)
+    public void ToggleCanvas(
+        CanvasGroup canvasGroup,
+        Canvas canvas,
+        MyEnums.CanvasToToggle canvasToToggle,
+        bool state)//统一调用两个函数的接口函数
+    {
+        SetCanvaState(canvasGroup, canvasToToggle, state);
+        RefreshCanvaOrder(canvas, canvasToToggle, state);
+    }
+    void SetCanvaState(
+          CanvasGroup canva,
+          MyEnums.CanvasToToggle canvasToToggle,
+          bool state)//如果操作成功了，那就告知manager
     {
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
@@ -19,13 +27,14 @@ public interface ICanvasManager
         }
     }
 
-    public void RefreshCanvaOrder(
-        Canvas canvas,
-        MyEnums.CanvasToToggle canvasToToggle,
-        bool state)
+    void RefreshCanvaOrder(
+       Canvas canvas,
+       MyEnums.CanvasToToggle canvasToToggle,
+       bool state)
     {
         int order = state && UIManager.instance != null &&
                     UIManager.instance.IsCanvasFocused(canvasToToggle)
+            //如果Manager里当前已经focus了该画布，就设置当前画布的为聚焦顺序，否则为默认顺序
             ? UIManager.FocusOrder
             : UIManager.DefaultOrder;
         if (canvas == null)
@@ -36,14 +45,6 @@ public interface ICanvasManager
         canvas.sortingOrder = order;
     }
 
-    public void ToggleCanvas(
-        CanvasGroup canvasGroup,
-        Canvas canvas,
-        MyEnums.CanvasToToggle canvasToToggle,
-        bool state)
-    {
-        SetCanvaState(canvasGroup, canvasToToggle, state);
-        RefreshCanvaOrder(canvas, canvasToToggle, state);
-    }
+
 
 }

@@ -23,10 +23,6 @@ public class ToggleSkillTree : MonoBehaviour, ICanvasManager
     }
     private void OnToggleSkillEvent(bool state)
     {
-        ((ICanvasManager)this).ToggleCanvas(
-            skillsCanvas,
-            canvas,
-            MyEnums.CanvasToToggle.Skills,
-            state);
+        ((ICanvasManager)this).ToggleCanvas(skillsCanvas, canvas, MyEnums.CanvasToToggle.Skills, state);
     }
 }

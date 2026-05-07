@@ -25,7 +25,7 @@ public class UIManager : MonoBehaviour
     private LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder;
     private MyEnums.CanvasToToggle currentFocusCanvas
         = MyEnums.CanvasToToggle.Default;
-    // Uses an enum-keyed dictionary to drive behavior instead of hardcoded routing.
+    // 使用枚举键字典驱动行为，而非硬编码路由。
     private void Awake()
     {
         if (instance == null)
@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
         ApplyFocusChange(canvas);
     }
 
-    // Used for externally toggling the requested canvas/default state.
+    // 用于外部切换请求的画布/默认状态。
     public void RequestCanvasToggle(MyEnums.CanvasToToggle canvas)
     {
         if (!inputState.ContainsKey(canvas))
@@ -101,7 +101,7 @@ public class UIManager : MonoBehaviour
         RaiseCanvasEvent(canvas, false);
         RefreshFocusAfterClose(canvas);
     }
-    // Reports the canvas's real open/close state.
+    // 报告画布的真实开启/关闭状态。
     public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
     {
         if (canvas == MyEnums.CanvasToToggle.Default)
@@ -125,12 +125,12 @@ public class UIManager : MonoBehaviour
 
     private void ToggleCanvas()
     {
-        // Reads registered input bindings; unregistered canvases can still use RequestCanvasToggle.
+        // 读取已注册的输入绑定；未注册的画布仍可使用RequestCanvasToggle。
         foreach (var binding in inputBindings)
         {
             bool pressed = Input.GetButtonDown(binding.buttonName);
             inputState[binding.canvas] = inputState[binding.canvas] || pressed;
-            // Both external requests and button presses can trigger a toggle.
+            // 外部请求和按键按下都可以触发切换。
         }
 
         if (inputState[MyEnums.CanvasToToggle.ESC])
@@ -158,7 +158,7 @@ public class UIManager : MonoBehaviour
             {
                 canvasToToggle = binding.canvas;
 
-                break;// Only handle the first input in this frame.
+                break;// 只处理本帧的第一个输入。
             }
         }
 
@@ -211,7 +211,7 @@ public class UIManager : MonoBehaviour
     {
         bool wasTargetOpen = ContainsCanvas(target);
         MyEnums.CanvasToToggle previousFocus = currentFocusCanvas;
-        currentFocusCanvas = target;
+        currentFocusCanvas = target;//标记当前focus，作为画布组设置优先、默认order的依据
 
         if (previousFocus != MyEnums.CanvasToToggle.Default &&
             previousFocus != target &&
