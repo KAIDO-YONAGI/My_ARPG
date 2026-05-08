@@ -12,29 +12,27 @@ public class DataManager : MonoBehaviour
 {
     public static DataManager instance;
 
-    List<ISaveable> saveables = new List<ISaveable>();
-
-    Data dataToSave;
+    public Data GetData => dataToSave;
+    [Header("Send")]
+    public DataSaveEventSO dataSavedEvent;
 
     [Header("Receive")]
-    public VoidEventSO saveDataEvent;
-    public VoidEventSO loadDataEvent;
+
     public SceneLoadEventSO sceneLoadEventSO;
     public VoidEventSO sceneLoadedEvent;
 
+    private List<ISaveable> saveables = new();
+
+    private Data dataToSave = new Data();
     private void OnEnable()
     {
-        sceneLoadEventSO.LoadRequestEvent += OnSave;
-        sceneLoadedEvent.VoidEvent += OnLoad;
-
+        sceneLoadEventSO.LoadRequestEvent += OnAutoSave;
+        sceneLoadedEvent.VoidEvent += OnAutoLoad;
     }
-
-
-
     private void OnDisable()
     {
-        sceneLoadEventSO.LoadRequestEvent -= OnSave;
-        sceneLoadedEvent.VoidEvent -= OnLoad;
+        sceneLoadEventSO.LoadRequestEvent -= OnAutoSave;
+        sceneLoadedEvent.VoidEvent -= OnAutoLoad;
     }
     private void Awake()
     {
@@ -42,8 +40,6 @@ public class DataManager : MonoBehaviour
             instance = this;
         else
             Destroy(gameObject);
-
-        dataToSave = new Data();
     }
 
     public void RegisterSaveableData(ISaveable saveable)
@@ -58,17 +54,28 @@ public class DataManager : MonoBehaviour
     {
         saveables.Remove(saveable);
     }
-    private void OnSave(GameSceneSO arg0, Vector3 arg1, bool arg2)
+    private void OnAutoSave(GameSceneSO arg0, Vector3 arg1, bool arg2)
     {
         foreach (var saveable in saveables.ToList())
         {
             saveable.SaveData(dataToSave);
         }
-        
+        //场景名、人物位置、任务、背包
+        dataToSave.playerStatsData = StatsManager.instance.GetStats();
+        dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.SystemSave);
     }
 
-    void OnLoad()
+    void OnAutoLoad()
     {
+        foreach (var saveable in saveables.ToList())
+        {
+            saveable.LoadData(dataToSave);
+        }
+    }
+
+    public void LoadFromData(Data data)
+    {
+        dataToSave = data;
         foreach (var saveable in saveables.ToList())
         {
             saveable.LoadData(dataToSave);

@@ -28,7 +28,6 @@ public class StatsManager : MonoBehaviour
         else Destroy(gameObject);
     }
     [SerializeField] private PlayerStatsData stats = new();
-
     public PlayerStatsData GetStats() => stats;
     public void LoadStats(PlayerStatsData data)
     {
@@ -49,16 +48,7 @@ public class StatsManager : MonoBehaviour
     public int GetExpToUpgrade() => stats.expToUpgrade;
     public float GetExpMutiplier() => stats.expMutiplier;
 
-    public void SetWeaponRange(float value) => stats.weaponRange = value;
-    public void SetKnockBackForce(float value) => stats.knockBackForce = value;
-    public void SetKnockBackTime(float value) => stats.knockBackTime = value;
-    public void SetStunTime(float value) => stats.stunTime = value;
-    public void SetCoolDown(float value) => stats.coolDown = value;
-    public void SetHealth(int health)
-    {
-        stats.currentHealth = Math.Min(health, stats.maxHealth);
-        HealthCanvasManager.instance.UpdateHealthText();
-    }
+    //注意setter需要伴随UI的更新一起编写，非必要不要直接用setter
     public void Respwan()
     {
         if (stats.currentHealth <= 0)

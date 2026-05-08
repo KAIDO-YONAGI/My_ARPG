@@ -2,33 +2,56 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Save
-{
-    SaveInfo saveInfo;
 
-    Data data;
-    public Save(SaveInfo saveInfo, Data data)
-    {
-        this.saveInfo = saveInfo;
-        this.data = data;
-
-    }
-}
-public class Data//string是GUID
+public class Data
 {
-    //元组的第一个参数代表位置，第二个代表是否被拾取
-    public Dictionary<string, (Vector3, bool)> lootsStatsDic = new();
-    public Tuple<string, Vector3> SceneNameAndPlayerPos;
+    public Dictionary<string, LootStatus> lootsStatsDic = new();//string是GUID
+    public SceneAndPosition sceneNameAndPlayerPos;
     public PlayerStatsData playerStatsData;
 }
 public class SaveInfo
 {
-    string saveID;//用于标识
-    MyEnums.SaveType saveType;
-    public SaveInfo(string saveID,MyEnums.SaveType saveType)
+    public string saveID;//时间戳
+    public MyEnums.SaveType saveType;
+    public SaveInfo(string saveID, MyEnums.SaveType saveType)
     {
-        this.saveID=saveID;
-        this.saveType=saveType;
+        this.saveID = saveID;
+        this.saveType = saveType;
     }
 }
 
+
+[Serializable]
+public class SerializableVector3
+{
+    public float x, y, z;
+    public SerializableVector3() { }
+    public SerializableVector3(Vector3 v) { x = v.x; y = v.y; z = v.z; }
+    public Vector3 ToVector3() => new Vector3(x, y, z);
+}
+
+[Serializable]
+public class LootStatus
+{
+    public SerializableVector3 position;
+    public bool hasBeenPicked;
+    public LootStatus() { }
+    public LootStatus(Vector3 pos, bool picked)
+    {
+        position = new SerializableVector3(pos);
+        hasBeenPicked = picked;
+    }
+}
+
+[Serializable]
+public class SceneAndPosition
+{
+    public string sceneName;
+    public SerializableVector3 position;
+    public SceneAndPosition() { }
+    public SceneAndPosition(string name, Vector3 pos)
+    {
+        sceneName = name;
+        position = new SerializableVector3(pos);
+    }
+}

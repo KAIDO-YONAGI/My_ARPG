@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -11,33 +10,77 @@ using UnityEngine;
 
 
 //目前存档和加载太频繁，需要批量处理 done
+
+
+//DataManager做Data对象，此处做info并且打包、写文件进行存档
+
+public class Save
+{
+    public SaveInfo saveInfo;
+    public Data data;
+    public Save(SaveInfo saveInfo, Data data)
+    {
+        this.saveInfo = saveInfo;
+        this.data = data;
+    }
+}
 public class SaveSystem : MonoBehaviour
 {
     public static SaveSystem instance;
-
+    public DataSaveEventSO dataSavedEvent;
+    private void OnEnable()
+    {
+        dataSavedEvent.DataSaveEvent += OnSaveEvent;
+    }
+    private void OnDisable()
+    {
+        dataSavedEvent.DataSaveEvent -= OnSaveEvent;
+    }
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
     }
-
-    public void InitiateSave(MyEnums.SaveType saveType, Data data)
+    public void OnSaveEvent(MyEnums.SaveType saveType)//通过事件确认存档：以收到的Data保存完成事件为准（带存档类型）
     {
-        string saveID = System.Guid.NewGuid().ToString();
+        WriteSave(saveType);
+    }
+    private void WriteSave(MyEnums.SaveType saveType)
+    {
+        string saveID = System.DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
         SaveInfo saveInfo = new(saveID, saveType);
-        Save save = new(saveInfo, data);
+        Save save = new(saveInfo, DataManager.instance.GetData);
 
+        string json = JsonConvert.SerializeObject(save, Formatting.Indented);
+        File.WriteAllText(Application.persistentDataPath + $"/{saveType}_{saveID}.json", json);
 
-        Dictionary<string, int> points = new Dictionary<string, int>
+        Debug.Log("SaveRoute: " + Application.persistentDataPath + $"/{saveType}_{saveID}.json");
+    }
+    public void LoadSave(MyEnums.SaveType saveType)
+    {
+        string[] files = Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
+        if (files.Length == 0)
         {
-            { "James", 9001 },
-            { "Jo", 3474 },
-            { "Jess", 11926 }
-        };
+            Debug.LogWarning("No save files found.");
+            return;
+        }
 
-        // 序列化并写入
-        string json = JsonConvert.SerializeObject(points, Formatting.Indented);
-        File.WriteAllText(Application.persistentDataPath + "/save.json", json);
-        Debug.Log("SaveRoute: " + Application.persistentDataPath + "/save.json");
+        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
+        Array.Sort(files);
+        string latestFile = files[files.Length - 1];
+
+        try
+        {
+            string json = File.ReadAllText(latestFile);
+            Save save = JsonConvert.DeserializeObject<Save>(json);
+
+            DataManager.instance.LoadFromData(save.data);
+
+            Debug.Log("LoadRoute: " + latestFile);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to load save file {latestFile}: {e.Message}");
+        }
     }
 }

@@ -8,6 +8,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections;
 
 [RequireComponent(typeof(Scrollbar))]
 public class ScrollbarFix : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
@@ -23,6 +24,7 @@ public class ScrollbarFix : MonoBehaviour, IDragHandler, IPointerDownHandler, IP
 
         scrollRect.verticalScrollbar = null;
         scrollbar.onValueChanged.AddListener(OnScrollbarChanged);
+        StartCoroutine(InitializeScrollPosition());
     }
 
     private void OnScrollbarChanged(float value)
@@ -33,6 +35,14 @@ public class ScrollbarFix : MonoBehaviour, IDragHandler, IPointerDownHandler, IP
 
     private void LateUpdate()
     {
+        if (!CanScrollVertically())
+        {
+            scrollRect.StopMovement();
+            scrollRect.verticalNormalizedPosition = 1f;
+            scrollbar.SetValueWithoutNotify(1f);
+            return;
+        }
+
         if (skipFrames > 0)
             skipFrames--;
         else
@@ -42,6 +52,29 @@ public class ScrollbarFix : MonoBehaviour, IDragHandler, IPointerDownHandler, IP
     public void OnDrag(PointerEventData eventData) => skipFrames = 2;
     public void OnPointerDown(PointerEventData eventData) => skipFrames = 2;
     public void OnPointerUp(PointerEventData eventData) => skipFrames = 2;
+
+    private IEnumerator InitializeScrollPosition()
+    {
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+
+        if (scrollRect.content != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(scrollRect.content);
+        }
+
+        scrollRect.StopMovement();
+        scrollRect.verticalNormalizedPosition = 1f;
+        scrollbar.SetValueWithoutNotify(1f);
+    }
+
+    private bool CanScrollVertically()
+    {
+        if (scrollRect == null || scrollRect.content == null || scrollRect.viewport == null)
+            return false;
+
+        return scrollRect.content.rect.height > scrollRect.viewport.rect.height + 0.01f;
+    }
 
     private void OnDestroy()
     {
