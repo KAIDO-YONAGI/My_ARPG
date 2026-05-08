@@ -62,6 +62,7 @@ public class DataManager : MonoBehaviour
         }
         //场景名、人物位置、任务、背包
         dataToSave.playerStatsData = StatsManager.instance.GetStats();
+        //场景类型能区分要不要存档如果是menu就不存，location就存名字
         dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.SystemSave);
     }
 

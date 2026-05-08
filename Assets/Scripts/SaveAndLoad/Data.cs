@@ -46,12 +46,12 @@ public class LootStatus
 [Serializable]
 public class SceneAndPosition
 {
-    public string sceneName;
+    public string sceneID;
     public SerializableVector3 position;
     public SceneAndPosition() { }
-    public SceneAndPosition(string name, Vector3 pos)
+    public SceneAndPosition(string sceneID, Vector3 pos)
     {
-        sceneName = name;
+        this.sceneID = sceneID;
         position = new SerializableVector3(pos);
     }
 }

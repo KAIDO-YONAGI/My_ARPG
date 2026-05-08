@@ -21,7 +21,8 @@ namespace MyEnums
     public enum SceneType
     {
         Location,
-        Menu
+        Menu,
+        Retry
     }
     public enum PersistentType
     {
