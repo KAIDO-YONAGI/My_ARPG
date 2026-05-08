@@ -241,7 +241,7 @@ public class UIManager : MonoBehaviour
 
     private void UpdateCanvasOpenOrder(MyEnums.CanvasToToggle canvas, bool state)
     {
-        RemoveCanvasNode(canvas);
+        RemoveCanvasNode(canvas);//没有就不删，有的话删掉再加，确保链表的末尾那个始终是在最上层的
 
         if (state)
         {

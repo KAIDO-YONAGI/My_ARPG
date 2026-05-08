@@ -10,8 +10,6 @@ public class InventoryManager : MonoBehaviour
 
     public Transform hotbarParent;
     public Transform backpackParent;
-    private readonly List<InventorySlot> hotbarSlotsList = new();
-    private readonly List<InventorySlot> backpackSlotsList = new();
     private List<InventorySlot> inventorySlotsList = new();
     public UseItem useItem;
     public TMP_Text amountText;

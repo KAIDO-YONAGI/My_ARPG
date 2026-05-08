@@ -12,6 +12,7 @@ UserSettings/
 .vs/
 .vscode/
 .idea/
+omnisharp.json
 .gradle/
 .settings/
 
