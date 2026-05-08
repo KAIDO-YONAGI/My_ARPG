@@ -9,8 +9,8 @@ public class Loot : MonoBehaviour, ISaveable
     public Animator animator;
     public LootEventSO lootEvent;
     public int quantity = 10;
-    public bool canBePick = true;
-    public bool hasBeenPicked = false;
+    public bool canBePick = true;//防止丢弃拾取死循环
+    public bool hasBeenPicked = false;//在对象池里标记是否被拾取，决定是否加载时刷新
     [Header("Send")]
     public VoidEventSO saveDataEvent;
     public VoidEventSO loadDataEvent;
