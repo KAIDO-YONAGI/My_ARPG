@@ -1,51 +1,71 @@
 using UnityEngine;
 using TMPro;
 using System;
+[Serializable]
+public class PlayerStatsData
+{
+    public int damage;
+    public float weaponRange;
+    public float knockBackForce;
+    public float knockBackTime;
+    public float stunTime;
+    public float coolDown;
+    public float speed;
+    public int maxHealth;
+    public int currentHealth;
+    public int skillPoints;
+    public int level;
+    public int currentExp;
+    public int expToUpgrade;
+    public float expMutiplier;
+}
+
 public class StatsManager : MonoBehaviour
 {
-    public static StatsManager instance;//单例模式
+    public static StatsManager instance;
     public TMP_Text healthText;
     public StatsUI statsUI;
 
+    [SerializeField] private PlayerStatsData stats = new();
 
-    [SerializeField] private int damage;
-    [SerializeField] private float weaponRange;
-    [SerializeField] private float knockBackForce;
-    [SerializeField] private float knockBackTime;
-    [SerializeField] private float stunTime;
-    [SerializeField] private float coolDown;
-    [SerializeField] private float speed;
-    [SerializeField] private int maxHealth;
-    [SerializeField] private int currentHealth;
+    public PlayerStatsData GetStats() => stats;
+    public void LoadStats(PlayerStatsData data)
+    {
+        stats = data;
+        UpdateHealthText();
+    }
+    public int GetDamage() => stats.damage;
+    public float GetWeaponRange() => stats.weaponRange;
+    public float GetKnockBackForce() => stats.knockBackForce;
+    public float GetKnockBackTime() => stats.knockBackTime;
+    public float GetStunTime() => stats.stunTime;
+    public float GetCoolDown() => stats.coolDown;
+    public float GetSpeed() => stats.speed;
+    public int GetMaxHealth() => stats.maxHealth;
+    public int GetCurrentHealth() => stats.currentHealth;
+    public int GetSkillPoints() => stats.skillPoints;
+    public int GetLevel() => stats.level;
+    public int GetCurrentExp() => stats.currentExp;
+    public int GetExpToUpgrade() => stats.expToUpgrade;
+    public float GetExpMutiplier() => stats.expMutiplier;
 
-    public int GetDamage() { return damage; }
-    public float GetWeaponRange() { return weaponRange; }
-    public float GetKnockBackForce() { return knockBackForce; }
-    public float GetKnockBackTime() { return knockBackTime; }
-    public float GetStunTime() { return stunTime; }
-    public float GetCoolDown() { return coolDown; }
-    public float GetSpeed() { return speed; }
-    public int GetMaxHealth() { return maxHealth; }
-    public int GetCurrentHealth() { return currentHealth; }
-
-
-    public void SetWeaponRange(float value) { weaponRange = value; }
-    public void SetKnockBackForce(float value) { knockBackForce = value; }
-    public void SetKnockBackTime(float value) { knockBackTime = value; }
-    public void SetStunTime(float value) { stunTime = value; }
-    public void SetCoolDown(float value) { coolDown = value; }
+    public void SetWeaponRange(float value) => stats.weaponRange = value;
+    public void SetKnockBackForce(float value) => stats.knockBackForce = value;
+    public void SetKnockBackTime(float value) => stats.knockBackTime = value;
+    public void SetStunTime(float value) => stats.stunTime = value;
+    public void SetCoolDown(float value) => stats.coolDown = value;
     public void SetHealth(int health)
     {
-        currentHealth = Math.Min(health, maxHealth);
+        stats.currentHealth = Math.Min(health, stats.maxHealth);
         UpdateHealthText();
     }
     public void Respwan()
     {
-        if (currentHealth <= 0)
-            currentHealth = maxHealth;
+        if (stats.currentHealth <= 0)
+            stats.currentHealth = stats.maxHealth;
         UpdateHealthText();
     }
-    private void Awake()//每次唤醒就检测单例，如果已有有就删除
+    private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
@@ -57,36 +77,26 @@ public class StatsManager : MonoBehaviour
         {
             animator.Play("TextUpdate");
         }
-        healthText.text = "HP:" + currentHealth + "/" + maxHealth;
+        healthText.text = "HP:" + stats.currentHealth + "/" + stats.maxHealth;
     }
     public void UpdateMaxHealth(int amount)
     {
-        maxHealth += amount;
+        stats.maxHealth += amount;
         UpdateHealthText();
     }
     public void UpdateHealth(int amount)
     {
-        currentHealth += amount;
-        if (currentHealth > maxHealth)
-            currentHealth = maxHealth;
+        stats.currentHealth += amount;
+        if (stats.currentHealth > stats.maxHealth)
+            stats.currentHealth = stats.maxHealth;
         UpdateHealthText();
     }
-    public void UpdateSpeed(float amount)
-    {
-        speed += amount;
-    }
-
+    public void UpdateSpeed(float amount) => stats.speed += amount;
     public void UpdateDamage(int amount)
     {
-        damage += amount;
+        stats.damage += amount;
         statsUI.UpdateDamage();
-
     }
+    public void UpdateSkillPoints(int amount) => stats.skillPoints += amount;
 
-    [SerializeField] private int skillPoints;
-    public int GetSkillPoints() { return skillPoints; }
-    public void UpdateSkillPoints(int amount)
-    {
-        skillPoints += amount;
-    }
 }
