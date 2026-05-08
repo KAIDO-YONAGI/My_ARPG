@@ -88,7 +88,7 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
     {
         InitiateUICanvasPanel(!isMenuOpen);
         toggleMenuText.text = !isMenuOpen ? "Open" : "Close";
-        Debug.Log("toggle");
+        // Debug.Log("toggle");
     }
 
     private void OnClickNextButton()

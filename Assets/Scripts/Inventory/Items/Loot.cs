@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.IO;
+using Newtonsoft.Json;
 using UnityEngine;
 public class Loot : MonoBehaviour, ISaveable
 {
@@ -11,24 +13,11 @@ public class Loot : MonoBehaviour, ISaveable
     public int quantity = 10;
     public bool canBePick = true;//防止丢弃拾取死循环
     public bool hasBeenPicked = false;//在对象池里标记是否被拾取，决定是否加载时刷新
-    [Header("Send")]
-    public VoidEventSO saveDataEvent;
-    public VoidEventSO loadDataEvent;
-
     private void Awake()
     {
-        loadDataEvent?.OnEventRaised();
-    }
-    private void OnEnable()
-    {
+        gameObject.SetActive(false);
         ISaveable saveable = this;
         saveable.RegisterSaveable();//注册在需要保存的数据的列表中
-    }
-
-    private void OnDisable()
-    {
-        ISaveable saveable = this;
-        saveable.UnRegisterSaveable();
     }
 
     private void OnValidate()
@@ -50,8 +39,6 @@ public class Loot : MonoBehaviour, ISaveable
             dataDef.ID = System.Guid.NewGuid().ToString();
         }
 
-        saveDataEvent?.OnEventRaised();
-
         UpdateAppearence();
     }
 
@@ -68,13 +55,19 @@ public class Loot : MonoBehaviour, ISaveable
             animator.SetBool("isPicked", true);
             lootEvent.OnEventRaised(item, quantity, this);
             hasBeenPicked = true;
-            saveDataEvent.OnEventRaised();
         }
     }
 
-    public void MarkAsDestroyed()
+    public void MarkAsDisable()
     {
-        Destroy(gameObject, .5f);
+        hasBeenPicked = true;
+        StartCoroutine(DisableAfterDelay(0.5f));
+    }
+
+    private IEnumerator DisableAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        gameObject.SetActive(false);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -87,6 +80,7 @@ public class Loot : MonoBehaviour, ISaveable
 
     public DataDefinition GetDataID()
     {
+        if (!this) return null;
         return GetComponent<DataDefinition>();
     }
 
@@ -97,14 +91,27 @@ public class Loot : MonoBehaviour, ISaveable
         var dataId = GetDataID();
         if (dataId == null) return;
 
-        if (data.lootsStatsDic.ContainsKey(dataId.ID))
+        if (data.lootsStatsDic.ContainsKey(dataId.ID))//有这个ID就改位置
         {
             data.lootsStatsDic[dataId.ID] = (transform.position, hasBeenPicked);
         }
-        else
+        else//没ID的注册
         {
             data.lootsStatsDic.Add(dataId.ID, (transform.position, hasBeenPicked));
         }
+        Dictionary<string, int> points = new Dictionary<string, int>
+        {
+            { "James", 9001 },
+            { "Jo", 3474 },
+            { "Jess", 11926 }
+        };
+
+        // 序列化并写入
+        string json = JsonConvert.SerializeObject(points, Formatting.Indented);
+        File.WriteAllText(Application.persistentDataPath + "/save.json", json);
+        Debug.Log("SaveRoute: " + Application.persistentDataPath + "/save.json");
+
+
     }
 
     public void LoadData(Data data)
@@ -120,9 +127,19 @@ public class Loot : MonoBehaviour, ISaveable
             transform.position = data.lootsStatsDic[dataId.ID].Item1;
             hasBeenPicked = data.lootsStatsDic[dataId.ID].Item2;
         }
-        if (hasBeenPicked)
+
+        if (hasBeenPicked)//disable里不删除索引，为的是这里能在load的时候设置active
         {
             gameObject.SetActive(false);
         }
+        else
+        {
+            gameObject.SetActive(true);
+        }
+        // 读取并反序列化
+        string json = File.ReadAllText(Application.persistentDataPath + "/save.json");
+        var loaded = JsonConvert.DeserializeObject<Dictionary<string, int>>(json);
+        Debug.Log("loaded: " + loaded.ToString());
+
     }
 }

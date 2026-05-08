@@ -103,7 +103,7 @@ public class InventoryManager : MonoBehaviour
             ItemHistoryManager.instance.RecordItem(item, quantity);
 
             amountText.text = goldAmount.ToString();
-            lootObj?.MarkAsDestroyed();
+            lootObj?.MarkAsDisable();
             return;
         }
         if (item.isEXP)
@@ -146,7 +146,7 @@ public class InventoryManager : MonoBehaviour
                     slot.UpdateUI();
                     if (quantity <= 0)
                     {
-                        lootObj?.MarkAsDestroyed();
+                        lootObj?.MarkAsDisable();
                         return;
                     }
                 }
@@ -163,7 +163,7 @@ public class InventoryManager : MonoBehaviour
 
                     if (quantity <= 0)
                     {
-                        lootObj?.MarkAsDestroyed();
+                        lootObj?.MarkAsDisable();
                         return;
                     }
 

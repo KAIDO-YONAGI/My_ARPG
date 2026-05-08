@@ -79,7 +79,7 @@ package "Inventory" #E8F5E9 {
             + canBePick : bool = true
             + hasBeenPicked : bool = false
             + Initialize(item : ItemSO, quantity : int) : void
-            + MarkAsDestroyed() : void
+            + MarkAsDisable() : void
             + SaveData(data : Data) : void
             + LoadData(data : Data) : void
         }
