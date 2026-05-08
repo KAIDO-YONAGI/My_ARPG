@@ -1,10 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class SceneDataForSave : MonoBehaviour
 {
-    public static PlayerController Instance;
+    public static SceneDataForSave Instance;
+
+    public List<GameSceneSO> gameScenes;
 
     void Awake()
     {
@@ -15,6 +16,4 @@ public class PlayerController : MonoBehaviour
         }
         Instance = this;
     }
-
-    public Vector3 GetPosition() => transform.position;
 }

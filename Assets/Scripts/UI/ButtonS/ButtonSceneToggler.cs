@@ -17,7 +17,7 @@ public class ButtonSceneToggler : MonoBehaviour
         ButtonCanvas.interactable = false;
         ButtonCanvas.blocksRaycasts = false;
 
-        if (sceneToLoad.sceneName != "Retry")
+        if (sceneToLoad.sceneType != MyEnums.SceneType.Retry)
         {
             loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
         }
