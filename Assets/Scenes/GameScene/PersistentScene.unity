@@ -13193,6 +13193,7 @@ GameObject:
   - component: {fileID: 697989144}
   - component: {fileID: 697989143}
   - component: {fileID: 697989146}
+  - component: {fileID: 697989147}
   m_Layer: 5
   m_Name: HealthCanvas
   m_TagString: Untagged
@@ -13296,6 +13297,19 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &697989147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697989141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 348b02df5eb9926439dd27e8452c9193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthText: {fileID: 5017396996528277926}
 --- !u!1 &708706359
 GameObject:
   m_ObjectHideFlags: 0
@@ -33594,31 +33608,6 @@ RectTransform:
   m_AnchoredPosition: {x: 4, y: 400}
   m_SizeDelta: {x: 1000, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2489995085478689421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4341828683417181844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd1236588444f324ea857f91568a24d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  statsSlots:
-  - {fileID: 8427774326903979367}
-  - {fileID: 1610658674253856621}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  statsCanvas: {fileID: 512097847646187518}
-  toggleStatsEvent: {fileID: 11400000, guid: 7323168f056471047bd7cec1a6e84e10, type: 2}
 --- !u!224 &2526332664528444952
 RectTransform:
   m_ObjectHideFlags: 0
@@ -34036,8 +34025,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ec7868448581a14c822725c7d9c67ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthText: {fileID: 5017396996528277926}
-  statsUI: {fileID: 2489995085478689421}
   stats:
     damage: 2
     weaponRange: 2
@@ -34045,7 +34032,7 @@ MonoBehaviour:
     knockBackTime: 0.2
     stunTime: 0.2
     coolDown: 0.3
-    speed: 2
+    speed: 5
     maxHealth: 2
     currentHealth: 2
     skillPoints: 1
@@ -34383,7 +34370,6 @@ GameObject:
   - component: {fileID: 2162121688278354604}
   - component: {fileID: 6729193936166893384}
   - component: {fileID: 5012027242298747578}
-  - component: {fileID: 2489995085478689421}
   m_Layer: 5
   m_Name: StatsPanel
   m_TagString: Untagged
@@ -35396,6 +35382,7 @@ GameObject:
   - component: {fileID: 8121855391415322902}
   - component: {fileID: 1057958822056869027}
   - component: {fileID: 512097847646187518}
+  - component: {fileID: 8522748460087903098}
   m_Layer: 5
   m_Name: StatsCanvas
   m_TagString: Untagged
@@ -37772,6 +37759,31 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &8522748460087903098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5981288922528490745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd1236588444f324ea857f91568a24d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statsSlots:
+  - {fileID: 8427774326903979367}
+  - {fileID: 1610658674253856621}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  statsCanvas: {fileID: 512097847646187518}
+  toggleStatsEvent: {fileID: 11400000, guid: 7323168f056471047bd7cec1a6e84e10, type: 2}
 --- !u!114 &8638644169856925240
 MonoBehaviour:
   m_ObjectHideFlags: 0

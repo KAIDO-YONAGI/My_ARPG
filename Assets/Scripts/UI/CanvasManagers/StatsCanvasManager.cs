@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class StatsUI : MonoBehaviour, ICanvasManager
+public class StatsCanvasManager : MonoBehaviour, ICanvasManager
 {
+    public static StatsCanvasManager instance;
     public GameObject[] statsSlots;
     public CanvasGroup statsCanvas;
 
@@ -13,8 +14,10 @@ public class StatsUI : MonoBehaviour, ICanvasManager
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
     private Canvas canvas;
 
-    private void Awake()// 在实例化时运行，早于Start()。
+    private void Awake()
     {
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
         statsCanvas.alpha = 0;
         canvas = statsCanvas.GetComponent<Canvas>();
     }

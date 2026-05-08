@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 using System;
 [Serializable]
 public class PlayerStatsData
@@ -23,16 +22,17 @@ public class PlayerStatsData
 public class StatsManager : MonoBehaviour
 {
     public static StatsManager instance;
-    public TMP_Text healthText;
-    public StatsUI statsUI;
-
+    private void Awake()
+    {
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
+    }
     [SerializeField] private PlayerStatsData stats = new();
 
     public PlayerStatsData GetStats() => stats;
     public void LoadStats(PlayerStatsData data)
     {
         stats = data;
-        UpdateHealthText();
     }
     public int GetDamage() => stats.damage;
     public float GetWeaponRange() => stats.weaponRange;
@@ -57,45 +57,36 @@ public class StatsManager : MonoBehaviour
     public void SetHealth(int health)
     {
         stats.currentHealth = Math.Min(health, stats.maxHealth);
-        UpdateHealthText();
+        HealthCanvasManager.instance.UpdateHealthText();
     }
     public void Respwan()
     {
         if (stats.currentHealth <= 0)
             stats.currentHealth = stats.maxHealth;
-        UpdateHealthText();
+        HealthCanvasManager.instance.UpdateHealthText();
     }
-    private void Awake()
-    {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
-    }
-    private void UpdateHealthText()
-    {
-        Animator animator = healthText.GetComponent<Animator>();
-        if (animator != null)
-        {
-            animator.Play("TextUpdate");
-        }
-        healthText.text = "HP:" + stats.currentHealth + "/" + stats.maxHealth;
-    }
+
     public void UpdateMaxHealth(int amount)
     {
         stats.maxHealth += amount;
-        UpdateHealthText();
+        HealthCanvasManager.instance.UpdateHealthText();
     }
     public void UpdateHealth(int amount)
     {
         stats.currentHealth += amount;
         if (stats.currentHealth > stats.maxHealth)
             stats.currentHealth = stats.maxHealth;
-        UpdateHealthText();
+        HealthCanvasManager.instance.UpdateHealthText();
     }
-    public void UpdateSpeed(float amount) => stats.speed += amount;
+    public void UpdateSpeed(float amount)
+    {
+        stats.speed += amount;
+        StatsCanvasManager.instance.UpdateSpeed();
+    }
     public void UpdateDamage(int amount)
     {
         stats.damage += amount;
-        statsUI.UpdateDamage();
+        StatsCanvasManager.instance.UpdateDamage();
     }
     public void UpdateSkillPoints(int amount) => stats.skillPoints += amount;
 
