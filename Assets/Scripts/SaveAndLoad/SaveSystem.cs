@@ -46,7 +46,11 @@ public class SaveSystem : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null) instance = this;
+        if (instance == null)
+        {
+            instance = this;
+            DeleteNewGameSavesOnLaunch();
+        }
         else Destroy(gameObject);
     }
     public void OnSaveEvent(MyEnums.SaveType saveType)//通过事件确认存档：以收到的Data保存完成事件为准（带存档类型）
@@ -83,16 +87,9 @@ public class SaveSystem : MonoBehaviour
                 Vector3 pos = save.data.sceneIDAndPlayerPos != null && save.data.sceneIDAndPlayerPos.position != null
                     ? save.data.sceneIDAndPlayerPos.position.ToVector3()//如果存档位置为空，会加载到场景的默认位置
                     : gameScene.initialPosition;
-                // 标记当前切场来自读档，避免 DataManager 把 Continue 误判成 NewGame。
                 IsLoadingSaveRequest = true;
-                try
-                {
-                    loadEventSO.RaiseLoadRequestEvent(gameScene, pos, true);
-                }
-                finally
-                {
-                    IsLoadingSaveRequest = false;
-                }
+                loadEventSO.RaiseLoadRequestEvent(gameScene, pos, true);
+                IsLoadingSaveRequest = false;
             }
             else
             {
@@ -115,15 +112,13 @@ public class SaveSystem : MonoBehaviour
     public bool TryGetLatestSaveData(MyEnums.SaveType saveType, out Data data)
     {
         data = null;
-        // 给 DataManager 一个“只读数据、不切场景”的入口。
-        // out 参数会把读到的 Data 带回给调用方。
         if (!TryGetLatestSave(saveType, out Save save, out _))
         {
             return false;
         }
 
         data = save.data;
-        return data != null;
+        return true;
     }
 
     private bool TryGetLatestSave(MyEnums.SaveType saveType, out Save save, out string latestFile)
@@ -149,14 +144,9 @@ public class SaveSystem : MonoBehaviour
 
         string json = File.ReadAllText(latestFile);
         save = JsonConvert.DeserializeObject<Save>(json);
-        if (save?.data == null)
-        {
-            return false;
-        }
 
         if (saveType == MyEnums.SaveType.NewGame)
         {
-            // NewGame 读取的是初始档，所以动态数据要在这里统一清空。
             DynamicDataHandler.PrepareForNewGameLoad(save.data);
         }
 
@@ -194,5 +184,14 @@ public class SaveSystem : MonoBehaviour
             if (scene != null && sceneID == scene.ID) return scene;
         }
         return null;
+    }
+
+    private void DeleteNewGameSavesOnLaunch()
+    {
+        string[] newGameFiles = Directory.GetFiles(Application.persistentDataPath, $"{MyEnums.SaveType.NewGame}_*.json");
+        foreach (string file in newGameFiles)
+        {
+            File.Delete(file);
+        }
     }
 }
