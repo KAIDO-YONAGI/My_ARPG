@@ -11,7 +11,7 @@ public interface ICanvasManager
     {
         SetCanvaState(canvasGroup, canvasToToggle, state);
         RefreshCanvaOrder(canvas, canvasToToggle, state);
-        Debug.Log("toggle&order");
+        // Debug.Log("toggle&order");
     }
     void SetCanvaState(
           CanvasGroup canva,

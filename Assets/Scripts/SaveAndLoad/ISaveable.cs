@@ -1,5 +1,6 @@
 public interface ISaveable
 {
+    
     DataDefinition GetDataID();
     void RegisterSaveable()
     {

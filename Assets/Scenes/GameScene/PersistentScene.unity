@@ -8476,13 +8476,13 @@ RectTransform:
   m_Children:
   - {fileID: 138144112}
   - {fileID: 906968761}
-  - {fileID: 1005818518}
   - {fileID: 26066369501299684}
   - {fileID: 7289243526454935472}
   - {fileID: 2012965570}
   - {fileID: 666307406}
   - {fileID: 870103886}
   - {fileID: 2060990189}
+  - {fileID: 1005818518}
   m_Father: {fileID: 7920227249279348528}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -10344,6 +10344,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saveDataEvent: {fileID: 11400000, guid: 5515505a9aa8e8d48a08941905512b9f, type: 2}
   loadDataEvent: {fileID: 11400000, guid: 34ee6145d8eac2c46a84b66cb736ea70, type: 2}
+  sceneLoadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
+  sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
 --- !u!1 &551537482
 GameObject:
   m_ObjectHideFlags: 0
@@ -16442,6 +16444,7 @@ GameObject:
   - component: {fileID: 1005818522}
   - component: {fileID: 1005818521}
   - component: {fileID: 1005818520}
+  - component: {fileID: 1005818523}
   - component: {fileID: 1005818519}
   m_Layer: 0
   m_Name: SaveLoadCanvas
@@ -16545,6 +16548,18 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!225 &1005818523
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005818517}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1006575480
 GameObject:
   m_ObjectHideFlags: 0
@@ -34030,8 +34045,9 @@ MonoBehaviour:
   stunTime: 0.2
   coolDown: 0.3
   speed: 5
-  maxHealth: 2147483647
-  currentHealth: 2147483647
+  maxHealth: 2
+  currentHealth: 2
+  skillPoints: 1
 --- !u!222 &3410760494699495321
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -34766,6 +34782,7 @@ MonoBehaviour:
   player: {fileID: 6166002366618250803}
   fadeCanva: {fileID: 1424539692}
   loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
+  sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
   transitionImagesDuringFade:
   - {fileID: 551537484}
   - {fileID: 203452129}
@@ -35785,7 +35802,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7920227249279348528}
   m_Layer: 0
-  m_Name: UI
+  m_Name: UICanavases
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37447,7 +37464,6 @@ MonoBehaviour:
   - {fileID: 5283207609076773156}
   - {fileID: 6795413237592403828}
   pointsText: {fileID: 432747330827997248}
-  availablePoints: 60
 --- !u!1001 &8341332583056121757
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38258,7 +38274,7 @@ GameObject:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 5360259125137984082}
   - {fileID: 781860693603705375}
+  - {fileID: 5360259125137984082}
   - {fileID: 42653699}
   - {fileID: 7920227249279348528}

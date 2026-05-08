@@ -23,6 +23,7 @@ public class SceneChanger : MonoBehaviour
     ///     
     [Header("Events")]
     public SceneLoadEventSO loadEventSO;
+    public VoidEventSO sceneLoadedEvent;
     public Animator[] transitionImagesDuringFade;
     public Object[] objectsToUnableWhileGameReset;
     private GameSceneSO sceneToLoad;
@@ -185,6 +186,7 @@ public class SceneChanger : MonoBehaviour
             PlayLoadingAnimation("FadeOut");
         }
         isInitialScene = false;
+        sceneLoadedEvent?.OnEventRaised();
         AllowInput();
         TimeManager.instance.ForceResumeGame();
     }

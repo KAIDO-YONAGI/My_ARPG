@@ -82,4 +82,11 @@ public class StatsManager : MonoBehaviour
         statsUI.UpdateDamage();
 
     }
+
+    [SerializeField] private int skillPoints;
+    public int GetSkillPoints() { return skillPoints; }
+    public void UpdateSkillPoints(int amount)
+    {
+        skillPoints += amount;
+    }
 }
