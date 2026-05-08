@@ -71,7 +71,7 @@ public class UIManager : MonoBehaviour
     {
         ToggleCanvas();
     }
-    public void HandleDragFocus(MyEnums.CanvasToToggle canvas)//拖拽脚本的输入，用于完成focus调整
+    public void HandleFocus(MyEnums.CanvasToToggle canvas)//拖拽脚本的输入，用于完成focus调整
     {
         if (canvas == MyEnums.CanvasToToggle.Default ||
                 canvas == currentFocusCanvas && IsCanvasOpen(canvas))

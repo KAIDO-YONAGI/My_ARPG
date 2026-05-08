@@ -45,6 +45,11 @@ public class SceneChanger : MonoBehaviour
     {
         return loadedScene != null ? loadedScene : SceneManager.GetActiveScene();
     }
+    // 供存档系统在切场前读取当前场景 SO。
+    public GameSceneSO GetCurrentGameScene()
+    {
+        return currentScene;
+    }
     /// <summary>
     /// 唤醒时初始化单例并加载首个场景
     /// </summary>

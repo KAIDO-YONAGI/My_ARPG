@@ -70,6 +70,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     {
         isPanelOpen = true;
         ((ICanvasManager)this).ToggleCanvas(saveCanvasGroup, canvas, MyEnums.CanvasToToggle.SaveLoad, true);
+        UIManager.instance.HandleFocus(MyEnums.CanvasToToggle.SaveLoad);//非键盘按键唤起的画布，直接手动focus
     }
 
     public void ClosePanel()
