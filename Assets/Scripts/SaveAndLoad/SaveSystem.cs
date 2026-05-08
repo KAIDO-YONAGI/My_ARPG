@@ -28,6 +28,7 @@ public class Save
 public class SaveSystem : MonoBehaviour
 {
     public static SaveSystem instance;
+    public bool IsLoadingSaveRequest { get; private set; }
 
     [Header("Send")]
 
@@ -65,18 +66,7 @@ public class SaveSystem : MonoBehaviour
     }
     public bool LoadSave(MyEnums.SaveType saveType)
     {
-        string[] files = Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
-        if (files.Length == 0)
-        {
-            Debug.LogWarning("No save files found.");
-            return false;
-        }
-
-        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
-        Array.Sort(files);
-        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
-        string latestFile = files.LastOrDefault(IsLoadableSaveFile);
-        if (string.IsNullOrEmpty(latestFile))
+        if (!TryGetLatestSave(saveType, out Save save, out string latestFile))
         {
             Debug.LogWarning($"No valid {saveType} save files found.");
             return false;
@@ -84,9 +74,6 @@ public class SaveSystem : MonoBehaviour
 
         try
         {
-            string json = File.ReadAllText(latestFile);
-            Save save = JsonConvert.DeserializeObject<Save>(json);
-
             DataManager.instance.LoadFromData(save.data);
             //触发加载场景
             GameSceneSO gameScene = GetScene(save.data);
@@ -96,7 +83,16 @@ public class SaveSystem : MonoBehaviour
                 Vector3 pos = save.data.sceneIDAndPlayerPos != null && save.data.sceneIDAndPlayerPos.position != null
                     ? save.data.sceneIDAndPlayerPos.position.ToVector3()//如果存档位置为空，会加载到场景的默认位置
                     : gameScene.initialPosition;
-                loadEventSO.RaiseLoadRequestEvent(gameScene, pos, true);
+                // 标记当前切场来自读档，避免 DataManager 把 Continue 误判成 NewGame。
+                IsLoadingSaveRequest = true;
+                try
+                {
+                    loadEventSO.RaiseLoadRequestEvent(gameScene, pos, true);
+                }
+                finally
+                {
+                    IsLoadingSaveRequest = false;
+                }
             }
             else
             {
@@ -114,6 +110,57 @@ public class SaveSystem : MonoBehaviour
 
 
         return false;
+    }
+
+    public bool TryGetLatestSaveData(MyEnums.SaveType saveType, out Data data)
+    {
+        data = null;
+        // 给 DataManager 一个“只读数据、不切场景”的入口。
+        // out 参数会把读到的 Data 带回给调用方。
+        if (!TryGetLatestSave(saveType, out Save save, out _))
+        {
+            return false;
+        }
+
+        data = save.data;
+        return data != null;
+    }
+
+    private bool TryGetLatestSave(MyEnums.SaveType saveType, out Save save, out string latestFile)
+    {
+        save = null;
+        latestFile = null;
+
+        string[] files = Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
+        if (files.Length == 0)
+        {
+            return false;
+        }
+
+        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
+        Array.Sort(files);
+        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
+        latestFile = files.LastOrDefault(IsLoadableSaveFile);
+
+        if (string.IsNullOrEmpty(latestFile))
+        {
+            return false;
+        }
+
+        string json = File.ReadAllText(latestFile);
+        save = JsonConvert.DeserializeObject<Save>(json);
+        if (save?.data == null)
+        {
+            return false;
+        }
+
+        if (saveType == MyEnums.SaveType.NewGame)
+        {
+            // NewGame 读取的是初始档，所以动态数据要在这里统一清空。
+            DynamicDataHandler.PrepareForNewGameLoad(save.data);
+        }
+
+        return true;
     }
 
     private bool IsLoadableSaveFile(string saveFile)

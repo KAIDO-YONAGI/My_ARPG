@@ -64,7 +64,27 @@ public class DataManager : MonoBehaviour
             saveable.SaveData(dataToSave);
         }
         //场景名、人物位置、任务、背包
-        dataToSave.playerStatsData = StatsManager.instance.GetStats();
+        bool isLoadingSaveRequest = SaveSystem.instance != null && SaveSystem.instance.IsLoadingSaveRequest;
+        if (!isLoadingSaveRequest
+            && lastSceneType == MyEnums.SceneType.Menu
+            && sceneToLoadSO.sceneType == MyEnums.SceneType.Location)
+        {
+            // Menu -> Location 视为点击 NewGame：有初始档就读取，没有就现场创建。
+            Vector3 savePosition = pos == Vector3.zero ? sceneToLoadSO.initialPosition : pos;
+            if (!TryLoadInitialNewGameData(sceneToLoadSO, savePosition))
+            {
+                dataToSave = new Data();
+                dataToSave.playerStatsData = StatsManager.instance.GetStats();
+                dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, savePosition);
+                // 初始档不保留动态 loot 状态，保证每次 NewGame 都从干净世界开始。
+                DynamicDataHandler.ClearDynamicData(dataToSave);
+                dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.NewGame);
+            }
+        }
+        else
+        {
+            dataToSave.playerStatsData = StatsManager.instance.GetStats();
+        }
         //上个场景是Menu则不存档
         if (lastSceneType != MyEnums.SceneType.Menu)
         {
@@ -84,6 +104,31 @@ public class DataManager : MonoBehaviour
             }
         }
         lastSceneType = sceneToLoadSO.sceneType;
+    }
+
+    private bool TryLoadInitialNewGameData(GameSceneSO sceneToLoadSO, Vector3 savePosition)
+    {
+        // 这里不再额外触发切场景，只把初始档数据装回 DataManager。
+        // out 会把读到的初始档数据写进 initialData 变量里。
+        if (SaveSystem.instance == null
+            || !SaveSystem.instance.TryGetLatestSaveData(MyEnums.SaveType.NewGame, out Data initialData))
+        {
+            return false;
+        }
+
+        // 旧初始档如果缺场景或出生点，进入游戏前先补齐。
+        if (initialData.sceneIDAndPlayerPos == null
+            || string.IsNullOrEmpty(initialData.sceneIDAndPlayerPos.sceneID))
+        {
+            initialData.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, savePosition);
+        }
+        else if (initialData.sceneIDAndPlayerPos.position == null)
+        {
+            initialData.sceneIDAndPlayerPos.position = new SerializableVector3(savePosition);
+        }
+
+        LoadFromData(initialData);
+        return true;
     }
 
     void OnAutoLoad()
