@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 //TODO每次进入新场景需要自动备份上个场景的信息
@@ -27,6 +28,12 @@ public class Save
 public class SaveSystem : MonoBehaviour
 {
     public static SaveSystem instance;
+
+    [Header("Send")]
+
+    public SceneLoadEventSO loadEventSO;
+    [Header("Receive")]
+
     public DataSaveEventSO dataSavedEvent;
     private void OnEnable()
     {
@@ -56,13 +63,13 @@ public class SaveSystem : MonoBehaviour
 
         Debug.Log("SaveRoute: " + Application.persistentDataPath + $"/{saveType}_{saveID}.json");
     }
-    public void LoadSave(MyEnums.SaveType saveType)
+    public bool LoadSave(MyEnums.SaveType saveType)
     {
         string[] files = Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
         if (files.Length == 0)
         {
             Debug.LogWarning("No save files found.");
-            return;
+            return false;
         }
 
         //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
@@ -75,6 +82,22 @@ public class SaveSystem : MonoBehaviour
             Save save = JsonConvert.DeserializeObject<Save>(json);
 
             DataManager.instance.LoadFromData(save.data);
+            //触发加载场景
+            GameSceneSO gameScene = GetScene(save.data);
+            if (gameScene != null)
+            {
+                loadEventSO.RaiseLoadRequestEvent
+                (
+                    gameScene,
+                    save.data.sceneIDAndPlayerPos.position.ToVector3(),
+                    true
+                );
+            }
+            else
+            {
+                Debug.Log("Failed Load SceneID");
+                return false;
+            }
 
             Debug.Log("LoadRoute: " + latestFile);
         }
@@ -82,5 +105,18 @@ public class SaveSystem : MonoBehaviour
         {
             Debug.LogError($"Failed to load save file {latestFile}: {e.Message}");
         }
+
+
+        return true;
+    }
+
+    private GameSceneSO GetScene(Data data)
+    {
+        string sceneID = data.sceneIDAndPlayerPos.sceneID;
+        foreach (var scene in SceneDataForSave.Instance.gameScenes.ToList())
+        {
+            if (sceneID == scene.ID) return scene;
+        }
+        return null;
     }
 }

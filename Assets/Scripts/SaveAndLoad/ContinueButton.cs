@@ -3,12 +3,19 @@ using UnityEngine;
 
 public class ContinueButton : MonoBehaviour
 {
-    DataSaveEventSO loadDataForContinue;
+    // public DataSaveEventSO loadDataForContinue;
 
     [SerializeField] private Button continueButton;
     private void OnEnable()
     {
-        continueButton.onClick.AddListener(() => SaveSystem.instance.LoadSave(MyEnums.SaveType.SystemSave));
+        continueButton.onClick.AddListener(() =>
+        {
+            if (!SaveSystem.instance.LoadSave(MyEnums.SaveType.SystemSave))
+            {
+                //TODO 加载失败操作
+            }
+        }
+        );
     }
     private void OnDisable()
     {

@@ -54,7 +54,8 @@ public class DataManager : MonoBehaviour
     {
         saveables.Remove(saveable);
     }
-    private void OnAutoSave(GameSceneSO arg0, Vector3 arg1, bool arg2)
+    private void OnAutoSave(GameSceneSO sceneToLoadSO, Vector3 pos, bool isToFade)
+    //关于位置，手动存的时候可以用玩家当前位置取代默认位置，自动存档用的是新位置或者场景默认位置
     {
         foreach (var saveable in saveables.ToList())
         {
@@ -62,7 +63,11 @@ public class DataManager : MonoBehaviour
         }
         //场景名、人物位置、任务、背包
         dataToSave.playerStatsData = StatsManager.instance.GetStats();
-        //场景类型能区分要不要存档如果是menu就不存，location就存名字
+        //场景类型能区分要不要存档
+        if (sceneToLoadSO.sceneType == MyEnums.SceneType.Location)
+            dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, sceneToLoadSO.initialPosition);
+        else return;
+
         dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.SystemSave);
     }
 
@@ -74,13 +79,15 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public void LoadFromData(Data data)
+    public void LoadFromData(Data data)//saveSystem调用
     {
         dataToSave = data;
         foreach (var saveable in saveables.ToList())
         {
             saveable.LoadData(dataToSave);
         }
+        StatsManager.instance.LoadStats(data.playerStatsData);
+        
     }
 
 

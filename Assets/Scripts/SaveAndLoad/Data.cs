@@ -6,7 +6,7 @@ using UnityEngine;
 public class Data
 {
     public Dictionary<string, LootStatus> lootsStatsDic = new();//string是GUID
-    public SceneAndPosition sceneNameAndPlayerPos;
+    public SceneAndPosition sceneIDAndPlayerPos;
     public PlayerStatsData playerStatsData;
 }
 public class SaveInfo
