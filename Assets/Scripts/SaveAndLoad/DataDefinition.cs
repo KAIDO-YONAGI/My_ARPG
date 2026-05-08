@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MyEnums;
 public class DataDefinition : MonoBehaviour
 {
-    public PersistentType persistentType;
+    public MyEnums.PersistentType persistentType;
+    //一个标记字段，用来决定这个 GameObject 是否参与存档
     public string ID;
     private void OnValidate()
     {
-        if (persistentType == PersistentType.ReadWrite)
+        if (persistentType == MyEnums.PersistentType.ReadWrite)
         {
             if (string.IsNullOrEmpty(ID))
             {

@@ -10,7 +10,7 @@ public class Loot : MonoBehaviour, ISaveable
     public SpriteRenderer sr;
     public Animator animator;
     public LootEventSO lootEvent;
-    public int quantity = 10;
+    public int quantity;
     public bool canBePick = true;//防止丢弃拾取死循环
     public bool hasBeenPicked = false;//在对象池里标记是否被拾取，决定是否加载时刷新
     private void Awake()
@@ -40,6 +40,7 @@ public class Loot : MonoBehaviour, ISaveable
         }
 
         UpdateAppearence();
+        gameObject.SetActive(true);
     }
 
     private void UpdateAppearence()
@@ -93,11 +94,11 @@ public class Loot : MonoBehaviour, ISaveable
 
         if (data.lootsStatsDic.ContainsKey(dataId.ID))//有这个ID就改位置
         {
-            data.lootsStatsDic[dataId.ID] = (transform.position, hasBeenPicked);
+            data.lootsStatsDic[dataId.ID] = new LootStatus(transform.position, hasBeenPicked);
         }
         else//没ID的注册
         {
-            data.lootsStatsDic.Add(dataId.ID, (transform.position, hasBeenPicked));
+            data.lootsStatsDic.Add(dataId.ID, new LootStatus(transform.position, hasBeenPicked));
         }
 
     }
@@ -112,8 +113,8 @@ public class Loot : MonoBehaviour, ISaveable
 
         if (data.lootsStatsDic.ContainsKey(dataId.ID))
         {
-            transform.position = data.lootsStatsDic[dataId.ID].Item1;
-            hasBeenPicked = data.lootsStatsDic[dataId.ID].Item2;
+            transform.position = data.lootsStatsDic[dataId.ID].position.ToVector3();
+            hasBeenPicked = data.lootsStatsDic[dataId.ID].hasBeenPicked;
         }
 
         if (hasBeenPicked)//disable里不删除索引，为的是这里能在load的时候设置active
