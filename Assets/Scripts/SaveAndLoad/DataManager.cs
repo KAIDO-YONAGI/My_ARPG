@@ -24,10 +24,8 @@ public class DataManager : MonoBehaviour
 
     private void OnEnable()
     {
-        saveDataEvent.VoidEvent += Save;
-        loadDataEvent.VoidEvent += Load;
         sceneLoadEventSO.LoadRequestEvent += OnSave;
-        sceneLoadedEvent.VoidEvent += Load;
+        sceneLoadedEvent.VoidEvent += OnLoad;
 
     }
 
@@ -35,10 +33,8 @@ public class DataManager : MonoBehaviour
 
     private void OnDisable()
     {
-        saveDataEvent.VoidEvent -= Save;
-        loadDataEvent.VoidEvent -= Load;
         sceneLoadEventSO.LoadRequestEvent -= OnSave;
-        sceneLoadedEvent.VoidEvent -= Load;
+        sceneLoadedEvent.VoidEvent -= OnLoad;
     }
     private void Awake()
     {
@@ -62,14 +58,16 @@ public class DataManager : MonoBehaviour
     {
         saveables.Remove(saveable);
     }
-    void Save()
+    private void OnSave(GameSceneSO arg0, Vector3 arg1, bool arg2)
     {
         foreach (var saveable in saveables.ToList())
         {
             saveable.SaveData(dataToSave);
         }
+        
     }
-    void Load()
+
+    void OnLoad()
     {
         foreach (var saveable in saveables.ToList())
         {
@@ -77,9 +75,5 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    private void OnSave(GameSceneSO arg0, Vector3 arg1, bool arg2)
-    {
-        Save();
 
-    }
 }

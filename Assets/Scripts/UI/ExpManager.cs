@@ -1,15 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 public class ExpManager : MonoBehaviour
 {
-    public int level = 0;
-    public int currentExp;
-    public int expToUpgrade = 10;
-    public float mutiplier = 1.2f;
     public Slider expSlider;
     public TMP_Text currentLevelText;
     public static event Action<int> OnLevelUp;
@@ -32,36 +26,38 @@ public class ExpManager : MonoBehaviour
         UpdateUI();
     }
 
-    private void OnEnable()//用于观察者模式中订阅、监听事件
+    private void OnEnable()
     {
         EnemyHealth.OnDefeated += GainExp;
     }
 
-    private void OnDisable()//取消监听
+    private void OnDisable()
     {
         EnemyHealth.OnDefeated -= GainExp;
-
     }
     public void GainExp(int amount)
     {
-        currentExp += amount;
-        if (currentExp >= expToUpgrade)
+        var stats = StatsManager.instance.GetStats();
+        stats.currentExp += amount;
+        if (stats.currentExp >= stats.expToUpgrade)
         {
             LevelUp();
         }
-        UpdateUI();//注意升级之后要改
+        UpdateUI();
     }
     public void UpdateUI()
     {
-        expSlider.maxValue = expToUpgrade;
-        expSlider.value = currentExp;
-        currentLevelText.text = "Level:" + level;
+        var stats = StatsManager.instance.GetStats();
+        expSlider.maxValue = stats.expToUpgrade;
+        expSlider.value = stats.currentExp;
+        currentLevelText.text = "Level:" + stats.level;
     }
     private void LevelUp()
     {
-        level++;
-        currentExp -= expToUpgrade;
-        expToUpgrade = Mathf.RoundToInt(expToUpgrade * mutiplier);
-        OnLevelUp?.Invoke(1);//事件被触发
+        var stats = StatsManager.instance.GetStats();
+        stats.level++;
+        stats.currentExp -= stats.expToUpgrade;
+        stats.expToUpgrade = Mathf.RoundToInt(stats.expToUpgrade * stats.expMutiplier);
+        OnLevelUp?.Invoke(1);
     }
 }

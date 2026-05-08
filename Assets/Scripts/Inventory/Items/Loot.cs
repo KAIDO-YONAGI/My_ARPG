@@ -99,18 +99,6 @@ public class Loot : MonoBehaviour, ISaveable
         {
             data.lootsStatsDic.Add(dataId.ID, (transform.position, hasBeenPicked));
         }
-        Dictionary<string, int> points = new Dictionary<string, int>
-        {
-            { "James", 9001 },
-            { "Jo", 3474 },
-            { "Jess", 11926 }
-        };
-
-        // 序列化并写入
-        string json = JsonConvert.SerializeObject(points, Formatting.Indented);
-        File.WriteAllText(Application.persistentDataPath + "/save.json", json);
-        Debug.Log("SaveRoute: " + Application.persistentDataPath + "/save.json");
-
 
     }
 
@@ -136,10 +124,6 @@ public class Loot : MonoBehaviour, ISaveable
         {
             gameObject.SetActive(true);
         }
-        // 读取并反序列化
-        string json = File.ReadAllText(Application.persistentDataPath + "/save.json");
-        var loaded = JsonConvert.DeserializeObject<Dictionary<string, int>>(json);
-        Debug.Log("loaded: " + loaded.ToString());
 
     }
 }
