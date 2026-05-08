@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09a4ebb01acc81c41889f97c05800566, type: 3}
   m_Name: RetrySceneSO
   m_EditorClassIdentifier: 
-  sceneName: Retry
+  ID: c992082d-cc05-4ec7-bc06-a06719598938
   sceneReference:
     m_AssetGUID: 2cda990e2423bbf4892e6590ba056729
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-  sceneType: 0
+  sceneType: 2
   initialPosition: {x: 0, y: 0, z: 0}
