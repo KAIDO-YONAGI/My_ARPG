@@ -74,7 +74,13 @@ public class SaveSystem : MonoBehaviour
 
         //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
         Array.Sort(files);
-        string latestFile = files[files.Length - 1];
+        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
+        string latestFile = files.LastOrDefault(IsLoadableSaveFile);
+        if (string.IsNullOrEmpty(latestFile))
+        {
+            Debug.LogWarning($"No valid {saveType} save files found.");
+            return false;
+        }
 
         try
         {
@@ -86,12 +92,11 @@ public class SaveSystem : MonoBehaviour
             GameSceneSO gameScene = GetScene(save.data);
             if (gameScene != null)
             {
-                loadEventSO.RaiseLoadRequestEvent
-                (
-                    gameScene,
-                    save.data.sceneIDAndPlayerPos.position.ToVector3(),
-                    true
-                );
+                // 某些旧档只缺位置时，仍允许用场景默认出生点继续游戏。
+                Vector3 pos = save.data.sceneIDAndPlayerPos != null && save.data.sceneIDAndPlayerPos.position != null
+                    ? save.data.sceneIDAndPlayerPos.position.ToVector3()//如果存档位置为空，会加载到场景的默认位置
+                    : gameScene.initialPosition;
+                loadEventSO.RaiseLoadRequestEvent(gameScene, pos, true);
             }
             else
             {
@@ -100,6 +105,7 @@ public class SaveSystem : MonoBehaviour
             }
 
             Debug.Log("LoadRoute: " + latestFile);
+            return true;
         }
         catch (System.Exception e)
         {
@@ -107,15 +113,38 @@ public class SaveSystem : MonoBehaviour
         }
 
 
-        return true;
+        return false;
+    }
+
+    private bool IsLoadableSaveFile(string saveFile)
+    {
+        try
+        {
+            // Continue 按钮只尝试读取至少包含场景和角色数据的系统档。
+            string json = File.ReadAllText(saveFile);
+            Save save = JsonConvert.DeserializeObject<Save>(json);
+            return save?.data != null
+                && save.data.playerStatsData != null
+                && GetScene(save.data) != null;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Skip invalid save file {saveFile}: {e.Message}");
+            return false;
+        }
     }
 
     private GameSceneSO GetScene(Data data)
     {
-        string sceneID = data.sceneIDAndPlayerPos.sceneID;
+        string sceneID = data?.sceneIDAndPlayerPos?.sceneID;
+        if (string.IsNullOrEmpty(sceneID) || SceneDataForSave.Instance == null || SceneDataForSave.Instance.gameScenes == null)
+        {
+            return null;
+        }
+
         foreach (var scene in SceneDataForSave.Instance.gameScenes.ToList())
         {
-            if (sceneID == scene.ID) return scene;
+            if (scene != null && sceneID == scene.ID) return scene;
         }
         return null;
     }

@@ -24,6 +24,8 @@ public class DataManager : MonoBehaviour
     private List<ISaveable> saveables = new();
 
     private Data dataToSave = new Data();
+    // 首次从主菜单进入游戏时不应写系统档，否则场景信息还没准备好。
+    private MyEnums.SceneType lastSceneType = MyEnums.SceneType.Menu;
     private void OnEnable()
     {
         sceneLoadEventSO.LoadRequestEvent += OnAutoSave;
@@ -63,12 +65,25 @@ public class DataManager : MonoBehaviour
         }
         //场景名、人物位置、任务、背包
         dataToSave.playerStatsData = StatsManager.instance.GetStats();
-        //场景类型能区分要不要存档
-        if (sceneToLoadSO.sceneType == MyEnums.SceneType.Location)
-            dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, sceneToLoadSO.initialPosition);
-        else return;
+        //上个场景是Menu则不存档
+        if (lastSceneType != MyEnums.SceneType.Menu)
+        {
+            var sceneChanger = SceneChanger.instance;
+            // 切到新 Location 时沿用目标场景和入口点，退回 Menu 时则记录当前游玩场景。
+            GameSceneSO saveScene = sceneToLoadSO.sceneType == MyEnums.SceneType.Location
+                ? sceneToLoadSO
+                : sceneChanger != null ? sceneChanger.GetCurrentGameScene() : null;
+            Vector3 savePosition = sceneToLoadSO.sceneType == MyEnums.SceneType.Location
+                ? sceneToLoadSO.initialPosition
+                : PlayerController.Instance != null ? PlayerController.Instance.GetPosition() : Vector3.zero;
 
-        dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.SystemSave);
+            if (saveScene != null)
+            {
+                dataToSave.sceneIDAndPlayerPos = new(saveScene.ID, savePosition);
+                dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.SystemSave);
+            }
+        }
+        lastSceneType = sceneToLoadSO.sceneType;
     }
 
     void OnAutoLoad()
@@ -81,13 +96,23 @@ public class DataManager : MonoBehaviour
 
     public void LoadFromData(Data data)//saveSystem调用
     {
+        // 兜底防御，避免其他读取入口把空数据直接塞进运行态。
+        if (data == null)
+        {
+            Debug.LogWarning("Skip load because save data is null.");
+            return;
+        }
         dataToSave = data;
-        foreach (var saveable in saveables.ToList())
+        foreach (var saveable in saveables.ToList())//拷贝一份再操作，防止耗时操作中发生时序竞态修改
         {
             saveable.LoadData(dataToSave);
         }
-        StatsManager.instance.LoadStats(data.playerStatsData);
-        
+        // 旧档缺少数值时先保留当前运行态，避免把 StatsManager 置空。
+        if (data.playerStatsData != null)
+        {
+            StatsManager.instance.LoadStats(data.playerStatsData);
+        }
+
     }
 
 
