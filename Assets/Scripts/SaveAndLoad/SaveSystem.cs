@@ -46,11 +46,7 @@ public class SaveSystem : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DeleteNewGameSavesOnLaunch();
-        }
+        if (instance == null) instance = this;
         else Destroy(gameObject);
     }
     public void OnSaveEvent(MyEnums.SaveType saveType)//通过事件确认存档：以收到的Data保存完成事件为准（带存档类型）
@@ -70,7 +66,18 @@ public class SaveSystem : MonoBehaviour
     }
     public bool LoadSave(MyEnums.SaveType saveType)
     {
-        if (!TryGetLatestSave(saveType, out Save save, out string latestFile))
+        string[] files = Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
+        if (files.Length == 0)
+        {
+            Debug.LogWarning("No save files found.");
+            return false;
+        }
+
+        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
+        Array.Sort(files);
+        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
+        string latestFile = files.LastOrDefault(IsLoadableSaveFile);
+        if (string.IsNullOrEmpty(latestFile))
         {
             Debug.LogWarning($"No valid {saveType} save files found.");
             return false;
@@ -78,6 +85,9 @@ public class SaveSystem : MonoBehaviour
 
         try
         {
+            string json = File.ReadAllText(latestFile);
+            Save save = JsonConvert.DeserializeObject<Save>(json);
+
             DataManager.instance.LoadFromData(save.data);
             //触发加载场景
             GameSceneSO gameScene = GetScene(save.data);
@@ -107,50 +117,6 @@ public class SaveSystem : MonoBehaviour
 
 
         return false;
-    }
-
-    public bool TryGetLatestSaveData(MyEnums.SaveType saveType, out Data data)
-    {
-        data = null;
-        if (!TryGetLatestSave(saveType, out Save save, out _))
-        {
-            return false;
-        }
-
-        data = save.data;
-        return true;
-    }
-
-    private bool TryGetLatestSave(MyEnums.SaveType saveType, out Save save, out string latestFile)
-    {
-        save = null;
-        latestFile = null;
-
-        string[] files = Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
-        if (files.Length == 0)
-        {
-            return false;
-        }
-
-        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
-        Array.Sort(files);
-        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
-        latestFile = files.LastOrDefault(IsLoadableSaveFile);
-
-        if (string.IsNullOrEmpty(latestFile))
-        {
-            return false;
-        }
-
-        string json = File.ReadAllText(latestFile);
-        save = JsonConvert.DeserializeObject<Save>(json);
-
-        if (saveType == MyEnums.SaveType.NewGame)
-        {
-            DynamicDataHandler.PrepareForNewGameLoad(save.data);
-        }
-
-        return true;
     }
 
     private bool IsLoadableSaveFile(string saveFile)
@@ -184,14 +150,5 @@ public class SaveSystem : MonoBehaviour
             if (scene != null && sceneID == scene.ID) return scene;
         }
         return null;
-    }
-
-    private void DeleteNewGameSavesOnLaunch()
-    {
-        string[] newGameFiles = Directory.GetFiles(Application.persistentDataPath, $"{MyEnums.SaveType.NewGame}_*.json");
-        foreach (string file in newGameFiles)
-        {
-            File.Delete(file);
-        }
     }
 }
