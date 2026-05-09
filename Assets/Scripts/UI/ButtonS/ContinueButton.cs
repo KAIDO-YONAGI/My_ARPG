@@ -10,9 +10,10 @@ public class ContinueButton : MonoBehaviour
     {
         continueButton.onClick.AddListener(() =>
         {
-            if (!SaveSystem.instance.LoadSave(MyEnums.SaveType.SystemSave))
+            string savePath = SaveSystem.instance.GetLatestLoadableSavePath(MyEnums.SaveType.SystemSave);
+            if (string.IsNullOrEmpty(savePath) || !SaveSystem.instance.LoadSave(MyEnums.SaveType.SystemSave, savePath))
             {
-                //TODO 加载失败操作
+                //TODO加载失败处理
             }
         }
         );
