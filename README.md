@@ -1,5 +1,4 @@
 # My_ARPG
-# My_ARPG
 
 一个基于 Unity 2022.3.62f3c1 开发的 2D ARPG 原型项目。
 A 2D ARPG prototype built with Unity 2022.3.62f3c1.
