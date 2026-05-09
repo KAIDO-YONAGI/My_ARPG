@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 812033023340906267}
   - component: {fileID: 7035445642325824785}
   m_Layer: 5
-  m_Name: SaveLoad
+  m_Name: OpenSaveLoadButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

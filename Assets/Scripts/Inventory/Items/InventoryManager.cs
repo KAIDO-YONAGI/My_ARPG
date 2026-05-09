@@ -12,7 +12,7 @@ public class InventoryManager : MonoBehaviour
     public Transform backpackParent;
     private List<InventorySlot> inventorySlotsList = new();
     public UseItem useItem;
-    public TMP_Text amountText;
+    public TMP_Text goldAmountText;
     public GameObject lootPrefab;
     public Transform player;
 
@@ -102,7 +102,7 @@ public class InventoryManager : MonoBehaviour
             goldAmount += quantity;
             ItemHistoryManager.instance.RecordItem(item, quantity);
 
-            amountText.text = goldAmount.ToString();
+            goldAmountText.text = goldAmount.ToString();
             lootObj?.MarkAsDisable();
             return;
         }
@@ -248,7 +248,7 @@ public class InventoryManager : MonoBehaviour
     public void UpdateGold(int price)
     {
         goldAmount -= price;
-        amountText.text = goldAmount.ToString();
+        goldAmountText.text = goldAmount.ToString();
     }
 
 }

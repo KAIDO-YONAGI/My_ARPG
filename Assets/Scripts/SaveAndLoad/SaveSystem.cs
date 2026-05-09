@@ -53,39 +53,80 @@ public class SaveSystem : MonoBehaviour
     {
         WriteSave(saveType);
     }
-    private void WriteSave(MyEnums.SaveType saveType)
+    public string WriteSave(MyEnums.SaveType saveType)
     {
         string saveID = System.DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
         SaveInfo saveInfo = new(saveID, saveType);
         Save save = new(saveInfo, DataManager.instance.GetData);
 
         string json = JsonConvert.SerializeObject(save, Formatting.Indented);
-        File.WriteAllText(Application.persistentDataPath + $"/{saveType}_{saveID}.json", json);
+        string path=Application.persistentDataPath + $"/{saveType}_{saveID}.json";
+        File.WriteAllText(path, json);
 
-        Debug.Log("SaveRoute: " + Application.persistentDataPath + $"/{saveType}_{saveID}.json");
+        Debug.Log("SaveRoute: " + path);
+
+        return path;
+
     }
-    public bool LoadSave(MyEnums.SaveType saveType)
+    public bool DeleteSave(string savePath)
     {
-        string[] files = Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
-        if (files.Length == 0)
+        if (string.IsNullOrEmpty(savePath))
         {
-            Debug.LogWarning("No save files found.");
+            Debug.LogWarning("Save path is empty for delete.");
             return false;
         }
 
-        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
-        Array.Sort(files);
-        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
-        string latestFile = files.LastOrDefault(IsLoadableSaveFile);
-        if (string.IsNullOrEmpty(latestFile))
+        string fullSavePath = Path.GetFullPath(savePath);
+        string fullPersistentPath = Path.GetFullPath(Application.persistentDataPath);
+        if (!fullSavePath.StartsWith(fullPersistentPath, StringComparison.OrdinalIgnoreCase))
         {
-            Debug.LogWarning($"No valid {saveType} save files found.");
+            Debug.LogWarning($"Save file is outside persistentDataPath: {savePath}");
+            return false;
+        }
+
+        if (!File.Exists(fullSavePath))
+        {
+            Debug.LogWarning($"Save file not found: {savePath}");
             return false;
         }
 
         try
         {
-            string json = File.ReadAllText(latestFile);
+            File.Delete(fullSavePath);
+            Debug.Log("DeleteRoute: " + fullSavePath);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to delete save file {savePath}: {e.Message}");
+            return false;
+        }
+    }
+
+
+    public bool LoadSave(MyEnums.SaveType saveType, string savePath)
+    {
+        if (string.IsNullOrEmpty(savePath))
+        {
+            Debug.LogWarning($"Save path is empty for {saveType}.");
+            return false;
+        }
+
+        if (!File.Exists(savePath))
+        {
+            Debug.LogWarning($"Save file not found: {savePath}");
+            return false;
+        }
+
+        if (!IsLoadableSaveFile(savePath))
+        {
+            Debug.LogWarning($"Save file is not loadable: {savePath}");
+            return false;
+        }
+
+        try
+        {
+            string json = File.ReadAllText(savePath);
             Save save = JsonConvert.DeserializeObject<Save>(json);
 
             DataManager.instance.LoadFromData(save.data);
@@ -107,18 +148,42 @@ public class SaveSystem : MonoBehaviour
                 return false;
             }
 
-            Debug.Log("LoadRoute: " + latestFile);
+            Debug.Log("LoadRoute: " + savePath);
             return true;
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to load save file {latestFile}: {e.Message}");
+            Debug.LogError($"Failed to load save file {savePath}: {e.Message}");
         }
 
 
         return false;
     }
+    public string GetLatestLoadableSavePath(MyEnums.SaveType saveType)
+    {
+        string[] files = GetSavesPath(saveType);
+        if (files.Length == 0)
+        {
+            Debug.LogWarning("No save files found.");
+            return null;
+        }
 
+        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
+        Array.Sort(files);
+        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
+        string latestFile = files.LastOrDefault(IsLoadableSaveFile);
+        if (string.IsNullOrEmpty(latestFile))
+        {
+            Debug.LogWarning($"No valid {saveType} save files found.");
+            return null;
+        }
+
+        return latestFile;
+    }
+    public string[] GetSavesPath(MyEnums.SaveType saveType)
+    {
+        return Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
+    }
     private bool IsLoadableSaveFile(string saveFile)
     {
         try

@@ -1,58 +1,77 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
 {
     [Header("Events To Receive")]
-    public OpenSaveLoadPanelEventSO openSaveLoadPanelEvent;
     public ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleSaveLoadCanvasEvent;
 
     [Header("UI")]
     [SerializeField] private CanvasGroup saveCanvasGroup;
     [SerializeField] private Canvas canvas;
+    [SerializeField] private GameObject buttonsContent;
+
 
     private bool isPanelOpen = false;
+    private MyEnums.SaveType saveType = MyEnums.SaveType.PalyerSave;
+    private List<SaveLoadButtonGroup> saveLoadButtonGroups = new();
+    public class SaveLoadButtonGroup
+    {
+        public SaveInfo saveInfo;
+        public TMP_Text saveInfoText;
+        public Button saveButton;
+        public TMP_Text saveButtonText;
+        public Button loadButton;
+        public SaveLoadButtonGroup() { }
 
+    }
+    public class SaveInfo
+
+    {
+        public string savePath;
+        public MyEnums.SaveType saveType;
+        public SaveInfo() { }
+        public SaveInfo(string savePath, MyEnums.SaveType saveType)
+        {
+            this.savePath = savePath;
+            this.saveType = saveType;
+        }
+
+    }
     private void OnEnable()
     {
-        openSaveLoadPanelEvent.OpenSaveLoadPanelEvent += OnPanelOpen;
         toggleSaveLoadCanvasEvent.toggleCanvasEvent += OnToggleCanvas;
+        if (saveLoadButtonGroups.Count == 0)
+        {
+            LoadButtons();
+        }
+        LoadInfoToSaveList();
+        RefreshSaveButtonState();
+
     }
 
     private void OnDisable()
     {
-        openSaveLoadPanelEvent.OpenSaveLoadPanelEvent -= OnPanelOpen;
         toggleSaveLoadCanvasEvent.toggleCanvasEvent -= OnToggleCanvas;
     }
 
-    private void OnPanelOpen(MyEnums.SaveLoadPanelType panelType)
-    {
-        if (!isPanelOpen)
-        {
-            OpenPanel();
-            if (panelType == MyEnums.SaveLoadPanelType.Save)
-            {
-                // TODO: 初始化保存面板
-            }
-            else if (panelType == MyEnums.SaveLoadPanelType.Load)
-            {
-                // TODO: 初始化读取面板
-            }
-            return;
-        }
-        ((ICanvasManager)this).RefreshCanvaOrder(
-            canvas,
-            MyEnums.CanvasToToggle.SaveLoad,
-            isPanelOpen);
-    }
 
     private void OnToggleCanvas(bool state)
     {
         if (state)
         {
+            LoadInfoToSaveList();
+            RefreshSaveButtonState();
+
             if (!isPanelOpen)
             {
                 OpenPanel();
+
                 return;
             }
             ((ICanvasManager)this).RefreshCanvaOrder(
@@ -65,7 +84,107 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
             ClosePanel();
         }
     }
+    string[] files;
+    private void LoadInfoToSaveList()
+    {
+        files = SaveSystem.instance.GetSavesPath(saveType);
 
+        int i = 0;
+        foreach (var group in saveLoadButtonGroups)
+        {
+            if (i >= files.Length)
+            {
+                group.saveInfo = new(null,saveType);
+                group.saveInfoText.text = "";
+                continue;
+            }
+            else if (files != null)
+            {
+                group.saveInfo = new(files[i], saveType);
+                group.saveInfoText.text = "Save Info\n" + group.saveInfo.savePath;
+            }
+
+            i++;
+        }
+        //按顺序加载到List里
+    }
+
+    public void OnClickSave(SaveLoadButtonGroup group)
+    //按钮订阅的时候持有自己所在对象的引用，这样可以拿到文本引用
+    {
+        TMP_Text infoText = group.saveInfoText;
+        if (IsMenuScene())
+        {
+            if (SaveSystem.instance.DeleteSave(group.saveInfo?.savePath))
+            {
+                group.saveInfo = new(null, saveType);
+                infoText.text = "";
+                LoadInfoToSaveList();
+                RefreshSaveButtonState();
+            }
+            return;
+        }
+        if (group.saveInfo == null)
+        {
+            group.saveInfo = new(null, saveType);
+        }
+        string path = SaveSystem.instance.WriteSave(group.saveInfo.saveType);
+        group.saveInfo.savePath=path;
+        infoText.text =  "Save Info\n" + path;
+
+    }
+    public void OnClickLoad(SaveLoadButtonGroup group)
+    {
+        SaveSystem.instance.LoadSave(group.saveInfo.saveType, group.saveInfo.savePath);
+
+    }
+    private void LoadButtons()
+    {
+        saveLoadButtonGroups = new List<SaveLoadButtonGroup>();
+
+        // 遍历 content 下的每个 button 组
+        foreach (Transform groupTransform in buttonsContent.transform)
+        {
+            var buttonsParent = groupTransform.GetChild(1);
+            var group = new SaveLoadButtonGroup
+            {
+                saveInfoText = groupTransform.GetChild(0).GetComponent<TMP_Text>(),
+                saveButton = buttonsParent.GetChild(0).GetComponent<Button>(),
+                saveButtonText = buttonsParent.GetChild(0).GetComponentInChildren<TMP_Text>(),
+                loadButton = buttonsParent.GetChild(1).GetComponent<Button>()
+            };
+            if (group.saveInfoText == null || group.saveButton == null || group.saveButtonText == null || group.loadButton == null)
+            {
+                Debug.LogWarning($"SaveLoadButtonGroup 初始化失败: {groupTransform.name}");
+                continue;
+            }
+
+            saveLoadButtonGroups.Add(group);
+            group.saveButton.onClick.AddListener(() => OnClickSave(group));
+            group.loadButton.onClick.AddListener(() => OnClickLoad(group));
+
+        }
+    }
+    private void RefreshSaveButtonState()
+    {
+        bool isMenuScene = IsMenuScene();
+        foreach (var group in saveLoadButtonGroups)
+        {
+            if (group.saveButtonText != null)
+            {
+                group.saveButtonText.text = isMenuScene ? "Delete" : "Save";
+            }
+            if (group.saveButton != null)
+            {
+                group.saveButton.interactable = !isMenuScene || !string.IsNullOrEmpty(group.saveInfo?.savePath);
+            }
+        }
+    }
+    private bool IsMenuScene()
+    {
+        GameSceneSO currentScene = SceneChanger.instance != null ? SceneChanger.instance.GetCurrentGameScene() : null;
+        return currentScene != null && currentScene.sceneType == MyEnums.SceneType.Menu;
+    }
     public void OpenPanel()
     {
         isPanelOpen = true;

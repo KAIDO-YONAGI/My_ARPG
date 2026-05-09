@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 [DefaultExecutionOrder(-100)]
 
-//TODO使用流程：实现了IS接口，以loot为例，在特定时刻使用自己接口的注册方法注册自己到DataManager
+//TODO使用流程：实现了IS接口的类，以loot为例，在特定时刻使用自己接口的注册方法注册自己到DataManager
 //DataManager订阅事件，loot脚本特定时刻拉起事件，此时DataManager负责调用loot实现的对应函数，把数据存进去
 //加载和存储基本对称
 
@@ -63,7 +63,9 @@ public class DataManager : MonoBehaviour
         {
             saveable.SaveData(dataToSave);
         }
-        //场景名、人物位置、任务、背包
+
+        //TODO任务、物品栏、背包。另外，重新开始的时候要删除存下的动态数据
+
         bool isLoadingSaveRequest = SaveSystem.instance.IsLoadingSaveRequest;
         if (!isLoadingSaveRequest
             && lastSceneType == MyEnums.SceneType.Menu
