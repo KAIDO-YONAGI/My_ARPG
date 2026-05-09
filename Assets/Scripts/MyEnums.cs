@@ -70,9 +70,7 @@ namespace MyEnums
     public enum SaveType
     {
         SystemSave,
-        PalyerSave,
-        // 第一次从主菜单进入游戏时生成的初始档，后续 NewGame 都读取它。
-        NewGame
+        PalyerSave
     }
     public enum SaveLoadPanelType
     {

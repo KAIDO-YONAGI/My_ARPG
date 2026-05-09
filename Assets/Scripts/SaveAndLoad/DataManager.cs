@@ -70,14 +70,10 @@ public class DataManager : MonoBehaviour
             && sceneToLoadSO.sceneType == MyEnums.SceneType.Location)
         {
             Vector3 savePosition = pos == Vector3.zero ? sceneToLoadSO.initialPosition : pos;
-            if (!TryLoadInitialNewGameData())
-            {
-                dataToSave = new Data();
-                dataToSave.playerStatsData = StatsManager.instance.GetStats();
-                dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, savePosition);
-                DynamicDataHandler.ClearDynamicData(dataToSave);
-                dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.NewGame);
-            }
+            dataToSave = new Data();
+            dataToSave.playerStatsData = StatsManager.instance.GetStats();
+            dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, savePosition);
+            DynamicDataHandler.ClearDynamicData(dataToSave);
         }
         else
         {
@@ -102,17 +98,6 @@ public class DataManager : MonoBehaviour
             }
         }
         lastSceneType = sceneToLoadSO.sceneType;
-    }
-
-    private bool TryLoadInitialNewGameData()
-    {
-        if (!SaveSystem.instance.TryGetLatestSaveData(MyEnums.SaveType.NewGame, out Data initialData))
-        {
-            return false;
-        }
-
-        LoadFromData(initialData);
-        return true;
     }
 
     void OnAutoLoad()
