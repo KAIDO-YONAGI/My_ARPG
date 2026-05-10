@@ -56,6 +56,39 @@ public class DataManager : MonoBehaviour
     {
         saveables.Remove(saveable);
     }
+    public void RemoveLootRegistration(string lootId)
+    {
+        if (string.IsNullOrEmpty(lootId) || dataToSave == null || dataToSave.lootsStatsDic == null)
+        {
+            return;
+        }
+
+        dataToSave.lootsStatsDic.Remove(lootId);
+    }
+    public bool PrepareManualSaveData()
+    {
+        GameSceneSO currentScene = SceneChanger.instance != null ? SceneChanger.instance.GetCurrentGameScene() : null;
+        if (currentScene == null || StatsManager.instance == null)
+        {
+            return false;
+        }
+
+        dataToSave ??= new Data();
+        dataToSave.lootsStatsDic ??= new Dictionary<string, LootStatus>();
+
+        dataToSave.playerStatsData = StatsManager.instance.GetStats();
+        Vector3 savePosition = PlayerController.Instance != null
+            ? PlayerController.Instance.GetPosition()
+            : currentScene.initialPosition;
+        dataToSave.sceneIDAndPlayerPos = new SceneAndPosition(currentScene.ID, savePosition);
+
+        foreach (var saveable in saveables.ToList())
+        {
+            saveable.SaveData(dataToSave);
+        }
+
+        return true;
+    }
     private void OnAutoSave(GameSceneSO sceneToLoadSO, Vector3 pos, bool isToFade)
     //关于位置，手动存的时候可以用玩家当前位置取代默认位置，自动存档用的是新位置或者场景默认位置
     {
