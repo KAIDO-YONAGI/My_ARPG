@@ -128,6 +128,11 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         {
             group.saveInfo = new(null, saveType);
         }
+        if (DataManager.instance == null || !DataManager.instance.PrepareManualSaveData())
+        {
+            Debug.LogWarning("Manual save data is not ready.");
+            return;
+        }
         string path = SaveSystem.instance.WriteSave(group.saveInfo.saveType);
         group.saveInfo.savePath=path;
         infoText.text =  "Save Info\n" + path;

@@ -20,6 +20,14 @@ public class Loot : MonoBehaviour, ISaveable
         saveable.RegisterSaveable();//注册在需要保存的数据的列表中
     }
 
+    private void OnDestroy()
+    {
+        if (DataManager.instance == null) return;
+
+        ISaveable saveable = this;
+        saveable.UnRegisterSaveable();
+    }
+
     private void OnValidate()
     {
         if (item == null) return;
@@ -36,6 +44,10 @@ public class Loot : MonoBehaviour, ISaveable
         var dataDef = GetComponent<DataDefinition>();
         if (dataDef != null)
         {
+            if (DataManager.instance != null)
+            {
+                DataManager.instance.RemoveLootRegistration(dataDef.ID);
+            }
             dataDef.ID = System.Guid.NewGuid().ToString();
         }
 
@@ -111,18 +123,24 @@ public class Loot : MonoBehaviour, ISaveable
         var dataId = GetDataID();
         if (dataId == null) return;
 
-        if (data.lootsStatsDic.ContainsKey(dataId.ID))
+        if (data.lootsStatsDic.TryGetValue(dataId.ID, out LootStatus lootStatus))
         {
-            transform.position = data.lootsStatsDic[dataId.ID].position.ToVector3();
-            hasBeenPicked = data.lootsStatsDic[dataId.ID].hasBeenPicked;
+            transform.position = lootStatus.position.ToVector3();
+            hasBeenPicked = lootStatus.hasBeenPicked;
+        }
+        else
+        {
+            hasBeenPicked = false;
         }
 
         if (hasBeenPicked)//disable里不删除索引，为的是这里能在load的时候设置active
         {
+            canBePick = false;
             gameObject.SetActive(false);
         }
         else
         {
+            canBePick = true;
             gameObject.SetActive(true);
         }
 
