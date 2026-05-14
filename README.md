@@ -141,6 +141,80 @@ A 2D ARPG prototype built with Unity 2022.3.62f3c1.
 - `Assets/Scripts/ScriptableObjects`：任务、场景、对话和事件类 SO 定义。
 - `Assets/Scripts/ScriptableObjects`: ScriptableObject definitions for quests, scenes, dialogue, and events.
 
+## 核心系统架构
+## Core System Architecture
+
+### 存档系统 | Save System
+
+采用 `ISaveable` 接口 + 注册表模式统一管理所有可持久化对象。
+
+The save system uses an `ISaveable` interface + registry pattern to manage all persistable objects.
+
+- **`ISaveable`** 接口定义 `SaveData(Data)` / `LoadData(Data)` 方法，实现该接口的类（Loot、InventoryManager 等）在激活时自动注册到 `DataManager`。
+- **`DataManager`** 维护 `List<ISaveable>` 注册表，场景切换时统一调用所有已注册对象的存/读方法。
+- **`SaveSystem`** 负责序列化（Newtonsoft.Json）和文件 I/O，支持手动存档与自动系统档分离。
+- 自动存档在场景切换时触发；手动存档由玩家操作触发。
+- 存档安全：删除前校验路径不超出 `persistentDataPath`；加载时自动跳过损坏存档并回退到最近的完整档。
+- **`ISaveable`** defines `SaveData(Data)` / `LoadData(Data)`. Implementations (Loot, InventoryManager, etc.) self-register with `DataManager` on enable.
+- **`DataManager`** holds a `List<ISaveable>` registry and invokes save/load on all entries during scene transitions.
+- **`SaveSystem`** handles serialization (Newtonsoft.Json) and file I/O, with separate manual and automatic system saves.
+- Auto-save triggers on scene transitions; manual save triggers from player actions.
+- Safety: delete validates paths stay within `persistentDataPath`; loading skips corrupt files and falls back to the latest valid save.
+
+### 对话系统 | Dialogue System
+
+基于 `DialogSO` ScriptableObject 构建树状对话图，支持条件分支和历史记录。
+
+The dialogue system builds tree-structured dialogue graphs from `DialogSO` ScriptableObjects, with conditional branching and history tracking.
+
+- 每个 `DialogSO` 节点包含对话行（`dialogLines`）和子选项（`nextDialogOptions`），形成对话树。
+- 条件分支通过 `RefuseDialogSO` 实现：对话开始前检查前置条件（角色是否对话过、物品是否拾取够数量），不满足则展示拒绝对话。
+- `onlyTriggeredOnce` 标记实现一次性对话，`ConversationHistoryManager` 记录对话历史。
+- `ItemHistoryManager` 跟踪物品拾取历史，供条件检查和任务目标使用。
+- Each `DialogSO` node holds dialogue lines (`dialogLines`) and child options (`nextDialogOptions`), forming a dialogue tree.
+- Conditional branching via `RefuseDialogSO`: before starting a dialogue, prerequisites are checked (character spoken to, items collected). Failure shows a refusal dialogue instead.
+- `onlyTriggeredOnce` enables one-shot dialogues. `ConversationHistoryManager` tracks dialogue history.
+- `ItemHistoryManager` tracks item pickup history for condition checks and quest objectives.
+
+### 任务系统 | Quest System
+
+基于状态机的任务管理，支持多目标类型和自动状态推进。
+
+State-machine-based quest management with multi-objective types and automatic state progression.
+
+- 任务状态机：`Idle → Accepted → IsToComplete → Completed`，带 `Decline` 分支可回退到 `Accepted`。
+- `QuestProgressData` 内部类用 `Dictionary<QuestObjective, int>` 管理每个目标的当前进度。
+- 目标类型支持物品拾取数量检查（通过 `ItemHistoryManager`）和角色对话检查（通过 `ConversationHistoryManager`）。
+- 目标达成后自动推进状态到 `IsToComplete`；完成任务自动通过事件系统发放奖励到背包。
+- Quest state machine: `Idle → Accepted → IsToComplete → Completed`, with a `Decline` branch that reverts to `Accepted`.
+- `QuestProgressData` inner class uses `Dictionary<QuestObjective, int>` to track per-objective progress.
+- Objective types include item pickup counts (via `ItemHistoryManager`) and character conversation checks (via `ConversationHistoryManager`).
+- Completing all objectives auto-promotes to `IsToComplete`; finishing a quest auto-rewards items through the event system.
+
+### A* 寻路系统 | A* Pathfinding System
+
+采用三层解耦架构：网格管理、寻路算法、路径消费各自独立，NPC 和敌人只需挂载 `MovementController` 即可获得寻路能力。
+
+Three-layer decoupled architecture: grid management, pathfinding algorithm, and path consumption are independent. NPCs and enemies only need a `MovementController` component to use pathfinding.
+
+- **`AStarNodeManager`** — 网格数据层。从 Tilemap 和 Collider2D 自动构建节点地图，支持可步行/障碍节点标记，提供世界坐标↔网格坐标转换和安全边距（避免贴墙移动）。
+- **`AStarPathFinder`** — 寻路算法层。标准 A* 实现，支持 8 方向移动、对角线通行检查（`CanWalkDiagonally`）、起点优化（`NoCoverObstacleNodes` 直接直线移动到最优起点）。
+- **`MovementController`** — 路径消费层。可挂载到任意 GameObject，提供 `GetPosToGo()` 获取当前目标点、`ArrivedPos()` 消费节点。内置重寻路机制（目标移动超过阈值时自动重建路径，新旧路径比较后决定是否替换）和冷却计时器防止频繁重算。Scene View 中通过 Gizmos 可视化路径。
+- **`AStarNodeManager`** — Grid data layer. Auto-builds a node map from Tilemaps and Collider2Ds, with walkable/obstacle marking, world↔cell coordinate conversion, and safety margins to prevent wall-hugging.
+- **`AStarPathFinder`** — Algorithm layer. Standard A* with 8-directional movement, diagonal pass-through checks (`CanWalkDiagonally`), and start-point optimization (`NoCoverObstacleNodes` for direct line-of-sight shortcuts).
+- **`MovementController`** — Consumption layer. Attachable to any GameObject, provides `GetPosToGo()` for the current waypoint and `ArrivedPos()` to consume nodes. Includes automatic path rebuilding (triggers when the target moves beyond a threshold, compares old vs. new path before swapping) and a cooldown timer to prevent excessive recalculations. Path visualized via Gizmos in Scene View.
+
+### 事件驱动 | Event-Driven Architecture
+
+系统间通信通过 ScriptableObject 事件通道解耦。
+
+Inter-system communication is decoupled through ScriptableObject event channels.
+
+- 定义了多种事件 SO（`VoidEventSO`、`DataSaveEventSO`、`QuestOptionsEventSO`、`SceneLoadEventSO` 等），广播方 Raise 事件，接收方订阅回调。
+- 存档、任务奖励、场景加载、UI 切换等跨系统操作均通过事件传递，避免直接引用。
+- Various event SOs (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, `SceneLoadEventSO`, etc.) decouple broadcasters from subscribers.
+- Cross-system operations—saving, quest rewards, scene loading, UI toggling—all flow through events to avoid direct references.
+
 ## 已知限制
 ## Known Limitations
 
