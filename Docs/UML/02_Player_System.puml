@@ -1,16 +1,17 @@
 @startuml Player_System
 
+!pragma layout smetana
 left to right direction
 
 skinparam linetype ortho
-skinparam nodesep 50
-skinparam ranksep 60
+skinparam nodesep 40
+skinparam ranksep 50
 skinparam classAttributeIconSize 0
 skinparam defaultFontSize 11
 skinparam classFontSize 12
 skinparam classFontStyle bold
 skinparam padding 2
-skinparam wrapWidth 120
+skinparam wrapWidth 140
 
 title Player System
 
@@ -22,111 +23,141 @@ enum PlayerState {
     KnockBack
 }
 
-package "Managers" #FFF3E0 {
+package "Player Runtime Data" #E8F5E9 {
+    class PlayerStatsData <<serializable>> {
+        + damage : int
+        + weaponRange : float
+        + knockBackForce : float
+        + knockBackTime : float
+        + stunTime : float
+        + coolDown : float
+        + speed : float
+        + maxHealth : int
+        + currentHealth : int
+        + skillPoints : int
+        + level : int
+        + currentExp : int
+        + expToUpgrade : int
+        + expMutiplier : float
+    }
+
     class StatsManager <<singleton>> {
-        - {static} instance : StatsManager
-        - damage : int
-        - weaponRange : float
-        - knockBackForce : float
-        - stunTime : float
-        - coolDown : float
-        - speed : float
-        - maxHealth : int
-        - currentHealth : int
+        - stats : PlayerStatsData
+        + GetStats() : PlayerStatsData
+        + LoadStats(data : PlayerStatsData) : void
+        + Respwan() : void
         + UpdateMaxHealth(amount : int) : void
         + UpdateHealth(amount : int) : void
         + UpdateSpeed(amount : float) : void
         + UpdateDamage(amount : int) : void
-        + ResetHealth() : void
+        + UpdateSkillPoints(amount : int) : void
     }
 
     class TimeManager <<singleton>> {
-        - {static} instance : TimeManager
         - isGamePaused : bool
-        - pauseCount : int = 0
+        - pauseCount : int
         + PauseGame() : void
         + ResumeGame() : void
-        + ResumeGame() : void
+        + ForceResumeGame() : void
     }
 }
 
 package "Player Core" #E3F2FD {
+    class PlayerController <<singleton>> {
+        + GetPosition() : Vector3
+    }
+
     class PlayerMovement {
         + rb : Rigidbody2D
         + animator : Animator
         + playerCombat : PlayerCombat
         + playerBow : PlayerBow
         + joystick : Joystick
-        - facingDirection : int = 1
-        - canBeInterrupted : bool = true
-        - playerState : PlayerState = Idle
+        - playerState : PlayerState
+        - canBeInterrupted : bool
         + AnimatorSM(newState : PlayerState) : void
+        + SetCanBeInterrupted(value : bool) : void
+        + ResetTimer() : void
         + KonckBack(enemy : Transform, force : float, stunTime : float) : void
-        - MovementSM() : void
-        - HandleKnockBackState() : void
-        - HandleShootingState() : void
-        - HandleAttackingState() : void
-        - HandleRunningState() : void
-        - SetMovement(horizontal : float, vertical : float) : void
-        - Flip() : void
     }
 
     class PlayerCombat {
         + attackPoint : Transform
         + enemyMask : LayerMask
+        + playerMovement : PlayerMovement
         + DealDamage() : void
-        - StrengthBUff() : void
         + FinshCombat() : void
     }
 
     class PlayerBow {
         + launchPoint : Transform
         + arrowPrefab : GameObject
-        - aimDirection : Vector2 = right
         + anim : Animator
+        + playerMovement : PlayerMovement
         + HandleAiming() : void
         + HandleShootingAiming() : void
         + Shoot() : void
         + ShootingDone() : void
     }
-}
 
-package "Player Related" #E8F5E9 {
+    class ShiftEquipment {
+        + combat : PlayerCombat
+        + bow : PlayerBow
+        + playerMovement : PlayerMovement
+        - shiftCooldown : float
+    }
+
     class PlayerHealth {
         + GameOverCanvas : CanvasGroup
         + ChangeHealth(amount : int) : void
     }
 
-    class ShiftEquipment {
-        + combat : PlayerCombat
-        + bow : PlayerBow
-        - shiftCooldown : float = 0.3f
-    }
-
     class Arrow {
-        + direction : Vector2 = right
+        + direction : Vector2
         + enemyLayer : LayerMask
         + obstacleLayer : LayerMask
-        + buriedSprite : Sprite
-        + speed : float = 2
-        + damage : int = 1
-        + knockBackForce : float = 2
-        - OnCollisionEnter2D(collision : Collision2D) : void
+        + speed : float
+        + damage : int
+        + OnCollisionEnter2D(collision : Collision2D) : void
         - AttachToTarget(target : Transform) : void
     }
 }
 
-PlayerMovement --> PlayerState : playerState
+package "UI Feedback" #FFF3E0 {
+    class HealthCanvasManager <<singleton>> {
+        + UpdateHealthText() : void
+    }
+
+    class StatsCanvasManager <<singleton>> {
+        + UpdateDamage() : void
+        + UpdateSpeed() : void
+        + UpdateAllStats() : void
+    }
+}
+
+StatsManager *-- PlayerStatsData : current stats
+StatsManager --> HealthCanvasManager : updates HP text
+StatsManager --> StatsCanvasManager : updates stat labels
+PlayerMovement --> PlayerState : runtime state
 PlayerMovement o-- PlayerCombat
 PlayerMovement o-- PlayerBow
-PlayerMovement --> StatsManager : uses
-PlayerCombat --> StatsManager : uses
-PlayerBow --> StatsManager : uses
-PlayerBow --> Arrow : creates
-ShiftEquipment o-- PlayerCombat
-ShiftEquipment o-- PlayerBow
-ShiftEquipment --> PlayerMovement : uses
-PlayerHealth --> StatsManager : uses
-Arrow --> StatsManager : uses
+PlayerMovement --> StatsManager : reads movement / cooldown stats
+PlayerCombat --> StatsManager : reads damage / range / knockback
+PlayerCombat --> EnemyHealth : applies damage
+PlayerCombat --> EnemyKnockBack : applies knockback
+PlayerBow --> StatsManager : reads cooldown
+PlayerBow --> Arrow : instantiates projectile
+ShiftEquipment --> PlayerCombat : toggles melee mode
+ShiftEquipment --> PlayerBow : toggles ranged mode
+ShiftEquipment --> PlayerMovement : resets state
+PlayerHealth --> StatsManager : reads current health
+Arrow --> StatsManager : initializes projectile damage
+Arrow --> EnemyHealth : damages enemy
+Arrow --> EnemyKnockBack : knocks back enemy
+
+note bottom of ShiftEquipment
+The player switches between melee and ranged combat
+by enabling/disabling PlayerCombat and PlayerBow.
+end note
 
 @enduml

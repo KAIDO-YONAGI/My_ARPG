@@ -1,120 +1,190 @@
 @startuml Dialog_Inventory_System
 
+!pragma layout smetana
+
 skinparam linetype ortho
-skinparam nodesep 50
-skinparam ranksep 60
+skinparam nodesep 40
+skinparam ranksep 50
 skinparam classAttributeIconSize 0
 skinparam defaultFontSize 11
 skinparam classFontSize 12
 skinparam classFontStyle bold
 skinparam padding 2
-skinparam wrapWidth 120
+skinparam wrapWidth 140
 
-title Dialog & Inventory System
+title Dialog, Inventory & Shop System
 
 package "Dialog" #E3F2FD {
     class DialogManager <<singleton>> {
-        - {static} instance : DialogManager
         + dialogCanvasGroup : CanvasGroup
         + speakerPortrait : Image
+        + dialogText : TMP_Text
+        + speakerNameText : TMP_Text
         + isDialogActive : bool
         + optionButtons : Button[]
-        - currentLineIndex : int = 0
         - currentDialog : DialogSO
         + StartDialog(dialog : DialogSO) : void
         + AdvanceDialog() : void
         + EndDialog() : void
         + ForeceEndDialog() : void
         - MatchConditionsToStartDialog(dialog : DialogSO) : bool
-        - StartRefuseDialog(dialog : DialogSO, chatTypeToStart : ChatType) : void
-        - ShowChoices() : void
-        - ShowDialog() : void
-        - OnOptionSelected(nextDialog : DialogSO) : void
+        - HasRefuseConditions(refuse : RefuseDialogSO) : bool
+        - StartRefuseDialog(refuse : RefuseDialogSO) : void
     }
 
-    together {
-        class ConversationHistoryManager <<singleton>> {
-            - {static} instance : ConversationHistoryManager
-            - charactersHasChated : HashSet<CharacterSO>
-            + RecordCharacter(character : CharacterSO) : void
-            + HasChatedWith(character : CharacterSO) : bool
-        }
+    class ConversationHistoryManager <<singleton>> {
+        + RecordCharacter(character : CharacterSO) : void
+        + HasChatedWith(character : CharacterSO) : bool
+        + RecordDialogHasChated(dialog : DialogSO) : void
+        + HasDialogChated(dialog : DialogSO) : bool
+    }
 
-        class ItemHistoryManager <<singleton>> {
-            - {static} instance : ItemHistoryManager
-            - itemHasPicked : Dictionary<ItemSO, int>
-            + RecordItem(item : ItemSO, quantity : int) : void
-            + HasPickedOverAmount(item : ItemSO, amount : int) : bool
-        }
+    class ItemHistoryManager <<singleton>> {
+        + RecordItem(item : ItemSO, quantity : int) : void
+        + HasPickedOverAmount(item : ItemSO, amount : int) : bool
+        + GetItemQuantity(item : ItemSO) : int
+    }
 
-        class VisitedHistoryManager <<singleton>> {
-            - {static} instance : VisitedHistoryManager
-        }
+    class VisitedHistoryManager <<singleton>>
+
+    class NPCChat {
+        + dialogSO : DialogSO
+        + toggleDialogEvent : ToggleCanvasEventSO
     }
 }
 
 package "Inventory" #E8F5E9 {
-    class InventoryManager {
-        + itemSlots : InventorySlot[]
+    class InventoryManager <<singleton>> {
+        + hotbarParent : Transform
+        + backpackParent : Transform
+        + useItem : UseItem
+        + lootPrefab : GameObject
+        + player : Transform
         + goldAmount : int
-        + lootEvent : LootEventSO
         + ShoppingRequest : InventorySlotsStatsSO
         + QuestRewardRequest : InventorySlotsStatsSO
+        + lootEvent : LootEventSO
+        + SetSlotBeenClicked(slot : InventorySlot) : void
         + DropByClick(slot : InventorySlot) : void
         + UseItem(slot : InventorySlot) : void
-        + UpdateGold(price : int) : void
-        - HandleQuestReward(item : ItemSO, price : int, amount : int) : void
-        - OnItemLootedHandler(item : ItemSO, quantity : int, lootObj : Loot) : void
         - HandleShopping(item : ItemSO, price : int, amount : int) : void
-        - UpdateInvetorySlots(item : ItemSO, quantity : int, lootObj : Loot) : void
-        - HasSpaceForItem(item : ItemSO) : bool
-        - DropLoot(item : ItemSO, quantity : int, existingLoot : Loot) : void
+        - HandleQuestReward(item : ItemSO, price : int, amount : int) : void
+        - UpdateInvetorySlots(item : ItemSO, quantity : int, lootObj : Loot = null) : void
+        - DropLoot(item : ItemSO, quantity : int, existingLoot : Loot = null) : void
     }
 
-    together {
-        class Loot {
-            + item : ItemSO
-            + lootEvent : LootEventSO
-            + quantity : int = 10
-            + canBePick : bool = true
-            + hasBeenPicked : bool = false
-            + Initialize(item : ItemSO, quantity : int) : void
-            + MarkAsDisable() : void
-            + SaveData(data : Data) : void
-            + LoadData(data : Data) : void
-        }
+    class InventorySlot {
+        + itemSO : ItemSO
+        + quantity : int
+        + OnPointerClick(eventData : PointerEventData) : void
+        + UpdateUI() : void
+    }
 
-        class InventorySlot {
-            + itemSO : ItemSO
-            + quantity : int
-            + inventoryManager : InventoryManager
-            + OnPointerClick(eventData : PointerEventData) : void
-        }
+    class UseItem {
+        + ApplyItemEffects(item : ItemSO) : void
+        - EffectTimer(item : ItemSO, duration : float) : IEnumerator
+    }
 
-        class UseItem {
-            + ApplyItemEffects(item : ItemSO) : void
-            - EffectTimer(item : ItemSO, duration : float) : IEnumerator
-        }
+    class Loot {
+        + item : ItemSO
+        + quantity : int
+        + canBePick : bool
+        + hasBeenPicked : bool
+        + Initialize(item : ItemSO, quantity : int) : void
+        + MarkAsDisable() : void
+        + SaveData(data : Data) : void
+        + LoadData(data : Data) : void
     }
 }
 
+package "Shop" #FFF3E0 {
+    class ShopManager <<singleton>> {
+        + InventoryUpdateRequest : InventorySlotsStatsSO
+        + toggleShopCanvasEvent : ToggleCanvasEventSO
+        + CurrentPortraitTarget : Transform
+        + IsShopOpen : bool
+        + RegisterActiveShopKeeper(keeper : ShopKeeper) : void
+        + UnregisterActiveShopKeeper() : void
+        + OpenShop(items : List<ShopItems>, weapon : List<ShopItems>, armor : List<ShopItems>) : void
+        + CloseShop() : void
+        + TryBuyItem(item : ItemSO, price : int) : void
+        + SellItem(item : ItemSO) : void
+        + OpenItemShop() : void
+        + OpenWeaponShop() : void
+        + OpenArmorShop() : void
+    }
+
+    class ShopSlot {
+        + Initialize(item : ItemSO, price : int) : void
+        + GetItemSO() : ItemSO
+        + GetPrice() : int
+        + OnBuyButtonClick() : void
+    }
+
+    class ShopInfo {
+        + ShowItemInfo(item : ItemSO) : void
+        + HideItemInfo() : void
+        + FollowMouse() : void
+    }
+
+    class ShopToggles {
+        + OpenItemShop() : void
+        + OpenWeaponShop() : void
+        + OpenArmorShop() : void
+    }
+
+    class ShopPortraitCameraController {
+        - currentTarget : Transform
+        - LateUpdate() : void
+    }
+
+    class ShopKeeper {
+        + ShopItems : List<ShopItems>
+        + ShopWeapon : List<ShopItems>
+        + ShopArmor : List<ShopItems>
+        + PortraitTarget : Transform
+    }
+}
+
+DialogManager --> DialogSO : current dialog tree
+DialogManager --> ConversationHistoryManager : conversation history
+DialogManager --> ItemHistoryManager : item prerequisites
+DialogManager --> UIManager : reports dialog canvas state
+NPCChat --> DialogManager : open / advance dialog
+NPCChat --> DialogSO : dialog entry
+NPCChat --> ToggleCanvasEventSO : close dialog by event
+ConversationHistoryManager --> CharacterSO : tracks talked NPCs
+ConversationHistoryManager --> DialogSO : tracks one-shot branches
+ItemHistoryManager --> ItemSO : tracks pickups / consumption
+
+InventoryManager o-- InventorySlot : hotbar + backpack slots
+InventoryManager --> UseItem : applies item effects
+InventoryManager --> LootEventSO : receives pickups
+InventoryManager --> InventorySlotsStatsSO : buy / sell / quest reward
+InventoryManager --> ItemHistoryManager : records item changes
+InventoryManager --> StatsManager : gold / consumable effects
+InventoryManager --> ExpManager : applies EXP items
+InventorySlot --> InventoryManager : use / drop / mark clicked
+InventorySlot --> ShopManager : sell while shop is open
+UseItem --> StatsManager : updates player stats
 Loot ..|> ISaveable
-Loot --> ItemSO : item
-Loot --> LootEventSO : lootEvent
-InventoryManager o-- InventorySlot : itemSlots
-InventoryManager --> UseItem : useItem
-InventoryManager --> Loot : creates/uses
-InventoryManager --> LootEventSO : lootEvent
-InventoryManager --> InventorySlotsStatsSO : ShoppingRequest/QuestRewardRequest
-InventoryManager --> ItemHistoryManager : uses
-InventoryManager --> StatsManager : uses
-InventorySlot --> ItemSO : itemSO
-InventorySlot --> ShopManager : checks
-UseItem --> StatsManager : uses
-DialogManager --> DialogSO : currentDialog
-DialogManager --> ConversationHistoryManager : uses
-DialogManager --> ItemHistoryManager : uses
-ConversationHistoryManager --> CharacterSO : tracks
-ItemHistoryManager --> ItemSO : tracks
+Loot --> ItemSO : dropped item
+Loot --> LootEventSO : pickup event
+
+ShopManager o-- ShopSlot : visible shop entries
+ShopManager --> InventorySlotsStatsSO : requests buy / sell
+ShopManager --> ToggleCanvasEventSO : window toggle
+ShopManager --> ShopKeeper : active seller
+ShopSlot --> ShopManager : buy item
+ShopSlot --> ShopInfo : hover tooltip
+ShopSlot --> ItemSO : displayed item
+ShopToggles --> ShopManager : switches item/weapon/armor tabs
+ShopPortraitCameraController --> ShopManager : follows active portrait target
+ShopKeeper --> ShopManager : register / unregister interaction source
+
+note bottom of InventoryManager
+Inventory is the junction for pickups, shop trading,
+quest rewards, EXP items, and dropped loot.
+end note
 
 @enduml
