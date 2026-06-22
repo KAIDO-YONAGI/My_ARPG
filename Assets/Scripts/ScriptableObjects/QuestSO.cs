@@ -29,6 +29,7 @@ public class QuestObjective
 
 
     public int requiredAmount;
+    public int currentAmount;
 }
 
 /*
