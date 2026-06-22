@@ -29,7 +29,6 @@ public class QuestObjective
 
 
     public int requiredAmount;
-    public int currentAmount;
 }
 
 /*
@@ -61,7 +60,10 @@ public class QuestObjective
  *   - targetCharacter: 目标角色（击杀/对话/护送类任务）。
  *   - targetLocation : 目标地点（到达/探索类任务）。
  *   - requiredAmount : 需要达成的数量（如“收集 5 个草药”填 5）。
- *   - currentAmount  : 当前进度（运行时由任务系统写入；配置时一般填 0）。
+ *   - currentAmount  : 【当前未使用 / 疑似遗留字段】注意：项目运行时进度并不存在这里，
+ *                      而是 QuestManager 用 questProgress 字典单独维护
+ *                      （参见 QuestManager.GetCurrentObjAmount）。该字段目前无任何代码读写，
+ *                      可考虑移除，或明确其用途。
  *
  * 【rewards[] —— 奖励列表】
  *   每个 Reward 代表一项发放奖励。
@@ -73,14 +75,14 @@ public class QuestObjective
  *   2) 创建 QuestSO，填 questName / lv / questDescription。
  *   3) 在 questObjectives 里逐项添加目标，按任务类型只填相关字段
  *      （物品类填 targetItem，角色类填 targetCharacter，地点类填 targetLocation），
- *      并设置 requiredAmount，currentAmount 保持 0。
+ *      并设置 requiredAmount。
  *   4) 在 rewards 里挂奖励物品与数量。
  *
  * 注意事项：
  *   - 一个 QuestObjective 通常只用一种 target（物品/角色/地点），其余留空，
  *     避免任务系统判定时产生歧义。
- *   - currentAmount 是运行时状态，配置资源时不要预填非 0 值，
- *     否则任务“开局就已完成部分进度”。
+ *   - currentAmount 字段目前未被任何代码使用（运行时进度由 QuestManager 的
+ *     questProgress 字典维护），属于遗留字段，谨慎依赖或建议清理。
  *   - 奖励的金币/经验建议用 isGold / isEXP 标记的 ItemSO 统一表示，便于系统统计。
  *   - SO 之间是引用关系，重命名/移动资源会断引用。
  * ============================================================
