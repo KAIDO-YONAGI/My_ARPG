@@ -114,7 +114,7 @@ public class SceneChanger : MonoBehaviour
         TimeManager.instance.PauseGame();
         sceneToLoad = scene;
 
-        StatsManager.instance.Respwan();//回血
+        StatsManager.instance.Respawn();//回血
 
 
         this.newPosition = newPosition == Vector3.zero ? sceneToLoad.initialPosition : newPosition;

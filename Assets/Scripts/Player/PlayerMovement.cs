@@ -189,7 +189,7 @@ public class PlayerMovement : MonoBehaviour
     {
         return this.facingDirection;
     }
-    public void KonckBack(Transform enemy, float force, float stunTime)
+    public void KnockBack(Transform enemy, float force, float stunTime)
     {
         if(gameObject.activeSelf == false)
             return;

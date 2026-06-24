@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ public class Arrow : MonoBehaviour
 
 
 
-    public float lifeSpwan = 1;
+    public float lifeSpan = 1;
     public float speed = 2;
     public int damage = 1;
     public float  knockBackForce=2;
@@ -26,7 +26,7 @@ public class Arrow : MonoBehaviour
 
         rb.velocity = direction * speed;
         RotateArrow();
-        Destroy(gameObject,lifeSpwan);//destory方法的第二个参数表示对象生存时间/多久后销毁
+        Destroy(gameObject,lifeSpan);//destory方法的第二个参数表示对象生存时间/多久后销毁
         damage= StatsManager.instance.GetDamage();
     }
     private void RotateArrow()

@@ -57,7 +57,7 @@ public class ExpManager : MonoBehaviour
         var stats = StatsManager.instance.GetStats();
         stats.level++;
         stats.currentExp -= stats.expToUpgrade;
-        stats.expToUpgrade = Mathf.RoundToInt(stats.expToUpgrade * stats.expMutiplier);
+        stats.expToUpgrade = Mathf.RoundToInt(stats.expToUpgrade * stats.expMultiplier);
         OnLevelUp?.Invoke(1);
     }
 }

@@ -11,8 +11,6 @@ public class PlayerCombat : MonoBehaviour
     public void DealDamage()
     {
         //TODO:可以引入空间优化算法
-        StrengthBUff();
-
         Collider2D[] enemis = Physics2D.OverlapCircleAll(
             attackPoint.position,
             StatsManager.instance.GetWeaponRange(),
@@ -30,11 +28,7 @@ public class PlayerCombat : MonoBehaviour
         }
 
     }
-    private void StrengthBUff()
-    {
-        StatsManager.instance.UpdateDamage(1);//伤害+1
-    }
-    public void FinshCombat()
+    public void FinishCombat()
     {
         playerMovement.AnimatorSM(PlayerState.Idle);
         playerMovement.animator.SetBool("isAttacking", false);

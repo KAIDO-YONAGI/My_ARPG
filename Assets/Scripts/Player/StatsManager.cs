@@ -16,7 +16,7 @@ public class PlayerStatsData
     public int level;
     public int currentExp;
     public int expToUpgrade;
-    public float expMutiplier;
+    public float expMultiplier;
 }
 
 public class StatsManager : MonoBehaviour
@@ -46,10 +46,10 @@ public class StatsManager : MonoBehaviour
     public int GetLevel() => stats.level;
     public int GetCurrentExp() => stats.currentExp;
     public int GetExpToUpgrade() => stats.expToUpgrade;
-    public float GetExpMutiplier() => stats.expMutiplier;
+    public float GetExpMultiplier() => stats.expMultiplier;
 
     //注意setter需要伴随UI的更新一起编写，非必要不要直接用setter
-    public void Respwan()
+    public void Respawn()
     {
         if (stats.currentHealth <= 0)
             stats.currentHealth = stats.maxHealth;
