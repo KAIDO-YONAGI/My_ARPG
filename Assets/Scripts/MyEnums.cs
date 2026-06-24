@@ -70,7 +70,7 @@ namespace MyEnums
     public enum SaveType
     {
         SystemSave,
-        PalyerSave
+        PlayerSave
     }
     public enum SaveLoadPanelType
     {

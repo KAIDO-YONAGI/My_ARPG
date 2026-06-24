@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TMPro;
@@ -18,7 +18,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
 
 
     private bool isPanelOpen = false;
-    private MyEnums.SaveType saveType = MyEnums.SaveType.PalyerSave;
+    private MyEnums.SaveType saveType = MyEnums.SaveType.PlayerSave;
     private List<SaveLoadButtonGroup> saveLoadButtonGroups = new();
     public class SaveLoadButtonGroup
     {

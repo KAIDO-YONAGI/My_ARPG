@@ -8,7 +8,7 @@ public class PlayerHealth : MonoBehaviour
     public CanvasGroup GameOverCanvas;
     void Start()
     {
-        StatsManager.instance.Respwan();
+        StatsManager.instance.Respawn();
     }
     public void ChangeHealth(int amount)
     {
