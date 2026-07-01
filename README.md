@@ -215,6 +215,51 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 - Various event SOs (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, `SceneLoadEventSO`, etc.) decouple broadcasters from subscribers.
 - Cross-system operations—saving, quest rewards, scene loading, UI toggling—all flow through events to avoid direct references.
 
+## 构建建议
+## Build Notes
+
+> 本节记录在导出 / 打包过程中容易踩坑的点，尤其是 Addressables 与 ScriptableObject（SO）相关的注意事项。
+> This section documents pitfalls encountered during export / build, especially around Addressables and ScriptableObjects (SOs).
+
+### Addressables 相关 | Addressables
+
+- **构建入口与数据构建器**：项目已开启 `Build Addressables on Player Build`（`AddressableAssetSettings` 中 `m_BuildAddressablesWithPlayerBuild = 1`），打包时会自动构建 Addressables。但前提是**活动数据构建器为 Packed Mode**（`m_ActivePlayerDataBuilderIndex = 3`）。如果误切回 Use Asset Database / Simulate Groups 模式，运行时场景会无法被实际打包出来，导致导出包中场景缺失或运行时报错。
+  - **Build entry & data builder**: `Build Addressables on Player Build` is enabled (`m_BuildAddressablesWithPlayerBuild = 1`), so Addressables are built automatically during export — **provided the active data builder is Packed Mode** (`m_ActivePlayerDataBuilderIndex = 3`). Switching back to "Use Asset Database" / "Simulate Groups" leaves scenes unbuilt: the exported package will be missing scenes or fail at runtime.
+
+- **失效 / 缺失的引用会直接卡断构建**：Addressables 组里如果引用了已被删除或重命名的资源，构建阶段会报错甚至整体失败。当前 `Scenes` 组里残留了一条指向 `Assets/Scenes/Menu.unity` 的引用，而实际菜单场景是 `Assets/Scenes/GameScene/StartingMenu.unity` —— 这类失效引用（路径错或 GUID 失效）需要在导出前清理。**改资源名 / 路径后，记得同步检查 Addressables 组，或重新打开 `Window > Asset Management > Addressables > Groups` 让它刷新。**
+  - **Stale / missing references break the build outright**: An Addressables group that still references a deleted or renamed asset will error out — sometimes aborting the entire build. The `Scenes` group currently retains a reference to `Assets/Scenes/Menu.unity`, while the real menu scene is `Assets/Scenes/GameScene/StartingMenu.unity`. Clean up such stale entries (wrong path or broken GUID) before exporting. **After renaming or moving assets, always re-check the Addressables groups, or reopen `Window > Asset Management > Addressables > Groups` to let it refresh.**
+
+- **内容更新前的 Content Update 依赖 `addressables_content_state.bin`**：做增量内容更新（Content Update Build）前，项目目录下需要存在有效的 `addressables_content_state.bin`（每个平台一份，如 `Windows/`、`Android/`、`WebGL/`）。该文件已在 `.gitignore` 中被忽略，换机器或清理后若丢失，需先做一次 Clean Build 重建它，否则 Content Update 会失败或行为异常。
+  - **Content Update depends on `addressables_content_state.bin`**: An incremental Content Update requires a valid `addressables_content_state.bin` per platform (`Windows/`, `Android/`, `WebGL/`). It is git-ignored, so after a machine switch or cleanup it may be missing — run a Clean Build first to regenerate it, or Content Update will fail or behave unexpectedly.
+
+- **`ServerData/` 与本地运行**：Remote 组的产物会输出到 `ServerData/[BuildTarget]`。本仓库默认走本地构建、不启用远程托管（`m_CCDEnabled = 0`），所以不必依赖远端；但若将来开启远程目录，务必保证 `Local.LoadPath` / `Remote.LoadPath` profile 与实际托管地址一致，否则运行时找不到资源。
+  - **`ServerData/` and local runtime**: Remote group artifacts go to `ServerData/[BuildTarget]`. This repo defaults to local builds with no remote hosting (`m_CCDEnabled = 0`), so no remote is needed. If you later enable a remote catalog, ensure the `Local.LoadPath` / `Remote.LoadPath` profile values match the real host, or assets won't be found at runtime.
+
+- **场景加载入口**：打包后的运行入口是 `InitialScene`（不在 Addressables 组内，由 Player Settings 直接打进包），它再通过 `GameSceneSO.sceneReference`（`AssetReference`）异步加载 `PersistentScene` 与游戏场景。因此 **入口场景必须保留在 Build Settings 的 Scenes 列表里**，否则空包启动。
+  - **Scene load entry**: The post-build entry is `InitialScene` (not in any Addressables group — packed directly by Player Settings). It then asynchronously loads `PersistentScene` and gameplay scenes via `GameSceneSO.sceneReference` (`AssetReference`). So **`InitialScene` must remain in Build Settings' Scenes list**, otherwise the build launches into nothing.
+
+### Android 导出 | Android Export
+
+- **安卓导出存在不明原因失败**：在当前配置下，Android 平台的导出（无论 IL2CPP / Mono、有无导出工程）**会出现原因不明的构建失败**，且报错信息不够明确。目前将其作为已知问题记录，**不在此处提供解决方案**；若确需安卓包，请优先尝试排查 Addressables 失效引用、JDK/SDK/NDK 版本与 Gradle 配置（见根目录 `gradleTemplate.properties`），必要时先在 Windows / PC 平台验证流程通畅。
+  - **Android export fails for unknown reasons**: Under the current setup, Android export (regardless of IL2CPP/Mono, with or without exporting a project) **fails for reasons that are not clearly identified**, with unclear error messages. This is recorded as a known issue and **no fix is provided here**. If you need an Android build, first check Addressables stale references, JDK/SDK/NDK versions and the Gradle config (see root `gradleTemplate.properties`); when in doubt, validate the pipeline on the Windows / PC platform first.
+
+### ScriptableObject（SO）使用建议 | ScriptableObject Usage Tips
+
+- **资源名 / 路径改动后检查引用**：项目大量依赖 SO 作为数据容器与事件通道（`DialogSO`、`QuestSO`、`GameSceneSO`、各种 `*EventSO` 等）。重命名或移动 SO 资源后，Inspector 里引用它的字段可能变成 `Missing`，运行时静默失效。建议改名后用搜索（如按 GUID / `Missing`）批量核对一次。
+  - **Check references after renaming/moving**: The project leans heavily on SOs as data containers and event channels (`DialogSO`, `QuestSO`, `GameSceneSO`, the various `*EventSO`s). After renaming or moving an SO asset, fields referencing it can turn `Missing` and fail silently at runtime. After a rename, do a sweep (by GUID / `Missing`) to verify references.
+
+- **事件 SO 的订阅与注销必须成对**：自定义事件通道（`VoidEventSO`、`DataSaveEventSO`、`QuestOptionsEventSO` 等）通过 `UnityAction` 委托广播。本项目统一约定在 `OnEnable` 里 `+=` 订阅、`OnDisable` 里 `-=` 注销（参见 `DataManager`、`RetryManager`、`PlayerBow` 等）。**新增订阅者务必遵守此约定**，否则场景切换 / 对象销毁后会出现重复触发或空引用。
+  - **Subscribe / unsubscribe event SOs in pairs**: Custom event channels (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, …) broadcast via `UnityAction` delegates. The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `DataManager`, `RetryManager`, `PlayerBow`, etc.). **New subscribers must follow this**, or scene transitions / object destruction will cause double-fires or null-refs.
+
+- **`GameSceneSO.ID` 与 `GuidSO` 的稳定标识**：`GameSceneSO` 在 `OnValidate` 里用 `System.Guid` 自动生成 `ID`；`GuidSO` 也会在为空时自动填充 GUID 并 `SetDirty`。这意味着 **SO 的 GUID 一旦生成就不应手动清空或随意改动**，否则存档（`ISaveable`/`DataManager` 体系通过 ID 关联对象）会找不到对应目标。同时注意：`OnValidate` 仅在编辑器下运行，不要依赖它在打包后的运行时生成 ID。
+  - **`GameSceneSO.ID` and `GuidSO` stable identity**: `GameSceneSO` auto-generates `ID` via `System.Guid` in `OnValidate`; `GuidSO` likewise fills its GUID when empty and marks itself dirty. So **once a SO's GUID exists, never clear or hand-edit it** — the save system (`ISaveable` / `DataManager`, which keys objects by ID) would lose the link. Also note `OnValidate` is editor-only; do not rely on it to generate IDs in a built player.
+
+- **`GameSceneSO.sceneReference` 必须赋值**：`sceneReference` 是 `AssetReference`，必须指向已纳入 Addressables 的场景资产。若为空，场景加载流程会在运行时抛出 `InvalidKeyException` 之类错误。新建 `GameSceneSO` 后，先把对应场景拖进 `sceneReference`，并确认该场景已出现在 `Scenes` 组里。
+  - **Always assign `GameSceneSO.sceneReference`**: `sceneReference` is an `AssetReference` that must point to a scene already included in Addressables. Leaving it empty throws an `InvalidKeyException` (or similar) at runtime when the loader tries to use it. After creating a `GameSceneSO`, drag the scene into `sceneReference` and confirm the scene is present in the `Scenes` group.
+
+- **避免直接在 SO 实例上存“游戏运行时状态”**：SO 是共享资产。本项目把运行时状态放在专门的运行时类里（如 `QuestProgressData` 用 `Dictionary<QuestObjective,int>` 跟踪进度），而不是写回 `QuestSO`。**不要把会变化的运行时数据直接塞进 SO 字段**，否则多份引用共享同一份被篡改的数据，且容易污染编辑器中的资产值。
+  - **Don't store live runtime state on the SO instance**: SOs are shared assets. This project keeps runtime state in dedicated runtime classes (e.g. `QuestProgressData` holds per-objective progress in a `Dictionary<QuestObjective,int>`) rather than writing back into `QuestSO`. **Don't dump mutable runtime data into SO fields** — every reference would share the same mutated copy, and it can dirty the asset's stored value in the editor.
+
 ## 已知限制
 ## Known Limitations
 
