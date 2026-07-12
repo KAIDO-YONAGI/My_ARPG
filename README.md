@@ -275,8 +275,8 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 ## 借物表
 ## Credits
 
-- 美术资源：Tiny Swords by Pixel Frog（https://pixelfrog-assets.itch.io/tiny-swords），基于资产包许可使用，不单独再分发。
-- Art assets: Tiny Swords by Pixel Frog (https://pixelfrog-assets.itch.io/tiny-swords), used under asset pack license. Not redistributed separately.
+- 美术资源：Tiny Swords by Pixel Frog https://pixelfrog-assets.itch.io/tiny-swords ，基于资产包许可使用，不单独再分发。
+- Art assets: Tiny Swords by Pixel Frog https://pixelfrog-assets.itch.io/tiny-swords , used under asset pack license. Not redistributed separately.
 
 ## 许可证
 ## License
