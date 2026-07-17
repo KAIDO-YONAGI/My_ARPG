@@ -29,7 +29,7 @@ public class AStarNodeManager : MonoBehaviour
 
     public Dictionary<(int x, int y), AStarNode> GetNodeMap() => nodeCellMap;
     public float GetCellSize() => cellSize;
-
+    //从Unity本身的浮点网格转化成整形的离散网格 一方面方便操作 另一方面能减少算法负担
     public (int x, int y) WorldToCell(Vector3 worldPos)
     {
         int x = Mathf.FloorToInt(worldPos.x / cellSize);
@@ -46,7 +46,7 @@ public class AStarNodeManager : MonoBehaviour
         );
         return ApplySafetyMargin(cx, cy, basePos);
     }
-
+    //通过额外加上擦边通过的代价来让寻路路径远离边缘，从而避免卡脚
     private Vector3 ApplySafetyMargin(int cx, int cy, Vector3 worldPos)
     {
         if (safetyMargin <= 0) return worldPos;
@@ -136,7 +136,7 @@ public class AStarNodeManager : MonoBehaviour
             obstacleCount++;
         }
     }
-
+    //按指定网格宽度细分原始网格
     private void ProcessTileWithSubdivision(string layerName, Vector3Int cellPos, int subdivision)
     {
         int startX = cellPos.x * subdivision;
