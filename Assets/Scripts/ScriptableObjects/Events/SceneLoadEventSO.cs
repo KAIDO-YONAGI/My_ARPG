@@ -1,11 +1,11 @@
+using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 
 [CreateAssetMenu(fileName = "SceneLoadEventSO", menuName = "Events/SceneLoadEventSO", order = 0)]
 public class SceneLoadEventSO : ScriptableObject
 {
-    public UnityAction<GameSceneSO, Vector3, bool> LoadRequestEvent;
+    public event Action<GameSceneSO, Vector3, bool> LoadRequestEvent;
     /// <summary>
     /// 场景加载
     /// </summary>

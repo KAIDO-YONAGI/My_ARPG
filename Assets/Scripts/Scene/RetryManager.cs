@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RetryManager : MonoBehaviour
 {
-    RetryManager instance;
+    public static RetryManager instance;
     private void Awake()
     {
         if (instance == null)
