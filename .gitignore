@@ -15,6 +15,7 @@ UserSettings/
 omnisharp.json
 .gradle/
 .settings/
+.claude/
 
 # Visual Studio / Rider
 *.csproj

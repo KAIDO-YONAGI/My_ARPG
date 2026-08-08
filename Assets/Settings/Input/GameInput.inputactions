@@ -28,7 +28,7 @@
                     "name": "Shoot",
                     "type": "Button",
                     "id": "a1b2c3d4-0001-0001-0001-000000000012",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -157,7 +157,7 @@
                 {
                     "name": "",
                     "id": "b0000003-0000-0000-0000-000000000011",
-                    "path": "<Keyboard>/k",
+                    "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
