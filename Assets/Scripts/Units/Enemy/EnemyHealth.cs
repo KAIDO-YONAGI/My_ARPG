@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    public int currentHealth;
-    public int maxHealth;
-    public int expReward=2;
+    [SerializeField] private int currentHealth;
+    [SerializeField] private int maxHealth;
+    [SerializeField] private int expReward = 2;
 
     public delegate void MonsterDefeated(int exp);//观察者模式
     public static event MonsterDefeated OnDefeated;

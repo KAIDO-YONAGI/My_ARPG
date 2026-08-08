@@ -2,9 +2,9 @@ using UnityEngine;
 using MyEnums;
 public class PlayerCombat : MonoBehaviour
 {
-    public Transform attackPoint;
-    public LayerMask enemyMask;//需要在unity中创建并且标记
-    public PlayerMovement playerMovement;
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private LayerMask enemyMask;//需要在unity中创建并且标记
+    [SerializeField] private VoidEventSO meleeActionFinishedEvent;
 
 
 
@@ -30,10 +30,14 @@ public class PlayerCombat : MonoBehaviour
     }
     public void FinishCombat()
     {
-        playerMovement.AnimatorSM(PlayerState.Idle);
-        playerMovement.animator.SetBool("isAttacking", false);
-        playerMovement.SetCanBeInterrupted(true);
-        playerMovement.ResetTimer();
+        // 动画事件触发：通知 PlayerMovement（及其它订阅者）近战动作结束，由其统一重置状态
+        if (meleeActionFinishedEvent != null) meleeActionFinishedEvent.OnEventRaised();
+    }
+
+    // 动画事件里拼写为 "FinshCombat"（少个 i），此处作为别名接收，避免 no receiver 警告
+    public void FinshCombat()
+    {
+        FinishCombat();
     }
     //private void OnDrawGizmosSelected()
     //{

@@ -8,16 +8,16 @@ using UnityEngine;
 public class NPCPatrol : MonoBehaviour
 {
     [Header("Patrol Rectangle Settings")]
-    public Vector2 patrolSize = new Vector2(5f, 3f); // 矩形的长和宽
-    public bool clockwise = true; // true为顺时针，false为逆时针
+    [SerializeField] private Vector2 patrolSize = new Vector2(5f, 3f); // 矩形的长和宽
+    [SerializeField] private bool clockwise = true; // true为顺时针，false为逆时针
 
     [Header("Movement Settings")]
-    public float speed = 2f;
-    public float waitTime = 1f;
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private float waitTime = 1f;
 
     [Header("Component References")]
-    public Animator animator;
-    public MovementController aStarController;
+    [SerializeField] private Animator animator;
+    [SerializeField] private MovementController aStarController;
 
     // 四个角的位置
     private Vector3[] cornerPositions = new Vector3[4];

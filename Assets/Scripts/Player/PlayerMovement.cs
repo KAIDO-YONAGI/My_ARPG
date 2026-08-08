@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using MyEnums;
 
 public class PlayerMovement : MonoBehaviour
@@ -9,6 +10,15 @@ public class PlayerMovement : MonoBehaviour
     public PlayerCombat playerCombat;
     public PlayerBow playerBow;
     public Joystick joystick;
+
+    [Header("Input Actions")]
+    public InputActionReference moveAction;
+    public InputActionReference slashAction;
+    public InputActionReference shootAction;
+
+    [Header("Action Finished Events")]
+    [SerializeField] private VoidEventSO meleeActionFinishedEvent;
+    [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
     private int facingDirection = 1;//默认朝向为右
     private bool canBeInterrupted = true;//是否可以被打断，攻击和射击动画期间不可被打断
@@ -22,6 +32,36 @@ public class PlayerMovement : MonoBehaviour
         canBeInterrupted = true;
         playerState = PlayerState.Idle;
         timer = 0;
+
+        if (moveAction != null) moveAction.action.Enable();
+        if (slashAction != null) slashAction.action.Enable();
+        if (shootAction != null) shootAction.action.Enable();
+
+        if (meleeActionFinishedEvent != null) meleeActionFinishedEvent.VoidEvent += OnActionFinished;
+        if (shootActionFinishedEvent != null) shootActionFinishedEvent.VoidEvent += OnActionFinished;
+    }
+
+    private void OnDisable()
+    {
+        if (moveAction != null) moveAction.action.Disable();
+        if (slashAction != null) slashAction.action.Disable();
+        if (shootAction != null) shootAction.action.Disable();
+
+        if (meleeActionFinishedEvent != null) meleeActionFinishedEvent.VoidEvent -= OnActionFinished;
+        if (shootActionFinishedEvent != null) shootActionFinishedEvent.VoidEvent -= OnActionFinished;
+    }
+
+    /// <summary>
+    /// 统一的动作结束处理：回到 Idle、清除攻击/射击动画标记、解锁输入、重置冷却。
+    /// 由近战结束、射击结束、切换装备三个来源通过 SO 事件触发。
+    /// </summary>
+    private void OnActionFinished()
+    {
+        AnimatorSM(PlayerState.Idle);
+        animator.SetBool("isAttacking", false);
+        animator.SetBool("isShooting", false);
+        SetCanBeInterrupted(true);
+        ResetTimer();
     }
 
     public void AnimatorSM(PlayerState newState)//用于切换动画
@@ -81,11 +121,11 @@ public class PlayerMovement : MonoBehaviour
             HandleKnockBackState();
             return;
         }
-        if (Input.GetButtonDown("Slash") && playerCombat.enabled && timer < 0)
+        if (slashAction != null && slashAction.action.WasPressedThisFrame() && playerCombat.enabled && timer < 0)
         {
             AnimatorSM(PlayerState.Attacking);
         }
-        else if (Input.GetButtonDown("Shoot") && playerBow.enabled && timer < 0)
+        else if (shootAction != null && shootAction.action.WasPressedThisFrame() && playerBow.enabled && timer < 0)
         {
             AnimatorSM(PlayerState.Shooting);
         }
@@ -127,7 +167,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (joystick != null && (Mathf.Abs(joystick.Horizontal) > 0.1f || Mathf.Abs(joystick.Vertical) > 0.1f))
             return true;
-        return Mathf.Abs(Input.GetAxis("Horizontal")) > 0 || Mathf.Abs(Input.GetAxis("Vertical")) > 0;
+        Vector2 v = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+        return Mathf.Abs(v.x) > 0 || Mathf.Abs(v.y) > 0;
     }
 
     private void HandleKnockBackState()
@@ -161,8 +202,9 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            horizontal = Input.GetAxis("Horizontal");
-            vertical = Input.GetAxis("Vertical");
+            Vector2 v = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+            horizontal = v.x;
+            vertical = v.y;
         }
 
         //判断（仅）水平输入值和当前角色朝向的符号是否一致，否（意味着玩家将要转向）则调用翻转

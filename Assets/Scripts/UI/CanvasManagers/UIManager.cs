@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(-100)]
 public class UIManager : MonoBehaviour
@@ -52,11 +53,21 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         loadEventSO.LoadRequestEvent += OnLoadScene;
+
+        foreach (var binding in inputBindings)
+        {
+            if (binding.action != null) binding.action.action.Enable();
+        }
     }
 
     private void OnDisable()
     {
         loadEventSO.LoadRequestEvent -= OnLoadScene;
+
+        foreach (var binding in inputBindings)
+        {
+            if (binding.action != null) binding.action.action.Disable();
+        }
     }
 
     private void OnLoadScene(GameSceneSO arg0, Vector3 arg1, bool arg2)
@@ -125,7 +136,7 @@ public class UIManager : MonoBehaviour
         // 读取已注册的输入绑定；未注册的画布仍可使用RequestCanvasToggle。
         foreach (var binding in inputBindings)
         {
-            bool pressed = Input.GetButtonDown(binding.buttonName);
+            bool pressed = binding.action != null && binding.action.action.WasPressedThisFrame();
             inputState[binding.canvas] = inputState[binding.canvas] || pressed;
             // 外部请求和按键按下都可以触发切换。
         }
@@ -314,5 +325,5 @@ public class UIManager : MonoBehaviour
 public class CanvasInputBinding
 {
     public MyEnums.CanvasToToggle canvas;
-    public string buttonName;
+    public InputActionReference action;
 }

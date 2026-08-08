@@ -7,13 +7,13 @@ using UnityEngine;
 public class NPCWander : MonoBehaviour
 {
     [Header("Component References")]
-    public Animator animator;
-    public MovementController aStarController;
+    [SerializeField] private Animator animator;
+    [SerializeField] private MovementController aStarController;
 
     [Header("Movement Settings")]
-    public float speed = 2f;
-    public float waitTime = 1f;
-    public int patrolRadius = 5;
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private float waitTime = 1f;
+    [SerializeField] private int patrolRadius = 5;
 
     private int facingDirec = 1; // 1表示朝右，-1表示朝左
     private Vector3 circleCenter;

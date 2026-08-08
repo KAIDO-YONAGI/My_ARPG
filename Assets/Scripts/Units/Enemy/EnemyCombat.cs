@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class EnemyCombat : MonoBehaviour
 {
-    public int damage = 1;
-    public Transform attackPoint;
-    public float weaponRange;
-    public LayerMask playerLayer;
-    public float konckBackForce=5;
-    public float stunTime=0.3f;
+    [SerializeField] private int damage = 1;
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float weaponRange;
+    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private float konckBackForce = 5;
+    [SerializeField] private float stunTime = 0.3f;
 
     
     public void Attack()
@@ -19,8 +19,11 @@ public class EnemyCombat : MonoBehaviour
 
         if (hits.Length > 0&&hits[0].enabled)//如果有目标，并且目标具有PlayerHealth组件
         {
-            hits[0].GetComponent<PlayerHealth>().ChangeHealth(-damage);
-            hits[0].GetComponent<PlayerMovement>().KnockBack(transform, konckBackForce,stunTime);
+            var health = hits[0].GetComponent<PlayerHealth>();
+            if (health != null) health.ChangeHealth(-damage);
+
+            var movement = hits[0].GetComponent<PlayerMovement>();
+            if (movement != null) movement.KnockBack(transform, konckBackForce, stunTime);
         }
     }
 }

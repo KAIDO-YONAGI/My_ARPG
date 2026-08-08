@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using MyEnums;
 
 public class ShiftEquipment : MonoBehaviour
@@ -9,15 +10,28 @@ public class ShiftEquipment : MonoBehaviour
     public PlayerBow bow;
     public PlayerMovement playerMovement;
 
+    [Header("Input Actions")]
+    public InputActionReference shiftEquipmentAction;
+
     private float shiftCooldown = 0.3f;
     private float shiftTimer;
+
+    private void OnEnable()
+    {
+        if (shiftEquipmentAction != null) shiftEquipmentAction.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (shiftEquipmentAction != null) shiftEquipmentAction.action.Disable();
+    }
 
     private void Update()
     {
         if (shiftTimer > 0)
             shiftTimer -= Time.deltaTime;
 
-        if (Input.GetButtonDown("ShiftEquipment") && shiftTimer <= 0)
+        if (shiftEquipmentAction != null && shiftEquipmentAction.action.WasPressedThisFrame() && shiftTimer <= 0)
         {
             combat.enabled = !combat.enabled;
             bow.enabled = !bow.enabled;

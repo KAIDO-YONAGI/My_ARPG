@@ -8,22 +8,23 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
 
-    public Transform hotbarParent;
-    public Transform backpackParent;
+    [SerializeField] private Transform hotbarParent;
+    [SerializeField] private Transform backpackParent;
     private List<InventorySlot> inventorySlotsList = new();
-    public UseItem useItem;
-    public TMP_Text goldAmountText;
-    public GameObject lootPrefab;
-    public Transform player;
+    [SerializeField] private UseItem useItem;
+    [SerializeField] private TMP_Text goldAmountText;
+    [SerializeField] private GameObject lootPrefab;
+    [SerializeField] private Transform player;
 
-    public int goldAmount;
+    public int GoldAmount => goldAmount;
+    private int goldAmount;
 
 
     [Header("Events")]
-    public InventorySlotsStatsSO ShoppingRequest;
-    public InventorySlotsStatsSO QuestRewardRequest;
+    [SerializeField] private InventorySlotsStatsSO ShoppingRequest;
+    [SerializeField] private InventorySlotsStatsSO QuestRewardRequest;
 
-    public LootEventSO lootEvent;
+    [SerializeField] private LootEventSO lootEvent;
 
 
     private InventorySlot slotBeenClicked;
@@ -118,15 +119,10 @@ public class InventoryManager : MonoBehaviour
             {
                 Debug.Log("No slot been Marked");
             }
-            else if (slotBeenClicked.quantity > 0)
+            else if (slotBeenClicked.Quantity > 0)
             {
-                slotBeenClicked.quantity += quantity;
-                ItemHistoryManager.instance.RecordItem(item, quantity);
-                if (slotBeenClicked.quantity <= 0)
-                {
-                    slotBeenClicked.itemSO = null;
-                }
-                slotBeenClicked.UpdateUI();
+                int removed = slotBeenClicked.RemoveItem(-quantity);
+                ItemHistoryManager.instance.RecordItem(item, -removed);
                 return;
             }
         }
@@ -134,39 +130,20 @@ public class InventoryManager : MonoBehaviour
         {
             foreach (InventorySlot slot in inventorySlotsList)
             {
-                if (slot.itemSO == null)//找空格子
+                if (slot.IsEmpty || slot.ItemSO == item)//空格子 或 可堆叠格子
                 {
-                    int amount = Mathf.Min(item.stackableSize, quantity);
-
-                    slot.itemSO = item;
-                    slot.quantity = amount;
-                    quantity-=amount;
-                    ItemHistoryManager.instance.RecordItem(item, amount);
-
-                    slot.UpdateUI();
-                    if (quantity <= 0)
+                    int placed = slot.AddItem(item, quantity);
+                    if (placed > 0)
                     {
-                        lootObj?.MarkAsDisable();
-                        return;
+                        ItemHistoryManager.instance.RecordItem(item, placed);
+                        quantity -= placed;
                     }
-                }
-                if (slot.itemSO == item && slot.quantity < item.stackableSize)//寻找可堆叠的格子
-                {
-                    int availableSize = item.stackableSize - slot.quantity;
-                    int amount = Mathf.Min(availableSize, quantity);
-
-                    slot.quantity += amount;
-                    quantity -= amount;
-                    ItemHistoryManager.instance.RecordItem(item, amount);
-
-                    slot.UpdateUI();
 
                     if (quantity <= 0)
                     {
                         lootObj?.MarkAsDisable();
                         return;
                     }
-
                 }
             }
 
@@ -177,10 +154,10 @@ public class InventoryManager : MonoBehaviour
     }
     private bool HasSpaceForItem(ItemSO item)
     {
+        if (item == null) return false;
         foreach (var slot in inventorySlotsList)
         {
-            if ((slot.itemSO == item && slot.quantity < item.stackableSize)
-                || slot.itemSO == null) return true;
+            if (slot.SpaceRemaining(item) > 0) return true;
         }
         return false;
     }
@@ -220,29 +197,20 @@ public class InventoryManager : MonoBehaviour
     }
     public void DropByClick(InventorySlot slot)
     {
-        DropLoot(slot.itemSO, 1);
-        slot.quantity -= 1;
-        if (slot.quantity <= 0)
-        {
-            slot.itemSO = null;
-        }
-        slot.UpdateUI();
+        if (slot.ItemSO == null) return;
+        DropLoot(slot.ItemSO, 1);
+        slot.RemoveItem(1);
     }
 
 
     public void UseItem(InventorySlot slot)
     {
-        if (slot.itemSO != null && slot.quantity >= 0)
+        if (slot.ItemSO != null && slot.Quantity > 0)
         {
-            useItem.ApplyItemEffects(slot.itemSO);//使用效果
-            slot.quantity--;
-            ItemHistoryManager.instance.RecordItem(slot.itemSO, -1);
-
-            if (slot.quantity <= 0)
-            {
-                slot.itemSO = null;
-            }
-            slot.UpdateUI();
+            useItem.ApplyItemEffects(slot.ItemSO);//使用效果
+            ItemSO used = slot.ItemSO;
+            slot.RemoveItem(1);
+            ItemHistoryManager.instance.RecordItem(used, -1);
         }
     }
     public void UpdateGold(int price)

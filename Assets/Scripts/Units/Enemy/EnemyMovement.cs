@@ -11,13 +11,13 @@ public class EnemyMovement : MonoBehaviour
     private EnemyState enemyState;//存储敌人唯一的状态
     private float attackCoolDownTimer;//攻击间隔冷却计时器
 
-    public int speed = 5;
-    public float attackDetectRange = 2;
-    public float attackCoolDown = 1;//每次恢复计时会被赋给计时器
-    public float playerDetectRange = 5;
-    public Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
-    public LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
-    public MovementController aStarController;
+    [SerializeField] private int speed = 5;
+    [SerializeField] private float attackDetectRange = 2;
+    [SerializeField] private float attackCoolDown = 1;//每次恢复计时会被赋给计时器
+    [SerializeField] private float playerDetectRange = 5;
+    [SerializeField] private Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
+    [SerializeField] private LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
+    [SerializeField] private MovementController aStarController;
 
     private float velocityCooldown = 0.2f;
     private float velocityTimer;

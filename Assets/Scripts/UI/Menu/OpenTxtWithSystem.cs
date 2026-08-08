@@ -1,12 +1,26 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System.Diagnostics;
 using System.IO;
 
 public class OpenTxtWithSystem : MonoBehaviour
 {
+    [Header("Input Actions")]
+    public InputActionReference openGuideAction;
+
+    private void OnEnable()
+    {
+        if (openGuideAction != null) openGuideAction.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (openGuideAction != null) openGuideAction.action.Disable();
+    }
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G))
+        if (openGuideAction != null && openGuideAction.action.WasPressedThisFrame())
         {
             OpenGuide();
         }

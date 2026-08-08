@@ -66,7 +66,7 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
 
         toggleMenuButton.onClick.AddListener(OnClickMenuToggleButton);
         nextPageButton.onClick.AddListener(OnClickNextButton);
-        prevPageButton.onClick.AddListener(OnClickPrevutton);
+        prevPageButton.onClick.AddListener(OnClickPrevButton);
 
         toggleMenuText = toggleMenuButton.GetComponentInChildren<TMP_Text>();
         toggleMenuText.text = "Open";
@@ -94,7 +94,7 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
         ShiftPage(currentPageNum + 1);
     }
 
-    private void OnClickPrevutton()
+    private void OnClickPrevButton()
     {
         ShiftPage(currentPageNum - 1);
     }

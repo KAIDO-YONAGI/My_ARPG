@@ -3,15 +3,22 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
 using MyEnums;
 public class PlayerBow : MonoBehaviour
 {
-    public Transform launchPoint;
-    public GameObject arrowPrefab;
+    [SerializeField] private Transform launchPoint;
+    [SerializeField] private GameObject arrowPrefab;
     private Vector2 aimDirection = Vector2.right;
     private Vector2 shootDirection = Vector2.right;
-    public Animator anim;
-    public PlayerMovement playerMovement;
+    [SerializeField] private Animator anim;
+    [SerializeField] private PlayerMovement playerMovement;
+
+    [Header("Input Actions")]
+    [SerializeField] private InputActionReference moveAction;
+
+    [Header("Action Finished Event")]
+    [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
     private float shootTimer;//防止多箭发射
     private void OnEnable()
@@ -40,8 +47,10 @@ public class PlayerBow : MonoBehaviour
         }
         aimDirection = new Vector2(playerMovement.getFacingDirection(), 0).normalized;
 
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        // GetAxisRaw 对键盘返回 -1/0/1 离散值，Move action 的 WASD composite 同样是 -1/0/1，语义一致
+        Vector2 move = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+        float horizontal = move.x;
+        float vertical = move.y;
 
         if (horizontal != 0 || vertical != 0)
         {
@@ -60,8 +69,9 @@ public class PlayerBow : MonoBehaviour
     {
         HandleAiming();
         playerMovement.AnimatorSM(PlayerState.Shooting);
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        Vector2 move = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+        float horizontal = move.x;
+        float vertical = move.y;
         if (horizontal != 0 || vertical != 0)
         {
             shootDirection = new Vector2(horizontal, vertical).normalized;
@@ -77,7 +87,7 @@ public class PlayerBow : MonoBehaviour
         if (shootTimer <= 0)
         {
             Arrow arrow = Instantiate(arrowPrefab, launchPoint.position, Quaternion.identity).GetComponent<Arrow>();//实例化箭矢，第二个参数为生成位置,第三个为单位向量（表示禁用旋转)
-            arrow.direction = shootDirection;//先创建箭矢并且获取引用，然后修改方向
+            arrow.Launch(shootDirection);//先创建箭矢并且获取引用，然后发射
             shootTimer = StatsManager.instance.GetCoolDown();//重置射击计时器，防止多箭发射
 
         }

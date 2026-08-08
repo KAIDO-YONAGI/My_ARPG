@@ -428,3 +428,4 @@ MonoBehaviour:
   chatAnimator: {fileID: 245929698277191774}
   dialogSO: {fileID: 0}
   toggleDialogEvent: {fileID: 11400000, guid: 955f6dbe397714a4ebb6c61eb71272a4, type: 2}
+  advanceDialogAction: {fileID: -1257654685319991713, guid: da9f4b8c6a46f284990529895901b2dd, type: 3}

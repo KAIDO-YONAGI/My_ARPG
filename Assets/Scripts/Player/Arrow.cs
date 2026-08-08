@@ -4,30 +4,35 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
-    public Rigidbody2D rb;
-    public Vector2 direction=Vector2.right;
-    public LayerMask enemyLayer;
-    public LayerMask obstacleLayer;
-    public SpriteRenderer spriteRenderer;
-    public Sprite buriedSprite;
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private LayerMask obstacleLayer;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Sprite buriedSprite;
 
+    [SerializeField] private float lifeSpan = 1;
+    [SerializeField] private float speed = 2;
+    [SerializeField] private int damage = 1;
+    [SerializeField] private float knockBackForce = 2;
+    [SerializeField] private float knockBackTime = .2f;
+    [SerializeField] private float stunTime = .2f;
 
+    private Vector2 direction = Vector2.right;
 
-
-    public float lifeSpan = 1;
-    public float speed = 2;
-    public int damage = 1;
-    public float  knockBackForce=2;
-    public float  knockBackTime=.2f;
-    public float  stunTime=.2f;
+    /// <summary>
+    /// 发射箭矢：设置飞行方向、初速度、旋转角度。由外部（PlayerBow）在实例化后调用一次。
+    /// </summary>
+    public void Launch(Vector2 direction)
+    {
+        this.direction = direction;
+        rb.velocity = direction * speed;
+        RotateArrow();
+    }
 
     private void Start()
     {
-
-        rb.velocity = direction * speed;
-        RotateArrow();
-        Destroy(gameObject,lifeSpan);//destory方法的第二个参数表示对象生存时间/多久后销毁
-        damage= StatsManager.instance.GetDamage();
+        Destroy(gameObject, lifeSpan);//destory方法的第二个参数表示对象生存时间/多久后销毁
+        damage = StatsManager.instance.GetDamage();
     }
     private void RotateArrow()
     {

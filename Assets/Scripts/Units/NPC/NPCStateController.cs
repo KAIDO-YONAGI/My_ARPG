@@ -6,11 +6,10 @@ using UnityEngine;
 public class NPCStateController : MonoBehaviour
 {
     [Header("Component References")]
-    public NPCWander wanderScript;
-    public NPCChat chatScript;
-    public NPCPatrol patrolScript;
-    [SerializeField]
-    public MyEnums.NPCState DefaultState = MyEnums.NPCState.Patrol;
+    [SerializeField] private NPCWander wanderScript;
+    [SerializeField] private NPCChat chatScript;
+    [SerializeField] private NPCPatrol patrolScript;
+    [SerializeField] private MyEnums.NPCState DefaultState = MyEnums.NPCState.Patrol;
     private MyEnums.NPCState currentState;
 
     private void Start()

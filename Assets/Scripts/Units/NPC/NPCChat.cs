@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class NPCChat : MonoBehaviour
 {
@@ -6,6 +7,9 @@ public class NPCChat : MonoBehaviour
     public Animator chatAnimator;
     public DialogSO dialogSO;
     public ToggleCanvasEventSO toggleDialogEvent;
+
+    [Header("Input Actions")]
+    public InputActionReference advanceDialogAction;
 
     private bool openDialogRequested;
 
@@ -38,6 +42,8 @@ public class NPCChat : MonoBehaviour
         {
             chatAnimator.Play("Chat");
         }
+
+        if (advanceDialogAction != null) advanceDialogAction.action.Enable();
     }
 
     private void OnDisable()
@@ -48,6 +54,8 @@ public class NPCChat : MonoBehaviour
         {
             toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
         }
+
+        if (advanceDialogAction != null) advanceDialogAction.action.Disable();
 
         if (rb != null)
         {
@@ -97,7 +105,7 @@ public class NPCChat : MonoBehaviour
             }
         }
 
-        if (DialogManager.instance.isDialogActive && Input.GetMouseButtonDown(0))
+        if (DialogManager.instance.isDialogActive && advanceDialogAction != null && advanceDialogAction.action.WasPressedThisFrame())
         {
             DialogManager.instance.AdvanceDialog();
         }
