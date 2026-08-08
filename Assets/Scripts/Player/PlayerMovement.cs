@@ -31,8 +31,12 @@ public class PlayerMovement : MonoBehaviour
     private void OnEnable()
     {
         canBeInterrupted = true;
-        playerState = PlayerState.Idle;
         timer = 0;
+
+        // 场景切换（ForbidInput/AllowInput）会禁用再启用 PlayerMovement，
+        // 必须走 AnimatorSM 清掉残留动画布尔并清空速度，否则进新场景仍保持旧的移动状态
+        AnimatorSM(PlayerState.Idle);
+        if (rb != null) rb.velocity = Vector2.zero;
 
         if (moveAction != null) moveAction.action.Enable();
         if (slashAction != null) slashAction.action.Enable();
