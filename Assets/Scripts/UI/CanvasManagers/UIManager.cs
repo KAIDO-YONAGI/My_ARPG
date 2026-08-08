@@ -7,29 +7,35 @@ using UnityEngine.InputSystem;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
-    public static int FocusOrder = 90;
-    public static int DefaultOrder = 5;
+    public const int FocusOrder = 90;
+    public const int DefaultOrder = 5;
+    private const int OrderStep = 10; // 相邻打开画布之间的 order 差值
 
-    [Header("Events")]
-    [SerializeField] private SceneLoadEventSO loadEventSO;
+    [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
     [SerializeField] private List<ToggleCanvasEventSO> toggleCanvasEvents;
 
-    [Header("Input Bindings")]
-    [SerializeField] private List<CanvasInputBinding> inputBindings;
+    [Header("Input Bindings")] [SerializeField]
+    private List<CanvasInputBinding> inputBindings;
+
     private bool isAnyCanvasOpen;
 
     private MyEnums.CanvasToToggle canvasToToggle
         = MyEnums.CanvasToToggle.Default;
+
     private MyEnums.CanvasToToggle LastOpenCanvas =>
         canvasOpenOrder.Last != null
             ? canvasOpenOrder.Last.Value
             : MyEnums.CanvasToToggle.Default;
-    private Dictionary<MyEnums.CanvasToToggle, bool> inputState = new();
+
+    private readonly Dictionary<MyEnums.CanvasToToggle, bool> inputState = new();
+
     //用来合并外部（代码调用）输入
-    private LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder = new();
+    private readonly LinkedList<MyEnums.CanvasToToggle> canvasOpenOrder = new();
+
     //用来存已打开画布的链表，顺序访问，但是可以依赖枚举任意删除节点
     private MyEnums.CanvasToToggle currentFocusCanvas
         = MyEnums.CanvasToToggle.Default;
+
     private void Awake()
     {
         if (instance == null)
@@ -43,11 +49,10 @@ public class UIManager : MonoBehaviour
         }
 
         foreach (MyEnums.CanvasToToggle canvas in
-            Enum.GetValues(typeof(MyEnums.CanvasToToggle)))
+                 Enum.GetValues(typeof(MyEnums.CanvasToToggle)))
         {
             inputState[canvas] = false;
         }
-
     }
 
     private void OnEnable()
@@ -71,21 +76,23 @@ public class UIManager : MonoBehaviour
     }
 
     private void OnLoadScene(GameSceneSO arg0, Vector3 arg1, bool arg2)
-    //UIManager作为跨场景持久单例，不会随场景卸载而disable，因此需要订阅场景加载事件来主动重置画布状态。
-    //LoadRequestEvent是同步委托，UIManager的ExecutionOrder(-100)早于SceneChanger，所以OnLoadScene
-    //会在SceneChanger开始异步卸载/加载流程之前同步执行，确保所有UI面板在场景过渡动画和旧场景卸载前被关闭。
-    //另外也有异步等待操作能为这里争取时间，但是还是要注意可能会导致冲突的时序问题
+        //UIManager作为跨场景持久单例，不会随场景卸载而disable，因此需要订阅场景加载事件来主动重置画布状态。
+        //LoadRequestEvent是同步委托，UIManager的ExecutionOrder(-100)早于SceneChanger，所以OnLoadScene
+        //会在SceneChanger开始异步卸载/加载流程之前同步执行，确保所有UI面板在场景过渡动画和旧场景卸载前被关闭。
+        //另外也有异步等待操作能为这里争取时间，但是还是要注意可能会导致冲突的时序问题
     {
         ResetCanvas();
     }
+
     private void Update()
     {
         ToggleCanvas();
     }
-    public void HandleFocus(MyEnums.CanvasToToggle canvas)//拖拽脚本的输入，用于完成focus调整
+
+    public void HandleFocus(MyEnums.CanvasToToggle canvas) //拖拽脚本的输入，用于完成focus调整
     {
         if (canvas == MyEnums.CanvasToToggle.Default ||
-                canvas == currentFocusCanvas && IsCanvasOpen(canvas))
+            canvas == currentFocusCanvas && IsCanvasOpen(canvas))
             return;
 
         ApplyFocusChange(canvas);
@@ -112,6 +119,7 @@ public class UIManager : MonoBehaviour
         RaiseCanvasEvent(canvas, false);
         RefreshFocusAfterClose(canvas);
     }
+
     // 状态回调，画布报告的真实开启/关闭状态。
     public void ReportCanvasState(MyEnums.CanvasToToggle canvas, bool state)
     {
@@ -121,6 +129,7 @@ public class UIManager : MonoBehaviour
         }
 
         UpdateCanvasOpenOrder(canvas, state);
+        RefreshAllCanvasOrders();
 
         canvasToToggle = LastOpenCanvas;
         isAnyCanvasOpen = canvasOpenOrder.Count > 0;
@@ -166,7 +175,7 @@ public class UIManager : MonoBehaviour
             {
                 canvasToToggle = binding.canvas;
 
-                break;// 只处理本帧的第一个输入。
+                break; // 只处理本帧的第一个输入。
             }
         }
 
@@ -215,23 +224,36 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void RaiseFocusEvent(MyEnums.CanvasToToggle target)
+    {
+        foreach (var eventSO in toggleCanvasEvents)
+        {
+            if (eventSO.canvasToToggle == target)
+            {
+                eventSO.RaiseFocusEvent();
+                return;
+            }
+
+        }
+    }
+
     private void ApplyFocusChange(MyEnums.CanvasToToggle target)
     {
         bool wasTargetOpen = IsCanvasOpen(target);
         MyEnums.CanvasToToggle previousFocus = currentFocusCanvas;
-        currentFocusCanvas = target;//标记当前focus，作为画布组设置优先、默认order的依据
+        currentFocusCanvas = target; //标记当前focus，作为画布组设置优先、默认order的依据
 
-        if (previousFocus != MyEnums.CanvasToToggle.Default &&//Default意味着没有面板打开
-            previousFocus != target &&
-            IsCanvasOpen(previousFocus))//不是当前目标，并且打开，再次发送true通知画布降低order
+        if (!wasTargetOpen)
         {
-            RaiseCanvasEvent(previousFocus, true);
-        }
-
-        if (!wasTargetOpen || wasTargetOpen && previousFocus != target)
-        //处理两种情况。首先是没打开的画布，在这打开。其次是已经打开但是不在顶层的提升到顶层
-        {
+            // 没打开的画布：用 open 事件真正打开
+            //（内部 SetCanvaState → ReportCanvasState 会更新 open-order 链表并全量刷新 order）
             RaiseCanvasEvent(target, true);
+        }
+        else if (previousFocus != target)
+        {
+            // 已打开但不在顶层：移到链表末尾后全量刷新 order
+            UpdateCanvasOpenOrder(target, true);
+            RefreshAllCanvasOrders();
         }
     }
 
@@ -242,21 +264,51 @@ public class UIManager : MonoBehaviour
             return;
         }
 
+        // 关闭时 ReportCanvasState 已触发 RefreshAllCanvasOrders，其余打开画布的 order 已按新链表刷新
         currentFocusCanvas = LastOpenCanvas;
-
-        if (currentFocusCanvas != MyEnums.CanvasToToggle.Default)
-        {
-            RaiseCanvasEvent(currentFocusCanvas, true);
-        }
     }
 
     private void UpdateCanvasOpenOrder(MyEnums.CanvasToToggle canvas, bool state)
     {
-        RemoveCanvasNode(canvas);//没有就不删，有的话删掉再加，确保链表的末尾那个始终是在最上层的
+        RemoveCanvasNode(canvas); //没有就不删，有的话删掉再加，确保链表的末尾那个始终是在最上层的
 
         if (state)
         {
             canvasOpenOrder.AddLast(canvas);
+        }
+    }
+
+    // 根据 open-order 链表计算排序优先级：顶层（链表末尾）最高，向下按链表顺序递减
+    public int GetCanvasOrder(MyEnums.CanvasToToggle canvas, bool state)
+    {
+        if (!state) return DefaultOrder;
+
+        int index = GetOpenOrderIndex(canvas);
+        if (index < 0) return DefaultOrder;
+
+        int stepsFromTop = canvasOpenOrder.Count - 1 - index;
+        return Mathf.Max(DefaultOrder, FocusOrder - stepsFromTop * OrderStep);
+    }
+
+    private int GetOpenOrderIndex(MyEnums.CanvasToToggle canvas)
+    {
+        int index = 0;
+        LinkedListNode<MyEnums.CanvasToToggle> currentNode = canvasOpenOrder.First;
+        while (currentNode != null)
+        {
+            if (currentNode.Value == canvas) return index;
+            currentNode = currentNode.Next;
+            index++;
+        }
+        return -1;
+    }
+
+    // 链表顺序变化（打开/关闭/提升）后，通知所有已打开画布按新顺序刷新 order
+    private void RefreshAllCanvasOrders()
+    {
+        foreach (var canvas in canvasOpenOrder)
+        {
+            RaiseFocusEvent(canvas);
         }
     }
 

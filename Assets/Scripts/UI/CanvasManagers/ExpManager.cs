@@ -7,7 +7,7 @@ public class ExpManager : MonoBehaviour
     [SerializeField] private Slider expSlider;
     [SerializeField] private TMP_Text currentLevelText;
     public static event Action<int> OnLevelUp;
-    static public ExpManager instance;
+    public static ExpManager instance;
 
     private void Awake()
     {
@@ -18,7 +18,6 @@ public class ExpManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
-            return;
         }
     }
     private void Start()

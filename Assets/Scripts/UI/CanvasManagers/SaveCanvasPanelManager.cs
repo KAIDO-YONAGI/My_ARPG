@@ -46,6 +46,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     private void OnEnable()
     {
         toggleSaveLoadCanvasEvent.toggleCanvasEvent += OnToggleCanvas;
+        toggleSaveLoadCanvasEvent.focusEvent += OnFocus;
         if (saveLoadButtonGroups.Count == 0)
         {
             LoadButtons();
@@ -58,6 +59,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     private void OnDisable()
     {
         toggleSaveLoadCanvasEvent.toggleCanvasEvent -= OnToggleCanvas;
+        toggleSaveLoadCanvasEvent.focusEvent -= OnFocus;
     }
 
 
@@ -71,18 +73,18 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
             if (!isPanelOpen)
             {
                 OpenPanel();
-
-                return;
             }
-            ((ICanvasManager)this).RefreshCanvaOrder(
-                canvas,
-                MyEnums.CanvasToToggle.SaveLoad,
-                isPanelOpen);
         }
         else
         {
             ClosePanel();
         }
+    }
+
+    private void OnFocus()
+    {
+        if (!isPanelOpen) return;
+        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.SaveLoad, true);
     }
     string[] files;
     private void LoadInfoToSaveList()

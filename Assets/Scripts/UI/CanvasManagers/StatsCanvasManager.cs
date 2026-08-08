@@ -30,17 +30,24 @@ public class StatsCanvasManager : MonoBehaviour, ICanvasManager
     private void OnEnable()
     {
         toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
+        toggleStatsEvent.focusEvent += OnFocus;
     }
 
     private void OnDisable()
     {
         toggleStatsEvent.toggleCanvasEvent -= OnToggleStatsEvent;
+        toggleStatsEvent.focusEvent -= OnFocus;
     }
 
     private void OnToggleStatsEvent(bool state)
     {
         UpdateAllStats();
         ((ICanvasManager)this).ToggleCanvas(statsCanvas, canvas, MyEnums.CanvasToToggle.Stats, state);
+    }
+
+    private void OnFocus()
+    {
+        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Stats, true);
     }
 
     public void UpdateDamage()

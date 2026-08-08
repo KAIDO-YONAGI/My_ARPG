@@ -33,10 +33,9 @@ public interface ICanvasManager
        MyEnums.CanvasToToggle canvasToToggle,
        bool state)
     {
-        int order = state && UIManager.instance != null &&
-                    UIManager.instance.IsCanvasFocused(canvasToToggle)
-            //如果Manager里当前已经focus了该画布，就设置当前画布的为聚焦顺序，否则为默认顺序
-            ? UIManager.FocusOrder
+        int order = UIManager.instance != null
+            //按 open-order 链表顺序分配降序排序优先级，顶层（链表末尾）最高
+            ? UIManager.instance.GetCanvasOrder(canvasToToggle, state)
             : UIManager.DefaultOrder;
         if (canvas == null)
         {

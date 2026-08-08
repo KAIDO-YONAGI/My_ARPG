@@ -84,6 +84,7 @@ public class QuestManager : MonoBehaviour, ICanvasManager
         loadQuestEventSO.LoadQuestEvent += OnReFreshQuestState;
         questOptionsEventSO.questOptionsEvent += OnQuestOptionChose;
         toggleQuestEvent.toggleCanvasEvent += OnToggleQuest;
+        toggleQuestEvent.focusEvent += OnFocus;
 
     }
 
@@ -94,6 +95,7 @@ public class QuestManager : MonoBehaviour, ICanvasManager
         loadQuestEventSO.LoadQuestEvent -= OnReFreshQuestState;
         questOptionsEventSO.questOptionsEvent -= OnQuestOptionChose;
         toggleQuestEvent.toggleCanvasEvent -= OnToggleQuest;
+        toggleQuestEvent.focusEvent -= OnFocus;
 
     }
 
@@ -101,17 +103,17 @@ public class QuestManager : MonoBehaviour, ICanvasManager
     {
         if (state)
         {
-            if (canvasIsActive)
-            {
-                ((ICanvasManager)this).RefreshCanvaOrder(
-                    canvas,
-                    MyEnums.CanvasToToggle.Quest,
-                    true);
-            }
+            // 打开由 openQuestEvent 处理，reorder 由 focusEvent 处理，这里不再响应
             return;
         }
 
         CloseQuestBoard();
+    }
+
+    private void OnFocus()
+    {
+        if (!canvasIsActive) return;
+        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Quest, true);
     }
     private void OnQuestOptionChose(MyEnums.QuestState questStateToShift)
     {

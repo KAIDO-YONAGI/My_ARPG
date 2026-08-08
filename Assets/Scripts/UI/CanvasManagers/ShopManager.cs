@@ -46,11 +46,13 @@ public class ShopManager : MonoBehaviour, ICanvasManager
     private void OnEnable()
     {
         toggleShopCanvasEvent.toggleCanvasEvent += OnShopToggle;
+        toggleShopCanvasEvent.focusEvent += OnFocus;
     }
 
     private void OnDisable()
     {
         toggleShopCanvasEvent.toggleCanvasEvent -= OnShopToggle;
+        toggleShopCanvasEvent.focusEvent -= OnFocus;
     }
 
     public void RegisterActiveShopKeeper(ShopKeeper keeper)
@@ -73,18 +75,18 @@ public class ShopManager : MonoBehaviour, ICanvasManager
                     activeShopKeeper.ShopItems,
                     activeShopKeeper.ShopWeapon,
                     activeShopKeeper.ShopArmor);
-                return;
             }
-
-            ((ICanvasManager)this).RefreshCanvaOrder(
-                canvas,
-                MyEnums.CanvasToToggle.Shop,
-                isShopOpen);
         }
         else
         {
             CloseShop();
         }
+    }
+
+    private void OnFocus()
+    {
+        if (!isShopOpen) return;
+        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Shop, true);
     }
 
     public void OpenShop(

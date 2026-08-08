@@ -39,6 +39,7 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
         InitiateButtons();
 
         toggleIntegratedCanvasEventSO.toggleCanvasEvent += OnToggleIntegratedCanvas;
+        toggleIntegratedCanvasEventSO.focusEvent += OnFocus;
 
         //此处事件在UIManager里仅索引到editor里，没有在代码层编写
         //特别地，将开闭功能都放在当前这个脚本里
@@ -47,9 +48,19 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
     private void OnDisable()
     {
         toggleIntegratedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegratedCanvas;
+        toggleIntegratedCanvasEventSO.focusEvent -= OnFocus;
         toggleMenuButton.onClick.RemoveAllListeners();
         nextPageButton.onClick.RemoveAllListeners();
         prevPageButton.onClick.RemoveAllListeners();
+    }
+
+    private void OnFocus()
+    {
+        if (!isMenuOpen) return;
+        ((ICanvasManager)this).RefreshCanvaOrder(
+            UICanvasPanel.GetComponent<Canvas>(),
+            MyEnums.CanvasToToggle.Integrated,
+            true);
     }
     private void OnToggleIntegratedCanvas(bool state)
     {
