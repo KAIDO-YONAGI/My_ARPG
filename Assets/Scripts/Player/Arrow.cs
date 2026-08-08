@@ -44,9 +44,12 @@ public class Arrow : MonoBehaviour
     {
         if ((enemyLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
-            collision.gameObject.GetComponent<EnemyHealth>().ChangeHealth(-damage);
-            collision.gameObject.GetComponent<EnemyKnockBack>().Knockback(transform, knockBackForce, stunTime, knockBackTime);
-            AttachToTarget(collision.gameObject.transform);
+            var damageable = collision.gameObject.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(damage, transform);
+                AttachToTarget(collision.gameObject.transform);
+            }
         }
         else if((obstacleLayer.value & (1 << collision.gameObject.layer)) > 0)
         {

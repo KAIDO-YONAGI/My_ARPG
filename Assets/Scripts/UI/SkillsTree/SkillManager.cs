@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SkillManager : MonoBehaviour
 {
-    public PlayerCombat combat;
+    [SerializeField] private PlayerCombat combat;
     private void OnEnable()
     {
         SkillSlot.OnAbilityPointSpent += HandleAbilityPointSpent;
@@ -24,7 +24,7 @@ public class SkillManager : MonoBehaviour
                 StatsManager.instance.UpdateHealth(1);
                 break;
             case "SwordSlash":
-                combat.enabled = true;
+                combat.SetActive(true);
                 break;
 
             default:

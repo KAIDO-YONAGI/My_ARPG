@@ -6,12 +6,15 @@ using MyEnums;
 
 public class ShiftEquipment : MonoBehaviour
 {
-    public PlayerCombat combat;
-    public PlayerBow bow;
-    public PlayerMovement playerMovement;
+    [SerializeField] private PlayerCombat combat;
+    [SerializeField] private PlayerBow bow;
 
     [Header("Input Actions")]
-    public InputActionReference shiftEquipmentAction;
+    [SerializeField] private InputActionReference shiftEquipmentAction;
+
+    [Header("Action Finished Events")]
+    [SerializeField] private VoidEventSO slashActionFinishedEvent;
+    [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
     private float shiftCooldown = 0.3f;
     private float shiftTimer;
@@ -33,14 +36,13 @@ public class ShiftEquipment : MonoBehaviour
 
         if (shiftEquipmentAction != null && shiftEquipmentAction.action.WasPressedThisFrame() && shiftTimer <= 0)
         {
-            combat.enabled = !combat.enabled;
-            bow.enabled = !bow.enabled;
+            // 翻转武器激活状态（不禁用组件，确保 Animation Event 始终能被接收）
+            combat.SetActive(!combat.IsActive);
+            bow.SetActive(!bow.IsActive);
 
-            playerMovement.AnimatorSM(PlayerState.Idle);
-            playerMovement.animator.SetBool("isAttacking", false);
-            playerMovement.animator.SetBool("isShooting", false);
-            playerMovement.SetCanBeInterrupted(true);
-            playerMovement.ResetTimer();
+            // 切换装备时两种动作都视为结束，通过事件通知 PlayerMovement 统一重置状态
+            if (slashActionFinishedEvent != null) slashActionFinishedEvent.OnEventRaised();
+            if (shootActionFinishedEvent != null) shootActionFinishedEvent.OnEventRaised();
 
             shiftTimer = shiftCooldown;
         }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour
+public class EnemyHealth : MonoBehaviour, IDamageable
 {
     [SerializeField] private int currentHealth;
     [SerializeField] private int maxHealth;
@@ -11,6 +11,12 @@ public class EnemyHealth : MonoBehaviour
     public delegate void MonsterDefeated(int exp);//观察者模式
     public static event MonsterDefeated OnDefeated;
 
+    private EnemyKnockBack knockBack;
+
+    private void Awake()
+    {
+        knockBack = GetComponent<EnemyKnockBack>();
+    }
     private void Start()
     {
         currentHealth = maxHealth;
@@ -26,6 +32,22 @@ public class EnemyHealth : MonoBehaviour
         {
             OnDefeated(expReward);//事件被触发
             Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// IDamageable：扣血 + 击退一次完成。玩家攻击命中只需调这个方法。
+    /// </summary>
+    public void TakeDamage(int damage, Transform attacker)
+    {
+        ChangeHealth(-damage);
+        if (knockBack != null)
+        {
+            knockBack.Knockback(
+                attacker,
+                StatsManager.instance.GetKnockBackForce(),
+                StatsManager.instance.GetStunTime(),
+                StatsManager.instance.GetKnockBackTime());
         }
     }
 }

@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     public InputActionReference shootAction;
 
     [Header("Action Finished Events")]
-    [SerializeField] private VoidEventSO meleeActionFinishedEvent;
+    [SerializeField] private VoidEventSO slashActionFinishedEvent;
     [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
     private int facingDirection = 1;//默认朝向为右
@@ -37,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
         if (slashAction != null) slashAction.action.Enable();
         if (shootAction != null) shootAction.action.Enable();
 
-        if (meleeActionFinishedEvent != null) meleeActionFinishedEvent.VoidEvent += OnActionFinished;
+        if (slashActionFinishedEvent != null) slashActionFinishedEvent.VoidEvent += OnActionFinished;
         if (shootActionFinishedEvent != null) shootActionFinishedEvent.VoidEvent += OnActionFinished;
     }
 
@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
         if (slashAction != null) slashAction.action.Disable();
         if (shootAction != null) shootAction.action.Disable();
 
-        if (meleeActionFinishedEvent != null) meleeActionFinishedEvent.VoidEvent -= OnActionFinished;
+        if (slashActionFinishedEvent != null) slashActionFinishedEvent.VoidEvent -= OnActionFinished;
         if (shootActionFinishedEvent != null) shootActionFinishedEvent.VoidEvent -= OnActionFinished;
     }
 
@@ -121,11 +121,11 @@ public class PlayerMovement : MonoBehaviour
             HandleKnockBackState();
             return;
         }
-        if (slashAction != null && slashAction.action.WasPressedThisFrame() && playerCombat.enabled && timer < 0)
+        if (slashAction != null && slashAction.action.WasPressedThisFrame() && playerCombat.IsActive && timer < 0)
         {
             AnimatorSM(PlayerState.Attacking);
         }
-        else if (shootAction != null && shootAction.action.WasPressedThisFrame() && playerBow.enabled && timer < 0)
+        else if (shootAction != null && shootAction.action.WasPressedThisFrame() && playerBow.IsActive && timer < 0)
         {
             AnimatorSM(PlayerState.Shooting);
         }

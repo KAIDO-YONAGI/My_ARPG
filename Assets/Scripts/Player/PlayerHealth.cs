@@ -5,7 +5,13 @@ using UnityEngine.Video;
 using TMPro;
 public class PlayerHealth : MonoBehaviour
 {
-    public CanvasGroup GameOverCanvas;
+    public static PlayerHealth instance;
+
+    private void Awake()
+    {
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
+    }
     void Start()
     {
         StatsManager.instance.Respawn();
@@ -17,9 +23,11 @@ public class PlayerHealth : MonoBehaviour
         if (StatsManager.instance.GetCurrentHealth() <= 0)
         {
             gameObject.SetActive(false);
-            GameOverCanvas.alpha = 1;
-            GameOverCanvas.interactable = true;
-            GameOverCanvas.blocksRaycasts = true;
+            //通过 UIManager 画布调度系统弹出 GameOver，不再直接持有画布引用
+            if (UIManager.instance != null)
+            {
+                UIManager.instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);
+            }
         }
     }
 }

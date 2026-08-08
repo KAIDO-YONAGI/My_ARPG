@@ -20,17 +20,30 @@ public class PlayerBow : MonoBehaviour
     [Header("Action Finished Event")]
     [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
+    /// <summary>
+    /// 当前是否为激活的武器模式。替代组件 enabled：
+    /// 组件常驻 enabled 才能正常接收 Animation Event（HandleShootingAiming/Shoot/ShootingDone）。
+    /// </summary>
+    public bool IsActive { get; private set; } = false;
+
+    public void SetActive(bool active)
+    {
+        IsActive = active;
+        // 动画层权重随武器切换：弓激活时弓层(1)全权，否则剑层(0)全权
+        if (anim != null)
+        {
+            anim.SetLayerWeight(0, active ? 0 : 1);
+            anim.SetLayerWeight(1, active ? 1 : 0);
+        }
+    }
+
+    private void Start()
+    {
+        // 游戏开始时按初始武器状态设置动画层权重（默认 IsActive=false，即剑模式）
+        SetActive(IsActive);
+    }
+
     private float shootTimer;//防止多箭发射
-    private void OnEnable()
-    {
-        anim.SetLayerWeight(0, 0);//意为把序号零的层设为优先级零
-        anim.SetLayerWeight(1, 1);
-    }
-    private void OnDisable()
-    {
-        anim.SetLayerWeight(0, 1);
-        anim.SetLayerWeight(1, 0);
-    }
     private void Update()
     {
         if (shootTimer >= 0)
@@ -95,10 +108,8 @@ public class PlayerBow : MonoBehaviour
     }
     public void ShootingDone()//动画事件触发的函数，结束射击，重置状态和计时器
     {
-        playerMovement.AnimatorSM(PlayerState.Idle);
-        playerMovement.animator.SetBool("isShooting", false);
-        playerMovement.SetCanBeInterrupted(true);
-        playerMovement.ResetTimer();
+        // 通知 PlayerMovement（及其它订阅者）射击动作结束，由其统一重置状态
+        if (shootActionFinishedEvent != null) shootActionFinishedEvent.OnEventRaised();
         StartCoroutine(ResetShooting(0.1f));
     }
     IEnumerator ResetShooting(float delay)
