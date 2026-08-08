@@ -123,8 +123,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7955157176541925022}
-        m_TargetAssemblyTypeName: ButtonSceneToggler, Assembly-CSharp
-        m_MethodName: HandleSceneToggle
+        m_TargetAssemblyTypeName: RetryButton, Assembly-CSharp
+        m_MethodName: HandleRetry
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -143,14 +143,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 165555865617636474}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87d1fc010ab61f143bbc0071fe380f72, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
-  sceneToLoad: {fileID: 11400000, guid: ebd6b38e5d8c51b4080a49222c8c9c22, type: 2}
+  m_Script: {fileID: 11500000, guid: add5b191f48d4e0c8df308cd0924ec41, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
   ButtonCanvas: {fileID: 0}
-  newPosition: {x: 0, y: 0, z: 0}
-  isToFade: 1
   retryEventSO: {fileID: 11400000, guid: ab55211f38f1eba4b8515a1ac13837a3, type: 2}
 --- !u!1 &7632956191357238880
 GameObject:
