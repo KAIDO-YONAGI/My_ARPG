@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class ESCMenuManager : MonoBehaviour
 {
-    public CanvasGroup ESCGroup;
-    public ToggleCanvasEventSO toggleESCEvent;
+    [SerializeField] private CanvasGroup ESCGroup;
+    [SerializeField] private ToggleCanvasEventSO toggleESCEvent;
     private void OnEnable()
     {
         toggleESCEvent.toggleCanvasEvent += OnESC;

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Elevation_Entry : MonoBehaviour
 {
-    public Collider2D[] mountainColliders;
-    public Collider2D[] edgeColliders;
+    [SerializeField] private Collider2D[] mountainColliders;
+    [SerializeField] private Collider2D[] edgeColliders;
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")

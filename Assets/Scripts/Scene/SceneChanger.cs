@@ -14,20 +14,20 @@ public class SceneChanger : MonoBehaviour
     public static SceneChanger instance;
 
     /// <summary>玩家初始位置</summary>
-    public Vector3 initialPosition = Vector3.zero;
+    [SerializeField] private Vector3 initialPosition = Vector3.zero;
 
-    public float fadeDuration = 1f;
-    public GameSceneSO initScene;
-    public GameObject player;
-    public CanvasGroup fadeCanva;
+    [SerializeField] private float fadeDuration = 1f;
+    [SerializeField] private GameSceneSO initScene;
+    [SerializeField] private GameObject player;
+    [SerializeField] private CanvasGroup fadeCanva;
 
     /// <summary>过渡动画播放器数组</summary>
     ///     
-    [Header("Events")] public SceneLoadEventSO loadEventSO;
+    [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
 
-    public VoidEventSO sceneLoadedEvent;
-    public Animator[] transitionImagesDuringFade;
-    public Object[] objectsToUnableWhileGameReset;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private Animator[] transitionImagesDuringFade;
+    [SerializeField] private Object[] objectsToUnableWhileGameReset;
     private GameSceneSO sceneToLoad;
 
     private GameSceneSO currentScene;

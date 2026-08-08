@@ -7,8 +7,8 @@ using UnityEngine;
 /// </summary>
 public class GameOverCanvasManager : MonoBehaviour
 {
-    public CanvasGroup gameOverGroup;
-    public ToggleCanvasEventSO toggleGameOverEvent;
+    [SerializeField] private CanvasGroup gameOverGroup;
+    [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
 
     private void OnEnable()
     {

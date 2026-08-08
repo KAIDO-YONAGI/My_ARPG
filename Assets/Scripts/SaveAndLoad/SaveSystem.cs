@@ -32,10 +32,10 @@ public class SaveSystem : MonoBehaviour
 
     [Header("Send")]
 
-    public SceneLoadEventSO loadEventSO;
+    [SerializeField] private SceneLoadEventSO loadEventSO;
     [Header("Receive")]
 
-    public DataSaveEventSO dataSavedEvent;
+    [SerializeField] private DataSaveEventSO dataSavedEvent;
     private void OnEnable()
     {
         dataSavedEvent.DataSaveEvent += OnSaveEvent;

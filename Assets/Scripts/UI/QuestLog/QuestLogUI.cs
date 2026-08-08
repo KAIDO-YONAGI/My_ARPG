@@ -11,7 +11,7 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
     [SerializeField] private QuestObjectiveSlot[] objectiveSlots;//任务条目槽位
     [SerializeField] private QuestRewardsSlot[] questRewardsSlot;//任务奖励槽位
 
-    public VoidEventSO openQuestEvent;
+    [SerializeField] private VoidEventSO openQuestEvent;
 
     private QuestSO currentQuest;
 

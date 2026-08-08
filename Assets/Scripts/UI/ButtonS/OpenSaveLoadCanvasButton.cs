@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class OpenSaveLoadCanvasButton : MonoBehaviour
 {
-    public ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
-    public Button OpenButton;
+    [SerializeField] private ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
+    [SerializeField] private Button OpenButton;
     private void OnEnable()
     {
         OpenButton.onClick.AddListener(

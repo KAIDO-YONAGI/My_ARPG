@@ -16,9 +16,9 @@ public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField] private ShopInfo shopInfo;
 
     [Header("Link To Child Objections")]
-    public TMP_Text itemNameText;
-    public TMP_Text priceText;
-    public Image itemImage;
+    [SerializeField] private TMP_Text itemNameText;
+    [SerializeField] private TMP_Text priceText;
+    [SerializeField] private Image itemImage;
     public ItemSO GetItemSO()
     {
         return item;

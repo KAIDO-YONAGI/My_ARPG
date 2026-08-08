@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance;
-    public Transform Transform;
+    [SerializeField, FormerlySerializedAs("Transform")] private Transform playerTransform;
 
     void Awake()
     {
@@ -17,5 +18,5 @@ public class PlayerController : MonoBehaviour
         Instance = this;
     }
 
-    public Vector3 GetPosition() => Transform.position;
+    public Vector3 GetPosition() => playerTransform.position;
 }

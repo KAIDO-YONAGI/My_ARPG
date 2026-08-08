@@ -6,10 +6,10 @@ using UnityEngine;
 public class StatsCanvasManager : MonoBehaviour, ICanvasManager
 {
     public static StatsCanvasManager instance;
-    public GameObject[] statsSlots;
-    public CanvasGroup statsCanvas;
+    [SerializeField] private GameObject[] statsSlots;
+    [SerializeField] private CanvasGroup statsCanvas;
 
-    public ToggleCanvasEventSO toggleStatsEvent;
+    [SerializeField] private ToggleCanvasEventSO toggleStatsEvent;
 
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
     private Canvas canvas;

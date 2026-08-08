@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class ShopKeeper : MonoBehaviour
 {
-    public Animator logoAnimator;
-    public Animator shopKeeperAnimator;
+    [SerializeField] private Animator logoAnimator;
+    [SerializeField] private Animator shopKeeperAnimator;
 
     [SerializeField] private List<ShopItems> shopItems;
     [SerializeField] private List<ShopItems> shopWeapon;

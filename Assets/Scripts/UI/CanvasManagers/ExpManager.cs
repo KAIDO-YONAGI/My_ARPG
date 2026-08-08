@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 public class ExpManager : MonoBehaviour
 {
-    public Slider expSlider;
-    public TMP_Text currentLevelText;
+    [SerializeField] private Slider expSlider;
+    [SerializeField] private TMP_Text currentLevelText;
     public static event Action<int> OnLevelUp;
     static public ExpManager instance;
 

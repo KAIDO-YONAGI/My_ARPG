@@ -5,37 +5,37 @@ using UnityEngine;
 public class QuestManager : MonoBehaviour, ICanvasManager
 {
     public static QuestManager instance;
-    public CanvasGroup questCanvaGroup;
+    [SerializeField] private CanvasGroup questCanvaGroup;
 
     [Header("Events To Receive")]
-    public VoidEventSO openQuestEventSO;
-    public LoadQuestEventSO loadQuestEventSO;
-    public QuestOptionsEventSO questOptionsEventSO;
-    public ToggleCanvasEventSO toggleQuestEvent;
+    [SerializeField] private VoidEventSO openQuestEventSO;
+    [SerializeField] private LoadQuestEventSO loadQuestEventSO;
+    [SerializeField] private QuestOptionsEventSO questOptionsEventSO;
+    [SerializeField] private ToggleCanvasEventSO toggleQuestEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleQuestEvent;
 
 
     [Header("Events To Trigger")]
 
-    public InventorySlotsStatsSO QuestRewardRequest;
+    [SerializeField] private InventorySlotsStatsSO QuestRewardRequest;
 
 
 
     [Header("Options")]
-    public CanvasGroup acceptCanvaGroup;
-    public CanvasGroup declineCanvaGroup;
-    public CanvasGroup completeCanvaGroup;
+    [SerializeField] private CanvasGroup acceptCanvaGroup;
+    [SerializeField] private CanvasGroup declineCanvaGroup;
+    [SerializeField] private CanvasGroup completeCanvaGroup;
 
 
     [Header("QuestLogSlots")]
-    public QuestLogSlot[] questLogSlots;
+    [SerializeField] private QuestLogSlot[] questLogSlots;
 
     [Header("Canvas To Operate While No Quests")]
-    public CanvasGroup detailsCanvaGroup;
-    public CanvasGroup promptCanvaGroup;
+    [SerializeField] private CanvasGroup detailsCanvaGroup;
+    [SerializeField] private CanvasGroup promptCanvaGroup;
 
     [Header("QuestLogUI")]
-    public QuestLogUI questLogUI;
+    [SerializeField] private QuestLogUI questLogUI;
 
     private MyEnums.QuestState currentQuestState = MyEnums.QuestState.Idle;
 

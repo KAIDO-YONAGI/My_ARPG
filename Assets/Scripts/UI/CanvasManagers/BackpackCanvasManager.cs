@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class BackpackCanvasManager : MonoBehaviour, ICanvasManager
 {
-    public CanvasGroup currentCanvas;
-    public ToggleCanvasEventSO toggleBackpackCanvasEventSO;
+    [SerializeField] private CanvasGroup currentCanvas;
+    [SerializeField] private ToggleCanvasEventSO toggleBackpackCanvasEventSO;
 
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleBackpackCanvasEventSO;
     private Canvas canvas;

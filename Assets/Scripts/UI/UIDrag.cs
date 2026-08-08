@@ -3,9 +3,9 @@ using UnityEngine.EventSystems;
 
 public class UIDrag : MonoBehaviour, IDragHandler, IPointerDownHandler
 {
-    public RectTransform dragTarget;
-    public CanvasGroup canvasGroup;
-    public MyEnums.CanvasToToggle dragCanvasType;
+    [SerializeField] private RectTransform dragTarget;
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private MyEnums.CanvasToToggle dragCanvasType;
     private Vector2 offset;
     private Vector2 originPosition;
     private bool wasVisible;

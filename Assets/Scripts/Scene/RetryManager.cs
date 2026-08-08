@@ -15,10 +15,10 @@ public class RetryManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    public GameSceneSO currentScene;
-    public SceneLoadEventSO loadEventSO;
+    [SerializeField] private GameSceneSO currentScene;
+    [SerializeField] private SceneLoadEventSO loadEventSO;
     [Header("Retry Event")]
-    public VoidEventSO retryEventSO;
+    [SerializeField] private VoidEventSO retryEventSO;
 
     private void OnEnable()
     {

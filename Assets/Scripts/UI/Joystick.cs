@@ -3,8 +3,8 @@ using UnityEngine.EventSystems;
 
 public class Joystick : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
-    public RectTransform backgroundRect;
-    public RectTransform handleRect;
+    [SerializeField] private RectTransform backgroundRect;
+    [SerializeField] private RectTransform handleRect;
 
     public float Horizontal { get; private set; }
     public float Vertical { get; private set; }

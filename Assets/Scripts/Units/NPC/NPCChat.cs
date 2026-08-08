@@ -4,12 +4,12 @@ using UnityEngine.InputSystem;
 public class NPCChat : MonoBehaviour
 {
     private Rigidbody2D rb;
-    public Animator chatAnimator;
-    public DialogSO dialogSO;
-    public ToggleCanvasEventSO toggleDialogEvent;
+    [SerializeField] private Animator chatAnimator;
+    [SerializeField] private DialogSO dialogSO;
+    [SerializeField] private ToggleCanvasEventSO toggleDialogEvent;
 
     [Header("Input Actions")]
-    public InputActionReference advanceDialogAction;
+    [SerializeField] private InputActionReference advanceDialogAction;
 
     private bool openDialogRequested;
 

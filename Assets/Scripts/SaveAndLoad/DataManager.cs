@@ -14,12 +14,11 @@ public class DataManager : MonoBehaviour
 
     public Data GetData => dataToSave;
     [Header("Send")]
-    public DataSaveEventSO dataSavedEvent;
+    [SerializeField] private DataSaveEventSO dataSavedEvent;
 
     [Header("Receive")]
-
-    public SceneLoadEventSO sceneLoadEventSO;
-    public VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadEventSO sceneLoadEventSO;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
 
     private List<ISaveable> saveables = new();
 

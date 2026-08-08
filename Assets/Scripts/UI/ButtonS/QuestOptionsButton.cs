@@ -4,7 +4,7 @@ using UnityEngine.Events;
 public class QuestOptionsButton : MonoBehaviour
 {
     [SerializeField]private MyEnums.QuestState questStateToShift;
-    public QuestOptionsEventSO questOptionsEventSO;
+    [SerializeField] private QuestOptionsEventSO questOptionsEventSO;
 
     public void OnOptionButtonClicked()//unity中绑定
     {

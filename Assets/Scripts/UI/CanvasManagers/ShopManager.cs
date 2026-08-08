@@ -7,9 +7,9 @@ public class ShopManager : MonoBehaviour, ICanvasManager
     [SerializeField] private CanvasGroup shopCanvasGroup;
 
     [Header("Events To Trigger")]
-    public InventorySlotsStatsSO InventoryUpdateRequest;
+    [SerializeField] private InventorySlotsStatsSO InventoryUpdateRequest;
     [Header("Events To Receive")]
-    public ToggleCanvasEventSO toggleShopCanvasEvent;
+    [SerializeField] private ToggleCanvasEventSO toggleShopCanvasEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
 
     public static ShopManager instance;

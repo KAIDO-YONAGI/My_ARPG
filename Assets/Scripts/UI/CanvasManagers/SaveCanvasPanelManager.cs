@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
 {
     [Header("Events To Receive")]
-    public ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
+    [SerializeField] private ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleSaveLoadCanvasEvent;
 
     [Header("UI")]

@@ -11,11 +11,11 @@ public class UIManager : MonoBehaviour
     public static int DefaultOrder = 5;
 
     [Header("Events")]
-    public SceneLoadEventSO loadEventSO;
-    public List<ToggleCanvasEventSO> toggleCanvasEvents;
+    [SerializeField] private SceneLoadEventSO loadEventSO;
+    [SerializeField] private List<ToggleCanvasEventSO> toggleCanvasEvents;
 
     [Header("Input Bindings")]
-    public List<CanvasInputBinding> inputBindings;
+    [SerializeField] private List<CanvasInputBinding> inputBindings;
     private bool isAnyCanvasOpen;
 
     private MyEnums.CanvasToToggle canvasToToggle

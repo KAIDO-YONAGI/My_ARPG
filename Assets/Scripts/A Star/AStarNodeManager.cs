@@ -19,9 +19,9 @@ public class AStarNodeManager : MonoBehaviour
     }
 
     [Header("Tilemaps")]
-    public Tilemap[] tilemaps;
+    [SerializeField] private Tilemap[] tilemaps;
     [Header("Grid Settings")]
-    public LayerMask obstacleLayers;
+    [SerializeField] private LayerMask obstacleLayers;
 
     private float cellSize = 1f;
     private float safetyMargin = 0.3f;

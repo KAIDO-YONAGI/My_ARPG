@@ -4,7 +4,7 @@ public class PlayerHealth : MonoBehaviour
 {
     private static PlayerHealth instance;
     [SerializeField] private GameObject playerRoot;
-    public ToggleCanvasEventSO toggleGameOverEvent;
+    [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
 
 
     private void Awake()

@@ -5,8 +5,8 @@ using TMPro;
 using UnityEngine;
 public class SkillTreeManager : MonoBehaviour
 {
-    public SkillSlot[] skillSlots;
-    public TMP_Text pointsText;
+    [SerializeField] private SkillSlot[] skillSlots;
+    [SerializeField] private TMP_Text pointsText;
 
 
     private void OnEnable()

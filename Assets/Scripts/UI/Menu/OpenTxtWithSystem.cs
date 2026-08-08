@@ -6,7 +6,7 @@ using System.IO;
 public class OpenTxtWithSystem : MonoBehaviour
 {
     [Header("Input Actions")]
-    public InputActionReference openGuideAction;
+    [SerializeField] private InputActionReference openGuideAction;
 
     private void OnEnable()
     {

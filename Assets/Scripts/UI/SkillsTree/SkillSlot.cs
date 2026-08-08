@@ -7,12 +7,12 @@ using System;
 public class SkillSlot : MonoBehaviour
 {
     public SkillSO skillSO;
-    public Image skillIcon;
-    public TMP_Text skillLevelText;
+    [SerializeField] private Image skillIcon;
+    [SerializeField] private TMP_Text skillLevelText;
     public Button skillButton;
-    public List<SkillSlot> preRiquriedForSkillUnlock_List;
+    [SerializeField] private List<SkillSlot> preRiquriedForSkillUnlock_List;
 
-    public int currentLevel;
+    [SerializeField] private int currentLevel;
     public bool isUnlocked = false;
 
     public static event Action<SkillSlot> OnAbilityPointSpent;//事件广播

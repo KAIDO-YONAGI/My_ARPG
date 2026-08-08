@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class ToggleSkillTree : MonoBehaviour, ICanvasManager
 {
-    public CanvasGroup skillsCanvas;
-    public ToggleCanvasEventSO toggleSkillEvent;
+    [SerializeField] private CanvasGroup skillsCanvas;
+    [SerializeField] private ToggleCanvasEventSO toggleSkillEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleSkillEvent;
     private Canvas canvas;
 

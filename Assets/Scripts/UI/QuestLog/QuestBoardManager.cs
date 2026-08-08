@@ -9,10 +9,10 @@ public class QuestBoardManager : MonoBehaviour
     [SerializeField] private List<QuestSO> questsOnBoard;//如果要区分任务实例，则需要深拷贝类包装
 
     [Header("Events To Trigger")]
-    public VoidEventSO openQuestEvent;
-    public LoadQuestEventSO loadQuestEventSO;
+    [SerializeField] private VoidEventSO openQuestEvent;
+    [SerializeField] private LoadQuestEventSO loadQuestEventSO;
     [Header("Events To Receive")]
-    public ToggleCanvasEventSO toggleQuestEvent;
+    [SerializeField] private ToggleCanvasEventSO toggleQuestEvent;
     private bool isInRange = false;
 
 

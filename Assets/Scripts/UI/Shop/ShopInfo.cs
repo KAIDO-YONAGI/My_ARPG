@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ShopInfo : MonoBehaviour
 {
-    public CanvasGroup infoPanel;
-    public TMP_Text itemNameText;
-    public TMP_Text itemDescriptionText;
+    [SerializeField] private CanvasGroup infoPanel;
+    [SerializeField] private TMP_Text itemNameText;
+    [SerializeField] private TMP_Text itemDescriptionText;
 
-    [Header("Stats")]
-    public TMP_Text[] itemStatsText;
+    [Header("Stats")] [SerializeField] private TMP_Text[] itemStatsText;
 
     private RectTransform infoPanelRect;
 
@@ -28,11 +28,11 @@ public class ShopInfo : MonoBehaviour
 
         List<string> stats = new List<string>();
 
-        if (item.currentHealth > 0) stats.Add("Health:"+item.currentHealth.ToString());
-        if (item.maxHealth > 0) stats.Add("MaxHealth:"+item.maxHealth.ToString());
-        if (item.damage > 0) stats.Add("Damage:"+item.damage.ToString());
-        if (item.speed > 0) stats.Add("Speed:"+item.speed.ToString());
-        if (item.duration > 0) stats.Add("Duration:"+item.duration.ToString());
+        if (item.currentHealth > 0) stats.Add("Health:" + item.currentHealth.ToString());
+        if (item.maxHealth > 0) stats.Add("MaxHealth:" + item.maxHealth.ToString());
+        if (item.damage > 0) stats.Add("Damage:" + item.damage.ToString());
+        if (item.speed > 0) stats.Add("Speed:" + item.speed.ToString());
+        if (item.duration > 0) stats.Add("Duration:" + item.duration.ToString());
 
 
         for (int i = 0; i < itemStatsText.Length; i++)
@@ -51,18 +51,18 @@ public class ShopInfo : MonoBehaviour
     }
 
 
-public void HideItemInfo()
-{
-    infoPanel.alpha = 0;
-    itemNameText.text = "";
-    itemDescriptionText.text = "";
-}
+    public void HideItemInfo()
+    {
+        infoPanel.alpha = 0;
+        itemNameText.text = "";
+        itemDescriptionText.text = "";
+    }
 
-public void FollowMouse()
-{
-    Vector3 mousePosition = Input.mousePosition;
-    mousePosition += new Vector3(10, -10, 0);//偏移位置以免遮挡
-    infoPanelRect.position = mousePosition;
-
-}
+    public void FollowMouse()
+    {
+        if (Mouse.current == null) return;
+        Vector3 mousePosition = Mouse.current.position.ReadValue();
+        mousePosition += new Vector3(10, -10, 0); //偏移位置以免遮挡
+        infoPanelRect.position = mousePosition;
+    }
 }

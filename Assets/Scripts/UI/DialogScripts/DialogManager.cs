@@ -7,12 +7,12 @@ public class DialogManager : MonoBehaviour
     public static DialogManager instance;
 
     [Header("Dialog UI")]
-    public CanvasGroup dialogCanvasGroup;
-    public Image speakerPortrait;
-    public TMP_Text dialogText;
-    public TMP_Text speakerNameText;
+    [SerializeField] private CanvasGroup dialogCanvasGroup;
+    [SerializeField] private Image speakerPortrait;
+    [SerializeField] private TMP_Text dialogText;
+    [SerializeField] private TMP_Text speakerNameText;
     public bool isDialogActive;
-    public Button[] optionButtons;
+    [SerializeField] private Button[] optionButtons;
 
     private int currentLineIndex = 0;
     private DialogSO currentDialog;

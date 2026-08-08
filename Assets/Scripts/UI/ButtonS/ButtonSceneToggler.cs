@@ -4,13 +4,13 @@ using UnityEngine;
 using MyEnums;
 public class ButtonSceneToggler : MonoBehaviour
 {
-    public SceneLoadEventSO loadEventSO;
-    public GameSceneSO sceneToLoad;
-    public CanvasGroup ButtonCanvas;
-    public Vector3 newPosition;
-    public bool isToFade = true;
+    [SerializeField] private SceneLoadEventSO loadEventSO;
+    [SerializeField] private GameSceneSO sceneToLoad;
+    [SerializeField] private CanvasGroup ButtonCanvas;
+    [SerializeField] private Vector3 newPosition;
+    [SerializeField] private bool isToFade = true;
     [Header("Retry Event")]
-    public VoidEventSO retryEventSO;
+    [SerializeField] private VoidEventSO retryEventSO;
     public void HandleSceneToggle()//editor内由button组件绑定
     {
         ButtonCanvas.alpha = 0;

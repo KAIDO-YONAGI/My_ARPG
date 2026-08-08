@@ -4,7 +4,7 @@ using UnityEngine;
 public class HealthCanvasManager : MonoBehaviour
 {
     public static HealthCanvasManager instance;
-    public TMP_Text healthText;
+    [SerializeField] private TMP_Text healthText;
 
     private void Awake()
     {

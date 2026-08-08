@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class ESCButton : MonoBehaviour
 {
-    public Button escButton;
+    [SerializeField] private Button escButton;
     [SerializeField] private MyEnums.CanvasToToggle canvasToESC;
     private void OnEnable() {
         escButton.onClick.AddListener(OnESC);

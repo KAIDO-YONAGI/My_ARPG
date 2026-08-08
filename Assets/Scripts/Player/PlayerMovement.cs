@@ -5,17 +5,17 @@ using MyEnums;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Rigidbody2D rb;
-    public Animator animator;
-    public PlayerCombat playerCombat;
-    public PlayerBow playerBow;
-    public Joystick joystick;
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private Animator animator;
+    [SerializeField] private PlayerCombat playerCombat;
+    [SerializeField] private PlayerBow playerBow;
+    [SerializeField] private Joystick joystick;
     [SerializeField] private Transform visualRoot;
 
     [Header("Input Actions")]
-    public InputActionReference moveAction;
-    public InputActionReference slashAction;
-    public InputActionReference shootAction;
+    [SerializeField] private InputActionReference moveAction;
+    [SerializeField] private InputActionReference slashAction;
+    [SerializeField] private InputActionReference shootAction;
 
     [Header("Action Finished Events")]
     [SerializeField] private VoidEventSO slashActionFinishedEvent;
