@@ -19,12 +19,11 @@ public class EnemyCombat : MonoBehaviour
 
         if (hits.Length > 0 && hits[0].enabled)//如果有目标
         {
-            // 玩家受伤走单例，不再 GetComponent
-            if (PlayerHealth.instance != null)
-                PlayerHealth.instance.ChangeHealth(-damage);
+            var health = hits[0].GetComponentInChildren<PlayerHealth>();
+            if (health != null)
+                health.ChangeHealth(-damage);
 
-            // 击退仍需 PlayerMovement 组件（玩家非单例，暂保留 GetComponent）
-            var movement = hits[0].GetComponent<PlayerMovement>();
+            var movement = hits[0].GetComponentInChildren<PlayerMovement>();
             if (movement != null) movement.KnockBack(transform, konckBackForce, stunTime);
         }
     }

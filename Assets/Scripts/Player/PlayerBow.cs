@@ -21,8 +21,8 @@ public class PlayerBow : MonoBehaviour
     [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
     /// <summary>
-    /// 当前是否为激活的武器模式。替代组件 enabled：
-    /// 组件常驻 enabled 才能正常接收 Animation Event（HandleShootingAiming/Shoot/ShootingDone）。
+    /// 当前是否为激活的武器模式。
+    /// Player 根节点上的 PlayerAnimationEventRelay 会按此状态转发动画事件。
     /// </summary>
     public bool IsActive { get; private set; } = false;
 

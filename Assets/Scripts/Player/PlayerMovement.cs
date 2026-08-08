@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public PlayerCombat playerCombat;
     public PlayerBow playerBow;
     public Joystick joystick;
+    [SerializeField] private Transform visualRoot;
 
     [Header("Input Actions")]
     public InputActionReference moveAction;
@@ -208,7 +209,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //判断（仅）水平输入值和当前角色朝向的符号是否一致，否（意味着玩家将要转向）则调用翻转
-        if (horizontal * transform.localScale.x < 0)
+        Transform root = GetPlayerRoot();
+        if (horizontal * root.localScale.x < 0)
             Flip();
 
         //将animator的horizontal参数的值设定为变量的值
@@ -222,10 +224,11 @@ public class PlayerMovement : MonoBehaviour
     private void Flip()
     {
         facingDirection *= -1;
-        transform.localScale =
-            new Vector3(-1 * transform.localScale.x,
-            transform.localScale.y,
-            transform.localScale.z);
+        Transform root = GetPlayerRoot();
+        root.localScale =
+            new Vector3(-root.localScale.x,
+            root.localScale.y,
+            root.localScale.z);
     }
     public int getFacingDirection()
     {
@@ -233,15 +236,24 @@ public class PlayerMovement : MonoBehaviour
     }
     public void KnockBack(Transform enemy, float force, float stunTime)
     {
-        if(gameObject.activeSelf == false)
+        if (!isActiveAndEnabled)
             return;
         playerState = PlayerState.KnockBack;
-        Vector2 direction = (transform.position - enemy.position).normalized;
+        Vector2 direction = (GetPlayerRoot().position - enemy.position).normalized;
 
         Vector2 knockBackVelocity = direction * force;
         SetMovement(knockBackVelocity.x, knockBackVelocity.y);
 
         StartCoroutine(KnockBackCounter(stunTime));
+    }
+
+    private Transform GetPlayerRoot()
+    {
+        if (visualRoot != null)
+            return visualRoot;
+        if (rb != null)
+            return rb.transform;
+        return transform;
     }
     public PlayerState GetPlayerState()
     {

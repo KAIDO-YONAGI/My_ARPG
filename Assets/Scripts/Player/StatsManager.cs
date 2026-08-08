@@ -63,9 +63,7 @@ public class StatsManager : MonoBehaviour
     }
     public void UpdateHealth(int amount)
     {
-        stats.currentHealth += amount;
-        if (stats.currentHealth > stats.maxHealth)
-            stats.currentHealth = stats.maxHealth;
+        stats.currentHealth = Mathf.Clamp(stats.currentHealth + amount, 0, stats.maxHealth);
         HealthCanvasManager.instance.UpdateHealthText();
     }
     public void UpdateSpeed(float amount)

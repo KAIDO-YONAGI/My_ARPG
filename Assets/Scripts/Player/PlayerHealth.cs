@@ -1,17 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Video;
-using TMPro;
+
 public class PlayerHealth : MonoBehaviour
 {
-    public static PlayerHealth instance;
+    private static PlayerHealth instance;
+    [SerializeField] private GameObject playerRoot;
+    public ToggleCanvasEventSO toggleGameOverEvent;
+
 
     private void Awake()
     {
         if (instance == null) instance = this;
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(this);
+        }
     }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+            instance = null;
+    }
+
     void Start()
     {
         StatsManager.instance.Respawn();
@@ -22,12 +32,10 @@ public class PlayerHealth : MonoBehaviour
 
         if (StatsManager.instance.GetCurrentHealth() <= 0)
         {
-            gameObject.SetActive(false);
-            //通过 UIManager 画布调度系统弹出 GameOver，不再直接持有画布引用
-            if (UIManager.instance != null)
-            {
-                UIManager.instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);
-            }
+            toggleGameOverEvent.RaiseToggleCanvasEvent(true);
+
+            if (playerRoot != null)
+                playerRoot.SetActive(false);
         }
     }
 }

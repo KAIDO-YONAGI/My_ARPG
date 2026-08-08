@@ -7,8 +7,8 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private VoidEventSO slashActionFinishedEvent;
 
     /// <summary>
-    /// 当前是否为激活的武器模式。替代组件 enabled：
-    /// 组件常驻 enabled 才能正常接收 Animation Event（DealDamage/FinishCombat）。
+    /// 当前是否为激活的武器模式。
+    /// Player 根节点上的 PlayerAnimationEventRelay 会按此状态转发动画事件。
     /// </summary>
     public bool IsActive { get; private set; } = true;
 
@@ -40,7 +40,7 @@ public class PlayerCombat : MonoBehaviour
         if (slashActionFinishedEvent != null) slashActionFinishedEvent.OnEventRaised();
     }
 
-    // 动画事件里拼写为 "FinshCombat"（少个 i），此处作为别名接收，避免 no receiver 警告
+    // 兼容仍使用旧拼写 "FinshCombat" 的动画资源。
     public void FinshCombat()
     {
         FinishCombat();

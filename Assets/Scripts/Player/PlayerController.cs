@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance;
+    public Transform Transform;
 
     void Awake()
     {
@@ -16,5 +17,5 @@ public class PlayerController : MonoBehaviour
         Instance = this;
     }
 
-    public Vector3 GetPosition() => transform.position;
+    public Vector3 GetPosition() => Transform.position;
 }

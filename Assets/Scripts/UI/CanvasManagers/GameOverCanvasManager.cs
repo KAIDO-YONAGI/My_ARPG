@@ -38,9 +38,5 @@ public class GameOverCanvasManager : MonoBehaviour
             gameOverGroup.blocksRaycasts = false;
         }
 
-        if (UIManager.instance != null)
-        {
-            UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.GameOver, state);
-        }
     }
 }

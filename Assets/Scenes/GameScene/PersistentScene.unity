@@ -2087,6 +2087,7 @@ MonoBehaviour:
   playerCombat: {fileID: 1424315137}
   playerBow: {fileID: 1424315136}
   joystick: {fileID: 2027922517}
+  visualRoot: {fileID: 5360259125137984082}
   moveAction: {fileID: 11400000, guid: 22dbfc63e54664341bf080da7b411b1e, type: 2}
   slashAction: {fileID: 11400000, guid: 641ac5442e2111b409fc487cc69ca98d, type: 2}
   shootAction: {fileID: 11400000, guid: dcbfeb9ae0911c24f9b5255c4959c899, type: 2}
@@ -13759,7 +13760,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 981c401ba718ed348ac5d29d44888098, type: 2}
   - {fileID: 11400000, guid: 31b9cc770eb5b0a4284d1ca1b9c114b7, type: 2}
   - {fileID: 11400000, guid: 76deb2b825335b646b4885bf78461757, type: 2}
-  - {fileID: 11400000, guid: b9587cfb3a2b6454bb029fbdb1a53458, type: 2}
   inputBindings:
   - canvas: 0
     action: {fileID: 11400000, guid: ae871b6f45b069148ac2a645785f7458, type: 2}
@@ -15168,7 +15168,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1424315133}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f1a462ab1051574a9239a29281fb425, type: 3}
   m_Name: 
@@ -30202,6 +30202,7 @@ GameObject:
   - component: {fileID: 6992500781786840138}
   - component: {fileID: 1819091520131574448}
   - component: {fileID: 7590469777950019831}
+  - component: {fileID: 9138375027716410941}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -32935,6 +32936,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f627a0cd82a530499e65fada60d1ad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Transform: {fileID: 5360259125137984082}
 --- !u!1001 &7650353239046441296
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33413,6 +33415,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b40b6395a2a312f48b29733ed0c6e046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerRoot: {fileID: 6166002366618250803}
+  toggleGameOverEvent: {fileID: 11400000, guid: b9587cfb3a2b6454bb029fbdb1a53458, type: 2}
 --- !u!224 &7919261848797980662 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7953370996453584490, guid: ad6c571997aade34da41c92faf999008, type: 3}
@@ -35440,6 +35444,20 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7aa8b31dcf3c9a8479583d49182e90a0, type: 3}
+--- !u!114 &9138375027716410941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6166002366618250803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5376714f3aeb47be9477558779c1b38f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  combat: {fileID: 1424315137}
+  bow: {fileID: 1424315136}
 --- !u!1 &9140946962347789005
 GameObject:
   m_ObjectHideFlags: 0

@@ -36,7 +36,7 @@ public class ShiftEquipment : MonoBehaviour
 
         if (shiftEquipmentAction != null && shiftEquipmentAction.action.WasPressedThisFrame() && shiftTimer <= 0)
         {
-            // 翻转武器激活状态（不禁用组件，确保 Animation Event 始终能被接收）
+            // 翻转武器模式；动画事件由 Player 根节点的转发器路由到当前武器。
             combat.SetActive(!combat.IsActive);
             bow.SetActive(!bow.IsActive);
 

@@ -210,14 +210,14 @@ public class SceneChanger : MonoBehaviour
     private void ForbidInput()
     {
         if (player == null) return;
-        var movement = player.GetComponent<PlayerMovement>();
+        var movement = player.GetComponentInChildren<PlayerMovement>(true);
         if (movement != null) movement.enabled = false;
     }
 
     private void AllowInput()
     {
         if (player == null) return;
-        var movement = player.GetComponent<PlayerMovement>();
+        var movement = player.GetComponentInChildren<PlayerMovement>(true);
         if (movement != null) movement.enabled = true;
     }
 }
