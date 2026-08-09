@@ -59,12 +59,12 @@ public class InventoryManager : YSingleton<InventoryManager>
 
     private void HandleQuestReward(ItemSO item, int price, int amount)
     {
-        UpdateInvetorySlots(item, amount);
+        UpdateInventorySlots(item, amount);
     }
 
     private void OnItemLootedHandler(ItemSO item, int quantity, Loot lootObj)
     {
-        UpdateInvetorySlots(item, quantity, lootObj);
+        UpdateInventorySlots(item, quantity, lootObj);
     }
     private void HandleShopping(ItemSO item, int price, int amount)
     {
@@ -74,18 +74,18 @@ public class InventoryManager : YSingleton<InventoryManager>
             if (HasSpaceForItem(item))
             {
                 UpdateGold(price);
-                UpdateInvetorySlots(item, amount);
+                UpdateInventorySlots(item, amount);
             }
         }
         else if (amount < 0)//出售
         {
             UpdateGold(price);
-            UpdateInvetorySlots(item, amount);
+            UpdateInventorySlots(item, amount);
         }
     }
 
 
-    private void UpdateInvetorySlots(ItemSO item, int quantity, Loot lootObj = null)
+    private void UpdateInventorySlots(ItemSO item, int quantity, Loot lootObj = null)
     {
         //金币
         if (item.isGold)

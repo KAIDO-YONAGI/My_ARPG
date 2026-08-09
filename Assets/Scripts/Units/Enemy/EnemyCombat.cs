@@ -8,7 +8,7 @@ public class EnemyCombat : MonoBehaviour
     [SerializeField] private Transform attackPoint;
     [SerializeField] private float weaponRange;
     [SerializeField] private LayerMask playerLayer;
-    [SerializeField] private float konckBackForce = 5;
+    [SerializeField] private float knockBackForce = 5;
     [SerializeField] private float stunTime = 0.3f;
 
     
@@ -24,7 +24,7 @@ public class EnemyCombat : MonoBehaviour
                 health.ChangeHealth(-damage);
 
             var movement = hits[0].GetComponentInChildren<PlayerMovement>();
-            if (movement != null) movement.KnockBack(transform, konckBackForce, stunTime);
+            if (movement != null) movement.KnockBack(transform, knockBackForce, stunTime);
         }
     }
 }
