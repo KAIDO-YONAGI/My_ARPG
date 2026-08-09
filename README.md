@@ -240,8 +240,8 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 
 ### Android 导出 | Android Export
 
-- **安卓导出存在不明原因失败**：在当前配置下，Android 平台的导出（无论 IL2CPP / Mono、有无导出工程）**会出现原因不明的构建失败**，且报错信息不够明确。目前将其作为已知问题记录，**不在此处提供解决方案**；若确需安卓包，请优先尝试排查 Addressables 失效引用、JDK/SDK/NDK 版本与 Gradle 配置（见根目录 `gradleTemplate.properties`），必要时先在 Windows / PC 平台验证流程通畅。
-  - **Android export fails for unknown reasons**: Under the current setup, Android export (regardless of IL2CPP/Mono, with or without exporting a project) **fails for reasons that are not clearly identified**, with unclear error messages. This is recorded as a known issue and **no fix is provided here**. If you need an Android build, first check Addressables stale references, JDK/SDK/NDK versions and the Gradle config (see root `gradleTemplate.properties`); when in doubt, validate the pipeline on the Windows / PC platform first.
+- **Android Release 构建已于 2026-08-09 验证通过**：SDK 检测卡住是 `sdkmanager` 未使用本机代理；Release lint 失败是 `StreamingAssets` 中的非 ASCII 文件名导致 AAR 条目解码异常。全局代理配置、卸载和排障步骤见 [`Docs/UnityAndroidGlobalBuildFix.md`](Docs/UnityAndroidGlobalBuildFix.md)。当前测试 APK 使用 Debug 证书，正式发布前仍需配置项目专用 keystore。
+  - **Android Release build verified on 2026-08-09**: SDK detection stalled because `sdkmanager` was not using the local proxy, while Release lint failed because a non-ASCII filename in `StreamingAssets` produced an AAR entry that could not be decoded. See [`Docs/UnityAndroidGlobalBuildFix.md`](Docs/UnityAndroidGlobalBuildFix.md) for global proxy setup, removal, and diagnostics. The current test APK is debug-signed; configure a project keystore before publishing.
 
 ### ScriptableObject（SO）使用建议 | ScriptableObject Usage Tips
 
@@ -269,8 +269,8 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 - 部分菜单依赖交互范围或上下文状态，不是任何时刻都能直接打开。
 - Some menus depend on interaction range or context state and cannot always be opened freely.
 
-- 当前文档以现有工程和 `游戏指南.txt` 为准，若后续功能调整请同步更新。
-- This document reflects the current project and `游戏指南.txt`; please update it when features change.
+- 当前文档以现有工程和 `GameGuide.txt` 为准，若后续功能调整请同步更新。
+- This document reflects the current project and `GameGuide.txt`; please update it when features change.
 
 ## 借物表
 ## Credits

@@ -28,7 +28,7 @@ public class OpenTxtWithSystem : MonoBehaviour
 
     public void OpenGuide()
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "游戏指南.txt");
+        string path = Path.Combine(Application.streamingAssetsPath, "GameGuide.txt");
 
         if (File.Exists(path))
         {

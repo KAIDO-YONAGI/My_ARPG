@@ -17,6 +17,7 @@ omnisharp.json
 .settings/
 .claude/
 .codegraph/
+.zcode/
 
 # Visual Studio / Rider
 *.csproj
@@ -57,6 +58,8 @@ Assets/AddressableAssetsData/iOS/*
 Assets/AddressableAssetsData/WebGL/*
 Assets/AddressableAssetsData/Windows/*
 Assets/AddressableAssetsData/macOS/*
+Assets/AddressableAssetsData/link.xml
+Assets/AddressableAssetsData/link.xml.meta
 
 # Generated Asset Bundles
 Assets/StreamingAssets/aa/

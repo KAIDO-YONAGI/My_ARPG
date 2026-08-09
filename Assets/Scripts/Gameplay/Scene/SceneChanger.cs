@@ -26,7 +26,7 @@ public class SceneChanger : YSingleton<SceneChanger>
 
     [SerializeField] private VoidEventSO sceneLoadedEvent;
     [SerializeField] private Animator[] transitionImagesDuringFade;
-    [SerializeField] private Object[] objectsToUnableWhileGameReset;
+    [SerializeField] private Object[] objectsToUnableWhileMenuOrReset;
     private GameSceneSO sceneToLoad;
 
     private GameSceneSO currentScene;
@@ -175,7 +175,7 @@ public class SceneChanger : YSingleton<SceneChanger>
 
     private void SetObjects(bool state)
     {
-        foreach (Object obj in objectsToUnableWhileGameReset)
+        foreach (Object obj in objectsToUnableWhileMenuOrReset)
         {
             if (obj is GameObject go)
             {
