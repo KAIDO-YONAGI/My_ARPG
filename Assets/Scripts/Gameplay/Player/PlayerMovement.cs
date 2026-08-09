@@ -126,13 +126,12 @@ public class PlayerMovement : MonoBehaviour
             HandleKnockBackState();
             return;
         }
-        if (slashAction != null && slashAction.action.WasPressedThisFrame() && playerCombat.IsActive && timer < 0)
+        bool attackPressed =
+            (slashAction != null && slashAction.action.WasPressedThisFrame() && playerCombat.IsActive) ||
+            (shootAction != null && shootAction.action.WasPressedThisFrame() && playerBow.IsActive);
+
+        if (attackPressed && TryAttack())
         {
-            AnimatorSM(PlayerState.Attacking);
-        }
-        else if (shootAction != null && shootAction.action.WasPressedThisFrame() && playerBow.IsActive && timer < 0)
-        {
-            AnimatorSM(PlayerState.Shooting);
         }
         else if (IsToRunning())
         {
@@ -160,6 +159,24 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
+
+    public bool TryAttack()
+    {
+        if (!isActiveAndEnabled || !canBeInterrupted || playerState == PlayerState.KnockBack || timer >= 0)
+            return false;
+
+        if (playerCombat.IsActive)
+            AnimatorSM(PlayerState.Attacking);
+        else if (playerBow.IsActive)
+            AnimatorSM(PlayerState.Shooting);
+        else
+            return false;
+
+        SetMovement(0, 0);
+        canBeInterrupted = false;
+        return true;
+    }
+
     public void SetCanBeInterrupted(bool value)
     {
         canBeInterrupted = value;
@@ -245,8 +262,7 @@ public class PlayerMovement : MonoBehaviour
         playerState = PlayerState.KnockBack;
         Vector2 direction = (GetPlayerRoot().position - enemy.position).normalized;
 
-        Vector2 knockBackVelocity = direction * force;
-        SetMovement(knockBackVelocity.x, knockBackVelocity.y);
+        rb.velocity = direction * force;
 
         StartCoroutine(KnockBackCounter(stunTime));
     }

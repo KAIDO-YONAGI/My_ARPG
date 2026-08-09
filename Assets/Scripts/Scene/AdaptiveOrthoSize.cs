@@ -12,6 +12,7 @@ using UnityEngine;
 /// Confiner 约束的是相机移动，本脚本约束的是视口大小，两者正交互不干扰。
 /// </summary>
 [RequireComponent(typeof(CinemachineVirtualCamera))]
+[DisallowMultipleComponent]
 public class AdaptiveOrthoSize : MonoBehaviour
 {
     [Tooltip("基础 Ortho Size（标准宽高比下用这个值）。留 0 则自动取挂载时虚拟相机的当前值。")]

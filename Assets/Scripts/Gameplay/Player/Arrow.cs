@@ -13,9 +13,6 @@ public class Arrow : MonoBehaviour
     [SerializeField] private float lifeSpan = 1;
     [SerializeField] private float speed = 2;
     [SerializeField] private int damage = 1;
-    [SerializeField] private float knockBackForce = 2;
-    [SerializeField] private float knockBackTime = .2f;
-    [SerializeField] private float stunTime = .2f;
 
     private Vector2 direction = Vector2.right;
 
