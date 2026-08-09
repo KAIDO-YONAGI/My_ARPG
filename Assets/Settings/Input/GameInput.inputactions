@@ -194,7 +194,7 @@
             "id": "a1b2c3d4-0001-0001-0001-000000000002",
             "actions": [
                 {
-                    "name": "ToggleESCPanel",
+                    "name": "ESCPress",
                     "type": "Button",
                     "id": "a1b2c3d4-0002-0002-0002-000000000021",
                     "expectedControlType": "",
@@ -283,7 +283,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
-                    "action": "ToggleESCPanel",
+                    "action": "ESCPress",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
