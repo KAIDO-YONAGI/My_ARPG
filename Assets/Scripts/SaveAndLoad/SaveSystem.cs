@@ -25,10 +25,8 @@ public class Save
         this.data = data;
     }
 }
-public class SaveSystem : MonoBehaviour
+public class SaveSystem : YSingleton<SaveSystem>
 {
-    private static SaveSystem _instance;
-    public static SaveSystem Instance => _instance;
     public bool IsLoadingSaveRequest { get; private set; }
 
     [Header("Send")]
@@ -44,21 +42,6 @@ public class SaveSystem : MonoBehaviour
     private void OnDisable()
     {
         dataSavedEvent.DataSaveEvent -= OnSaveEvent;
-    }
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
     public void OnSaveEvent(MyEnums.SaveType saveType)//通过事件确认存档：以收到的Data保存完成事件为准（带存档类型）
     {

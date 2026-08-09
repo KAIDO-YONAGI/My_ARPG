@@ -1,27 +1,19 @@
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : YSingleton<PlayerHealth>
 {
-    private static PlayerHealth _instance;
-    public static PlayerHealth Instance => _instance;
     [SerializeField] private GameObject playerRoot;
     [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
 
 
-    private void Awake()
+    protected override void Awake()
     {
         if (_instance != null && _instance != this)
         {
-            Destroy(this);
+            Destroy(this); // 只销毁重复组件，保留玩家根节点
             return;
         }
         _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
 
     void Start()

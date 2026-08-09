@@ -11,10 +11,8 @@ public class RetryConfig
     public Vector3 SpawnPosition => spawnPosition;
 }
 
-public class RetryManager : MonoBehaviour
+public class RetryManager : YSingleton<RetryManager>
 {
-    private static RetryManager _instance;
-    public static RetryManager Instance => _instance;
 
     [SerializeField] private SceneLoadEventSO loadEventSO;
     [Header("Retry Event")]
@@ -22,21 +20,6 @@ public class RetryManager : MonoBehaviour
     [Header("Retry Config")]
     [SerializeField] private RetryConfig[] retryConfigs; // 按场景索引配置，由 PersistentScene 统一维护
 
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
-    }
 
     private void OnEnable()
     {

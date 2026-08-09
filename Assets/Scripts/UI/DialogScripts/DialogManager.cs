@@ -2,10 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DialogManager : MonoBehaviour
+public class DialogManager : YSingleton<DialogManager>
 {
-    private static DialogManager _instance;
-    public static DialogManager Instance => _instance;
 
     [Header("Dialog UI")]
     [SerializeField] private CanvasGroup dialogCanvasGroup;
@@ -18,23 +16,10 @@ public class DialogManager : MonoBehaviour
     private int currentLineIndex = 0;
     private DialogSO currentDialog;
 
-    private void Awake()
+    protected override void OnSingletonInitialized()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-
         SetDialogCanvas(false);
         DisableButtons();
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
     private void OnDisable()
     {

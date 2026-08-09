@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class StatsCanvasManager : MonoBehaviour, ICanvasManager
+public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 {
-    private static StatsCanvasManager _instance;
-    public static StatsCanvasManager Instance => _instance;
     [SerializeField] private GameObject[] statsSlots;
     [SerializeField] private CanvasGroup statsCanvas;
 
@@ -15,23 +13,10 @@ public class StatsCanvasManager : MonoBehaviour, ICanvasManager
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
     private Canvas canvas;
 
-    private void Awake()
+    protected override void OnSingletonInitialized()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-
         statsCanvas.alpha = 0;
         canvas = statsCanvas.GetComponent<Canvas>();
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
 
     private void Start()

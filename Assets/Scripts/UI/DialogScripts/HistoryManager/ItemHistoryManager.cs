@@ -3,25 +3,8 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
-public class ItemHistoryManager : MonoBehaviour
+public class ItemHistoryManager : YSingleton<ItemHistoryManager>
 {
-    private static ItemHistoryManager _instance;
-    public static ItemHistoryManager Instance => _instance;
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
-    }
 
     private Dictionary<ItemSO, int> itemHasPicked = new();
 

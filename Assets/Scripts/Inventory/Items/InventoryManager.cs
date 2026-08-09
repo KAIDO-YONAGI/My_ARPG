@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class InventoryManager : MonoBehaviour
+public class InventoryManager : YSingleton<InventoryManager>
 {
-    private static InventoryManager _instance;
-    public static InventoryManager Instance => _instance;
 
     [SerializeField] private Transform hotbarParent;
     [SerializeField] private Transform backpackParent;
@@ -30,21 +28,6 @@ public class InventoryManager : MonoBehaviour
 
     private InventorySlot slotBeenClicked;
 
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
-    }
 
     private void Start()
     {

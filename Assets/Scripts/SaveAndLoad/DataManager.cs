@@ -8,10 +8,8 @@ using UnityEngine;
 //加载和存储基本对称
 
 //Loot脚本不需要自己拉起事件，DataManager会订阅场景加载事件，并且调用已注册的loot的对应函数
-public class DataManager : MonoBehaviour
+public class DataManager : YSingleton<DataManager>
 {
-    private static DataManager _instance;
-    public static DataManager Instance => _instance;
 
     public Data GetData => dataToSave;
     [Header("Send")]
@@ -35,21 +33,6 @@ public class DataManager : MonoBehaviour
     {
         sceneLoadEventSO.LoadRequestEvent -= OnAutoSave;
         sceneLoadedEvent.VoidEvent -= OnAutoLoad;
-    }
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
 
     public void RegisterSaveableData(ISaveable saveable)

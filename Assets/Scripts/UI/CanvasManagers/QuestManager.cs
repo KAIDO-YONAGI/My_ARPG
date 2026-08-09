@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestManager : MonoBehaviour, ICanvasManager
+public class QuestManager : YSingleton<QuestManager>, ICanvasManager
 {
-    private static QuestManager _instance;
-    public static QuestManager Instance => _instance;
     [SerializeField] private CanvasGroup questCanvaGroup;
 
     [Header("Events To Receive")]
@@ -64,22 +62,9 @@ public class QuestManager : MonoBehaviour, ICanvasManager
         public MyEnums.QuestState questState = MyEnums.QuestState.Idle;
         public Dictionary<QuestObjective, int> questObjectives = new();
     }
-    private void Awake()
+    protected override void OnSingletonInitialized()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-
         canvas = questCanvaGroup.GetComponent<Canvas>();
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
 
     private void OnEnable()

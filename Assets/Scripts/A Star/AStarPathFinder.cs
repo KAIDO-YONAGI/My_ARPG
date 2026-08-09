@@ -10,26 +10,9 @@ using UnityEngine;
 //细分单元格
 [DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(AStarNodeManager))]//依赖保证（不存在会自动添加）
-public class AStarPathFinder : MonoBehaviour
+public class AStarPathFinder : YSingleton<AStarPathFinder>
 {
-    private static AStarPathFinder _instance;
-    public static AStarPathFinder Instance => _instance;
 
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
-    }
 
     public Dictionary<(int x, int y), AStarNode> GetNodeMap() => AStarNodeManager.Instance.GetNodeMap();
     public (int x, int y) WorldToCell(Vector3 worldPos) => AStarNodeManager.Instance.WorldToCell(worldPos);

@@ -9,10 +9,8 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 /// 负责管理场景的加载、卸载和过渡动画
 /// 使用单例模式，通过事件响应场景切换请求
 /// </summary>
-public class SceneChanger : MonoBehaviour
+public class SceneChanger : YSingleton<SceneChanger>
 {
-    private static SceneChanger _instance;
-    public static SceneChanger Instance => _instance;
 
     /// <summary>玩家初始位置</summary>
     [SerializeField] private Vector3 initialPosition = Vector3.zero;
@@ -62,24 +60,11 @@ public class SceneChanger : MonoBehaviour
     /// <summary>
     /// 唤醒时初始化单例并加载首个场景
     /// </summary>
-    private void Awake()
+    protected override void OnSingletonInitialized()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-
         sceneToLoad = initScene;
         SetPlayerPostion(initialPosition);
         LoadScene(sceneToLoad);
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
 
     /// <summary>

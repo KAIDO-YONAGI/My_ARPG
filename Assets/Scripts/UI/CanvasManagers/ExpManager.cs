@@ -2,29 +2,12 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class ExpManager : MonoBehaviour
+public class ExpManager : YSingleton<ExpManager>
 {
     [SerializeField] private Slider expSlider;
     [SerializeField] private TMP_Text currentLevelText;
     public static event Action<int> OnLevelUp;
-    private static ExpManager _instance;
-    public static ExpManager Instance => _instance;
 
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
-    }
     private void Start()
     {
         UpdateUI();

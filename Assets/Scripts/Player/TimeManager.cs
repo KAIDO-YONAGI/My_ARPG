@@ -1,26 +1,9 @@
 using UnityEngine;
 
-public class TimeManager : MonoBehaviour
+public class TimeManager : YSingleton<TimeManager>
 {
-    private static TimeManager _instance;
-    public static TimeManager Instance => _instance;
     private bool isGamePaused;
     private int pauseCount = 0;
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
-    }
     public bool IsGamePaused()
     {
         return isGamePaused;

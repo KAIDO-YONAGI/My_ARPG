@@ -19,25 +19,8 @@ public class PlayerStatsData
     public float expMultiplier;
 }
 
-public class StatsManager : MonoBehaviour
+public class StatsManager : YSingleton<StatsManager>
 {
-    private static StatsManager _instance;
-    public static StatsManager Instance => _instance;
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
-    }
     [SerializeField] private PlayerStatsData stats = new();
     public PlayerStatsData GetStats() => stats;
     public void LoadStats(PlayerStatsData data)

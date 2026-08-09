@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-public class ShopManager : MonoBehaviour, ICanvasManager
+public class ShopManager : YSingleton<ShopManager>, ICanvasManager
 {
     [SerializeField] private ShopSlot[] shopSlots;
     [SerializeField] private CanvasGroup shopCanvasGroup;
@@ -12,8 +12,6 @@ public class ShopManager : MonoBehaviour, ICanvasManager
     [SerializeField] private ToggleCanvasEventSO toggleShopCanvasEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
 
-    private static ShopManager _instance;
-    public static ShopManager Instance => _instance;
 
     private List<ShopItems> shopItems;
     private List<ShopItems> shopWeapon;
@@ -33,22 +31,9 @@ public class ShopManager : MonoBehaviour, ICanvasManager
     private bool isShopOpen = false;
     public bool IsShopOpen => isShopOpen;
 
-    private void Awake()
+    protected override void OnSingletonInitialized()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-
         canvas = shopCanvasGroup.GetComponent<Canvas>();
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
 
     private void OnEnable()

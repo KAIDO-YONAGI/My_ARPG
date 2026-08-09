@@ -3,10 +3,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
+public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,ICanvasManager
 {
-    private static IntegratedUICanvasManager _instance;
-    public static IntegratedUICanvasManager Instance => _instance;
     [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
     [SerializeField] private CanvasGroup UICanvasPanel;
     [SerializeField] private GameObject integratedButtonsParent;
@@ -23,25 +21,12 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
     private int currentPageNum = 0;
     private int buttonsEachPage;//用来模拟初始化多页的Panel
     private bool isMenuOpen = false;
-    private void Awake()
+    protected override void OnSingletonInitialized()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-
         integratedButtons.AddRange(integratedButtonsParent.GetComponentsInChildren<Button>());
         buttonsEachPage = integratedButtons.Count;
 
         InitiateUICanvasPanel(false);
-    }
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
     private void OnEnable()
     {
