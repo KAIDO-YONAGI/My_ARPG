@@ -156,6 +156,6 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
         canva.interactable = state;
-        UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.Integrated, state);
+        // UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.Integrated, state); //不回调打开 自己管自己
     }
 }

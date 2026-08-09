@@ -3,8 +3,9 @@ using UnityEngine.EventSystems;
 
 public class Joystick : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
-    [Header("References")]
-    [SerializeField] private RectTransform backgroundRect;
+    [Header("References")] [SerializeField]
+    private RectTransform backgroundRect;
+
     [SerializeField] private RectTransform handleRect;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private GameObject joystickRoot;
@@ -19,7 +20,9 @@ public class Joystick : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoint
     {
         // 不依赖编辑器里保存的激活状态，运行时按平台强制调整显隐。
         // 全程使用显式引用控制，不做隐式 GetComponent、不直接操作自身 gameObject。
-#if UNITY_ANDROID || UNITY_IOS || UNITY_WEBGL
+#if UNITY_EDITOR
+        SetJoystickVisible(false);
+#elif UNITY_ANDROID || UNITY_IOS || UNITY_WEBGL
         SetJoystickVisible(true);
 #else
         SetJoystickVisible(false);
