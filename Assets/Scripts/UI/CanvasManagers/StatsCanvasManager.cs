@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class StatsCanvasManager : MonoBehaviour, ICanvasManager
 {
-    public static StatsCanvasManager instance;
+    private static StatsCanvasManager _instance;
+    public static StatsCanvasManager Instance => _instance;
     [SerializeField] private GameObject[] statsSlots;
     [SerializeField] private CanvasGroup statsCanvas;
 
@@ -16,10 +17,21 @@ public class StatsCanvasManager : MonoBehaviour, ICanvasManager
 
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+
         statsCanvas.alpha = 0;
         canvas = statsCanvas.GetComponent<Canvas>();
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     private void Start()
@@ -52,13 +64,13 @@ public class StatsCanvasManager : MonoBehaviour, ICanvasManager
 
     public void UpdateDamage()
     {
-        statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.instance.GetDamage();
+        statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.Instance.GetDamage();
         // 注意：Components是复数形式，返回的是数组。
     }
 
     public void UpdateSpeed()
     {
-        statsSlots[1].GetComponentInChildren<TMP_Text>().text = "Speed:" + StatsManager.instance.GetSpeed();
+        statsSlots[1].GetComponentInChildren<TMP_Text>().text = "Speed:" + StatsManager.Instance.GetSpeed();
     }
 
     public void UpdateAllStats()

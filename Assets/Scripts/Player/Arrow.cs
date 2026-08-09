@@ -32,7 +32,7 @@ public class Arrow : MonoBehaviour
     private void Start()
     {
         Destroy(gameObject, lifeSpan);//destory方法的第二个参数表示对象生存时间/多久后销毁
-        damage = StatsManager.instance.GetDamage();
+        damage = StatsManager.Instance.GetDamage();
     }
     private void RotateArrow()
     {

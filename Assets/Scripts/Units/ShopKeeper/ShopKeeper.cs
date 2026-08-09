@@ -22,8 +22,8 @@ public class ShopKeeper : MonoBehaviour
     {
         if (!collider.CompareTag("Player")) return;
 
-        if (ShopManager.instance != null)
-            ShopManager.instance.RegisterActiveShopKeeper(this);
+        if (ShopManager.Instance != null)
+            ShopManager.Instance.RegisterActiveShopKeeper(this);
 
         if (logoAnimator != null)
             logoAnimator.SetBool("playerInRange", true);
@@ -33,11 +33,11 @@ public class ShopKeeper : MonoBehaviour
     {
         if (!collider.CompareTag("Player")) return;
 
-        if (ShopManager.instance != null)
+        if (ShopManager.Instance != null)
         {
-            ShopManager.instance.UnregisterActiveShopKeeper();
-            if (ShopManager.instance.IsShopOpen)
-                ShopManager.instance.CloseShop();
+            ShopManager.Instance.UnregisterActiveShopKeeper();
+            if (ShopManager.Instance.IsShopOpen)
+                ShopManager.Instance.CloseShop();
         }
 
         if (logoAnimator != null)
@@ -46,11 +46,11 @@ public class ShopKeeper : MonoBehaviour
 
     private void OnDisable()
     {
-        if (ShopManager.instance != null)
+        if (ShopManager.Instance != null)
         {
-            if (ShopManager.instance.IsShopOpen)
-                ShopManager.instance.CloseShop();
-            ShopManager.instance.UnregisterActiveShopKeeper();
+            if (ShopManager.Instance.IsShopOpen)
+                ShopManager.Instance.CloseShop();
+            ShopManager.Instance.UnregisterActiveShopKeeper();
         }
     }
 }

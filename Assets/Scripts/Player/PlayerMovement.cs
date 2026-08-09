@@ -166,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void ResetTimer()
     {
-        timer = StatsManager.instance.GetCoolDown();
+        timer = StatsManager.Instance.GetCoolDown();
     }
     private bool IsToRunning()
     {
@@ -222,7 +222,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void SetMovement(float horizontal, float vertical)
     {
-        rb.velocity = new Vector2(horizontal, vertical) * StatsManager.instance.GetSpeed();
+        rb.velocity = new Vector2(horizontal, vertical) * StatsManager.Instance.GetSpeed();
     }
 
     private void Flip()

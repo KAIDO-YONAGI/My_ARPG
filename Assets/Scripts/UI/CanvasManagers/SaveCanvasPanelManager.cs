@@ -89,7 +89,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     string[] files;
     private void LoadInfoToSaveList()
     {
-        files = SaveSystem.instance.GetSavesPath(saveType);
+        files = SaveSystem.Instance.GetSavesPath(saveType);
 
         int i = 0;
         foreach (var group in saveLoadButtonGroups)
@@ -117,7 +117,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         TMP_Text infoText = group.saveInfoText;
         if (IsMenuScene())
         {
-            if (SaveSystem.instance.DeleteSave(group.saveInfo?.savePath))
+            if (SaveSystem.Instance.DeleteSave(group.saveInfo?.savePath))
             {
                 group.saveInfo = new(null, saveType);
                 infoText.text = "";
@@ -130,19 +130,19 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         {
             group.saveInfo = new(null, saveType);
         }
-        if (DataManager.instance == null || !DataManager.instance.PrepareManualSaveData())
+        if (DataManager.Instance == null || !DataManager.Instance.PrepareManualSaveData())
         {
             Debug.LogWarning("Manual save data is not ready.");
             return;
         }
-        string path = SaveSystem.instance.WriteSave(group.saveInfo.saveType);
+        string path = SaveSystem.Instance.WriteSave(group.saveInfo.saveType);
         group.saveInfo.savePath=path;
         infoText.text =  "Save Info\n" + path;
 
     }
     public void OnClickLoad(SaveLoadButtonGroup group)
     {
-        SaveSystem.instance.LoadSave(group.saveInfo.saveType, group.saveInfo.savePath);
+        SaveSystem.Instance.LoadSave(group.saveInfo.saveType, group.saveInfo.savePath);
 
     }
     private void LoadButtons()
@@ -189,14 +189,14 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     }
     private bool IsMenuScene()
     {
-        GameSceneSO currentScene = SceneChanger.instance != null ? SceneChanger.instance.GetCurrentGameScene() : null;
+        GameSceneSO currentScene = SceneChanger.Instance != null ? SceneChanger.Instance.GetCurrentGameScene() : null;
         return currentScene != null && currentScene.sceneType == MyEnums.SceneType.Menu;
     }
     public void OpenPanel()
     {
         isPanelOpen = true;
         ((ICanvasManager)this).ToggleCanvas(saveCanvasGroup, canvas, MyEnums.CanvasToToggle.SaveLoad, true);
-        UIManager.instance.HandleFocus(MyEnums.CanvasToToggle.SaveLoad);//非键盘按键唤起的画布，直接手动focus
+        UIManager.Instance.HandleFocus(MyEnums.CanvasToToggle.SaveLoad);//非键盘按键唤起的画布，直接手动focus
     }
 
     public void ClosePanel()

@@ -6,7 +6,8 @@ using UnityEngine.InputSystem;
 [DefaultExecutionOrder(-100)]
 public class UIManager : MonoBehaviour
 {
-    public static UIManager instance;
+    private static UIManager _instance;
+    public static UIManager Instance => _instance;
     public const int FocusOrder = 90;
     public const int DefaultOrder = 5;
     private const int OrderStep = 10; // 相邻打开画布之间的 order 差值
@@ -38,21 +39,24 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        _instance = this;
 
         foreach (MyEnums.CanvasToToggle canvas in
                  Enum.GetValues(typeof(MyEnums.CanvasToToggle)))
         {
             inputState[canvas] = false;
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     private void OnEnable()

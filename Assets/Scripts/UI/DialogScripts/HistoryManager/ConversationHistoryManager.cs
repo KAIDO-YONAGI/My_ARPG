@@ -5,12 +5,22 @@ using UnityEngine;
 
 public class ConversationHistoryManager : MonoBehaviour
 {
-    public static ConversationHistoryManager instance;
+    private static ConversationHistoryManager _instance;
+    public static ConversationHistoryManager Instance => _instance;
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else Destroy(gameObject);
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
     private HashSet<CharacterSO> charactersHasChated = new();
 

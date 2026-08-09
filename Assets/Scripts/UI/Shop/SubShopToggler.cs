@@ -29,9 +29,9 @@ public class ShopToggles : MonoBehaviour
     
     public void OpenItemShop()
     {
-        if (ShopManager.instance != null)
+        if (ShopManager.Instance != null)
         {
-            ShopManager.instance.OpenItemShop();
+            ShopManager.Instance.OpenItemShop();
         }
         else
         {
@@ -41,9 +41,9 @@ public class ShopToggles : MonoBehaviour
     
     public void OpenWeaponShop()
     {
-        if (ShopManager.instance != null)
+        if (ShopManager.Instance != null)
         {
-            ShopManager.instance.OpenWeaponShop();
+            ShopManager.Instance.OpenWeaponShop();
         }
         else
         {
@@ -53,9 +53,9 @@ public class ShopToggles : MonoBehaviour
     
     public void OpenArmorShop()
     {
-        if (ShopManager.instance != null)
+        if (ShopManager.Instance != null)
         {
-            ShopManager.instance.OpenArmorShop();
+            ShopManager.Instance.OpenArmorShop();
         }
         else
         {

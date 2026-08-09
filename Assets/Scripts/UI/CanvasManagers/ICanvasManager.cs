@@ -22,9 +22,9 @@ public interface ICanvasManager
         canva.blocksRaycasts = state;
         canva.interactable = state;
 
-        if (UIManager.instance != null)
+        if (UIManager.Instance != null)
         {
-            UIManager.instance.ReportCanvasState(canvasToToggle, state);
+            UIManager.Instance.ReportCanvasState(canvasToToggle, state);
         }
     }
 
@@ -33,9 +33,9 @@ public interface ICanvasManager
        MyEnums.CanvasToToggle canvasToToggle,
        bool state)
     {
-        int order = UIManager.instance != null
+        int order = UIManager.Instance != null
             //按 open-order 链表顺序分配降序排序优先级，顶层（链表末尾）最高
-            ? UIManager.instance.GetCanvasOrder(canvasToToggle, state)
+            ? UIManager.Instance.GetCanvasOrder(canvasToToggle, state)
             : UIManager.DefaultOrder;
         if (canvas == null)
         {

@@ -26,20 +26,20 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
         {
             if (eventData.button == PointerEventData.InputButton.Left)
             {
-                if (ShopManager.instance.IsShopOpen)//如果检测到商店活跃，那就出售物品
+                if (ShopManager.Instance.IsShopOpen)//如果检测到商店活跃，那就出售物品
                 {
-                    InventoryManager.instance.SetSlotBeenClicked(this);
-                    ShopManager.instance.SellItem(itemSO);
+                    InventoryManager.Instance.SetSlotBeenClicked(this);
+                    ShopManager.Instance.SellItem(itemSO);
                 }
                 else
                 {
-                    InventoryManager.instance.UseItem(this);
+                    InventoryManager.Instance.UseItem(this);
                 }
 
             }
             else if (eventData.button == PointerEventData.InputButton.Right)
             {
-                InventoryManager.instance.DropByClick(this);
+                InventoryManager.Instance.DropByClick(this);
             }
         }
     }

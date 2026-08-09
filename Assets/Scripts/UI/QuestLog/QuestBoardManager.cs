@@ -51,10 +51,10 @@ public class QuestBoardManager : MonoBehaviour
 
     private void CloseQuestBoardIfShowing()
     {
-        if (QuestManager.instance != null &&
-            QuestManager.instance.IsDisplayingQuestBoard(questsOnBoard))
+        if (QuestManager.Instance != null &&
+            QuestManager.Instance.IsDisplayingQuestBoard(questsOnBoard))
         {
-            QuestManager.instance.CloseQuestBoard();
+            QuestManager.Instance.CloseQuestBoard();
         }
     }
 }

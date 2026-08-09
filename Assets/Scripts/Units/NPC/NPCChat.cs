@@ -17,9 +17,9 @@ public class NPCChat : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        if (DialogManager.instance != null)
+        if (DialogManager.Instance != null)
         {
-            DialogManager.instance.DisableButtons();
+            DialogManager.Instance.DisableButtons();
         }
     }
 
@@ -67,14 +67,14 @@ public class NPCChat : MonoBehaviour
             chatAnimator.Play("Idle");
         }
 
-        if (DialogManager.instance != null)
+        if (DialogManager.Instance != null)
         {
-            DialogManager.instance.ForeceEndDialog();
+            DialogManager.Instance.ForeceEndDialog();
         }
     }
     private void OnToggleDialogEvent(bool state)
     {
-        if (DialogManager.instance == null)
+        if (DialogManager.Instance == null)
         {
             return;
         }
@@ -82,7 +82,7 @@ public class NPCChat : MonoBehaviour
         if (!state)
         {
             openDialogRequested = false;
-            DialogManager.instance.ForeceEndDialog();
+            DialogManager.Instance.ForeceEndDialog();
             return;
         }
 
@@ -90,7 +90,7 @@ public class NPCChat : MonoBehaviour
     }
     private void Update()
     {
-        if (DialogManager.instance == null)
+        if (DialogManager.Instance == null)
         {
             return;
         }
@@ -99,15 +99,15 @@ public class NPCChat : MonoBehaviour
         {
             openDialogRequested = false;
 
-            if (dialogSO != null && !DialogManager.instance.isDialogActive)
+            if (dialogSO != null && !DialogManager.Instance.isDialogActive)
             {
-                DialogManager.instance.StartDialog(dialogSO);
+                DialogManager.Instance.StartDialog(dialogSO);
             }
         }
 
-        if (DialogManager.instance.isDialogActive && advanceDialogAction != null && advanceDialogAction.action.WasPressedThisFrame())
+        if (DialogManager.Instance.isDialogActive && advanceDialogAction != null && advanceDialogAction.action.WasPressedThisFrame())
         {
-            DialogManager.instance.AdvanceDialog();
+            DialogManager.Instance.AdvanceDialog();
         }
     }
 }

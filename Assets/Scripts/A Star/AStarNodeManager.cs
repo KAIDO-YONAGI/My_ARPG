@@ -6,16 +6,26 @@ using UnityEngine.Tilemaps;
 
 public class AStarNodeManager : MonoBehaviour
 {
-    public static AStarNodeManager instance;
+    private static AStarNodeManager _instance;
+    public static AStarNodeManager Instance => _instance;
 
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
+        if (_instance != null && _instance != this)
+        {
             Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+
         InitMapInfo();
         InitiateNodes();
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     [Header("Tilemaps")]

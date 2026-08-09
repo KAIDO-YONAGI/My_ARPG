@@ -26,7 +26,7 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
     }
     public void ShowQuestOffer()
     {
-        QuestSO incomingQuestSO = QuestManager.instance.GetFirstIncompletedQuest();
+        QuestSO incomingQuestSO = QuestManager.Instance.GetFirstIncompletedQuest();
 
         if (incomingQuestSO != null)
             HandleQuestClicked(incomingQuestSO);
@@ -38,14 +38,14 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
         questNameText.text = currentQuest.questName;
         questDescriptionText.text = currentQuest.questDescription;
 
-        QuestManager.instance.QuestStateChanged(currentQuest, QuestManager.instance.GetQuestStateFromProgress(currentQuest));
+        QuestManager.Instance.QuestStateChanged(currentQuest, QuestManager.Instance.GetQuestStateFromProgress(currentQuest));
         DisPlayObjectives();
         DisplayRewards();
     }
     private void SetCurrentQuest(QuestSO quest)
     {
         currentQuest = quest;
-        QuestManager.instance.SetCurrentQuest(quest);
+        QuestManager.Instance.SetCurrentQuest(quest);
     }
     public void DisPlayObjectives()
     {
@@ -55,19 +55,19 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
             {
                 var obj = currentQuest.questObjectives[i];
                 int currentAmount =
-                    QuestManager.instance.GetCurrentObjAmount(currentQuest, obj);
+                    QuestManager.Instance.GetCurrentObjAmount(currentQuest, obj);
                 string progress =
-                    QuestManager.instance.GetProgressText(currentQuest, obj);
+                    QuestManager.Instance.GetProgressText(currentQuest, obj);
                 bool isCompleted = currentAmount >= obj.requiredAmount;
 
                 objectiveSlots[i].gameObject.SetActive(true);
 
                 objectiveSlots[i].RefreshObjectives(obj.description, progress, isCompleted);
 
-                if (QuestManager.instance.GetQuestStateFromProgress(currentQuest)
+                if (QuestManager.Instance.GetQuestStateFromProgress(currentQuest)
                         == MyEnums.QuestState.Completed)//完成状态就不更新状态了
                     continue;
-                else QuestManager.instance.UpdateObjectiveProgress(currentQuest, obj);
+                else QuestManager.Instance.UpdateObjectiveProgress(currentQuest, obj);
             }
             else
             {

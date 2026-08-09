@@ -21,11 +21,22 @@ public class PlayerStatsData
 
 public class StatsManager : MonoBehaviour
 {
-    public static StatsManager instance;
+    private static StatsManager _instance;
+    public static StatsManager Instance => _instance;
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
     [SerializeField] private PlayerStatsData stats = new();
     public PlayerStatsData GetStats() => stats;
@@ -53,28 +64,28 @@ public class StatsManager : MonoBehaviour
     {
         if (stats.currentHealth <= 0)
             stats.currentHealth = stats.maxHealth;
-        HealthCanvasManager.instance.UpdateHealthText();
+        HealthCanvasManager.Instance.UpdateHealthText();
     }
 
     public void UpdateMaxHealth(int amount)
     {
         stats.maxHealth += amount;
-        HealthCanvasManager.instance.UpdateHealthText();
+        HealthCanvasManager.Instance.UpdateHealthText();
     }
     public void UpdateHealth(int amount)
     {
         stats.currentHealth = Mathf.Clamp(stats.currentHealth + amount, 0, stats.maxHealth);
-        HealthCanvasManager.instance.UpdateHealthText();
+        HealthCanvasManager.Instance.UpdateHealthText();
     }
     public void UpdateSpeed(float amount)
     {
         stats.speed += amount;
-        StatsCanvasManager.instance.UpdateSpeed();
+        StatsCanvasManager.Instance.UpdateSpeed();
     }
     public void UpdateDamage(int amount)
     {
         stats.damage += amount;
-        StatsCanvasManager.instance.UpdateDamage();
+        StatsCanvasManager.Instance.UpdateDamage();
     }
     public void UpdateSkillPoints(int amount) => stats.skillPoints += amount;
 

@@ -10,7 +10,8 @@ using UnityEngine;
 //Loot脚本不需要自己拉起事件，DataManager会订阅场景加载事件，并且调用已注册的loot的对应函数
 public class DataManager : MonoBehaviour
 {
-    public static DataManager instance;
+    private static DataManager _instance;
+    public static DataManager Instance => _instance;
 
     public Data GetData => dataToSave;
     [Header("Send")]
@@ -37,10 +38,18 @@ public class DataManager : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
+        if (_instance != null && _instance != this)
+        {
             Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     public void RegisterSaveableData(ISaveable saveable)
@@ -66,8 +75,8 @@ public class DataManager : MonoBehaviour
     }
     public bool PrepareManualSaveData()
     {
-        GameSceneSO currentScene = SceneChanger.instance != null ? SceneChanger.instance.GetCurrentGameScene() : null;
-        if (currentScene == null || StatsManager.instance == null)
+        GameSceneSO currentScene = SceneChanger.Instance != null ? SceneChanger.Instance.GetCurrentGameScene() : null;
+        if (currentScene == null || StatsManager.Instance == null)
         {
             return false;
         }
@@ -75,7 +84,7 @@ public class DataManager : MonoBehaviour
         dataToSave ??= new Data();
         dataToSave.lootsStatsDic ??= new Dictionary<string, LootStatus>();
 
-        dataToSave.playerStatsData = StatsManager.instance.GetStats();
+        dataToSave.playerStatsData = StatsManager.Instance.GetStats();
         Vector3 savePosition = PlayerController.Instance != null
             ? PlayerController.Instance.GetPosition()
             : currentScene.initialPosition;
@@ -98,25 +107,25 @@ public class DataManager : MonoBehaviour
 
         //TODO任务、物品栏、背包。另外，重新开始的时候要删除存下的动态数据
 
-        bool isLoadingSaveRequest = SaveSystem.instance.IsLoadingSaveRequest;
+        bool isLoadingSaveRequest = SaveSystem.Instance.IsLoadingSaveRequest;
         if (!isLoadingSaveRequest
             && lastSceneType == MyEnums.SceneType.Menu
             && sceneToLoadSO.sceneType == MyEnums.SceneType.Location)
         {
             Vector3 savePosition = pos == Vector3.zero ? sceneToLoadSO.initialPosition : pos;
             dataToSave = new Data();
-            dataToSave.playerStatsData = StatsManager.instance.GetStats();
+            dataToSave.playerStatsData = StatsManager.Instance.GetStats();
             dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, savePosition);
             DynamicDataHandler.ClearDynamicData(dataToSave);
         }
         else
         {
-            dataToSave.playerStatsData = StatsManager.instance.GetStats();
+            dataToSave.playerStatsData = StatsManager.Instance.GetStats();
         }
         //上个场景是Menu则不存档
         if (lastSceneType != MyEnums.SceneType.Menu)
         {
-            var sceneChanger = SceneChanger.instance;
+            var sceneChanger = SceneChanger.Instance;
             // 切到新 Location 时沿用目标场景和入口点，退回 Menu 时则记录当前游玩场景。
             GameSceneSO saveScene = sceneToLoadSO.sceneType == MyEnums.SceneType.Location
                 ? sceneToLoadSO
@@ -158,7 +167,7 @@ public class DataManager : MonoBehaviour
         // 旧档缺少数值时先保留当前运行态，避免把 StatsManager 置空。
         if (data.playerStatsData != null)
         {
-            StatsManager.instance.LoadStats(data.playerStatsData);
+            StatsManager.Instance.LoadStats(data.playerStatsData);
         }
 
     }

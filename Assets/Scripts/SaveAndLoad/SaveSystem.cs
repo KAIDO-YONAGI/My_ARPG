@@ -27,7 +27,8 @@ public class Save
 }
 public class SaveSystem : MonoBehaviour
 {
-    public static SaveSystem instance;
+    private static SaveSystem _instance;
+    public static SaveSystem Instance => _instance;
     public bool IsLoadingSaveRequest { get; private set; }
 
     [Header("Send")]
@@ -46,8 +47,18 @@ public class SaveSystem : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
     public void OnSaveEvent(MyEnums.SaveType saveType)//通过事件确认存档：以收到的Data保存完成事件为准（带存档类型）
     {
@@ -57,7 +68,7 @@ public class SaveSystem : MonoBehaviour
     {
         string saveID = System.DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
         SaveInfo saveInfo = new(saveID, saveType);
-        Save save = new(saveInfo, DataManager.instance.GetData);
+        Save save = new(saveInfo, DataManager.Instance.GetData);
 
         string json = JsonConvert.SerializeObject(save, Formatting.Indented);
         string path=Application.persistentDataPath + $"/{saveType}_{saveID}.json";
@@ -129,7 +140,7 @@ public class SaveSystem : MonoBehaviour
             string json = File.ReadAllText(savePath);
             Save save = JsonConvert.DeserializeObject<Save>(json);
 
-            DataManager.instance.LoadFromData(save.data);
+            DataManager.Instance.LoadFromData(save.data);
             //触发加载场景
             GameSceneSO gameScene = GetScene(save.data);
             if (gameScene != null)

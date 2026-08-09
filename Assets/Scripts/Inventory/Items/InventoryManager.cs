@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class InventoryManager : MonoBehaviour
 {
-    public static InventoryManager instance;
+    private static InventoryManager _instance;
+    public static InventoryManager Instance => _instance;
 
     [SerializeField] private Transform hotbarParent;
     [SerializeField] private Transform backpackParent;
@@ -31,12 +32,18 @@ public class InventoryManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance != null && instance != this)
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
-        instance = this;
+        _instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     private void Start()
@@ -101,7 +108,7 @@ public class InventoryManager : MonoBehaviour
         if (item.isGold)
         {
             goldAmount += quantity;
-            ItemHistoryManager.instance.RecordItem(item, quantity);
+            ItemHistoryManager.Instance.RecordItem(item, quantity);
 
             goldAmountText.text = goldAmount.ToString();
             lootObj?.MarkAsDisable();
@@ -109,7 +116,7 @@ public class InventoryManager : MonoBehaviour
         }
         if (item.isEXP)
         {
-            ExpManager.instance.GainExp(quantity);
+            ExpManager.Instance.GainExp(quantity);
             return;
         }
         //普通物品
@@ -122,7 +129,7 @@ public class InventoryManager : MonoBehaviour
             else if (slotBeenClicked.Quantity > 0)
             {
                 int removed = slotBeenClicked.RemoveItem(-quantity);
-                ItemHistoryManager.instance.RecordItem(item, -removed);
+                ItemHistoryManager.Instance.RecordItem(item, -removed);
                 return;
             }
         }
@@ -135,7 +142,7 @@ public class InventoryManager : MonoBehaviour
                     int placed = slot.AddItem(item, quantity);
                     if (placed > 0)
                     {
-                        ItemHistoryManager.instance.RecordItem(item, placed);
+                        ItemHistoryManager.Instance.RecordItem(item, placed);
                         quantity -= placed;
                     }
 
@@ -210,7 +217,7 @@ public class InventoryManager : MonoBehaviour
             useItem.ApplyItemEffects(slot.ItemSO);//使用效果
             ItemSO used = slot.ItemSO;
             slot.RemoveItem(1);
-            ItemHistoryManager.instance.RecordItem(used, -1);
+            ItemHistoryManager.Instance.RecordItem(used, -1);
         }
     }
     public void UpdateGold(int price)

@@ -2,35 +2,37 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    private static PlayerHealth instance;
+    private static PlayerHealth _instance;
+    public static PlayerHealth Instance => _instance;
     [SerializeField] private GameObject playerRoot;
     [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
 
 
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else
+        if (_instance != null && _instance != this)
         {
             Destroy(this);
+            return;
         }
+        _instance = this;
     }
 
     private void OnDestroy()
     {
-        if (instance == this)
-            instance = null;
+        if (_instance == this)
+            _instance = null;
     }
 
     void Start()
     {
-        StatsManager.instance.Respawn();
+        StatsManager.Instance.Respawn();
     }
     public void ChangeHealth(int amount)
     {
-        StatsManager.instance.UpdateHealth(amount);
+        StatsManager.Instance.UpdateHealth(amount);
 
-        if (StatsManager.instance.GetCurrentHealth() <= 0)
+        if (StatsManager.Instance.GetCurrentHealth() <= 0)
         {
             toggleGameOverEvent.RaiseToggleCanvasEvent(true);
 

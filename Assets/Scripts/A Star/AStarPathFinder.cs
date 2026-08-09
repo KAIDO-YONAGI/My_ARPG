@@ -12,22 +12,31 @@ using UnityEngine;
 [RequireComponent(typeof(AStarNodeManager))]//依赖保证（不存在会自动添加）
 public class AStarPathFinder : MonoBehaviour
 {
-    public static AStarPathFinder instance;
+    private static AStarPathFinder _instance;
+    public static AStarPathFinder Instance => _instance;
 
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
+        if (_instance != null && _instance != this)
+        {
             Destroy(gameObject);
+            return;
+        }
+        _instance = this;
     }
 
-    public Dictionary<(int x, int y), AStarNode> GetNodeMap() => AStarNodeManager.instance.GetNodeMap();
-    public (int x, int y) WorldToCell(Vector3 worldPos) => AStarNodeManager.instance.WorldToCell(worldPos);
-    public Vector3 CellToWorld(int cx, int cy) => AStarNodeManager.instance.CellToWorld(cx, cy);
-    public float GetCellSize() => AStarNodeManager.instance.GetCellSize();
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
+    }
 
-    private Dictionary<(int x, int y), AStarNode> NodeCellMap => AStarNodeManager.instance.GetNodeMap();
+    public Dictionary<(int x, int y), AStarNode> GetNodeMap() => AStarNodeManager.Instance.GetNodeMap();
+    public (int x, int y) WorldToCell(Vector3 worldPos) => AStarNodeManager.Instance.WorldToCell(worldPos);
+    public Vector3 CellToWorld(int cx, int cy) => AStarNodeManager.Instance.CellToWorld(cx, cy);
+    public float GetCellSize() => AStarNodeManager.Instance.GetCellSize();
+
+    private Dictionary<(int x, int y), AStarNode> NodeCellMap => AStarNodeManager.Instance.GetNodeMap();
 
     public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {

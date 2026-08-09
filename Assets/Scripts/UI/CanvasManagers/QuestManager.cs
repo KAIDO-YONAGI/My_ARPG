@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour, ICanvasManager
 {
-    public static QuestManager instance;
+    private static QuestManager _instance;
+    public static QuestManager Instance => _instance;
     [SerializeField] private CanvasGroup questCanvaGroup;
 
     [Header("Events To Receive")]
@@ -65,17 +66,20 @@ public class QuestManager : MonoBehaviour, ICanvasManager
     }
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        _instance = this;
 
         canvas = questCanvaGroup.GetComponent<Canvas>();
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     private void OnEnable()
@@ -283,9 +287,9 @@ public class QuestManager : MonoBehaviour, ICanvasManager
 
         if (obj.targetItem != null)
         {
-            newAmount = ItemHistoryManager.instance.GetItemQuantity(obj.targetItem);
+            newAmount = ItemHistoryManager.Instance.GetItemQuantity(obj.targetItem);
         }
-        else if (obj.targetCharacter != null && ConversationHistoryManager.instance.HasChatedWith(obj.targetCharacter))
+        else if (obj.targetCharacter != null && ConversationHistoryManager.Instance.HasChatedWith(obj.targetCharacter))
         {
             newAmount = obj.requiredAmount;
         }

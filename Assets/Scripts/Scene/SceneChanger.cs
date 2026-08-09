@@ -11,7 +11,8 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 /// </summary>
 public class SceneChanger : MonoBehaviour
 {
-    public static SceneChanger instance;
+    private static SceneChanger _instance;
+    public static SceneChanger Instance => _instance;
 
     /// <summary>玩家初始位置</summary>
     [SerializeField] private Vector3 initialPosition = Vector3.zero;
@@ -63,11 +64,22 @@ public class SceneChanger : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+
         sceneToLoad = initScene;
         SetPlayerPostion(initialPosition);
         LoadScene(sceneToLoad);
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     /// <summary>
@@ -120,10 +132,10 @@ public class SceneChanger : MonoBehaviour
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
         ForbidInput();
-        TimeManager.instance.PauseGame();
+        TimeManager.Instance.PauseGame();
         sceneToLoad = scene;
 
-        StatsManager.instance.Respawn(); //回血
+        StatsManager.Instance.Respawn(); //回血
 
 
         this.newPosition = newPosition == Vector3.zero ? sceneToLoad.initialPosition : newPosition;
@@ -204,7 +216,7 @@ public class SceneChanger : MonoBehaviour
         isInitialScene = false;
         sceneLoadedEvent?.OnEventRaised();
         AllowInput();
-        TimeManager.instance.ForceResumeGame();
+        TimeManager.Instance.ForceResumeGame();
     }
 
     private void ForbidInput()

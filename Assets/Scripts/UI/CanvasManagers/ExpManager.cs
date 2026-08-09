@@ -7,18 +7,23 @@ public class ExpManager : MonoBehaviour
     [SerializeField] private Slider expSlider;
     [SerializeField] private TMP_Text currentLevelText;
     public static event Action<int> OnLevelUp;
-    public static ExpManager instance;
+    private static ExpManager _instance;
+    public static ExpManager Instance => _instance;
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        _instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
     private void Start()
     {
@@ -36,7 +41,7 @@ public class ExpManager : MonoBehaviour
     }
     public void GainExp(int amount)
     {
-        var stats = StatsManager.instance.GetStats();
+        var stats = StatsManager.Instance.GetStats();
         stats.currentExp += amount;
         if (stats.currentExp >= stats.expToUpgrade)
         {
@@ -46,14 +51,14 @@ public class ExpManager : MonoBehaviour
     }
     public void UpdateUI()
     {
-        var stats = StatsManager.instance.GetStats();
+        var stats = StatsManager.Instance.GetStats();
         expSlider.maxValue = stats.expToUpgrade;
         expSlider.value = stats.currentExp;
         currentLevelText.text = "Level:" + stats.level;
     }
     private void LevelUp()
     {
-        var stats = StatsManager.instance.GetStats();
+        var stats = StatsManager.Instance.GetStats();
         stats.level++;
         stats.currentExp -= stats.expToUpgrade;
         stats.expToUpgrade = Mathf.RoundToInt(stats.expToUpgrade * stats.expMultiplier);

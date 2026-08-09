@@ -28,9 +28,9 @@ public class ShopPortraitCameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (ShopManager.instance == null) return;
+        if (ShopManager.Instance == null) return;
 
-        Transform target = ShopManager.instance.CurrentPortraitTarget;
+        Transform target = ShopManager.Instance.CurrentPortraitTarget;
         if (target != currentTarget)
         {
             currentTarget = target;

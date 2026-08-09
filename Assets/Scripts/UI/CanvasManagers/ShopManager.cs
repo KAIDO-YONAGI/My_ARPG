@@ -12,7 +12,8 @@ public class ShopManager : MonoBehaviour, ICanvasManager
     [SerializeField] private ToggleCanvasEventSO toggleShopCanvasEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
 
-    public static ShopManager instance;
+    private static ShopManager _instance;
+    public static ShopManager Instance => _instance;
 
     private List<ShopItems> shopItems;
     private List<ShopItems> shopWeapon;
@@ -34,13 +35,20 @@ public class ShopManager : MonoBehaviour, ICanvasManager
 
     private void Awake()
     {
-        if (instance == null)
+        if (_instance != null && _instance != this)
         {
-            instance = this;
+            Destroy(gameObject);
+            return;
         }
-        else Destroy(gameObject);
+        _instance = this;
 
         canvas = shopCanvasGroup.GetComponent<Canvas>();
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     private void OnEnable()

@@ -13,7 +13,8 @@ public class RetryConfig
 
 public class RetryManager : MonoBehaviour
 {
-    public static RetryManager instance;
+    private static RetryManager _instance;
+    public static RetryManager Instance => _instance;
 
     [SerializeField] private SceneLoadEventSO loadEventSO;
     [Header("Retry Event")]
@@ -23,10 +24,18 @@ public class RetryManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
+        if (_instance != null && _instance != this)
+        {
             Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
 
     private void OnEnable()
@@ -40,7 +49,7 @@ public class RetryManager : MonoBehaviour
 
     private void OnReTry()
     {
-        GameSceneSO currentScene = SceneChanger.instance.GetCurrentGameScene();
+        GameSceneSO currentScene = SceneChanger.Instance.GetCurrentGameScene();
         RetryConfig config = GetConfig(currentScene);
         if (config == null)
         {
@@ -50,7 +59,7 @@ public class RetryManager : MonoBehaviour
 
         Vector3 position = config.SpawnPosition == Vector3.zero ? config.Scene.initialPosition : config.SpawnPosition;
         loadEventSO.RaiseLoadRequestEvent(config.Scene, position, true);
-        StatsManager.instance.Respawn();
+        StatsManager.Instance.Respawn();
     }
 
     private RetryConfig GetConfig(GameSceneSO scene)

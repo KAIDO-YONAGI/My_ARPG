@@ -18,20 +18,20 @@ public class ESCMenuManager : MonoBehaviour
 
         if (state)
         {
-            TimeManager.instance.PauseGame();
+            TimeManager.Instance.PauseGame();
             ESCGroup.alpha = 1;
             ESCGroup.interactable = true;
             ESCGroup.blocksRaycasts = true;
         }
         else
         {
-            TimeManager.instance.ResumeGame();
+            TimeManager.Instance.ResumeGame();
             ESCGroup.alpha = 0;
             ESCGroup.interactable = false;
             ESCGroup.blocksRaycasts = false;
         }
 
-        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.ESC, state);
+        UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.ESC, state);
     }
 }
 

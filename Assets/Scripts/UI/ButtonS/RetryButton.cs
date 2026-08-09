@@ -11,7 +11,7 @@ public class RetryButton : MonoBehaviour
         ButtonCanvas.interactable = false;
         ButtonCanvas.blocksRaycasts = false;
 
-        TimeManager.instance.ForceResumeGame();
+        TimeManager.Instance.ForceResumeGame();
         retryEventSO.OnEventRaised();
     }
 }

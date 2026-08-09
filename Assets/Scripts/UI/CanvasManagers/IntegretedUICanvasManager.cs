@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
 {
-    public static IntegratedUICanvasManager instance;
+    private static IntegratedUICanvasManager _instance;
+    public static IntegratedUICanvasManager Instance => _instance;
     [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
     [SerializeField] private CanvasGroup UICanvasPanel;
     [SerializeField] private GameObject integratedButtonsParent;
@@ -24,15 +25,23 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
     private bool isMenuOpen = false;
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
+        if (_instance != null && _instance != this)
+        {
             Destroy(gameObject);
+            return;
+        }
+        _instance = this;
 
         integratedButtons.AddRange(integratedButtonsParent.GetComponentsInChildren<Button>());
         buttonsEachPage = integratedButtons.Count;
 
         InitiateUICanvasPanel(false);
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
     }
     private void OnEnable()
     {
@@ -154,7 +163,7 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
     }
     private void OnIntegratedButtonClick(MyEnums.CanvasToToggle canvasToToggle)
     {
-        UIManager.instance.RequestCanvasToggle(canvasToToggle);
+        UIManager.Instance.RequestCanvasToggle(canvasToToggle);
     }
 
     private void SetCanvaState(CanvasGroup canva, bool state)
@@ -162,6 +171,6 @@ public class IntegratedUICanvasManager : MonoBehaviour,ICanvasManager
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
         canva.interactable = state;
-        UIManager.instance.ReportCanvasState(MyEnums.CanvasToToggle.Integrated, state);
+        UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.Integrated, state);
     }
 }

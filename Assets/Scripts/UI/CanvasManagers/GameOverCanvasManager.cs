@@ -26,7 +26,7 @@ public class GameOverCanvasManager : MonoBehaviour
     {
         if (state)
         {
-            TimeManager.instance.PauseGame();
+            TimeManager.Instance.PauseGame();
             gameOverGroup.alpha = 1;
             gameOverGroup.interactable = true;
             gameOverGroup.blocksRaycasts = true;

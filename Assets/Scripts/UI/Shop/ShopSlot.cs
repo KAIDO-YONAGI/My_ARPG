@@ -38,7 +38,7 @@ public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnBuyButtonClick()//unity按钮组件事件
     {
-        ShopManager.instance.TryBuyItem(item, price);
+        ShopManager.Instance.TryBuyItem(item, price);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

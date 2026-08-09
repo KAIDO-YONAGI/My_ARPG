@@ -22,7 +22,7 @@ public class Loot : MonoBehaviour, ISaveable
 
     private void OnDestroy()
     {
-        if (DataManager.instance == null) return;
+        if (DataManager.Instance == null) return;
 
         ISaveable saveable = this;
         saveable.UnRegisterSaveable();
@@ -44,9 +44,9 @@ public class Loot : MonoBehaviour, ISaveable
         var dataDef = GetComponent<DataDefinition>();
         if (dataDef != null)
         {
-            if (DataManager.instance != null)
+            if (DataManager.Instance != null)
             {
-                DataManager.instance.RemoveLootRegistration(dataDef.ID);
+                DataManager.Instance.RemoveLootRegistration(dataDef.ID);
             }
             dataDef.ID = System.Guid.NewGuid().ToString();
         }

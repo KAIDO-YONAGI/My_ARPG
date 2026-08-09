@@ -26,7 +26,7 @@ public class SkillTreeManager : MonoBehaviour
     }
     private void HandleAbilityPointSpent(SkillSlot skillSlot)
     {
-        if (StatsManager.instance.GetSkillPoints() > 0)
+        if (StatsManager.Instance.GetSkillPoints() > 0)
         {
             UpdateAbilityPoints(-1);
         }
@@ -45,7 +45,7 @@ public class SkillTreeManager : MonoBehaviour
         foreach (SkillSlot slot in skillSlots)
         {
             slot.skillButton.onClick.AddListener(()=>{
-                if (StatsManager.instance.GetSkillPoints() > 0)
+                if (StatsManager.Instance.GetSkillPoints() > 0)
                     slot.TryUpgradeSkill();
             });//注册事件处理器，但是由unity刷新时响应每次的事件
         }
@@ -53,7 +53,7 @@ public class SkillTreeManager : MonoBehaviour
     }
     public void UpdateAbilityPoints(int amount)
     {
-        StatsManager.instance.UpdateSkillPoints(amount);
-        pointsText.text = "Skill Points: " + StatsManager.instance.GetSkillPoints().ToString();
+        StatsManager.Instance.UpdateSkillPoints(amount);
+        pointsText.text = "Skill Points: " + StatsManager.Instance.GetSkillPoints().ToString();
     }
 }

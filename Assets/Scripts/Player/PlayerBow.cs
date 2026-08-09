@@ -101,7 +101,7 @@ public class PlayerBow : MonoBehaviour
         {
             Arrow arrow = Instantiate(arrowPrefab, launchPoint.position, Quaternion.identity).GetComponent<Arrow>();//实例化箭矢，第二个参数为生成位置,第三个为单位向量（表示禁用旋转)
             arrow.Launch(shootDirection);//先创建箭矢并且获取引用，然后发射
-            shootTimer = StatsManager.instance.GetCoolDown();//重置射击计时器，防止多箭发射
+            shootTimer = StatsManager.Instance.GetCoolDown();//重置射击计时器，防止多箭发射
 
         }
 
