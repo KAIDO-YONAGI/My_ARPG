@@ -8,7 +8,8 @@ public class ToggleCanvasEventSO : ScriptableObject
 {
     public event Action<bool> toggleCanvasEvent;
     /// <summary>
-    /// 画布 focus 事件：只调整画布的排序优先级，不改变画布的开/合状态。
+    /// 画布 focus 事件：只调整画布的排序优先级
+    /// 也可以组合canvasState=true 用于实现画布组互斥 适合在ICanvasManager里放一个状态枚举来规范
     /// 与 toggleCanvasEvent 分离，避免复用 open 语义来传达置顶/降级。
     /// </summary>
     public event Action focusEvent;

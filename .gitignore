@@ -17,6 +17,7 @@ omnisharp.json
 .settings/
 .claude/
 .codegraph/
+.reasonix/
 .zcode/
 
 # Visual Studio / Rider
