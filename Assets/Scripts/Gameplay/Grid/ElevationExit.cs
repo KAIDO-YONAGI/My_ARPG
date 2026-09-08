@@ -21,6 +21,8 @@ public class Elevation_Exit : MonoBehaviour
 
         }
         else return;
-        collision.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 5;
+        // 例外保留：触发对方是玩家碰撞体，运行时才知道是谁；补判空防 NRE
+        if (collision.gameObject.TryGetComponent<SpriteRenderer>(out var sr))
+            sr.sortingOrder = 5;
     }
 }

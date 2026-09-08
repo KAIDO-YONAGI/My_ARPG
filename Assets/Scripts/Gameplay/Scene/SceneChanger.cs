@@ -105,7 +105,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// <param name="newPosition">新位置坐标</param>
     private void SetPlayerPostion(Vector3 newPosition)
     {
-        player.GetComponent<Transform>().position = newPosition;
+        player.transform.position = newPosition;
     }
 
     /// <summary>
@@ -207,14 +207,14 @@ public class SceneChanger : YSingleton<SceneChanger>
     private void ForbidInput()
     {
         if (player == null) return;
-        var movement = player.GetComponentInChildren<PlayerMovement>(true);
+        var movement = PlayerMovement.Main;
         if (movement != null) movement.enabled = false;
     }
 
     private void AllowInput()
     {
         if (player == null) return;
-        var movement = player.GetComponentInChildren<PlayerMovement>(true);
+        var movement = PlayerMovement.Main;
         if (movement != null) movement.enabled = true;
     }
 }

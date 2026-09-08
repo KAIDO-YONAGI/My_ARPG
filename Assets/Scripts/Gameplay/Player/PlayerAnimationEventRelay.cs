@@ -7,10 +7,11 @@ public class PlayerAnimationEventRelay : MonoBehaviour
 
     private void Awake()
     {
+        // 引用必须在 Inspector 里接好；不再做 GetComponentInChildren 兜底
         if (combat == null)
-            combat = GetComponentInChildren<PlayerCombat>(true);
+            Debug.LogError("PlayerAnimationEventRelay: combat 引用未在 Inspector 接线。", this);
         if (bow == null)
-            bow = GetComponentInChildren<PlayerBow>(true);
+            Debug.LogError("PlayerAnimationEventRelay: bow 引用未在 Inspector 接线。", this);
     }
 
     public void DealDamage()

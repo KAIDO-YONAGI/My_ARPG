@@ -26,11 +26,9 @@ public class PlayerCombat : MonoBehaviour
 
         foreach (Collider2D enemy in enemis)
         {
-            var damageable = enemy.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                damageable.TakeDamage(StatsManager.Instance.GetDamage(), transform);
-            }
+            // 例外保留：碰撞/命中对象运行时才知道是谁，无法预引用（见重构清单 GetComponent 治理一节）
+            if (!enemy.TryGetComponent<IDamageable>(out var damageable)) continue;
+            damageable.TakeDamage(StatsManager.Instance.GetDamage(), transform);
         }
 
     }
@@ -40,11 +38,6 @@ public class PlayerCombat : MonoBehaviour
         if (slashActionFinishedEvent != null) slashActionFinishedEvent.OnEventRaised();
     }
 
-    // 兼容仍使用旧拼写 "FinshCombat" 的动画资源。
-    public void FinshCombat()
-    {
-        FinishCombat();
-    }
     //private void OnDrawGizmosSelected()
     //{
     //    Gizmos.color = Color.yellow;

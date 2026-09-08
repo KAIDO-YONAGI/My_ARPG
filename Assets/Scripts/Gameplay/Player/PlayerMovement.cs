@@ -28,6 +28,23 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerState playerState = PlayerState.Idle;
 
+    /// <summary>
+    /// 玩家移动组件的静态定位器（唯一玩家）。SceneChanger/EnemyCombat 等经此访问，
+    /// 免去 GetComponentInChildren 查找。注意：ForbidInput 禁用本组件不清空此引用
+    /// （AllowInput 还要用），仅在 OnDestroy 销毁时清空。
+    /// </summary>
+    public static PlayerMovement Main { get; private set; }
+
+    private void Awake()
+    {
+        Main = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Main == this) Main = null;
+    }
+
     private void OnEnable()
     {
         canBeInterrupted = true;

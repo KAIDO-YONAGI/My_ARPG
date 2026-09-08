@@ -19,11 +19,12 @@ public class EnemyCombat : MonoBehaviour
 
         if (hits.Length > 0 && hits[0].enabled)//如果有目标
         {
-            var health = hits[0].GetComponentInChildren<PlayerHealth>();
+            // 玩家是常驻对象：经单例/静态定位器访问，免去对命中体的组件查找
+            var health = PlayerHealth.Instance;
             if (health != null)
                 health.ChangeHealth(-damage);
 
-            var movement = hits[0].GetComponentInChildren<PlayerMovement>();
+            var movement = PlayerMovement.Main;
             if (movement != null) movement.KnockBack(transform, knockBackForce, stunTime);
         }
     }
