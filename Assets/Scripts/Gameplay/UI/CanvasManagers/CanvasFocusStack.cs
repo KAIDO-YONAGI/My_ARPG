@@ -78,6 +78,12 @@ public class CanvasFocusStack
         RefreshFocusAfterClose(canvasToClose);
     }
 
+    /// <summary>无面板打开时直接唤起 ESC 菜单（栈顶不可 ESC 关闭时的 ESC 分支）。</summary>
+    public void HandleESCOrOpen()
+    {
+        RaiseCanvasEvent(CanvasToToggle.ESC, true);
+    }
+
     /// <summary>状态回调，画布报告的真实开启/关闭状态（对应原 UIManager.ReportCanvasState）。</summary>
     public void ReportState(CanvasToToggle canvas, bool state)
     {
@@ -188,6 +194,12 @@ public class CanvasFocusStack
         }
 
         return false;
+    }
+
+    /// <summary>当前已打开画布的快照（副本），供互斥关闭等遍历使用。</summary>
+    public List<CanvasToToggle> GetOpenCanvases()
+    {
+        return new List<CanvasToToggle>(canvasOpenOrder);
     }
 
     private void RemoveCanvasNode(CanvasToToggle canvas)

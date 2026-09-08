@@ -4,15 +4,26 @@ public class ESCMenuManager : MonoBehaviour
 {
     [SerializeField] private CanvasGroup ESCGroup;
     [SerializeField] private ToggleCanvasEventSO toggleESCEvent;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
+
     private void OnEnable()
     {
         toggleESCEvent.toggleCanvasEvent += OnESC;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
     }
     private void OnDisable()
     {
         toggleESCEvent.toggleCanvasEvent -= OnESC;
-
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
     }
+
+    private void OnSceneLoaded()
+    {
+        OnESC(false);
+    }
+
     private void OnESC(bool state)
     {
 
@@ -34,4 +45,3 @@ public class ESCMenuManager : MonoBehaviour
         UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.ESC, state);
     }
 }
-

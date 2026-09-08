@@ -4,22 +4,33 @@ using UnityEngine;
 /// GameOver 画布管理器，结构和 ESCMenuManager 一致。
 /// 通过 ToggleCanvasEventSO(GameOver) 接收开关指令，
 /// 由 UIManager 的画布调度系统统一触发，不依赖外部直接引用。
+/// 声明：不可 ESC 关闭 + 打开时阻塞全局面板输入（玩家必须走重试流程）。
 /// </summary>
 public class GameOverCanvasManager : MonoBehaviour
 {
     [SerializeField] private CanvasGroup gameOverGroup;
     [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
 
     private void OnEnable()
     {
         if (toggleGameOverEvent != null)
             toggleGameOverEvent.toggleCanvasEvent += OnGameOver;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         if (toggleGameOverEvent != null)
             toggleGameOverEvent.toggleCanvasEvent -= OnGameOver;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded()
+    {
+        OnGameOver(false);
     }
 
     private void OnGameOver(bool state)
@@ -38,5 +49,9 @@ public class GameOverCanvasManager : MonoBehaviour
             gameOverGroup.blocksRaycasts = false;
         }
 
+        if (UIManager.Instance != null)
+            UIManager.Instance.ReportCanvasState(
+                MyEnums.CanvasToToggle.GameOver, state,
+                closeOnEscape: false, blocksGlobalInput: true);
     }
 }

@@ -3,7 +3,6 @@ using UnityEngine;
 public class PlayerHealth : YSingleton<PlayerHealth>
 {
     [SerializeField] private GameObject playerRoot;
-    [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
 
 
     protected override void Awake()
@@ -26,7 +25,8 @@ public class PlayerHealth : YSingleton<PlayerHealth>
 
         if (StatsManager.Instance.GetCurrentHealth() <= 0)
         {
-            toggleGameOverEvent.RaiseToggleCanvasEvent(true);
+            // 经 UIManager 统一入口唤起 GameOver，进入焦点栈与互斥/阻塞体系
+            UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);
 
             if (playerRoot != null)
                 playerRoot.SetActive(false);

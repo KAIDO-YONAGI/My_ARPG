@@ -7,33 +7,40 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
 {
     [SerializeField] private List<MyEnums.CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
     [SerializeField] private CanvasGroup UICanvasPanel;
-    [SerializeField] private GameObject integratedButtonsParent;
+    [SerializeField] private Canvas canvas;
     [SerializeField] private Button toggleMenuButton;
     [SerializeField] private Button nextPageButton;
     [SerializeField] private Button prevPageButton;
     [SerializeField] private TMP_Text pageNumText;
+    [SerializeField] private TMP_Text toggleMenuText;
+    [SerializeField] private Button[] integratedButtons;
+    [SerializeField] private TMP_Text[] integratedButtonTexts;
     [SerializeField] private ToggleCanvasEventSO toggleIntegratedCanvasEventSO;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleIntegratedCanvasEventSO;
-    private List<Button> integratedButtons = new();
+    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
 
-    private TMP_Text toggleMenuText;
-    private List<TMP_Text> integratedButtonTexts = new();
     private int currentPageNum = 0;
     private int buttonsEachPage;//用来模拟初始化多页的Panel
     private bool isMenuOpen = false;
+
     protected override void OnSingletonInitialized()
     {
-        integratedButtons.AddRange(integratedButtonsParent.GetComponentsInChildren<Button>());
-        buttonsEachPage = integratedButtons.Count;
+        buttonsEachPage = integratedButtons != null ? integratedButtons.Length : 0;
+
+        //按钮监听与文本引用均为固定 UI 结构，一次性注册即可（不随 OnEnable 重复注册/堆积）
+        toggleMenuButton.onClick.AddListener(OnClickMenuToggleButton);
+        nextPageButton.onClick.AddListener(OnClickNextButton);
+        prevPageButton.onClick.AddListener(OnClickPrevButton);
 
         InitiateUICanvasPanel(false);
     }
     private void OnEnable()
     {
-        InitiateButtons();
-
         toggleIntegratedCanvasEventSO.toggleCanvasEvent += OnToggleIntegratedCanvas;
         toggleIntegratedCanvasEventSO.focusEvent += OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
 
         //此处事件在UIManager里仅索引到editor里，没有在代码层编写
         //特别地，将开闭功能都放在当前这个脚本里
@@ -43,18 +50,19 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     {
         toggleIntegratedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegratedCanvas;
         toggleIntegratedCanvasEventSO.focusEvent -= OnFocus;
-        toggleMenuButton.onClick.RemoveAllListeners();
-        nextPageButton.onClick.RemoveAllListeners();
-        prevPageButton.onClick.RemoveAllListeners();
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded()
+    {
+        InitiateUICanvasPanel(false);
     }
 
     private void OnFocus()
     {
         if (!isMenuOpen) return;
-        ((ICanvasManager)this).RefreshCanvaOrder(
-            UICanvasPanel.GetComponent<Canvas>(),
-            MyEnums.CanvasToToggle.Integrated,
-            true);
+        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Integrated, true);
     }
     private void OnToggleIntegratedCanvas(bool state)
     {
@@ -62,27 +70,15 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
 
         isMenuOpen = state;
 
-        toggleMenuText.text = !isMenuOpen ? "Open" : "Close";
+        if (toggleMenuText != null)
+            toggleMenuText.text = !isMenuOpen ? "Open" : "Close";
 
     }
 
-    private void InitiateButtons()
-    {
-
-        toggleMenuButton.onClick.AddListener(OnClickMenuToggleButton);
-        nextPageButton.onClick.AddListener(OnClickNextButton);
-        prevPageButton.onClick.AddListener(OnClickPrevButton);
-
-        toggleMenuText = toggleMenuButton.GetComponentInChildren<TMP_Text>();
-        toggleMenuText.text = "Open";
-        for (int i = 0; i < buttonsEachPage; i++)
-        {
-            integratedButtonTexts.Add(integratedButtons[i].GetComponentInChildren<TMP_Text>());
-        }
-    }
     private void InitiateUICanvasPanel(bool state)
     {
-        pageNumText.text = "1";
+        if (pageNumText != null)
+            pageNumText.text = "1";
         isMenuOpen = state;
         SetCanvaState(UICanvasPanel, isMenuOpen);
         if (isMenuOpen) ShiftPage(0);
@@ -90,8 +86,8 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     private void OnClickMenuToggleButton()
     {
         InitiateUICanvasPanel(!isMenuOpen);
-        toggleMenuText.text = !isMenuOpen ? "Open" : "Close";
-        // Debug.Log("toggle");
+        if (toggleMenuText != null)
+            toggleMenuText.text = !isMenuOpen ? "Open" : "Close";
     }
 
     private void OnClickNextButton()
@@ -126,9 +122,11 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     }
     private void InitiatePage(int startNum, int canvasNum)
     {
-        pageNumText.text = ((startNum / buttonsEachPage) + 1).ToString();
+        if (pageNumText != null)
+            pageNumText.text = ((startNum / buttonsEachPage) + 1).ToString();
         foreach (var button in integratedButtons)
         {
+            if (button == null) continue;
             button.gameObject.SetActive(false);
             button.onClick.RemoveAllListeners();
         }
@@ -138,8 +136,13 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
             int pageButtonNum = i % buttonsEachPage;
             MyEnums.CanvasToToggle canvasToToggle = this.canvasToToggle[i];
             Button button = integratedButtons[pageButtonNum];
+            if (button == null) continue;
 
-            integratedButtonTexts[pageButtonNum].text = canvasToToggle.ToString();
+            if (integratedButtonTexts != null && pageButtonNum < integratedButtonTexts.Length
+                && integratedButtonTexts[pageButtonNum] != null)
+            {
+                integratedButtonTexts[pageButtonNum].text = canvasToToggle.ToString();
+            }
 
             button.gameObject.SetActive(true);
             button.onClick.AddListener(() => OnIntegratedButtonClick(canvasToToggle));
@@ -156,6 +159,7 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
         canva.interactable = state;
-        // UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.Integrated, state); //不回调打开 自己管自己
+        if (UIManager.Instance != null)
+            UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.Integrated, state);
     }
 }

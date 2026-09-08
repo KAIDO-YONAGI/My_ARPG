@@ -17,8 +17,16 @@ public class UIManager : YSingleton<UIManager>
     [Header("Input Bindings")] [SerializeField]
     private List<CanvasInputBinding> inputBindings;
 
+    [Header("互斥面板")]
+    [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")]
+    [SerializeField] private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
+
     // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
     private readonly CanvasFocusStack focusStack = new();
+
+    // 各画布上报的阻塞声明（ReportCanvasState 时登记）
+    private readonly Dictionary<CanvasToToggle, bool> canvasBlocksInput = new();
+    private readonly Dictionary<CanvasToToggle, bool> canvasCloseOnEscape = new();
 
     private CanvasToToggle canvasToToggle = CanvasToToggle.Default;
 
@@ -93,9 +101,27 @@ public class UIManager : YSingleton<UIManager>
         focusStack.RequestClose(canvas);
     }
 
-    // 状态回调，画布报告的真实开启/关闭状态。
-    public void ReportCanvasState(CanvasToToggle canvas, bool state)
+    // 状态回调：画布报告真实的开启或关闭状态；互斥由本组件的 mutexCanvases 列表解析，阻塞声明由面板传入。
+    public void ReportCanvasState(
+        CanvasToToggle canvas,
+        bool state,
+        bool closeOnEscape = true,
+        bool blocksGlobalInput = false)
     {
+        if (canvas == CanvasToToggle.Default)
+        {
+            return;
+        }
+
+        canvasCloseOnEscape[canvas] = closeOnEscape;
+        canvasBlocksInput[canvas] = blocksGlobalInput;
+
+        // 互斥：开启时自动关闭其它已打开的互斥面板。
+        if (state && IsMutexCanvas(canvas))
+        {
+            CloseOtherMutexCanvases(canvas);
+        }
+
         focusStack.ReportState(canvas, state);
     }
 
@@ -110,6 +136,52 @@ public class UIManager : YSingleton<UIManager>
         return focusStack.GetCanvasOrder(canvas, state);
     }
 
+    private void CloseOtherMutexCanvases(CanvasToToggle opening)
+    {
+        // 遍历副本：RequestClose 会经由面板回调修改焦点栈。
+        foreach (CanvasToToggle openCanvas in focusStack.GetOpenCanvases())
+        {
+            // 仅关闭可关闭面板：对“仅上报面板”发出无效关闭会导致焦点栈与真实显隐状态错位。
+            if (openCanvas != opening && IsMutexCanvas(openCanvas) && IsClosableCanvas(openCanvas))
+            {
+                focusStack.RequestClose(openCanvas);
+            }
+        }
+    }
+
+    // 是否为互斥面板：列在 mutexCanvases 里即参与互斥，未列出则可与任意面板共存。
+    private bool IsMutexCanvas(CanvasToToggle canvas)
+    {
+        return mutexCanvases != null && mutexCanvases.Contains(canvas);
+    }
+
+    // 是否为可关闭面板：开关事件在 toggleCanvasEvents 列表中，可被按键唤起、ESC 关闭、切场景复位和互斥关闭。
+    // 不在列表中的面板即使上报状态（仅上报层级），UIManager 也不主动关闭它，显隐由其自身逻辑决定。
+    private bool IsClosableCanvas(CanvasToToggle canvas)
+    {
+        foreach (var eventSO in toggleCanvasEvents)
+        {
+            if (eventSO != null && eventSO.canvasToToggle == canvas)
+                return true;
+        }
+
+        return false;
+    }
+
+    // 是否有"阻塞全局输入"的画布处于打开状态（按焦点栈开放列表推导，避免计数漂移）。
+    private bool IsGlobalInputBlocked()
+    {
+        foreach (CanvasToToggle openCanvas in focusStack.GetOpenCanvases())
+        {
+            if (canvasBlocksInput.TryGetValue(openCanvas, out bool blocks) && blocks)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void ToggleCanvas()
     {
         // 读取已注册的输入绑定；未注册的画布仍可使用RequestCanvasToggle。
@@ -120,9 +192,26 @@ public class UIManager : YSingleton<UIManager>
             // 外部请求和按键按下都可以触发切换。
         }
 
+        // 阻塞面板（如 GameOver）打开时，吞掉所有面板切换输入（含 ESC 与外部切换请求）。
+        // 注意：RequestCanvasClose 不受影响，阻塞面板自身的关闭按钮仍可直接关闭它。
+        if (IsGlobalInputBlocked())
+        {
+            ResetInputState();
+            return;
+        }
+
         if (inputState[CanvasToToggle.ESC])
         {
-            focusStack.HandleESCOrCloseTop();
+            CanvasToToggle top = focusStack.LastOpenCanvas;
+            bool canCloseTop =
+                top != CanvasToToggle.Default &&
+                IsClosableCanvas(top) &&
+                (!canvasCloseOnEscape.TryGetValue(top, out bool closeOnEscape) || closeOnEscape);
+
+            if (canCloseTop)
+                focusStack.HandleESCOrCloseTop();
+            else
+                focusStack.HandleESCOrOpen();
             ResetInputState();
             return;
         }
