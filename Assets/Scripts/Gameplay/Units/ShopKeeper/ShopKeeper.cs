@@ -5,6 +5,7 @@ public class ShopKeeper : MonoBehaviour
 {
     [SerializeField] private Animator logoAnimator;
     [SerializeField] private Animator shopKeeperAnimator;
+    [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
 
     [SerializeField] private List<ShopItems> shopItems;
     [SerializeField] private List<ShopItems> shopWeapon;
@@ -22,8 +23,8 @@ public class ShopKeeper : MonoBehaviour
     {
         if (!collider.CompareTag("Player")) return;
 
-        if (ShopManager.Instance != null)
-            ShopManager.Instance.RegisterActiveShopKeeper(this);
+        if (shopKeeperEvent != null)
+            shopKeeperEvent.RaiseShopKeeperEntered(this);
 
         if (logoAnimator != null)
             logoAnimator.SetBool("playerInRange", true);
@@ -33,12 +34,8 @@ public class ShopKeeper : MonoBehaviour
     {
         if (!collider.CompareTag("Player")) return;
 
-        if (ShopManager.Instance != null)
-        {
-            ShopManager.Instance.UnregisterActiveShopKeeper();
-            if (ShopManager.Instance.IsShopOpen)
-                ShopManager.Instance.CloseShop();
-        }
+        if (shopKeeperEvent != null)
+            shopKeeperEvent.RaiseShopKeeperExited(this);
 
         if (logoAnimator != null)
             logoAnimator.SetBool("playerInRange", false);
@@ -46,11 +43,7 @@ public class ShopKeeper : MonoBehaviour
 
     private void OnDisable()
     {
-        if (ShopManager.Instance != null)
-        {
-            if (ShopManager.Instance.IsShopOpen)
-                ShopManager.Instance.CloseShop();
-            ShopManager.Instance.UnregisterActiveShopKeeper();
-        }
+        if (shopKeeperEvent != null)
+            shopKeeperEvent.RaiseShopKeeperExited(this);
     }
 }

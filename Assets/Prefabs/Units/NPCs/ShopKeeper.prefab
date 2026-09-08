@@ -226,8 +226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logoAnimator: {fileID: 7250176339750171359}
   shopKeeperAnimator: {fileID: 3971748871566898795}
-  shopLoadEvent: {fileID: 11400000, guid: 2b0721e2583502d4aa99e6fc96519ae4, type: 2}
-  toggleShopCanvasEvent: {fileID: 11400000, guid: 588067e2f797b0743a94619245e8896c, type: 2}
+  shopKeeperEvent: {fileID: 11400000, guid: 5b083df9b77ba3f4c877b0871e81e6bf, type: 2}
   shopItems: []
   shopWeapon: []
   shopArmor: []

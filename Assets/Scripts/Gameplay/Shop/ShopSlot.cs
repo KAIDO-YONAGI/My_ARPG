@@ -12,13 +12,24 @@ public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private ItemSO item;
     private int price;
 
-    [SerializeField] private ShopManager shopManager;
     [SerializeField] private ShopInfo shopInfo;
+    [Header("Link To Parent Shop")]
+    [Tooltip("拖入父级商店面板上的 ShopManager 组件（接口无法序列化，用 Component 承载）")]
+    [SerializeField] private Component shopRef;
+
+    private IShopInteractable shop;
 
     [Header("Link To Child Objections")]
     [SerializeField] private TMP_Text itemNameText;
     [SerializeField] private TMP_Text priceText;
     [SerializeField] private Image itemImage;
+
+    private void Awake()
+    {
+        shop = shopRef as IShopInteractable;
+        if (shop == null)
+            Debug.LogError("ShopSlot: shopRef 未接线或未实现 IShopInteractable。", this);
+    }
     public ItemSO GetItemSO()
     {
         return item;
@@ -38,7 +49,10 @@ public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnBuyButtonClick()//unity按钮组件事件
     {
-        ShopManager.Instance.TryBuyItem(item, price);
+        if (shop != null)
+            shop.TryBuyItem(item, price);
+        else
+            Debug.LogWarning("ShopSlot: 商店引用缺失，无法购买。", this);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

@@ -1,23 +1,26 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-public class ShopManager : YSingleton<ShopManager>, ICanvasManager
+public class ShopManager : YSingleton<ShopManager>, ICanvasManager, IShopInteractable
 {
     [SerializeField] private ShopSlot[] shopSlots;
     [SerializeField] private CanvasGroup shopCanvasGroup;
+    [SerializeField] private Canvas canvas;
 
     [Header("Events To Trigger")]
     [SerializeField] private InventorySlotsStatsSO InventoryUpdateRequest;
     [Header("Events To Receive")]
     [SerializeField] private ToggleCanvasEventSO toggleShopCanvasEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
+    [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
 
 
     private List<ShopItems> shopItems;
     private List<ShopItems> shopWeapon;
     private List<ShopItems> shopArmor;
     private ShopKeeper activeShopKeeper;
-    private Canvas canvas;
 
     public Transform CurrentPortraitTarget
     {
@@ -31,31 +34,48 @@ public class ShopManager : YSingleton<ShopManager>, ICanvasManager
     private bool isShopOpen = false;
     public bool IsShopOpen => isShopOpen;
 
-    protected override void OnSingletonInitialized()
-    {
-        canvas = shopCanvasGroup.GetComponent<Canvas>();
-    }
-
     private void OnEnable()
     {
         toggleShopCanvasEvent.toggleCanvasEvent += OnShopToggle;
         toggleShopCanvasEvent.focusEvent += OnFocus;
+        if (shopKeeperEvent != null)
+        {
+            shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
+        }
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         toggleShopCanvasEvent.toggleCanvasEvent -= OnShopToggle;
         toggleShopCanvasEvent.focusEvent -= OnFocus;
+        if (shopKeeperEvent != null)
+        {
+            shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
+        }
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
     }
 
-    public void RegisterActiveShopKeeper(ShopKeeper keeper)
+    private void OnSceneLoaded()
+    {
+        CloseShop();
+    }
+
+    private void OnKeeperEntered(ShopKeeper keeper)
     {
         activeShopKeeper = keeper;
     }
 
-    public void UnregisterActiveShopKeeper()
+    private void OnKeeperExited(ShopKeeper keeper)
     {
+        if (activeShopKeeper != keeper) return;
         activeShopKeeper = null;
+        if (isShopOpen)
+            CloseShop();
     }
 
     private void OnShopToggle(bool state)

@@ -5,6 +5,7 @@ public class ShopPortraitCameraController : MonoBehaviour
 {
     [SerializeField] private Vector3 followOffset = new(0f, 0f, -2f);
     [SerializeField] private bool hideWhenNoShopKeeper = true;
+    [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
 
     private Camera cachedCamera;
     private Transform currentTarget;
@@ -17,10 +18,32 @@ public class ShopPortraitCameraController : MonoBehaviour
 
     private void OnEnable()
     {
+        if (shopKeeperEvent != null)
+        {
+            shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
+        }
         SetCameraState(false);
     }
 
     private void OnDisable()
+    {
+        if (shopKeeperEvent != null)
+        {
+            shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
+        }
+        currentTarget = null;
+        SetCameraState(false);
+    }
+
+    private void OnKeeperEntered(ShopKeeper keeper)
+    {
+        currentTarget = keeper != null ? keeper.PortraitTarget : null;
+        SetCameraState(currentTarget != null);
+    }
+
+    private void OnKeeperExited(ShopKeeper keeper)
     {
         currentTarget = null;
         SetCameraState(false);
@@ -28,15 +51,6 @@ public class ShopPortraitCameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (ShopManager.Instance == null) return;
-
-        Transform target = ShopManager.Instance.CurrentPortraitTarget;
-        if (target != currentTarget)
-        {
-            currentTarget = target;
-            SetCameraState(currentTarget != null);
-        }
-
         if (currentTarget != null)
         {
             transform.position = currentTarget.position + followOffset;
