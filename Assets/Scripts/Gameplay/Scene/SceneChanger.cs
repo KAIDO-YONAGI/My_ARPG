@@ -42,6 +42,9 @@ public class SceneChanger : YSingleton<SceneChanger>
 
     private bool isInitialScene = true;
 
+    /// <summary>加载进行中标记：请求→淡入→卸载→加载→完成的整个窗口内为 true，防止双请求竞态。</summary>
+    private bool isLoading;
+
     /// <summary>
     /// 获取当前活动场景
     /// </summary>
@@ -116,6 +119,15 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// <param name="isToFade">是否显示过渡动画</param>
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
+        // 加载窗口内拒绝新请求：否则第二个请求会覆写 sceneToLoad 字段、
+        // 并在首个流程未结束时再启动一条卸载协程（双协程 + 完成时记录错场景）
+        if (isLoading)
+        {
+            Debug.LogWarning($"[SceneChanger] 加载进行中，忽略新的加载请求: {scene.name}");
+            return;
+        }
+        isLoading = true;
+
         ForbidInput();
         TimeManager.Instance.PauseGame();
         sceneToLoad = scene;
@@ -168,8 +180,10 @@ public class SceneChanger : YSingleton<SceneChanger>
 
         if (sceneToLoad != null)
         {
-            var loadingOption = sceneToLoad.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
-            loadingOption.Completed += OnLoadCompleted;
+            // 闭包捕获本次目标（参数）：防止加载期间字段被覆写导致完成回调记录错场景
+            var target = sceneToLoad;
+            var loadingOption = target.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
+            loadingOption.Completed += handle => OnLoadCompleted(handle, target);
         }
     }
 
@@ -189,9 +203,11 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// 更新当前场景引用，播放淡出动画
     /// </summary>
     /// <param name="handle">异步操作句柄</param>
-    private void OnLoadCompleted(AsyncOperationHandle<SceneInstance> handle)
+    private void OnLoadCompleted(AsyncOperationHandle<SceneInstance> handle, GameSceneSO loadedTarget)
     {
-        currentScene = sceneToLoad;
+        // 不变量：currentScene 赋值必须在 sceneLoadedEvent 广播之前——
+        // 订阅方（画布管理器/DataManager/MenuSceneCanvasHider 等）经 GetCurrentGameScene() 回读
+        currentScene = loadedTarget;
         loadedScene = handle.Result.Scene;
         if (isToFade && !isInitialScene)
         {
@@ -202,6 +218,7 @@ public class SceneChanger : YSingleton<SceneChanger>
         sceneLoadedEvent?.OnEventRaised();
         AllowInput();
         TimeManager.Instance.ForceResumeGame();
+        isLoading = false; // 全部完成后才解锁，允许下一次加载请求
     }
 
     private void ForbidInput()
