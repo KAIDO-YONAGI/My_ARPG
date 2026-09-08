@@ -8,11 +8,20 @@ using MyEnums;
 public class PlayerBow : MonoBehaviour
 {
     [SerializeField] private Transform launchPoint;
-    [SerializeField] private GameObject arrowPrefab;
+    [SerializeField] private Arrow arrowPrefab;
+    [Header("Arrow Pool")]
+    [SerializeField] private int arrowPrewarm = 8;
+    [SerializeField] private int arrowPoolMaxSize = 30;
+    private ObjectPool<Arrow> arrowPool;
     private Vector2 aimDirection = Vector2.right;
     private Vector2 shootDirection = Vector2.right;
     [SerializeField] private Animator anim;
     [SerializeField] private PlayerMovement playerMovement;
+
+    private void Awake()
+    {
+        arrowPool = new ObjectPool<Arrow>(arrowPrefab, arrowPrewarm, transform, arrowPoolMaxSize);
+    }
 
     [Header("Input Actions")]
     [SerializeField] private InputActionReference moveAction;
@@ -99,8 +108,13 @@ public class PlayerBow : MonoBehaviour
     {
         if (shootTimer <= 0)
         {
-            Arrow arrow = Instantiate(arrowPrefab, launchPoint.position, Quaternion.identity).GetComponent<Arrow>();//实例化箭矢，第二个参数为生成位置,第三个为单位向量（表示禁用旋转)
-            arrow.Launch(shootDirection);//先创建箭矢并且获取引用，然后发射
+            Arrow arrow = arrowPool.Get();
+            if (arrow == null)//池满兜底：一次性实例化，仍可归还池中复用
+                arrow = Instantiate(arrowPrefab, launchPoint.position, Quaternion.identity);
+            else
+                arrow.transform.SetPositionAndRotation(launchPoint.position, Quaternion.identity);
+            arrow.SetSourcePool(arrowPool);
+            arrow.Launch(shootDirection);//先取箭并获取引用，然后发射
             shootTimer = StatsManager.Instance.GetCoolDown();//重置射击计时器，防止多箭发射
 
         }

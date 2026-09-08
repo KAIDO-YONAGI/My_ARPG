@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
-public class Loot : MonoBehaviour, ISaveable
+public class Loot : MonoBehaviour, ISaveable, IPoolable
 {
     public ItemSO item;
     public SpriteRenderer sr;
@@ -13,11 +13,31 @@ public class Loot : MonoBehaviour, ISaveable
     public int quantity;
     public bool canBePick = true;//防止丢弃拾取死循环
     public bool hasBeenPicked = false;//在对象池里标记是否被拾取，决定是否加载时刷新
+
+    private ObjectPool<Loot> sourcePool;
+    private DataDefinition dataDef;
+
+    /// <summary>由 InventoryManager 在取件后注入，拾取/回收时经它归还池中</summary>
+    public void SetSourcePool(ObjectPool<Loot> pool) => sourcePool = pool;
+
     private void Awake()
     {
+        dataDef = GetComponent<DataDefinition>();//自身组件一次性缓存
         gameObject.SetActive(false);
+        // 存档注册不再在此处进行：池化对象的注册/注销随 OnPoolGet/OnPoolReturn 走，
+        // 避免预热对象被记入存档。
+    }
+
+    public void OnPoolGet()
+    {
         ISaveable saveable = this;
-        saveable.RegisterSaveable();//注册在需要保存的数据的列表中
+        saveable.RegisterSaveable();//取件 = 重新进入存档系统
+    }
+
+    public void OnPoolReturn()
+    {
+        ISaveable saveable = this;
+        saveable.UnRegisterSaveable();//归还 = 移出存档系统，池内对象不参与存读档
     }
 
     private void OnDestroy()
@@ -41,14 +61,14 @@ public class Loot : MonoBehaviour, ISaveable
         this.quantity = quantity;
 
         // 重新生成 GUID，避免与 prefab 或其他实例共享 ID
-        var dataDef = GetComponent<DataDefinition>();
-        if (dataDef != null)
+        var dataDefNow = dataDef != null ? dataDef : (dataDef = GetComponent<DataDefinition>());
+        if (dataDefNow != null)
         {
             if (DataManager.Instance != null)
             {
-                DataManager.Instance.RemoveLootRegistration(dataDef.ID);
+                DataManager.Instance.RemoveLootRegistration(dataDefNow.ID);
             }
-            dataDef.ID = System.Guid.NewGuid().ToString();
+            dataDefNow.ID = System.Guid.NewGuid().ToString();
         }
 
         UpdateAppearence();
@@ -80,7 +100,10 @@ public class Loot : MonoBehaviour, ISaveable
     private IEnumerator DisableAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        gameObject.SetActive(false);
+        if (sourcePool != null)
+            sourcePool.Return(this);//归还池中复用（含注销存档注册）
+        else
+            gameObject.SetActive(false);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -94,7 +117,7 @@ public class Loot : MonoBehaviour, ISaveable
     public DataDefinition GetDataID()
     {
         if (!this) return null;
-        return GetComponent<DataDefinition>();
+        return dataDef != null ? dataDef : (dataDef = GetComponent<DataDefinition>());
     }
 
     public void SaveData(Data data)

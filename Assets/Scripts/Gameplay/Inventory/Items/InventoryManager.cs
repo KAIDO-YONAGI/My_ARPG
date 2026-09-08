@@ -12,8 +12,12 @@ public class InventoryManager : YSingleton<InventoryManager>
     private List<InventorySlot> inventorySlotsList = new();
     [SerializeField] private UseItem useItem;
     [SerializeField] private TMP_Text goldAmountText;
-    [SerializeField] private GameObject lootPrefab;
+    [SerializeField] private Loot lootPrefab;
     [SerializeField] private Transform player;
+    [Header("Loot Pool")]
+    [SerializeField] private int lootPrewarm = 4;
+    [SerializeField] private int lootPoolMaxSize = 20;
+    private ObjectPool<Loot> lootPool;
 
     public int GoldAmount => goldAmount;
     private int goldAmount;
@@ -39,6 +43,8 @@ public class InventoryManager : YSingleton<InventoryManager>
         {
             slot.UpdateUI();
         }
+
+        lootPool = new ObjectPool<Loot>(lootPrefab, lootPrewarm, transform, lootPoolMaxSize);
     }
     private void OnEnable()
     {
@@ -164,11 +170,17 @@ public class InventoryManager : YSingleton<InventoryManager>
         }
         else
         {
-            var sceneChanger = FindObjectOfType<SceneChanger>();
-            Scene currentScene = sceneChanger != null ? sceneChanger.GetCurrentScene() : SceneManager.GetActiveScene();
-            GameObject lootObj = Instantiate(lootPrefab, player.position, Quaternion.identity);
-            SceneManager.MoveGameObjectToScene(lootObj, currentScene);
-            Loot loot = lootObj.GetComponent<Loot>();
+            Scene currentScene = SceneChanger.Instance != null
+                ? SceneChanger.Instance.GetCurrentScene()
+                : SceneManager.GetActiveScene();
+            Loot loot = lootPool.Get();
+            if (loot == null)//池满兜底：一次性实例化，仍可归还池中复用
+                loot = Instantiate(lootPrefab, player.position, Quaternion.identity);
+            else
+                loot.transform.SetPositionAndRotation(player.position, Quaternion.identity);
+            loot.SetSourcePool(lootPool);
+            // 掉落物随当前场景卸载销毁；池 Get 会跳过已销毁对象并在池空时走兜底
+            SceneManager.MoveGameObjectToScene(loot.gameObject, currentScene);
             loot.Initialize(item, quantity);
         }
     }

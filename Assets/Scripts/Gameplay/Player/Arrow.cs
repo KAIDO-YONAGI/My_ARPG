@@ -1,8 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Arrow : MonoBehaviour
+public class Arrow : MonoBehaviour, IPoolable
 {
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private LayerMask enemyLayer;
@@ -15,9 +14,15 @@ public class Arrow : MonoBehaviour
     [SerializeField] private int damage = 1;
 
     private Vector2 direction = Vector2.right;
+    private Sprite originalSprite;
+    private ObjectPool<Arrow> sourcePool;
+    private Coroutine lifeCoroutine;
+
+    /// <summary>由 PlayerBow 在建池后注入，箭矢到期/回收时经它归还池中</summary>
+    public void SetSourcePool(ObjectPool<Arrow> pool) => sourcePool = pool;
 
     /// <summary>
-    /// 发射箭矢：设置飞行方向、初速度、旋转角度。由外部（PlayerBow）在实例化后调用一次。
+    /// 发射箭矢：设置飞行方向、初速度、旋转角度。由外部（PlayerBow）在取件后调用一次。
     /// </summary>
     public void Launch(Vector2 direction)
     {
@@ -26,11 +31,41 @@ public class Arrow : MonoBehaviour
         RotateArrow();
     }
 
-    private void Start()
+    public void OnPoolGet()
     {
-        Destroy(gameObject, lifeSpan);//destory方法的第二个参数表示对象生存时间/多久后销毁
+        // 每次取件都按当前玩家攻击力刷新伤害
         damage = StatsManager.Instance.GetDamage();
+        if (originalSprite != null) spriteRenderer.sprite = originalSprite;
+        transform.rotation = Quaternion.identity;
+        transform.SetParent(null);
+
+        if (lifeCoroutine != null) StopCoroutine(lifeCoroutine);
+        lifeCoroutine = StartCoroutine(LifeTimer());
     }
+
+    public void OnPoolReturn()
+    {
+        if (lifeCoroutine != null)
+        {
+            StopCoroutine(lifeCoroutine);
+            lifeCoroutine = null;
+        }
+        rb.velocity = Vector2.zero;
+        rb.isKinematic = false;
+    }
+
+    private void Awake()
+    {
+        originalSprite = spriteRenderer.sprite;
+    }
+
+    private IEnumerator LifeTimer()
+    {
+        yield return new WaitForSeconds(lifeSpan);
+        lifeCoroutine = null;
+        sourcePool?.Return(this);
+    }
+
     private void RotateArrow()
     {
         float angle = Mathf.Atan2(direction.y, direction.x) *Mathf.Rad2Deg;//*Rad2Deg表示转换弧度制为角度制
@@ -39,10 +74,10 @@ public class Arrow : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        // 例外保留：碰撞对象运行时才知道是谁，无法预引用（见重构清单 GetComponent 治理一节）
         if ((enemyLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
-            var damageable = collision.gameObject.GetComponent<IDamageable>();
-            if (damageable != null)
+            if (collision.gameObject.TryGetComponent<IDamageable>(out var damageable))
             {
                 damageable.TakeDamage(damage, transform);
                 AttachToTarget(collision.gameObject.transform);
