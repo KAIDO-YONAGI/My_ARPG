@@ -88,3 +88,6 @@ Assets/StreamingAssets/aa/
 # - ProjectSettings/
 # - *.meta
 # - *.dll
+
+# ========== Materials (本地大体积资源, git 出库仅留磁盘) ==========
+/Materials/
