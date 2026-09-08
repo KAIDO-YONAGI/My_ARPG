@@ -5,35 +5,61 @@ using UnityEngine;
 
 public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 {
-    [SerializeField] private GameObject[] statsSlots;
+    [SerializeField] private TMP_Text[] statTexts;
     [SerializeField] private CanvasGroup statsCanvas;
+    [SerializeField] private Canvas canvas;
 
     [SerializeField] private ToggleCanvasEventSO toggleStatsEvent;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
 
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
-    private Canvas canvas;
+    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+
+    // 运行时绑定 StatsManager 的数据副本（事件在副本身上）；初始绑定放在 Start：
+    // 面板可能随 GamePlay 根节点延迟激活，那时 StatsManager 必然已就绪。
+    private PlayerStatsSO stats;
 
     protected override void OnSingletonInitialized()
     {
         statsCanvas.alpha = 0;
-        canvas = statsCanvas.GetComponent<Canvas>();
     }
 
     private void Start()
     {
+        stats = StatsManager.Instance.RuntimeStats;
+        stats.StatsChanged += UpdateAllStats;
         UpdateAllStats();
     }
 
     private void OnEnable()
     {
+        // 重激活时补一次刷新：失活期间错过的事件没有累积通知
+        if (stats != null)
+            UpdateAllStats();
+
         toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
         toggleStatsEvent.focusEvent += OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         toggleStatsEvent.toggleCanvasEvent -= OnToggleStatsEvent;
         toggleStatsEvent.focusEvent -= OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+    }
+
+    private void OnDestroy()
+    {
+        if (stats != null)
+            stats.StatsChanged -= UpdateAllStats;
+    }
+
+    private void OnSceneLoaded()
+    {
+        ((ICanvasManager)this).SetCanvaInactive(statsCanvas, MyEnums.CanvasToToggle.Stats);
     }
 
     private void OnToggleStatsEvent(bool state)
@@ -44,22 +70,30 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 
     private void OnFocus()
     {
+        if (!canvasIsActive()) return;
         ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Stats, true);
+    }
+
+    private bool canvasIsActive()
+    {
+        return statsCanvas.alpha > 0;
     }
 
     public void UpdateDamage()
     {
-        statsSlots[0].GetComponentInChildren<TMP_Text>().text = "Damage:" + StatsManager.Instance.GetDamage();
-        // 注意：Components是复数形式，返回的是数组。
+        if (stats == null || statTexts == null || statTexts.Length < 1 || statTexts[0] == null) return;
+        statTexts[0].text = "Damage:" + stats.Data.damage;
     }
 
     public void UpdateSpeed()
     {
-        statsSlots[1].GetComponentInChildren<TMP_Text>().text = "Speed:" + StatsManager.Instance.GetSpeed();
+        if (stats == null || statTexts == null || statTexts.Length < 2 || statTexts[1] == null) return;
+        statTexts[1].text = "Speed:" + stats.Data.speed;
     }
 
     public void UpdateAllStats()
     {
+        if (stats == null) return;
         UpdateDamage();
         UpdateSpeed();
     }
