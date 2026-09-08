@@ -9,7 +9,9 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
 {
     [Header("Events To Receive")]
     [SerializeField] private ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleSaveLoadCanvasEvent;
+    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     [Header("UI")]
     [SerializeField] private CanvasGroup saveCanvasGroup;
@@ -19,7 +21,10 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
 
     private bool isPanelOpen = false;
     private MyEnums.SaveType saveType = MyEnums.SaveType.PlayerSave;
-    private List<SaveLoadButtonGroup> saveLoadButtonGroups = new();
+    [SerializeField] private List<SaveLoadButtonGroup> saveLoadButtonGroups = new();
+
+    /// <summary>存档按钮组引用（Inspector 接线，替代旧的 GetChild+GetComponent 自动发现）。</summary>
+    [System.Serializable]
     public class SaveLoadButtonGroup
     {
         public SaveInfo saveInfo;
@@ -27,8 +32,6 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         public Button saveButton;
         public TMP_Text saveButtonText;
         public Button loadButton;
-        public SaveLoadButtonGroup() { }
-
     }
     public class SaveInfo
 
@@ -43,14 +46,24 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         }
 
     }
+    private void Start()
+    {
+        // 一次性注册按钮监听（引用已在 Inspector 序列化好）
+        foreach (var group in saveLoadButtonGroups)
+        {
+            if (group == null || group.saveButton == null || group.loadButton == null) continue;
+            var g = group;
+            g.saveButton.onClick.AddListener(() => OnClickSave(g));
+            g.loadButton.onClick.AddListener(() => OnClickLoad(g));
+        }
+    }
+
     private void OnEnable()
     {
         toggleSaveLoadCanvasEvent.toggleCanvasEvent += OnToggleCanvas;
         toggleSaveLoadCanvasEvent.focusEvent += OnFocus;
-        if (saveLoadButtonGroups.Count == 0)
-        {
-            LoadButtons();
-        }
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
         LoadInfoToSaveList();
         RefreshSaveButtonState();
 
@@ -60,6 +73,14 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     {
         toggleSaveLoadCanvasEvent.toggleCanvasEvent -= OnToggleCanvas;
         toggleSaveLoadCanvasEvent.focusEvent -= OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded()
+    {
+        isPanelOpen = false;
+        ((ICanvasManager)this).SetCanvaInactive(saveCanvasGroup, MyEnums.CanvasToToggle.SaveLoad);
     }
 
 
@@ -89,6 +110,8 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     string[] files;
     private void LoadInfoToSaveList()
     {
+        if (SaveSystem.Instance == null) return; // 启动期 OnEnable 可能早于 SaveSystem.Awake
+
         files = SaveSystem.Instance.GetSavesPath(saveType);
 
         int i = 0;
@@ -144,33 +167,6 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     {
         SaveSystem.Instance.LoadSave(group.saveInfo.saveType, group.saveInfo.savePath);
 
-    }
-    private void LoadButtons()
-    {
-        saveLoadButtonGroups = new List<SaveLoadButtonGroup>();
-
-        // 遍历 content 下的每个 button 组
-        foreach (Transform groupTransform in buttonsContent.transform)
-        {
-            var buttonsParent = groupTransform.GetChild(1);
-            var group = new SaveLoadButtonGroup
-            {
-                saveInfoText = groupTransform.GetChild(0).GetComponent<TMP_Text>(),
-                saveButton = buttonsParent.GetChild(0).GetComponent<Button>(),
-                saveButtonText = buttonsParent.GetChild(0).GetComponentInChildren<TMP_Text>(),
-                loadButton = buttonsParent.GetChild(1).GetComponent<Button>()
-            };
-            if (group.saveInfoText == null || group.saveButton == null || group.saveButtonText == null || group.loadButton == null)
-            {
-                Debug.LogWarning($"SaveLoadButtonGroup 初始化失败: {groupTransform.name}");
-                continue;
-            }
-
-            saveLoadButtonGroups.Add(group);
-            group.saveButton.onClick.AddListener(() => OnClickSave(group));
-            group.loadButton.onClick.AddListener(() => OnClickLoad(group));
-
-        }
     }
     private void RefreshSaveButtonState()
     {

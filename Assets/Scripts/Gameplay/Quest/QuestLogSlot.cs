@@ -12,6 +12,9 @@ public class QuestLogSlot : MonoBehaviour
     public QuestLogUI questLogUI;
     private CanvasGroup slotCanvas;
 
+    /// <summary>本槽位的 CanvasGroup（Awake 已缓存，外部直接取，避免 GetComponent）。</summary>
+    public CanvasGroup SlotCanvas => slotCanvas;
+
     private void Awake()
     {
         slotCanvas = GetComponent<CanvasGroup>();

@@ -5,13 +5,16 @@ using UnityEngine;
 public class QuestManager : YSingleton<QuestManager>, ICanvasManager
 {
     [SerializeField] private CanvasGroup questCanvaGroup;
+    [SerializeField] private Canvas canvas;
 
     [Header("Events To Receive")]
     [SerializeField] private VoidEventSO openQuestEventSO;
     [SerializeField] private LoadQuestEventSO loadQuestEventSO;
     [SerializeField] private QuestOptionsEventSO questOptionsEventSO;
     [SerializeField] private ToggleCanvasEventSO toggleQuestEvent;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleQuestEvent;
+    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
 
 
     [Header("Events To Trigger")]
@@ -43,7 +46,6 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
     private bool canvasIsActive;
     private List<QuestSO> currentBoardLoadQuests;
     private QuestSO currentQuest;
-    private Canvas canvas;
 
     public void SetCurrentQuest(QuestSO quest)
     {
@@ -62,11 +64,6 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         public MyEnums.QuestState questState = MyEnums.QuestState.Idle;
         public Dictionary<QuestObjective, int> questObjectives = new();
     }
-    protected override void OnSingletonInitialized()
-    {
-        canvas = questCanvaGroup.GetComponent<Canvas>();
-    }
-
     private void OnEnable()
     {
         openQuestEventSO.VoidEvent += OnOpenQuestBoard;
@@ -74,6 +71,8 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         questOptionsEventSO.questOptionsEvent += OnQuestOptionChose;
         toggleQuestEvent.toggleCanvasEvent += OnToggleQuest;
         toggleQuestEvent.focusEvent += OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
 
     }
 
@@ -85,7 +84,14 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         questOptionsEventSO.questOptionsEvent -= OnQuestOptionChose;
         toggleQuestEvent.toggleCanvasEvent -= OnToggleQuest;
         toggleQuestEvent.focusEvent -= OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
 
+    }
+
+    private void OnSceneLoaded()
+    {
+        CloseQuestBoard();
     }
 
     private void OnToggleQuest(bool state)
@@ -321,7 +327,8 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         {
             if (questSlot.currentQuest == quest)
             {
-                CanvasGroup questSlotCanvas = questSlot.GetComponent<CanvasGroup>();
+                CanvasGroup questSlotCanvas = questSlot.SlotCanvas;
+                if (questSlotCanvas == null) continue;
                 questSlotCanvas.alpha = .2f;
                 questSlotCanvas.interactable = false;
                 questSlotCanvas.blocksRaycasts = false;

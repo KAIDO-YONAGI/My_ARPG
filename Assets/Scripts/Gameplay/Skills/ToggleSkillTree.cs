@@ -3,25 +3,30 @@ using UnityEngine;
 public class ToggleSkillTree : MonoBehaviour, ICanvasManager
 {
     [SerializeField] private CanvasGroup skillsCanvas;
+    [SerializeField] private Canvas canvas;
     [SerializeField] private ToggleCanvasEventSO toggleSkillEvent;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleSkillEvent;
-    private Canvas canvas;
-
-    private void Awake()
-    {
-        canvas = skillsCanvas.GetComponent<Canvas>();
-    }
+    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     private void OnEnable()
     {
         toggleSkillEvent.toggleCanvasEvent += OnToggleSkillEvent;
         toggleSkillEvent.focusEvent += OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
     }
     private void OnDisable()
     {
         toggleSkillEvent.toggleCanvasEvent -= OnToggleSkillEvent;
         toggleSkillEvent.focusEvent -= OnFocus;
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
 
+    }
+    private void OnSceneLoaded()
+    {
+        ((ICanvasManager)this).SetCanvaInactive(skillsCanvas, MyEnums.CanvasToToggle.Skills);
     }
     private void OnToggleSkillEvent(bool state)
     {

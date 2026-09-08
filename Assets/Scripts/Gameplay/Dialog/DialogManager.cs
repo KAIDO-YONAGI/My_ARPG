@@ -12,6 +12,8 @@ public class DialogManager : YSingleton<DialogManager>
     [SerializeField] private TMP_Text speakerNameText;
     public bool isDialogActive;
     [SerializeField] private Button[] optionButtons;
+    [SerializeField] private TMP_Text[] optionTexts;
+    [SerializeField] private VoidEventSO sceneLoadedEvent;
 
     private int currentLineIndex = 0;
     private DialogSO currentDialog;
@@ -21,9 +23,23 @@ public class DialogManager : YSingleton<DialogManager>
         SetDialogCanvas(false);
         DisableButtons();
     }
+
+    private void OnEnable()
+    {
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+    }
+
     private void OnDisable()
     {
+        if (sceneLoadedEvent != null)
+            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
         DisableButtons();
+    }
+
+    private void OnSceneLoaded()
+    {
+        ForeceEndDialog();
     }
     public void SetDialogCanvas(bool state)
     {
@@ -293,7 +309,7 @@ public class DialogManager : YSingleton<DialogManager>
             {
                 optionButtons[i].interactable = true;
                 optionButtons[i].gameObject.SetActive(true);
-                TMP_Text optionText = optionButtons[i].GetComponentInChildren<TMP_Text>();
+                TMP_Text optionText = optionTexts != null && i < optionTexts.Length ? optionTexts[i] : null;
 
                 if (optionText != null)
                 {
