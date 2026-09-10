@@ -1335,15 +1335,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 123784317}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 5, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7111420002568855259}
   - {fileID: 148041524}
   - {fileID: 1424315134}
-  m_Father: {fileID: 5360259125137984082}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &124610723
 PrefabInstance:
@@ -1896,6 +1896,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 144643058}
+  sceneLoadEvent: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
   sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
 --- !u!1 &144697901
 GameObject:
@@ -4722,7 +4723,7 @@ GameObject:
   m_Component:
   - component: {fileID: 304869145}
   m_Layer: 0
-  m_Name: HUD
+  m_Name: HUDCanvases
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4736,7 +4737,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 304869144}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4745,7 +4746,7 @@ Transform:
   - {fileID: 697989142}
   - {fileID: 2526332664528444952}
   - {fileID: 1171897204}
-  m_Father: {fileID: 7920227249279348528}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &317524238
 GameObject:
@@ -5666,6 +5667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 421772641}
+  sceneLoadEvent: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
   sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
 --- !u!1001 &424110729
 PrefabInstance:
@@ -9503,6 +9505,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 697989146}
+  sceneLoadEvent: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
   sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
 --- !u!1 &708706359
 GameObject:
@@ -9941,7 +9944,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 94.77516, y: 0, z: 100.594055, w: 0}
+  m_margin: {x: 94.77516, y: 93.48132, z: 100.594055, w: 91.07745}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -12307,7 +12310,7 @@ GameObject:
   m_Component:
   - component: {fileID: 941363829}
   m_Layer: 0
-  m_Name: GamePlay
+  m_Name: GamePlayCanvases
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12321,7 +12324,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 941363828}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -12332,7 +12335,7 @@ Transform:
   - {fileID: 666307406}
   - {fileID: 870103886}
   - {fileID: 2060990189}
-  m_Father: {fileID: 7920227249279348528}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &949759486 stripped
 RectTransform:
@@ -13750,7 +13753,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1110611258}
   m_Layer: 0
-  m_Name: System
+  m_Name: SystemCanvases
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13764,7 +13767,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1110611257}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -13773,7 +13776,8 @@ Transform:
   - {fileID: 185937015}
   - {fileID: 138144112}
   - {fileID: 906968761}
-  m_Father: {fileID: 7920227249279348528}
+  - {fileID: 1424539691}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1114865936
 PrefabInstance:
@@ -16812,7 +16816,7 @@ RectTransform:
   m_Children:
   - {fileID: 551537483}
   - {fileID: 203452128}
-  m_Father: {fileID: 5031346064064601231}
+  m_Father: {fileID: 1110611258}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -31012,8 +31016,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1424539691}
+  m_Children: []
   m_Father: {fileID: 42653699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5031346064064601232
@@ -31215,7 +31218,6 @@ Transform:
   m_Children:
   - {fileID: 6434889142096591104}
   - {fileID: 7312488964721089398}
-  - {fileID: 123784318}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &5375076446612261759
@@ -33432,22 +33434,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4341828683417181844}
   m_CullTransparentMesh: 1
---- !u!1 &6733727039573014254
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7920227249279348528}
-  m_Layer: 0
-  m_Name: UICanavases
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!114 &6794740610558029268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34739,6 +34725,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 7285831560088262299}
+  sceneLoadEvent: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
   sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
 --- !u!224 &7289243526454935472
 RectTransform:
@@ -35554,24 +35541,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7953370996453584490, guid: ad6c571997aade34da41c92faf999008, type: 3}
   m_PrefabInstance: {fileID: 2027055862}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &7920227249279348528
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6733727039573014254}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1110611258}
-  - {fileID: 304869145}
-  - {fileID: 941363829}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7942121137208117300
 GameObject:
   m_ObjectHideFlags: 0
@@ -35898,8 +35867,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1712612263776479917, guid: a2638a66248cbed478a5a23485bce105, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -39
+      objectReference: {fileID: 0}
+    - target: {fileID: 1712612263776479917, guid: a2638a66248cbed478a5a23485bce105, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 39
+      value: 19.5
       objectReference: {fileID: 0}
     - target: {fileID: 2352733637193725608, guid: a2638a66248cbed478a5a23485bce105, type: 3}
       propertyPath: m_Name
@@ -36574,6 +36547,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 2775953036972689469}
+  sceneLoadEvent: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
   sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
 --- !u!1 &8376443829537401629
 GameObject:
@@ -37853,5 +37827,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 781860693603705375}
   - {fileID: 5360259125137984082}
+  - {fileID: 123784318}
   - {fileID: 42653699}
-  - {fileID: 7920227249279348528}
+  - {fileID: 1110611258}
+  - {fileID: 304869145}
+  - {fileID: 941363829}

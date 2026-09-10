@@ -10,27 +10,38 @@ public class MenuSceneCanvasHider : MonoBehaviour
 {
     [Tooltip("要屏蔽的 CanvasGroup 组件（通常挂在本物体上）")]
     [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private SceneLoadEventSO sceneLoadEvent;
     [SerializeField] private VoidEventSO sceneLoadedEvent;
+
+    private GameSceneSO sceneToLoad;
 
     private void OnEnable()
     {
+        if (sceneLoadEvent != null)
+            sceneLoadEvent.LoadRequestEvent += OnSceneLoadRequested;
         if (sceneLoadedEvent != null)
             sceneLoadedEvent.VoidEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
+        if (sceneLoadEvent != null)
+            sceneLoadEvent.LoadRequestEvent -= OnSceneLoadRequested;
         if (sceneLoadedEvent != null)
             sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
     }
 
+    private void OnSceneLoadRequested(GameSceneSO scene, Vector3 position, bool isToFade)
+    {
+        sceneToLoad = scene;
+        Debug.Log("is menu:"+ (sceneToLoad.sceneType == MyEnums.SceneType.Menu));
+    }
+
     private void OnSceneLoaded()
     {
-        if (canvasGroup == null) return;
+        if (canvasGroup == null || sceneToLoad == null) return;
 
-        var scene = SceneChanger.Instance != null ? SceneChanger.Instance.GetCurrentGameScene() : null;
-        bool visible = scene == null || scene.sceneType != MyEnums.SceneType.Menu;
-
+        bool visible = sceneToLoad.sceneType != MyEnums.SceneType.Menu;
         canvasGroup.alpha = visible ? 1 : 0;
         canvasGroup.interactable = visible;
         canvasGroup.blocksRaycasts = visible;

@@ -3,7 +3,10 @@ guid: 700127576c2450249be622a6f97f5ac5
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - canvasGroup: {instanceID: 0}
+  - sceneLoadEvent: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
+  - sceneLoadedEvent: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
