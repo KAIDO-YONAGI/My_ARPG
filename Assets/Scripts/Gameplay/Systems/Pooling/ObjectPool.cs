@@ -6,6 +6,13 @@ public interface IPoolable
 {
     void OnPoolGet();
     void OnPoolReturn();
+
+    /// <summary>
+    /// 实例刚由池创建（预热或扩容）时调用一次，默认空实现。
+    /// 只有需要区分「池对象 / 场景摆放对象」的实现才关心它——
+    /// 池创建时 Awake/OnEnable 已自动跑过一遍，实现可借此把那次副作用退回。
+    /// </summary>
+    void OnPoolCreated() { }
 }
 
 /// <summary>
@@ -94,6 +101,9 @@ public class ObjectPool<T> where T : Component
     private T CreateNew()
     {
         var obj = Object.Instantiate(_prefab, _parent);
+        // 实例化过程中 Awake/OnEnable 已经跑过，这里补一次「由池创建」回调，
+        // 让实现有机会退回那次自动副作用（见 IPoolable.OnPoolCreated）。
+        (obj as IPoolable)?.OnPoolCreated();
         obj.name = $"{_prefab.name}_{TotalCreated}";
         TotalCreated++;
         return obj;

@@ -35,11 +35,16 @@ public class LootStatus
 {
     public SerializableVector3 position;
     public bool hasBeenPicked;
+    // 位置是否偏离「生成态」（场景摆放位置 / 掉落物出生位置）。
+    // 只有 true 时 position 才会在读档时回写；旧档没有这个字段，
+    // 反序列化后为 false → 位置以场景生成为准，只吃 hasBeenPicked。
+    public bool moved;
     public LootStatus() { }
-    public LootStatus(Vector3 pos, bool picked)
+    public LootStatus(Vector3 pos, bool picked, bool moved)
     {
         position = new SerializableVector3(pos);
         hasBeenPicked = picked;
+        this.moved = moved;
     }
 }
 

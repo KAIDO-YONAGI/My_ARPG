@@ -175,9 +175,17 @@ public class InventoryManager : YSingleton<InventoryManager>
                 : SceneManager.GetActiveScene();
             Loot loot = lootPool.Get();
             if (loot == null)//池满兜底：一次性实例化，仍可归还池中复用
+            {
                 loot = Instantiate(lootPrefab, player.position, Quaternion.identity);
+                // 兜底实例不经过池的 Get，补一次取件回调：Loot 在此确定自己的身份
+                // 并挂进存档系统。否则它会沿用 prefab 的共享 ID，多个兜底实例
+                // 会写进同一条存档记录互相覆盖。
+                loot.OnPoolGet();
+            }
             else
+            {
                 loot.transform.SetPositionAndRotation(player.position, Quaternion.identity);
+            }
             loot.SetSourcePool(lootPool);
             // 掉落物随当前场景卸载销毁；池 Get 会跳过已销毁对象并在池空时走兜底
             SceneManager.MoveGameObjectToScene(loot.gameObject, currentScene);
