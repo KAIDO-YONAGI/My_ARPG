@@ -33,8 +33,6 @@ public class UIManager : YSingleton<UIManager>
     private readonly Dictionary<CanvasToToggle, bool> canvasBlocksInput = new();
     private readonly Dictionary<CanvasToToggle, bool> canvasCloseOnEscape = new();
 
-    private CanvasToToggle canvasToToggle = CanvasToToggle.Default;
-
     // 外部（代码/按键）输入合并到这里
     private readonly Dictionary<CanvasToToggle, bool> inputState = new();
 
@@ -167,17 +165,24 @@ public class UIManager : YSingleton<UIManager>
         return mutexCanvases != null && mutexCanvases.Contains(canvas);
     }
 
-    // 是否为可关闭面板：开关事件在 toggleCanvasEvents 列表中，可被按键唤起、ESC 关闭、切场景复位和互斥关闭。
-    // 不在列表中的面板即使上报状态（仅上报层级），UIManager 也不主动关闭它，显隐由其自身逻辑决定。
-    private bool IsClosableCanvas(CanvasToToggle canvas)
+    // 在 toggleCanvasEvents 中查找某画布对应的事件资产；未登记返回 null。
+    // 可关闭判定、开关广播、focus 广播三处共用同一套匹配规则：取列表中第一个匹配项。
+    private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas)
     {
         foreach (var eventSO in toggleCanvasEvents)
         {
             if (eventSO != null && eventSO.canvasToToggle == canvas)
-                return true;
+                return eventSO;
         }
 
-        return false;
+        return null;
+    }
+
+    // 是否为可关闭面板：开关事件在 toggleCanvasEvents 列表中，可被按键唤起、ESC 关闭、切场景复位和互斥关闭。
+    // 不在列表中的面板即使上报状态（仅上报层级），UIManager 也不主动关闭它，显隐由其自身逻辑决定。
+    private bool IsClosableCanvas(CanvasToToggle canvas)
+    {
+        return FindToggleEvent(canvas) != null;
     }
 
     // 是否有"阻塞全局输入"的画布处于打开状态（按焦点栈开放列表推导，避免计数漂移）。
@@ -272,10 +277,10 @@ public class UIManager : YSingleton<UIManager>
     /// </summary>
     private void HandleCanvasToggleRequest()
     {
-        canvasToToggle = FindRequestedCanvas();
-        if (canvasToToggle != CanvasToToggle.Default)
+        CanvasToToggle requested = FindRequestedCanvas();
+        if (requested != CanvasToToggle.Default)
         {
-            focusStack.ApplyFocusChange(canvasToToggle);
+            focusStack.ApplyFocusChange(requested);
         }
     }
 
@@ -327,26 +332,12 @@ public class UIManager : YSingleton<UIManager>
 
     private void RaiseCanvasEvent(CanvasToToggle target, bool state)
     {
-        foreach (var eventSO in toggleCanvasEvents)
-        {
-            if (eventSO.canvasToToggle == target)
-            {
-                eventSO.RaiseToggleCanvasEvent(state);
-                return;
-            }
-        }
+        FindToggleEvent(target)?.RaiseToggleCanvasEvent(state);
     }
 
     private void RaiseFocusEvent(CanvasToToggle target)
     {
-        foreach (var eventSO in toggleCanvasEvents)
-        {
-            if (eventSO.canvasToToggle == target)
-            {
-                eventSO.RaiseFocusEvent();
-                return;
-            }
-        }
+        FindToggleEvent(target)?.RaiseFocusEvent();
     }
 
     private void ResetInputState()

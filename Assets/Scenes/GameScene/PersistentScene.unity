@@ -2291,7 +2291,6 @@ GameObject:
   - component: {fileID: 185937020}
   - component: {fileID: 185937019}
   - component: {fileID: 185937021}
-  - component: {fileID: 185937022}
   m_Layer: 5
   m_Name: JoystickCanvas
   m_TagString: Untagged
@@ -2412,20 +2411,6 @@ MonoBehaviour:
   handleRect: {fileID: 501222355}
   canvasGroup: {fileID: 185937019}
   joystickRoot: {fileID: 2027922515}
---- !u!114 &185937022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 185937014}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 700127576c2450249be622a6f97f5ac5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 185937019}
-  sceneLoadedEvent: {fileID: 11400000, guid: dd4b3ae6ad7a21a4ca837e490a83664e, type: 2}
 --- !u!1001 &202569404
 PrefabInstance:
   m_ObjectHideFlags: 0
