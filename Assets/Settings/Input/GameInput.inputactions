@@ -248,15 +248,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleGuidePanel",
-                    "type": "Button",
-                    "id": "a1b2c3d4-0002-0002-0002-000000000029",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "ToggleBackpack",
                     "type": "Button",
                     "id": "a1b2c3d4-0002-0002-0002-000000000025",
@@ -361,17 +352,6 @@
                     "processors": "",
                     "groups": "KeyboardMouse",
                     "action": "AdvanceDialog",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "c0000001-0000-0000-0000-000000000029",
-                    "path": "<Keyboard>/g",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "ToggleGuidePanel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

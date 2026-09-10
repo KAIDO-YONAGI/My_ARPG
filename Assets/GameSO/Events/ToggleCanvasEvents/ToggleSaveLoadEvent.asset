@@ -9,6 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8c3bc6967a23924682e4a0566bba9e6, type: 3}
-  m_Name: LootEventSO
+  m_Script: {fileID: 11500000, guid: 5ea4d69e00b40ba49bad5b6edd18617e, type: 3}
+  m_Name: ToggleSaveLoadEvent
   m_EditorClassIdentifier: 
+  canvasToToggle: 9

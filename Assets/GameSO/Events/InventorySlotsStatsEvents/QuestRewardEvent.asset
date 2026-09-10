@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edc4eacd8d34e5b4ebc88eedec549de8, type: 3}
-  m_Name: RetryRequestEventSO
+  m_Script: {fileID: 11500000, guid: ae03cb20af83ae24d9c1aec1d4d6b159, type: 3}
+  m_Name: QuestRewardEvent
   m_EditorClassIdentifier: 

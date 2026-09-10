@@ -17,9 +17,8 @@ public class UIManager : YSingleton<UIManager>
     [Header("Input Bindings")] [SerializeField]
     private List<CanvasInputBinding> inputBindings;
 
-    [Header("互斥面板")]
-    [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")]
-    [SerializeField] private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
+    [Header("互斥面板")] [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
+    private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
 
     // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
     private readonly CanvasFocusStack focusStack = new();
@@ -35,8 +34,8 @@ public class UIManager : YSingleton<UIManager>
 
     protected override void OnSingletonInitialized()
     {
-        foreach (CanvasToToggle canvas in
-                 Enum.GetValues(typeof(CanvasToToggle)))
+        //用枚举类初始化inputState
+        foreach (CanvasToToggle canvas in Enum.GetValues(typeof(CanvasToToggle)))
         {
             inputState[canvas] = false;
         }
@@ -267,7 +266,6 @@ public class UIManager : YSingleton<UIManager>
                 eventSO.RaiseFocusEvent();
                 return;
             }
-
         }
     }
 

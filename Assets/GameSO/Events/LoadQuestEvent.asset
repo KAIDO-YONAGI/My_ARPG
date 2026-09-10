@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae03cb20af83ae24d9c1aec1d4d6b159, type: 3}
-  m_Name: ShopUpdateRequestSO
+  m_Script: {fileID: 11500000, guid: f471e1385ece90440bb3ac77579b53f9, type: 3}
+  m_Name: LoadQuestEvent
   m_EditorClassIdentifier: 

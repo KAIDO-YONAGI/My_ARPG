@@ -10,5 +10,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: edc4eacd8d34e5b4ebc88eedec549de8, type: 3}
-  m_Name: ShootActionFinishedEventSO
-  m_EditorClassIdentifier:
+  m_Name: ShootActionFinishedEvent
+  m_EditorClassIdentifier: 
