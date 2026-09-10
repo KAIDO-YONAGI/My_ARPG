@@ -71,7 +71,7 @@ public class DataManager : YSingleton<DataManager>
         Vector3 savePosition = PlayerController.Instance != null
             ? PlayerController.Instance.GetPosition()
             : currentScene.initialPosition;
-        dataToSave.sceneIDAndPlayerPos = new SceneAndPosition(currentScene.ID, savePosition);
+        dataToSave.sceneIDAndPlayerPos = new SceneAndPosition(currentScene.SaveKey, savePosition);
 
         foreach (var saveable in saveables.ToList())
         {
@@ -98,7 +98,7 @@ public class DataManager : YSingleton<DataManager>
             Vector3 savePosition = pos == Vector3.zero ? sceneToLoadSO.initialPosition : pos;
             dataToSave = new Data();
             dataToSave.playerStatsData = StatsManager.Instance.GetStats();
-            dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.ID, savePosition);
+            dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.SaveKey, savePosition);
             DynamicDataHandler.ClearDynamicData(dataToSave);
         }
         else
@@ -119,7 +119,7 @@ public class DataManager : YSingleton<DataManager>
 
             if (saveScene != null)
             {
-                dataToSave.sceneIDAndPlayerPos = new(saveScene.ID, savePosition);
+                dataToSave.sceneIDAndPlayerPos = new(saveScene.SaveKey, savePosition);
                 dataSavedEvent.RaiseDataSaveEvent(MyEnums.SaveType.SystemSave);
             }
         }

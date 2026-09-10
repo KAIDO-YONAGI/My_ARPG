@@ -23,6 +23,9 @@ public class SceneChanger : YSingleton<SceneChanger>
     ///     
     [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
 
+    /// <summary>重试请求事件：死亡后重载当前场景，由 RetryButton 广播</summary>
+    [SerializeField] private VoidEventSO retryEventSO;
+
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     [SerializeField] private Animator[] transitionImagesDuringFade;
     [SerializeField] private Object[] objectsToUnableWhileMenuOrReset;
@@ -66,6 +69,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     private void OnEnable()
     {
         loadEventSO.LoadRequestEvent += OnLoadRequestEvent;
+        retryEventSO.VoidEvent += OnRetryRequest;
         loadEventSO.RaiseLoadRequestEvent(initScene, Vector3.zero, false);
     }
 
@@ -75,6 +79,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     private void OnDisable()
     {
         loadEventSO.LoadRequestEvent -= OnLoadRequestEvent;
+        retryEventSO.VoidEvent -= OnRetryRequest;
     }
 
     /// <summary>
@@ -138,6 +143,16 @@ public class SceneChanger : YSingleton<SceneChanger>
         }
 
         StartCoroutine(UnloadAndLoadNew(scene, targetPosition, isToFade)); //卸载当前场景
+    }
+
+    /// <summary>
+    /// 重试请求回调：重载当前所在场景。
+    /// 位置传零向量，复用 OnLoadRequestEvent 的初始位置兜底；
+    /// 回血、复活玩家、收起 GameOver 面板均由本次加载流程统一处理，此处不再重复。
+    /// </summary>
+    private void OnRetryRequest()
+    {
+        loadEventSO.RaiseLoadRequestEvent(currentScene, Vector3.zero, true);
     }
 
     /// <summary>

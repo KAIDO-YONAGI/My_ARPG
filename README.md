@@ -165,7 +165,7 @@
 
 - **资源名 / 路径改动后检查引用**：项目大量依赖 SO 作为数据容器与事件通道（`DialogSO`、`QuestSO`、`GameSceneSO`、各种 `*EventSO` 等）。重命名或移动 SO 资源后，Inspector 里引用它的字段可能变成 `Missing`，运行时静默失效。建议改名后用搜索（如按 GUID / `Missing`）批量核对一次。
 
-- **事件 SO 的订阅与注销必须成对**：自定义事件通道（`VoidEventSO`、`DataSaveEventSO`、`QuestOptionsEventSO` 等）通过 `UnityAction` 委托广播。本项目统一约定在 `OnEnable` 里 `+=` 订阅、`OnDisable` 里 `-=` 注销（参见 `DataManager`、`RetryManager`、`PlayerBow` 等）。**新增订阅者务必遵守此约定**，否则场景切换 / 对象销毁后会出现重复触发或空引用。
+- **事件 SO 的订阅与注销必须成对**：自定义事件通道（`VoidEventSO`、`DataSaveEventSO`、`QuestOptionsEventSO` 等）通过 `UnityAction` 委托广播。本项目统一约定在 `OnEnable` 里 `+=` 订阅、`OnDisable` 里 `-=` 注销（参见 `DataManager`、`SceneChanger`、`PlayerBow` 等）。**新增订阅者务必遵守此约定**，否则场景切换 / 对象销毁后会出现重复触发或空引用。
 
 - **`GameSceneSO.ID` 与 `GuidSO` 的稳定标识**：`GameSceneSO` 在 `OnValidate` 里用 `System.Guid` 自动生成 `ID`；`GuidSO` 也会在为空时自动填充 GUID 并 `SetDirty`。这意味着 **SO 的 GUID 一旦生成就不应手动清空或随意改动**，否则存档（`ISaveable`/`DataManager` 体系通过 ID 关联对象）会找不到对应目标。同时注意：`OnValidate` 仅在编辑器下运行，不要依赖它在打包后的运行时生成 ID。
 

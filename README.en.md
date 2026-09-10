@@ -165,7 +165,7 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 
 - **Check references after renaming/moving**: The project leans heavily on SOs as data containers and event channels (`DialogSO`, `QuestSO`, `GameSceneSO`, the various `*EventSO`s). After renaming or moving an SO asset, fields referencing it can turn `Missing` and fail silently at runtime. After a rename, do a sweep (by GUID / `Missing`) to verify references.
 
-- **Subscribe / unsubscribe event SOs in pairs**: Custom event channels (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, …) broadcast via `UnityAction` delegates. The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `DataManager`, `RetryManager`, `PlayerBow`, etc.). **New subscribers must follow this**, or scene transitions / object destruction will cause double-fires or null-refs.
+- **Subscribe / unsubscribe event SOs in pairs**: Custom event channels (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, …) broadcast via `UnityAction` delegates. The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `DataManager`, `SceneChanger`, `PlayerBow`, etc.). **New subscribers must follow this**, or scene transitions / object destruction will cause double-fires or null-refs.
 
 - **`GameSceneSO.ID` and `GuidSO` stable identity**: `GameSceneSO` auto-generates `ID` via `System.Guid` in `OnValidate`; `GuidSO` likewise fills its GUID when empty and marks itself dirty. So **once a SO's GUID exists, never clear or hand-edit it** — the save system (`ISaveable` / `DataManager`, which keys objects by ID) would lose the link. Also note `OnValidate` is editor-only; do not rely on it to generate IDs in a built player.
 

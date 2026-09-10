@@ -46,6 +46,7 @@ public class LootStatus
 [Serializable]
 public class SceneAndPosition
 {
+    // 存的是 GameSceneSO.SaveKey（Addressables 资产 GUID），不是 GameSceneSO.ID
     public string sceneID;
     public SerializableVector3 position;
     public SceneAndPosition() { }

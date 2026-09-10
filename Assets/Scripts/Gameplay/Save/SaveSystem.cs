@@ -206,7 +206,7 @@ public class SaveSystem : YSingleton<SaveSystem>
 
         foreach (var scene in SceneDataForSave.Instance.gameScenes.ToList())
         {
-            if (scene != null && sceneID == scene.ID) return scene;
+            if (scene != null && sceneID == scene.SaveKey) return scene;
         }
         return null;
     }

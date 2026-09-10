@@ -42,9 +42,11 @@ package "Scene Bootstrap & Transition" #E3F2FD {
         + initScene : GameSceneSO
         + player : GameObject
         + loadEventSO : SceneLoadEventSO
+        + retryEventSO : VoidEventSO
         + sceneLoadedEvent : VoidEventSO
         - currentScene : GameSceneSO
         - OnLoadRequestEvent(scene : GameSceneSO, newPosition : Vector3, isToFade : bool) : void
+        - OnRetryRequest() : void
         - UnloadCurrentScene(sceneToLoad : GameSceneSO) : IEnumerator
         - LoadScene(sceneToLoad : GameSceneSO) : void
         - OnLoadCompleted(handle : AsyncOperationHandle<SceneInstance>) : void
@@ -61,15 +63,7 @@ package "Scene Bootstrap & Transition" #E3F2FD {
         + loadEventSO : SceneLoadEventSO
         + sceneToLoad : GameSceneSO
         + ButtonCanvas : CanvasGroup
-        + retryEventSO : VoidEventSO
         + HandleSceneToggle() : void
-    }
-
-    class RetryManager {
-        + currentScene : GameSceneSO
-        + loadEventSO : SceneLoadEventSO
-        + retryEventSO : VoidEventSO
-        - OnReTry() : void
     }
 
     class ConfinerFinder {
@@ -175,6 +169,7 @@ package "Persisted Runtime Object" #FFF3E0 {
 
 SceneChanger --> SceneLoadEventSO : listens to load requests
 SceneChanger --> VoidEventSO : raises scene loaded
+SceneChanger --> VoidEventSO : listens for retry requests, reloads current scene
 SceneChanger --> GameSceneSO : loads scene assets
 SceneChanger --> TimeManager : pauses / resumes
 SceneChanger --> PlayerMovement : enable / disable input
@@ -182,9 +177,6 @@ InitialLoad --> AssetReference : loads PersistentScene
 SceneToggler --> SceneLoadEventSO : raises transition
 SceneToggler --> GameSceneSO : target scene
 ButtonSceneToggler --> SceneLoadEventSO : raises transition
-ButtonSceneToggler --> VoidEventSO : retry request
-RetryManager --> SceneLoadEventSO : reloads current scene
-RetryManager --> StatsManager : respawn player
 ConfinerFinder --> Scene : listens after scene load
 
 DataManager o-- ISaveable : registry
