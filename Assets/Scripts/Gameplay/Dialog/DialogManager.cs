@@ -13,7 +13,7 @@ public class DialogManager : YSingleton<DialogManager>
     public bool isDialogActive;
     [SerializeField] private Button[] optionButtons;
     [SerializeField] private TMP_Text[] optionTexts;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
     private int currentLineIndex = 0;
     private DialogSO currentDialog;
@@ -27,17 +27,17 @@ public class DialogManager : YSingleton<DialogManager>
     private void OnEnable()
     {
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
         DisableButtons();
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         ForeceEndDialog();
     }

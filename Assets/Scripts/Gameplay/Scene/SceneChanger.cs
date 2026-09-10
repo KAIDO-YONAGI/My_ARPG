@@ -11,7 +11,6 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 /// </summary>
 public class SceneChanger : YSingleton<SceneChanger>
 {
-
     /// <summary>玩家初始位置</summary>
     [SerializeField] private Vector3 initialPosition = Vector3.zero;
 
@@ -24,21 +23,14 @@ public class SceneChanger : YSingleton<SceneChanger>
     ///     
     [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
 
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     [SerializeField] private Animator[] transitionImagesDuringFade;
     [SerializeField] private Object[] objectsToUnableWhileMenuOrReset;
-    private GameSceneSO sceneToLoad;
 
     private GameSceneSO currentScene;
 
     /// <summary>已加载的场景对象</summary>
     private Scene loadedScene;
-
-    /// <summary>玩家新位置</summary>
-    private Vector3 newPosition;
-
-    /// <summary>是否需要淡入淡出</summary>
-    private bool isToFade;
 
     private bool isInitialScene = true;
 
@@ -65,9 +57,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// </summary>
     protected override void OnSingletonInitialized()
     {
-        sceneToLoad = initScene;
         SetPlayerPostion(initialPosition);
-        LoadScene(sceneToLoad);
     }
 
     /// <summary>
@@ -76,6 +66,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     private void OnEnable()
     {
         loadEventSO.LoadRequestEvent += OnLoadRequestEvent;
+        loadEventSO.RaiseLoadRequestEvent(initScene, Vector3.zero, false);
     }
 
     /// <summary>
@@ -119,72 +110,74 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// <param name="isToFade">是否显示过渡动画</param>
     private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
     {
-        // 加载窗口内拒绝新请求：否则第二个请求会覆写 sceneToLoad 字段、
-        // 并在首个流程未结束时再启动一条卸载协程（双协程 + 完成时记录错场景）
+        if (scene == null)
+        {
+            Debug.LogWarning("[SceneChanger] 收到空场景加载请求，已忽略。");
+            return;
+        }
+
+        // 加载窗口内拒绝新请求，避免同一时间启动多条卸载/加载协程。
         if (isLoading)
         {
             Debug.LogWarning($"[SceneChanger] 加载进行中，忽略新的加载请求: {scene.name}");
             return;
         }
+
         isLoading = true;
 
         ForbidInput();
         TimeManager.Instance.PauseGame();
-        sceneToLoad = scene;
 
         StatsManager.Instance.Respawn(); //回血
 
-
-        this.newPosition = newPosition == Vector3.zero ? sceneToLoad.initialPosition : newPosition;
+        Vector3 targetPosition = newPosition == Vector3.zero ? scene.initialPosition : newPosition;
         //如果传入位置为零向量，则使用场景预设的初始位置
-        this.isToFade = isToFade;
         if (isToFade && !isInitialScene)
         {
             PlayLoadingAnimation("FadeIn");
         }
 
-        StartCoroutine(UnloadCurrentScene(sceneToLoad)); //卸载当前场景
+        StartCoroutine(UnloadAndLoadNew(scene, targetPosition, isToFade)); //卸载当前场景
     }
 
     /// <summary>
     /// 卸载当前场景协程
     /// 等待淡入动画完成后卸载旧场景，然后加载新场景
     /// </summary>
-    /// <param name="sceneToLoad">要加载的目标场景</param>
-    private IEnumerator UnloadCurrentScene(GameSceneSO sceneToLoad)
+    /// <param name="targetScene">要加载的目标场景</param>
+    /// <param name="targetPosition">玩家在目标场景中的位置</param>
+    /// <param name="targetFade">是否播放过渡动画</param>
+    private IEnumerator UnloadAndLoadNew(
+        GameSceneSO targetScene,
+        Vector3 targetPosition,
+        bool targetFade)
     {
         yield return new WaitForSecondsRealtime(fadeDuration);
 
         if (currentScene != null)
             yield return currentScene.sceneReference.UnLoadScene();
-        LoadScene(sceneToLoad);
-        SetPlayerPostion(newPosition);
+        LoadScene(targetScene, targetFade); //这里是事件响应的合法调用 并非裸调用
+        SetPlayerPostion(targetPosition);
     }
 
     /// <summary>
-    /// 异步加载场景
+    /// 异步加载场景，禁止裸调用 需要走事件 否则订阅者收不到信息
     /// 使用 Addressables 加载场景，以 additive 模式添加
     /// </summary>
-    /// <param name="sceneToLoad">要加载的场景</param>
-    private void LoadScene(GameSceneSO sceneToLoad)
+    /// <param name="targetScene">要加载的目标场景</param>
+    /// <param name="targetFade">是否播放过渡动画</param>
+    private void LoadScene(GameSceneSO targetScene, bool targetFade)
     {
-        if (sceneToLoad.sceneType == MyEnums.SceneType.Menu)
-        {
+        if (targetScene == null) return;
+
+        if (targetScene.sceneType == MyEnums.SceneType.Menu)
             SetObjects(false);
-        }
 
-        else if (sceneToLoad.sceneType == MyEnums.SceneType.Location)
-        {
+        else if (targetScene.sceneType == MyEnums.SceneType.Location)
             SetObjects(true);
-        }
-
-        if (sceneToLoad != null)
-        {
-            // 闭包捕获本次目标（参数）：防止加载期间字段被覆写导致完成回调记录错场景
-            var target = sceneToLoad;
-            var loadingOption = target.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
-            loadingOption.Completed += handle => OnLoadCompleted(handle, target);
-        }
+        // 闭包捕获本次目标（参数）：防止加载期间字段被覆写导致完成回调记录错场景
+        var loadingOption = targetScene.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
+        loadingOption.Completed += handle => OnLoadCompleted(handle, targetScene, targetFade);
     }
 
     private void SetObjects(bool state)
@@ -203,19 +196,24 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// 更新当前场景引用，播放淡出动画
     /// </summary>
     /// <param name="handle">异步操作句柄</param>
-    private void OnLoadCompleted(AsyncOperationHandle<SceneInstance> handle, GameSceneSO loadedTarget)
+    /// <param name="loadedTarget">本次实际加载的场景</param>
+    /// <param name="targetFade">本次加载是否需要播放淡出动画</param>
+    private void OnLoadCompleted(
+        AsyncOperationHandle<SceneInstance> handle,
+        GameSceneSO loadedTarget,
+        bool targetFade)
     {
         // 不变量：currentScene 赋值必须在 sceneLoadedEvent 广播之前——
         // 订阅方（画布管理器/DataManager/MenuSceneCanvasHider 等）经 GetCurrentGameScene() 回读
         currentScene = loadedTarget;
         loadedScene = handle.Result.Scene;
-        if (isToFade && !isInitialScene)
+        if (targetFade && !isInitialScene)
         {
             PlayLoadingAnimation("FadeOut");
         }
 
         isInitialScene = false;
-        sceneLoadedEvent?.OnEventRaised();
+        sceneLoadedEvent?.RaiseSceneLoadedEvent(currentScene);
         AllowInput();
         TimeManager.Instance.ForceResumeGame();
         isLoading = false; // 全部完成后才解锁，允许下一次加载请求

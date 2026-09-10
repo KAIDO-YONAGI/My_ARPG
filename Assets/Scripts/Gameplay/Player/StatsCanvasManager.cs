@@ -10,10 +10,10 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
     [SerializeField] private Canvas canvas;
 
     [SerializeField] private ToggleCanvasEventSO toggleStatsEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
-    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     // 运行时绑定 StatsManager 的数据副本（事件在副本身上）；初始绑定放在 Start：
     // 面板可能随 GamePlay 根节点延迟激活，那时 StatsManager 必然已就绪。
@@ -40,7 +40,7 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
         toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
         toggleStatsEvent.focusEvent += OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -48,7 +48,7 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
         toggleStatsEvent.toggleCanvasEvent -= OnToggleStatsEvent;
         toggleStatsEvent.focusEvent -= OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnDestroy()
@@ -57,7 +57,7 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
             stats.StatsChanged -= UpdateAllStats;
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         ((ICanvasManager)this).SetCanvaInactive(statsCanvas, MyEnums.CanvasToToggle.Stats);
     }

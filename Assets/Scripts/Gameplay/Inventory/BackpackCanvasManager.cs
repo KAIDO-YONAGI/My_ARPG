@@ -5,17 +5,17 @@ public class BackpackCanvasManager : MonoBehaviour, ICanvasManager
     [SerializeField] private CanvasGroup currentCanvas;
     [SerializeField] private Canvas canvas;
     [SerializeField] private ToggleCanvasEventSO toggleBackpackCanvasEventSO;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleBackpackCanvasEventSO;
-    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     private void OnEnable()
     {
         toggleBackpackCanvasEventSO.toggleCanvasEvent += OnToggleBackpack;
         toggleBackpackCanvasEventSO.focusEvent += OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -23,10 +23,10 @@ public class BackpackCanvasManager : MonoBehaviour, ICanvasManager
         toggleBackpackCanvasEventSO.toggleCanvasEvent -= OnToggleBackpack;
         toggleBackpackCanvasEventSO.focusEvent -= OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         ((ICanvasManager)this).SetCanvaInactive(currentCanvas, MyEnums.CanvasToToggle.Backpack);
     }

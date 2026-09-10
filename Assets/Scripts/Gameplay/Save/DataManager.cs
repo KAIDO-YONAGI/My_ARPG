@@ -17,7 +17,7 @@ public class DataManager : YSingleton<DataManager>
 
     [Header("Receive")]
     [SerializeField] private SceneLoadEventSO sceneLoadEventSO;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
     private List<ISaveable> saveables = new();
 
@@ -27,12 +27,12 @@ public class DataManager : YSingleton<DataManager>
     private void OnEnable()
     {
         sceneLoadEventSO.LoadRequestEvent += OnAutoSave;
-        sceneLoadedEvent.VoidEvent += OnAutoLoad;
+        sceneLoadedEvent.SceneLoadedEvent += OnAutoLoad;
     }
     private void OnDisable()
     {
         sceneLoadEventSO.LoadRequestEvent -= OnAutoSave;
-        sceneLoadedEvent.VoidEvent -= OnAutoLoad;
+        sceneLoadedEvent.SceneLoadedEvent -= OnAutoLoad;
     }
 
     public void RegisterSaveableData(ISaveable saveable)
@@ -126,7 +126,7 @@ public class DataManager : YSingleton<DataManager>
         lastSceneType = sceneToLoadSO.sceneType;
     }
 
-    void OnAutoLoad()
+    void OnAutoLoad(GameSceneSO _)
     {
         foreach (var saveable in saveables.ToList())
         {

@@ -4,22 +4,22 @@ public class ESCMenuManager : MonoBehaviour
 {
     [SerializeField] private CanvasGroup ESCGroup;
     [SerializeField] private ToggleCanvasEventSO toggleESCEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
     private void OnEnable()
     {
         toggleESCEvent.toggleCanvasEvent += OnESC;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
     private void OnDisable()
     {
         toggleESCEvent.toggleCanvasEvent -= OnESC;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         OnESC(false);
     }

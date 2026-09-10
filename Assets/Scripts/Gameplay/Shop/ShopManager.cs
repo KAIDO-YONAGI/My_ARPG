@@ -13,8 +13,8 @@ public class ShopManager : YSingleton<ShopManager>, ICanvasManager, IShopInterac
     [SerializeField] private ToggleCanvasEventSO toggleShopCanvasEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
     [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
-    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
 
     private List<ShopItems> shopItems;
@@ -44,7 +44,7 @@ public class ShopManager : YSingleton<ShopManager>, ICanvasManager, IShopInterac
             shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
         }
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -57,10 +57,10 @@ public class ShopManager : YSingleton<ShopManager>, ICanvasManager, IShopInterac
             shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
         }
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         CloseShop();
     }

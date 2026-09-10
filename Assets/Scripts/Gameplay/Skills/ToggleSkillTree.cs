@@ -5,26 +5,26 @@ public class ToggleSkillTree : MonoBehaviour, ICanvasManager
     [SerializeField] private CanvasGroup skillsCanvas;
     [SerializeField] private Canvas canvas;
     [SerializeField] private ToggleCanvasEventSO toggleSkillEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleSkillEvent;
-    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     private void OnEnable()
     {
         toggleSkillEvent.toggleCanvasEvent += OnToggleSkillEvent;
         toggleSkillEvent.focusEvent += OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
     private void OnDisable()
     {
         toggleSkillEvent.toggleCanvasEvent -= OnToggleSkillEvent;
         toggleSkillEvent.focusEvent -= OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
 
     }
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         ((ICanvasManager)this).SetCanvaInactive(skillsCanvas, MyEnums.CanvasToToggle.Skills);
     }

@@ -10,14 +10,14 @@ public class GameOverCanvasManager : MonoBehaviour
 {
     [SerializeField] private CanvasGroup gameOverGroup;
     [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
     private void OnEnable()
     {
         if (toggleGameOverEvent != null)
             toggleGameOverEvent.toggleCanvasEvent += OnGameOver;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -25,10 +25,10 @@ public class GameOverCanvasManager : MonoBehaviour
         if (toggleGameOverEvent != null)
             toggleGameOverEvent.toggleCanvasEvent -= OnGameOver;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         OnGameOver(false);
     }

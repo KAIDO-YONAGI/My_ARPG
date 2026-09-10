@@ -16,9 +16,9 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     [SerializeField] private Button[] integratedButtons;
     [SerializeField] private TMP_Text[] integratedButtonTexts;
     [SerializeField] private ToggleCanvasEventSO toggleIntegratedCanvasEventSO;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleIntegratedCanvasEventSO;
-    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     private int currentPageNum = 0;
     private int buttonsEachPage;//用来模拟初始化多页的Panel
@@ -40,7 +40,7 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
         toggleIntegratedCanvasEventSO.toggleCanvasEvent += OnToggleIntegratedCanvas;
         toggleIntegratedCanvasEventSO.focusEvent += OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
 
         //此处事件在UIManager里仅索引到editor里，没有在代码层编写
         //特别地，将开闭功能都放在当前这个脚本里
@@ -51,10 +51,10 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
         toggleIntegratedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegratedCanvas;
         toggleIntegratedCanvasEventSO.focusEvent -= OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         InitiateUICanvasPanel(false);
     }

@@ -12,9 +12,9 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
     [SerializeField] private LoadQuestEventSO loadQuestEventSO;
     [SerializeField] private QuestOptionsEventSO questOptionsEventSO;
     [SerializeField] private ToggleCanvasEventSO toggleQuestEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleQuestEvent;
-    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
 
     [Header("Events To Trigger")]
@@ -72,7 +72,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         toggleQuestEvent.toggleCanvasEvent += OnToggleQuest;
         toggleQuestEvent.focusEvent += OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
 
     }
 
@@ -85,11 +85,11 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         toggleQuestEvent.toggleCanvasEvent -= OnToggleQuest;
         toggleQuestEvent.focusEvent -= OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
 
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         CloseQuestBoard();
     }

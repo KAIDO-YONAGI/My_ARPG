@@ -10,38 +10,25 @@ public class MenuSceneCanvasHider : MonoBehaviour
 {
     [Tooltip("要屏蔽的 CanvasGroup 组件（通常挂在本物体上）")]
     [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private SceneLoadEventSO sceneLoadEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
-
-    private GameSceneSO sceneToLoad;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
     private void OnEnable()
     {
-        if (sceneLoadEvent != null)
-            sceneLoadEvent.LoadRequestEvent += OnSceneLoadRequested;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        if (sceneLoadEvent != null)
-            sceneLoadEvent.LoadRequestEvent -= OnSceneLoadRequested;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoadRequested(GameSceneSO scene, Vector3 position, bool isToFade)
+    private void OnSceneLoaded(GameSceneSO currentScene)
     {
-        sceneToLoad = scene;
-        Debug.Log("is menu:"+ (sceneToLoad.sceneType == MyEnums.SceneType.Menu));
-    }
+        if (canvasGroup == null || currentScene == null) return;
 
-    private void OnSceneLoaded()
-    {
-        if (canvasGroup == null || sceneToLoad == null) return;
-
-        bool visible = sceneToLoad.sceneType != MyEnums.SceneType.Menu;
+        bool visible = currentScene.sceneType != MyEnums.SceneType.Menu;
         canvasGroup.alpha = visible ? 1 : 0;
         canvasGroup.interactable = visible;
         canvasGroup.blocksRaycasts = visible;

@@ -9,9 +9,9 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
 {
     [Header("Events To Receive")]
     [SerializeField] private ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
-    [SerializeField] private VoidEventSO sceneLoadedEvent;
+    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleSaveLoadCanvasEvent;
-    public VoidEventSO SceneLoadedEvent => sceneLoadedEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     [Header("UI")]
     [SerializeField] private CanvasGroup saveCanvasGroup;
@@ -63,7 +63,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         toggleSaveLoadCanvasEvent.toggleCanvasEvent += OnToggleCanvas;
         toggleSaveLoadCanvasEvent.focusEvent += OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
         LoadInfoToSaveList();
         RefreshSaveButtonState();
 
@@ -74,10 +74,10 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         toggleSaveLoadCanvasEvent.toggleCanvasEvent -= OnToggleCanvas;
         toggleSaveLoadCanvasEvent.focusEvent -= OnFocus;
         if (sceneLoadedEvent != null)
-            sceneLoadedEvent.VoidEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded()
+    private void OnSceneLoaded(GameSceneSO _)
     {
         isPanelOpen = false;
         ((ICanvasManager)this).SetCanvaInactive(saveCanvasGroup, MyEnums.CanvasToToggle.SaveLoad);
