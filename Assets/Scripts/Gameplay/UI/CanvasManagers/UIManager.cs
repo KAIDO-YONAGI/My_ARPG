@@ -12,12 +12,18 @@ public class UIManager : YSingleton<UIManager>
     public const int DefaultOrder = CanvasFocusStack.DefaultOrder;
 
     [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
-    [SerializeField] private List<ToggleCanvasEventSO> toggleCanvasEvents;
 
-    [Header("Input Bindings")] [SerializeField]
+    [Tooltip(
+        "可由 UIManager 主动控制的画布开关事件资产。列表中的画布可通过对应按键切换、由 ESC 关闭、在场景切换时复位，并参与互斥面板的自动关闭；未注册的画布只能上报状态和刷新层级，不会被 UIManager 主动关闭。")]
+    [SerializeField]
+    private List<ToggleCanvasEventSO> toggleCanvasEvents;
+
+    [SerializeField]
+    [Tooltip(
+        "配置通过按键进入通用切换流程的画布。每项将一个 CanvasToToggle 映射到 InputActionReference；GameOver、SaveLoad 等没有按键的画布可以不配置，仍可通过 RequestCanvasToggle 处理外部请求。")]
     private List<CanvasInputBinding> inputBindings;
 
-    [Header("互斥面板")] [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
+    [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
     private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
 
     // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
@@ -84,7 +90,11 @@ public class UIManager : YSingleton<UIManager>
         focusStack.HandleFocus(canvas);
     }
 
-    // 用于外部切换请求的画布/默认状态。
+    /// <summary>
+    /// 请求切换或聚焦画布。
+    /// 有按键绑定的画布按 inputBindings 顺序处理；没有按键绑定的画布也会在
+    /// ToggleCanvas 的外部请求分支中被消费。
+    /// </summary>
     public void RequestCanvasToggle(CanvasToToggle canvas)
     {
         if (!inputState.ContainsKey(canvas))
@@ -95,6 +105,9 @@ public class UIManager : YSingleton<UIManager>
         inputState[canvas] = true;
     }
 
+    /// <summary>
+    /// 直接关闭指定画布，不依赖 inputBindings，也不受 ESC 关闭规则限制。
+    /// </summary>
     public void RequestCanvasClose(CanvasToToggle canvas)
     {
         focusStack.RequestClose(canvas);
@@ -183,45 +196,92 @@ public class UIManager : YSingleton<UIManager>
 
     private void ToggleCanvas()
     {
-        // 读取已注册的输入绑定；未注册的画布仍可使用RequestCanvasToggle。
-        foreach (var binding in inputBindings)
-        {
-            bool pressed = binding.action != null && binding.action.action.WasPressedThisFrame();
-            inputState[binding.canvas] = inputState[binding.canvas] || pressed;
-            // 外部请求和按键按下都可以触发切换。
-        }
+        CollectInputBindingRequests();
 
-        // 阻塞面板（如 GameOver）打开时，吞掉所有面板切换输入（含 ESC 与外部切换请求）。
-        // 注意：RequestCanvasClose 不受影响，阻塞面板自身的关闭按钮仍可直接关闭它。
+        // 阻塞画布打开时，所有切换请求都在这里被消费，避免请求残留到下一帧。
         if (IsGlobalInputBlocked())
         {
             ResetInputState();
             return;
         }
 
-        if (inputState[CanvasToToggle.ESC])
+        // ESC 是独立语义：有可关闭的顶层画布时关闭它，否则打开 ESC 菜单。
+        if (HandleEscapeRequest())
         {
-            CanvasToToggle top = focusStack.LastOpenCanvas;
-            bool canCloseTop =
-                top != CanvasToToggle.Default &&
-                IsClosableCanvas(top) &&
-                (!canvasCloseOnEscape.TryGetValue(top, out bool closeOnEscape) || closeOnEscape);
-
-            if (canCloseTop)
-                focusStack.HandleESCOrCloseTop();
-            else
-                focusStack.HandleESCOrOpen();
-            ResetInputState();
             return;
         }
 
+        // ESC 菜单打开后，不再响应其它画布的切换请求，直到 ESC 菜单关闭。
         if (focusStack.LastOpenCanvas == CanvasToToggle.ESC)
         {
             ResetInputState();
             return;
         }
 
-        canvasToToggle = CanvasToToggle.Default;
+        // 普通按键请求和外部 RequestCanvasToggle 请求共用同一条焦点栈处理路径。
+        HandleCanvasToggleRequest();
+        ResetInputState();
+    }
+
+    /// <summary>
+    /// 将本帧 inputBindings 中的按键状态合并到统一请求表。
+    /// 外部 RequestCanvasToggle 请求已经提前写入 inputState，不会被这里覆盖。
+    /// </summary>
+    private void CollectInputBindingRequests()
+    {
+        foreach (var binding in inputBindings)
+        {
+            bool pressed = binding.action != null && binding.action.action.WasPressedThisFrame();
+            inputState[binding.canvas] = inputState[binding.canvas] || pressed;
+        }
+    }
+
+    /// <summary>
+    /// 处理 ESC 请求。返回 true 表示本帧已经处理完毕，调用方不应继续处理其它画布请求。
+    /// </summary>
+    private bool HandleEscapeRequest()
+    {
+        if (!inputState[CanvasToToggle.ESC])
+        {
+            return false;
+        }
+
+        CanvasToToggle top = focusStack.LastOpenCanvas;
+        bool canCloseTop =
+            top != CanvasToToggle.Default &&
+            IsClosableCanvas(top) &&
+            (!canvasCloseOnEscape.TryGetValue(top, out bool closeOnEscape) || closeOnEscape);
+
+        if (canCloseTop)
+        {
+            focusStack.HandleESCOrCloseTop();
+        }
+        else
+        {
+            focusStack.HandleESCOrOpen();
+        }
+
+        ResetInputState();
+        return true;
+    }
+
+    /// <summary>
+    /// 处理普通画布切换请求。
+    /// 先按 inputBindings 顺序处理按键绑定，再补充处理未配置按键但由
+    /// RequestCanvasToggle 写入的外部请求，避免 GameOver、SaveLoad 等画布被过滤。
+    /// </summary>
+    private void HandleCanvasToggleRequest()
+    {
+        canvasToToggle = FindRequestedCanvas();
+        if (canvasToToggle != CanvasToToggle.Default)
+        {
+            focusStack.ApplyFocusChange(canvasToToggle);
+        }
+    }
+
+    private CanvasToToggle FindRequestedCanvas()
+    {
+        // 有按键绑定的画布保持 Inspector 列表顺序，保证多个输入同帧触发时行为稳定。
         foreach (var binding in inputBindings)
         {
             if (binding.canvas == CanvasToToggle.ESC)
@@ -231,18 +291,38 @@ public class UIManager : YSingleton<UIManager>
 
             if (inputState[binding.canvas])
             {
-                canvasToToggle = binding.canvas;
-
-                break; // 只处理本帧的第一个输入。
+                return binding.canvas;
             }
         }
 
-        if (canvasToToggle != CanvasToToggle.Default)
+        // 外部请求不要求存在 inputBinding；按枚举顺序消费未绑定画布的第一个请求。
+        foreach (CanvasToToggle canvas in Enum.GetValues(typeof(CanvasToToggle)))
         {
-            focusStack.ApplyFocusChange(canvasToToggle);
+            if (canvas == CanvasToToggle.ESC || HasInputBinding(canvas))
+            {
+                continue;
+            }
+
+            if (inputState[canvas])
+            {
+                return canvas;
+            }
         }
 
-        ResetInputState();
+        return CanvasToToggle.Default;
+    }
+
+    private bool HasInputBinding(CanvasToToggle canvas)
+    {
+        foreach (var binding in inputBindings)
+        {
+            if (binding.canvas == canvas)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void RaiseCanvasEvent(CanvasToToggle target, bool state)

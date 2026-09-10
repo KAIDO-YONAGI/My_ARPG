@@ -25,7 +25,7 @@ public class PlayerHealth : YSingleton<PlayerHealth>
 
         if (StatsManager.Instance.GetCurrentHealth() <= 0)
         {
-            // 经 UIManager 统一入口唤起 GameOver，进入焦点栈与互斥/阻塞体系
+            // GameOver 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈与阻塞体系。
             UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);
 
             if (playerRoot != null)

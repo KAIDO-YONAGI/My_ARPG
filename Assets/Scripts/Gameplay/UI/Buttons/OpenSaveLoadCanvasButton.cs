@@ -9,7 +9,7 @@ public class OpenSaveLoadCanvasButton : MonoBehaviour
         OpenButton.onClick.AddListener(
             () =>
             {
-                // 经 UIManager 统一入口唤起 SaveLoad，进入焦点栈体系
+                // SaveLoad 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈体系。
                 UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.SaveLoad);
             }
         );
