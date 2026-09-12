@@ -13,15 +13,13 @@ public class ToggleSkillTree : MonoBehaviour, ICanvasManager
     {
         toggleSkillEvent.toggleCanvasEvent += OnToggleSkillEvent;
         toggleSkillEvent.focusEvent += OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
     private void OnDisable()
     {
         toggleSkillEvent.toggleCanvasEvent -= OnToggleSkillEvent;
         toggleSkillEvent.focusEvent -= OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
 
     }
     private void OnSceneLoaded(GameSceneSO _)

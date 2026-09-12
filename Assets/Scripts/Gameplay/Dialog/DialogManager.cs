@@ -26,14 +26,12 @@ public class DialogManager : YSingleton<DialogManager>
 
     private void OnEnable()
     {
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
         DisableButtons();
     }
 

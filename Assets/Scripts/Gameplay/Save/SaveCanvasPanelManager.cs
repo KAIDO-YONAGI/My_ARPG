@@ -62,8 +62,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     {
         toggleSaveLoadCanvasEvent.toggleCanvasEvent += OnToggleCanvas;
         toggleSaveLoadCanvasEvent.focusEvent += OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
         LoadInfoToSaveList();
         RefreshSaveButtonState();
 
@@ -73,8 +72,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
     {
         toggleSaveLoadCanvasEvent.toggleCanvasEvent -= OnToggleCanvas;
         toggleSaveLoadCanvasEvent.focusEvent -= OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO _)

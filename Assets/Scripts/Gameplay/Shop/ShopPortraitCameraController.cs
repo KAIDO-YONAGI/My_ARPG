@@ -18,21 +18,15 @@ public class ShopPortraitCameraController : MonoBehaviour
 
     private void OnEnable()
     {
-        if (shopKeeperEvent != null)
-        {
-            shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
-            shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
-        }
+        shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
+        shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
         SetCameraState(false);
     }
 
     private void OnDisable()
     {
-        if (shopKeeperEvent != null)
-        {
-            shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
-            shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
-        }
+        shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
+        shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
         currentTarget = null;
         SetCameraState(false);
     }

@@ -19,7 +19,7 @@ public class SkillSlot : MonoBehaviour
     public static event Action<SkillSlot> OnMaxSkillLevel;//事件广播
     private void OnValidate()
     {
-        if (skillSO != null && skillLevelText != null)
+        if (skillSO != null)
         {
             UpdateUI();
         }

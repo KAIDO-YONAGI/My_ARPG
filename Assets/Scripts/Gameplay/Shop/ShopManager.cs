@@ -38,26 +38,18 @@ public class ShopManager : YSingleton<ShopManager>, ICanvasManager, IShopInterac
     {
         toggleShopCanvasEvent.toggleCanvasEvent += OnShopToggle;
         toggleShopCanvasEvent.focusEvent += OnFocus;
-        if (shopKeeperEvent != null)
-        {
-            shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
-            shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
-        }
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
+        shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         toggleShopCanvasEvent.toggleCanvasEvent -= OnShopToggle;
         toggleShopCanvasEvent.focusEvent -= OnFocus;
-        if (shopKeeperEvent != null)
-        {
-            shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
-            shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
-        }
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
+        shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO _)

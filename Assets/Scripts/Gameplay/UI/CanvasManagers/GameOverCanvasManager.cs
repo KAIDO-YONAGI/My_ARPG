@@ -14,18 +14,14 @@ public class GameOverCanvasManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if (toggleGameOverEvent != null)
-            toggleGameOverEvent.toggleCanvasEvent += OnGameOver;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        toggleGameOverEvent.toggleCanvasEvent += OnGameOver;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        if (toggleGameOverEvent != null)
-            toggleGameOverEvent.toggleCanvasEvent -= OnGameOver;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        toggleGameOverEvent.toggleCanvasEvent -= OnGameOver;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO _)

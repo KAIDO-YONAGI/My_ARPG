@@ -39,8 +39,7 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     {
         toggleIntegratedCanvasEventSO.toggleCanvasEvent += OnToggleIntegratedCanvas;
         toggleIntegratedCanvasEventSO.focusEvent += OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
 
         //此处事件在UIManager里仅索引到editor里，没有在代码层编写
         //特别地，将开闭功能都放在当前这个脚本里
@@ -50,8 +49,7 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     {
         toggleIntegratedCanvasEventSO.toggleCanvasEvent -= OnToggleIntegratedCanvas;
         toggleIntegratedCanvasEventSO.focusEvent -= OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO _)

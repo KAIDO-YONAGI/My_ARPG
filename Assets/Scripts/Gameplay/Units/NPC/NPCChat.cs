@@ -27,10 +27,7 @@ public class NPCChat : MonoBehaviour
     {
         openDialogRequested = false;
 
-        if (toggleDialogEvent != null)
-        {
-            toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
-        }
+        toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
 
         if (rb != null)
         {
@@ -43,19 +40,16 @@ public class NPCChat : MonoBehaviour
             chatAnimator.Play("Chat");
         }
 
-        if (advanceDialogAction != null) advanceDialogAction.action.Enable();
+        advanceDialogAction.action.Enable();
     }
 
     private void OnDisable()
     {
         openDialogRequested = false;
 
-        if (toggleDialogEvent != null)
-        {
-            toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
-        }
+        toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
 
-        if (advanceDialogAction != null) advanceDialogAction.action.Disable();
+        advanceDialogAction.action.Disable();
 
         if (rb != null)
         {
@@ -105,7 +99,7 @@ public class NPCChat : MonoBehaviour
             }
         }
 
-        if (DialogManager.Instance.isDialogActive && advanceDialogAction != null && advanceDialogAction.action.WasPressedThisFrame())
+        if (DialogManager.Instance.isDialogActive && advanceDialogAction.action.WasPressedThisFrame())
         {
             DialogManager.Instance.AdvanceDialog();
         }

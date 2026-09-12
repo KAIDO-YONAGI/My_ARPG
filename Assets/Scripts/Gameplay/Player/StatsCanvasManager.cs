@@ -41,16 +41,14 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 
         toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
         toggleStatsEvent.focusEvent += OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         toggleStatsEvent.toggleCanvasEvent -= OnToggleStatsEvent;
         toggleStatsEvent.focusEvent -= OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnDestroy()

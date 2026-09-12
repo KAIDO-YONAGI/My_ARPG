@@ -14,14 +14,12 @@ public class MenuSceneCanvasHider : MonoBehaviour
 
     private void OnEnable()
     {
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO currentScene)

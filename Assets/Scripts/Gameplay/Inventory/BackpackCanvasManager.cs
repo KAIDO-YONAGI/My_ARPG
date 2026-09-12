@@ -14,16 +14,14 @@ public class BackpackCanvasManager : MonoBehaviour, ICanvasManager
     {
         toggleBackpackCanvasEventSO.toggleCanvasEvent += OnToggleBackpack;
         toggleBackpackCanvasEventSO.focusEvent += OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         toggleBackpackCanvasEventSO.toggleCanvasEvent -= OnToggleBackpack;
         toggleBackpackCanvasEventSO.focusEvent -= OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO _)

@@ -7,8 +7,9 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
     [SerializeField] private CanvasGroup questCanvaGroup;
     [SerializeField] private Canvas canvas;
 
-    [Header("Events To Receive")]
-    [SerializeField] private VoidEventSO openQuestEventSO;
+    [Header("Events To Receive")] [SerializeField]
+    private VoidEventSO openQuestEventSO;
+
     [SerializeField] private LoadQuestEventSO loadQuestEventSO;
     [SerializeField] private QuestOptionsEventSO questOptionsEventSO;
     [SerializeField] private ToggleCanvasEventSO toggleQuestEvent;
@@ -17,27 +18,25 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
     public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
 
-    [Header("Events To Trigger")]
-
-    [SerializeField] private InventorySlotsStatsSO QuestRewardRequest;
-
+    [Header("Events To Trigger")] [SerializeField]
+    private InventorySlotsStatsSO QuestRewardRequest;
 
 
-    [Header("Options")]
-    [SerializeField] private CanvasGroup acceptCanvaGroup;
+    [Header("Options")] [SerializeField] private CanvasGroup acceptCanvaGroup;
     [SerializeField] private CanvasGroup declineCanvaGroup;
     [SerializeField] private CanvasGroup completeCanvaGroup;
 
 
-    [Header("QuestLogSlots")]
-    [SerializeField] private QuestLogSlot[] questLogSlots;
+    [Header("QuestLogSlots")] [SerializeField]
+    private QuestLogSlot[] questLogSlots;
 
-    [Header("Canvas To Operate While No Quests")]
-    [SerializeField] private CanvasGroup detailsCanvaGroup;
+    [Header("Canvas To Operate While No Quests")] [SerializeField]
+    private CanvasGroup detailsCanvaGroup;
+
     [SerializeField] private CanvasGroup promptCanvaGroup;
 
-    [Header("QuestLogUI")]
-    [SerializeField] private QuestLogUI questLogUI;
+    [Header("QuestLogUI")] [SerializeField]
+    private QuestLogUI questLogUI;
 
     private MyEnums.QuestState currentQuestState = MyEnums.QuestState.Idle;
 
@@ -58,7 +57,9 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         SetCurrentQuest(quest);
         QuestStateChanged(quest, GetQuestStateFromProgress(quest));
     }
+
     public bool CanvasIsActive => canvasIsActive;
+
     class QuestProgressData
     {
         public QuestProgressData(List<QuestObjective> objectives)
@@ -68,9 +69,11 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
                 questObjectives[obj] = 0;
             }
         }
+
         public MyEnums.QuestState questState = MyEnums.QuestState.Idle;
         public Dictionary<QuestObjective, int> questObjectives = new();
     }
+
     private void OnEnable()
     {
         openQuestEventSO.VoidEvent += OnOpenQuestBoard;
@@ -78,9 +81,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         questOptionsEventSO.questOptionsEvent += OnQuestOptionChose;
         toggleQuestEvent.toggleCanvasEvent += OnToggleQuest;
         toggleQuestEvent.focusEvent += OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
-
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
 
 
@@ -91,9 +92,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         questOptionsEventSO.questOptionsEvent -= OnQuestOptionChose;
         toggleQuestEvent.toggleCanvasEvent -= OnToggleQuest;
         toggleQuestEvent.focusEvent -= OnFocus;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
-
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO _)
@@ -117,9 +116,9 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         if (!canvasIsActive) return;
         ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Quest, true);
     }
+
     private void OnQuestOptionChose(MyEnums.QuestState questStateToShift)
     {
-
         if (questStateToShift == MyEnums.QuestState.Completed)
         {
             if (IsQuestObjDone(currentQuest))
@@ -129,8 +128,8 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             else Debug.Log("Quest Not Done");
         }
         else QuestStateChanged(currentQuest, questStateToShift);
-
     }
+
     private void OnOpenQuestBoard()
     {
         if (!canvasIsActive)
@@ -158,8 +157,8 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         InitiateQuestSlots(quests);
 
         if (quests.Count == 0
-         || IsAllQuestsCompleted(quests)
-        )
+            || IsAllQuestsCompleted(quests)
+           )
         {
             SetNoQuestsState(true);
             return;
@@ -175,6 +174,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             }
         }
     }
+
     private void RaiseRewardEvent(QuestSO quest)
     {
         foreach (var reward in quest.rewards)
@@ -184,11 +184,13 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             QuestRewardRequest.RaiseInventoryUpdateRequest(item, 0, quantity);
         }
     }
+
     private void SetNoQuestsState(bool isOpenWhiteUI)
     {
         SetCanvaState(detailsCanvaGroup, !isOpenWhiteUI);
         SetCanvaState(promptCanvaGroup, isOpenWhiteUI);
     }
+
     private void InitializeQuestProgress(List<QuestSO> quests)
     {
         foreach (var quest in quests)
@@ -199,6 +201,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             }
         }
     }
+
     private void InitiateQuestSlots(List<QuestSO> quests)
     {
         foreach (var questSlot in questLogSlots)
@@ -218,6 +221,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             }
         }
     }
+
     public QuestSO GetFirstIncompletedQuest()
     {
         foreach (var quest in currentBoardLoadQuests)
@@ -225,12 +229,15 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             if (questProgress[quest].questState != MyEnums.QuestState.Completed)
                 return quest;
         }
+
         return null;
     }
+
     public MyEnums.QuestState GetQuestStateFromProgress(QuestSO quest)
     {
         return questProgress[quest].questState;
     }
+
     public void QuestStateChanged(QuestSO quest, MyEnums.QuestState state)
     {
         if (!questProgress.ContainsKey(quest)) return;
@@ -247,37 +254,32 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         if (currentQuestState == MyEnums.QuestState.Idle)
         {
             SetCanvaState(acceptCanvaGroup, true);
-
         }
         else if (currentQuestState == MyEnums.QuestState.Accepted)
         {
             SetCanvaState(declineCanvaGroup, true);
             SetCanvaState(completeCanvaGroup, true);
-
         }
         else if (currentQuestState == MyEnums.QuestState.Decline)
         {
             SetCanvaState(acceptCanvaGroup, true);
             SetCanvaState(declineCanvaGroup, true);
-
         }
         else if (currentQuestState == MyEnums.QuestState.IsToComplete)
         {
             SetCanvaState(declineCanvaGroup, true);
             SetCanvaState(completeCanvaGroup, true);
-
         }
         else if (currentQuestState == MyEnums.QuestState.Completed)
         {
             SetQuestSlotToDoneState(quest);
             RaiseRewardEvent(quest);
-
         }
 
         RefreshObjectiveProgress(quest);
         questLogUI.DisPlayObjectives();
-
     }
+
     //更新完成条件
     public void UpdateObjectiveProgress(QuestSO quest, QuestObjective obj)
     {
@@ -307,13 +309,14 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             UpdateObjectiveProgress(quest, obj);
         }
     }
+
     public string GetProgressText(QuestSO quest, QuestObjective obj)
     {
         int currentObjAmount = GetCurrentObjAmount(quest, obj);
 
         if (IsObjDone(quest, obj))
         {
-            return "\u221A";//打勾
+            return "\u221A"; //打勾
         }
 
         else if (obj != null)
@@ -321,6 +324,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         else
             return "In Progress";
     }
+
     public int GetCurrentObjAmount(QuestSO quest, QuestObjective obj)
     {
         if (questProgress.TryGetValue(quest, out var questProgressData))
@@ -328,6 +332,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
                 return amount;
         return 0;
     }
+
     private bool IsAllQuestsCompleted(List<QuestSO> quests)
     {
         foreach (var quest in quests)
@@ -341,6 +346,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
 
         return true;
     }
+
     public void SetQuestSlotToDoneState(QuestSO quest)
     {
         foreach (var questSlot in questLogSlots)
@@ -352,10 +358,10 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
                 questSlotCanvas.alpha = .2f;
                 questSlotCanvas.interactable = false;
                 questSlotCanvas.blocksRaycasts = false;
-
             }
         }
     }
+
     private bool IsQuestObjDone(QuestSO quest)
     {
         if (!questProgress.ContainsKey(quest)) return false;
@@ -369,6 +375,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
             if (!IsObjDone(quest, obj))
                 return false;
         }
+
         return true;
     }
 
@@ -380,16 +387,17 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         else
             return true;
     }
+
     private void SetQuestCanvasState(bool state)
     {
         ((ICanvasManager)this).ToggleCanvas(questCanvaGroup, canvas, MyEnums.CanvasToToggle.Quest, state);
         canvasIsActive = state;
     }
+
     private void SetCanvaState(CanvasGroup canva, bool state)
     {
         canva.alpha = state ? 1 : 0;
         canva.blocksRaycasts = state;
         canva.interactable = state;
     }
-
 }

@@ -36,7 +36,7 @@ public class PlayerCombat : MonoBehaviour
     public void FinishCombat()
     {
         // 动画事件触发：通知 PlayerMovement（及其它订阅者）近战动作结束，由其统一重置状态
-        if (slashActionFinishedEvent != null) slashActionFinishedEvent.OnEventRaised();
+        slashActionFinishedEvent.OnEventRaised();
     }
 
     //private void OnDrawGizmosSelected()

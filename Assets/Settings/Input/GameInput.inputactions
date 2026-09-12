@@ -264,6 +264,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "OpenGuide",
+                    "type": "Button",
+                    "id": "920ab2f1-1667-4ad3-b270-6b740adbb0e2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -352,6 +361,17 @@
                     "processors": "",
                     "groups": "KeyboardMouse",
                     "action": "AdvanceDialog",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cec9daed-160d-453c-b33f-5d0d412e774e",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenGuide",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

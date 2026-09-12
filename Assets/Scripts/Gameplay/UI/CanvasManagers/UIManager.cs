@@ -55,7 +55,7 @@ public class UIManager : YSingleton<UIManager>
 
         foreach (var binding in inputBindings)
         {
-            if (binding.action != null) binding.action.action.Enable();
+            binding.action.action.Enable();
         }
     }
 
@@ -65,7 +65,7 @@ public class UIManager : YSingleton<UIManager>
 
         foreach (var binding in inputBindings)
         {
-            if (binding.action != null) binding.action.action.Disable();
+            binding.action.action.Disable();
         }
     }
 
@@ -236,7 +236,7 @@ public class UIManager : YSingleton<UIManager>
     {
         foreach (var binding in inputBindings)
         {
-            bool pressed = binding.action != null && binding.action.action.WasPressedThisFrame();
+            bool pressed = binding.action.action.WasPressedThisFrame();
             inputState[binding.canvas] = inputState[binding.canvas] || pressed;
         }
     }

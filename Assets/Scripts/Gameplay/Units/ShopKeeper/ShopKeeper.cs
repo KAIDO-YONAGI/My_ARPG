@@ -23,8 +23,7 @@ public class ShopKeeper : MonoBehaviour
     {
         if (!collider.CompareTag("Player")) return;
 
-        if (shopKeeperEvent != null)
-            shopKeeperEvent.RaiseShopKeeperEntered(this);
+        shopKeeperEvent.RaiseShopKeeperEntered(this);
 
         if (logoAnimator != null)
             logoAnimator.SetBool("playerInRange", true);
@@ -34,8 +33,7 @@ public class ShopKeeper : MonoBehaviour
     {
         if (!collider.CompareTag("Player")) return;
 
-        if (shopKeeperEvent != null)
-            shopKeeperEvent.RaiseShopKeeperExited(this);
+        shopKeeperEvent.RaiseShopKeeperExited(this);
 
         if (logoAnimator != null)
             logoAnimator.SetBool("playerInRange", false);
@@ -43,7 +41,6 @@ public class ShopKeeper : MonoBehaviour
 
     private void OnDisable()
     {
-        if (shopKeeperEvent != null)
-            shopKeeperEvent.RaiseShopKeeperExited(this);
+        shopKeeperEvent.RaiseShopKeeperExited(this);
     }
 }

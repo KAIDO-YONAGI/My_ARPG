@@ -56,22 +56,22 @@ public class PlayerMovement : MonoBehaviour
         AnimatorSM(PlayerState.Idle);
         if (rb != null) rb.velocity = Vector2.zero;
 
-        if (moveAction != null) moveAction.action.Enable();
-        if (slashAction != null) slashAction.action.Enable();
-        if (shootAction != null) shootAction.action.Enable();
+        moveAction.action.Enable();
+        slashAction.action.Enable();
+        shootAction.action.Enable();
 
-        if (slashActionFinishedEvent != null) slashActionFinishedEvent.VoidEvent += OnActionFinished;
-        if (shootActionFinishedEvent != null) shootActionFinishedEvent.VoidEvent += OnActionFinished;
+        slashActionFinishedEvent.VoidEvent += OnActionFinished;
+        shootActionFinishedEvent.VoidEvent += OnActionFinished;
     }
 
     private void OnDisable()
     {
-        if (moveAction != null) moveAction.action.Disable();
-        if (slashAction != null) slashAction.action.Disable();
-        if (shootAction != null) shootAction.action.Disable();
+        moveAction.action.Disable();
+        slashAction.action.Disable();
+        shootAction.action.Disable();
 
-        if (slashActionFinishedEvent != null) slashActionFinishedEvent.VoidEvent -= OnActionFinished;
-        if (shootActionFinishedEvent != null) shootActionFinishedEvent.VoidEvent -= OnActionFinished;
+        slashActionFinishedEvent.VoidEvent -= OnActionFinished;
+        shootActionFinishedEvent.VoidEvent -= OnActionFinished;
     }
 
     /// <summary>
@@ -145,8 +145,8 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
         bool attackPressed =
-            (slashAction != null && slashAction.action.WasPressedThisFrame() && playerCombat.IsActive) ||
-            (shootAction != null && shootAction.action.WasPressedThisFrame() && playerBow.IsActive);
+            (slashAction.action.WasPressedThisFrame() && playerCombat.IsActive) ||
+            (shootAction.action.WasPressedThisFrame() && playerBow.IsActive);
 
         if (attackPressed && TryAttack())
         {
@@ -207,7 +207,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (joystick != null && (Mathf.Abs(joystick.Horizontal) > 0.1f || Mathf.Abs(joystick.Vertical) > 0.1f))
             return true;
-        Vector2 v = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+        Vector2 v = moveAction.action.ReadValue<Vector2>();
         return Mathf.Abs(v.x) > 0 || Mathf.Abs(v.y) > 0;
     }
 
@@ -242,7 +242,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            Vector2 v = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+            Vector2 v = moveAction.action.ReadValue<Vector2>();
             horizontal = v.x;
             vertical = v.y;
         }

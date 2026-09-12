@@ -9,14 +9,12 @@ public class ESCMenuManager : MonoBehaviour
     private void OnEnable()
     {
         toggleESCEvent.toggleCanvasEvent += OnESC;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
     private void OnDisable()
     {
         toggleESCEvent.toggleCanvasEvent -= OnESC;
-        if (sceneLoadedEvent != null)
-            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(GameSceneSO _)

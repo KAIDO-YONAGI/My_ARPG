@@ -13,7 +13,7 @@ public class GameSceneSO : ScriptableObject {
     /// 存档用的场景稳定标识：Addressables 资产 GUID，随资产落盘，跨会话与打包一致。
     /// 存档 Data.sceneIDAndPlayerPos.sceneID 存的是它，读档时由 SceneDataForSave.gameScenes 反查回本资产。
     /// </summary>
-    public string SaveKey => sceneReference != null ? sceneReference.AssetGUID : string.Empty;
+    public string SaveKey => sceneReference.AssetGUID;
 
     void OnValidate()
     {

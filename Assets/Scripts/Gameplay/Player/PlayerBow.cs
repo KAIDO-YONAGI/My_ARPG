@@ -71,7 +71,7 @@ public class PlayerBow : MonoBehaviour
         aimDirection = new Vector2(playerMovement.getFacingDirection(), 0).normalized;
 
         // GetAxisRaw 对键盘返回 -1/0/1 离散值，Move action 的 WASD composite 同样是 -1/0/1，语义一致
-        Vector2 move = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+        Vector2 move = moveAction.action.ReadValue<Vector2>();
         float horizontal = move.x;
         float vertical = move.y;
 
@@ -92,7 +92,7 @@ public class PlayerBow : MonoBehaviour
     {
         HandleAiming();
         playerMovement.AnimatorSM(PlayerState.Shooting);
-        Vector2 move = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+        Vector2 move = moveAction.action.ReadValue<Vector2>();
         float horizontal = move.x;
         float vertical = move.y;
         if (horizontal != 0 || vertical != 0)
@@ -124,7 +124,7 @@ public class PlayerBow : MonoBehaviour
     public void ShootingDone()//动画事件触发的函数，结束射击，重置状态和计时器
     {
         // 通知 PlayerMovement（及其它订阅者）射击动作结束，由其统一重置状态
-        if (shootActionFinishedEvent != null) shootActionFinishedEvent.OnEventRaised();
+        shootActionFinishedEvent.OnEventRaised();
         StartCoroutine(ResetShooting(0.1f));
     }
     IEnumerator ResetShooting(float delay)
