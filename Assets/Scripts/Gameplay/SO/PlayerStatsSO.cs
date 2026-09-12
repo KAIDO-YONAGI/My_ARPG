@@ -1,59 +1,17 @@
-using System;
 using UnityEngine;
 
-/// <summary>
-/// 玩家数值唯一数据源。数值变化时广播事件，UI 订阅被动刷新；
-/// StatsManager 只作为对外兼容的转发层（重构清单 4.3）。
-/// </summary>
+/// 运行时不再使用这个资产对象本身：StatsManager 启动时把它的数据拷一份进
+/// <see cref="PlayerStatsModel"/>，之后所有读写都发生在 Model 上。因此
+/// Play 期间不会污染资产落盘，也不需要再"克隆一个 SO 当运行时容器"。
+/// 规则与事件见 PlayerStatsModel；数值的唯一写入口也是它。
 [CreateAssetMenu(fileName = "PlayerStatsSO", menuName = "Data/PlayerStatsSO", order = 0)]
 public class PlayerStatsSO : ScriptableObject
 {
     [SerializeField] private PlayerStatsData stats = new();
 
-    /// <summary>血量/上限变化（HealthCanvasManager 订阅）。</summary>
-    public event Action HealthChanged;
-    /// <summary>速度/伤害等属性变化（StatsCanvasManager 订阅）。</summary>
-    public event Action StatsChanged;
-
+    /// <summary>模板里的初始值（只读用途；不要把它交给运行时当状态容器）。</summary>
     public PlayerStatsData Data => stats;
 
-    public void LoadStats(PlayerStatsData data)
-    {
-        stats = data;
-        HealthChanged?.Invoke();
-        StatsChanged?.Invoke();
-    }
-
-    public void UpdateMaxHealth(int amount)
-    {
-        stats.maxHealth += amount;
-        if (stats.maxHealth < 1) stats.maxHealth = 1;
-        HealthChanged?.Invoke();
-    }
-
-    public void UpdateHealth(int amount)
-    {
-        stats.currentHealth = Mathf.Clamp(stats.currentHealth + amount, 0, stats.maxHealth);
-        HealthChanged?.Invoke();
-    }
-
-    public void SetCurrentHealth(int value)
-    {
-        stats.currentHealth = Mathf.Clamp(value, 0, stats.maxHealth);
-        HealthChanged?.Invoke();
-    }
-
-    public void UpdateSpeed(float amount)
-    {
-        stats.speed += amount;
-        StatsChanged?.Invoke();
-    }
-
-    public void UpdateDamage(int amount)
-    {
-        stats.damage += amount;
-        StatsChanged?.Invoke();
-    }
-
-    public void UpdateSkillPoints(int amount) => stats.skillPoints += amount;
+    /// <summary>导出初始值的一份拷贝，供运行时模型使用。</summary>
+    public PlayerStatsData CreateInitialData() => stats.Clone();
 }

@@ -66,8 +66,22 @@ function Get-EditorRoots {
         $candidates += $EditorRoot
     }
 
+    # Unity Hub 把 Editor 安装根目录记录在用户配置里，每台机器各不相同；
+    # 从这里读取，避免写死某台机器的绝对路径。
+    $hubInstallPathFile = Join-Path $env:APPDATA 'UnityHub\secondaryInstallPath.json'
+    if (Test-Path -LiteralPath $hubInstallPathFile) {
+        try {
+            $hubInstallPath = Get-Content -LiteralPath $hubInstallPathFile -Raw | ConvertFrom-Json
+            if ($hubInstallPath -is [string] -and $hubInstallPath) {
+                $candidates += [string]$hubInstallPath
+            }
+        }
+        catch {
+            Write-Verbose "Could not read the Unity Hub install path: $($_.Exception.Message)"
+        }
+    }
+
     $candidates += @(
-        'D:\Unity\Editor',
         (Join-Path $env:ProgramFiles 'Unity\Hub\Editor'),
         (Join-Path $env:ProgramFiles 'Unity Hub\Editor'),
         (Join-Path $env:ProgramFiles 'Unity\Editor')

@@ -26,4 +26,5 @@ MonoBehaviour:
     level: 0
     currentExp: 0
     expToUpgrade: 10
-    expMultiplier: 0
+    expMultiplier: 1.5
+    maxLevel: 0

@@ -159,7 +159,7 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 
 ### Android Export
 
-- **Android Release build verified on 2026-08-09**: SDK detection stalled because `sdkmanager` was not using the local proxy, while Release lint failed because a non-ASCII filename in `StreamingAssets` produced an AAR entry that could not be decoded. See [`Docs/UnityAndroidGlobalBuildFix.md`](Docs/UnityAndroidGlobalBuildFix.md) for global proxy setup, removal, and diagnostics. The current test APK is debug-signed; configure a project keystore before publishing.
+- **Android Release build (verified 2026-08-09)**: SDK detection stalled because `sdkmanager` did not inherit the proxy, while Release lint failed because a non-ASCII filename in `StreamingAssets` produced an AAR entry that could not be decoded. See [`Docs/UnityAndroidBuildGuide.md`](Docs/UnityAndroidBuildGuide.md) for proxy setup, removal, environment self-checks, and diagnostics — that guide is **machine-independent**: first read the real paths and proxy port on your own machine via its "Step 1: confirm the environment". Build evidence is archived in [`Docs/UnityAndroidBuildVerification.md`](Docs/UnityAndroidBuildVerification.md). The current test APK is debug-signed; configure a project keystore before publishing.
 
 ### ScriptableObject Usage Tips
 

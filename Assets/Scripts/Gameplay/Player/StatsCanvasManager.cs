@@ -15,9 +15,9 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
     public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
-    // 运行时绑定 StatsManager 的数据副本（事件在副本身上）；初始绑定放在 Start：
+    // 运行时绑定 StatsManager 的数值模型（事件在模型上）；初始绑定放在 Start：
     // 面板可能随 GamePlay 根节点延迟激活，那时 StatsManager 必然已就绪。
-    private PlayerStatsSO stats;
+    private PlayerStatsModel model;
 
     protected override void OnSingletonInitialized()
     {
@@ -26,15 +26,15 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 
     private void Start()
     {
-        stats = StatsManager.Instance.RuntimeStats;
-        stats.StatsChanged += UpdateAllStats;
+        model = StatsManager.Instance.Model;
+        model.StatsChanged += UpdateAllStats;
         UpdateAllStats();
     }
 
     private void OnEnable()
     {
         // 重激活时补一次刷新：失活期间错过的事件没有累积通知
-        if (stats != null)
+        if (model != null)
             UpdateAllStats();
 
         toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
@@ -53,8 +53,8 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 
     private void OnDestroy()
     {
-        if (stats != null)
-            stats.StatsChanged -= UpdateAllStats;
+        if (model != null)
+            model.StatsChanged -= UpdateAllStats;
     }
 
     private void OnSceneLoaded(GameSceneSO _)
@@ -81,19 +81,19 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 
     public void UpdateDamage()
     {
-        if (stats == null || statTexts == null || statTexts.Length < 1 || statTexts[0] == null) return;
-        statTexts[0].text = "Damage:" + stats.Data.damage;
+        if (model == null || statTexts == null || statTexts.Length < 1 || statTexts[0] == null) return;
+        statTexts[0].text = "Damage:" + model.Damage;
     }
 
     public void UpdateSpeed()
     {
-        if (stats == null || statTexts == null || statTexts.Length < 2 || statTexts[1] == null) return;
-        statTexts[1].text = "Speed:" + stats.Data.speed;
+        if (model == null || statTexts == null || statTexts.Length < 2 || statTexts[1] == null) return;
+        statTexts[1].text = "Speed:" + model.Speed;
     }
 
     public void UpdateAllStats()
     {
-        if (stats == null) return;
+        if (model == null) return;
         UpdateDamage();
         UpdateSpeed();
     }

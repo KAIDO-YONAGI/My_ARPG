@@ -159,7 +159,7 @@
 
 ### Android 导出
 
-- **Android Release 构建已于 2026-08-09 验证通过**：SDK 检测卡住是 `sdkmanager` 未使用本机代理；Release lint 失败是 `StreamingAssets` 中的非 ASCII 文件名导致 AAR 条目解码异常。全局代理配置、卸载和排障步骤见 [`Docs/UnityAndroidGlobalBuildFix.md`](Docs/UnityAndroidGlobalBuildFix.md)。当前测试 APK 使用 Debug 证书，正式发布前仍需配置项目专用 keystore。
+- **Android Release 构建（2026-08-09 已验证通过）**：SDK 检测卡住是因为 `sdkmanager` 没有继承代理；Release lint 失败是因为 `StreamingAssets` 中的非 ASCII 文件名导致 AAR 条目解码异常。代理配置、卸载、环境自检与排障步骤见 [`Docs/UnityAndroidBuildGuide.md`](Docs/UnityAndroidBuildGuide.md)（**该文档不绑定具体机器**：先按其中「第一步：确认环境」在你机器上读出真实路径与代理端口，再照做）。构建结果存档见 [`Docs/UnityAndroidBuildVerification.md`](Docs/UnityAndroidBuildVerification.md)。当前测试 APK 使用 Debug 证书，正式发布前仍需配置项目专用 keystore。
 
 ### ScriptableObject（SO）使用建议
 
