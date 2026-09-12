@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 public class PlayerController : YSingleton<PlayerController>
 {
-    [SerializeField, FormerlySerializedAs("Transform")] private Transform playerTransform;
+    [SerializeField] private Transform playerTransform;
 
     public Vector3 GetPosition() => playerTransform.position;
 }

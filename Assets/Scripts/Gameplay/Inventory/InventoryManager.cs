@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Gameplay.Player.Services;
 public class InventoryManager : YSingleton<InventoryManager>
 {
 
@@ -105,7 +106,7 @@ public class InventoryManager : YSingleton<InventoryManager>
         }
         if (item.isEXP)
         {
-            ExperienceController.Instance.GainExp(quantity);
+            StatsService.Instance.AddExp(quantity);
             return;
         }
         //普通物品

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Gameplay.Player.Services;
 
 public class SkillManager : MonoBehaviour
 {
@@ -25,10 +26,6 @@ public class SkillManager : MonoBehaviour
                 break;
             case "SwordSlash":
                 combat.SetActive(true);
-                break;
-
-            default:
-                Debug.Log($"The skill {skillName} has lost");
                 break;
     
         }

@@ -1,50 +1,52 @@
+using Gameplay.Player.Models;
 using NUnit.Framework;
 using UnityEngine;
 
-/// <summary>
-/// PlayerStatsSO 现在只是"初始值模板"：规则与事件都搬到了 PlayerStatsModel
-/// （钳制、事件、经验曲线、守卫的用例见 PlayerStatsModelTests）。
-///
-/// 这里只验证模板的拷贝语义——运行时拿到的是拷贝，改它不会反过来污染资产。
-/// </summary>
-public class PlayerStatsSOTests
+namespace Gameplay.Tests
 {
-    private PlayerStatsSO so;
-
-    [SetUp]
-    public void SetUp()
+    /// <summary>
+    /// PlayerStatsSO 的单元测试：验证 CreateInitialData() 返回拷贝，
+    /// 修改拷贝之后资产内容保持不变。
+    /// </summary>
+    public class PlayerStatsSOTests
     {
-        so = ScriptableObject.CreateInstance<PlayerStatsSO>();
-    }
+        private PlayerStatsSO so;
 
-    [TearDown]
-    public void TearDown()
-    {
-        Object.DestroyImmediate(so);
-    }
+        [SetUp]
+        public void SetUp()
+        {
+            so = ScriptableObject.CreateInstance<PlayerStatsSO>();
+        }
 
-    [Test]
-    public void CreateInitialData_ReflectsConfiguredValues()
-    {
-        so.Data.damage = 7;
-        so.Data.expToUpgrade = 10;
-        so.Data.expMultiplier = 1.5f;
+        [TearDown]
+        public void TearDown()
+        {
+            Object.DestroyImmediate(so);
+        }
 
-        PlayerStatsData initial = so.CreateInitialData();
+        [Test]
+        public void CreateInitialData_ReflectsConfiguredValues()
+        {
+            so.Data.damage = 7;
+            so.Data.expToUpgrade = 10;
+            so.Data.expMultiplier = 1.5f;
 
-        Assert.AreEqual(7, initial.damage);
-        Assert.AreEqual(10, initial.expToUpgrade);
-        Assert.AreEqual(1.5f, initial.expMultiplier);
-    }
+            PlayerStatsData initial = so.CreateInitialData();
 
-    [Test]
-    public void CreateInitialData_ReturnsCopy_SoRuntimeWritesDoNotTouchTheTemplate()
-    {
-        so.Data.damage = 7;
+            Assert.AreEqual(7, initial.damage);
+            Assert.AreEqual(10, initial.expToUpgrade);
+            Assert.AreEqual(1.5f, initial.expMultiplier);
+        }
 
-        PlayerStatsData initial = so.CreateInitialData();
-        initial.damage = 999; // 模拟运行时改了模型里的那份数据
+        [Test]
+        public void CreateInitialData_ReturnsCopy_SoRuntimeWritesDoNotTouchTheTemplate()
+        {
+            so.Data.damage = 7;
 
-        Assert.AreEqual(7, so.Data.damage, "模板不应该被运行时改动");
+            PlayerStatsData initial = so.CreateInitialData();
+            initial.damage = 999; // 模拟运行时改了模型里的那份数据
+
+            Assert.AreEqual(7, so.Data.damage, "模板不应该被运行时改动");
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Gameplay.Player.Services;
 [DefaultExecutionOrder(-100)]
 
 //TODO使用流程：实现了IS接口的类，以loot为例，在特定时刻使用自己接口的注册方法注册自己到DataManager
@@ -67,7 +68,6 @@ public class DataManager : YSingleton<DataManager>
         dataToSave ??= new Data();
         dataToSave.lootsStatsDic ??= new Dictionary<string, LootStatus>();
 
-        dataToSave.playerStatsData = StatsService.Instance.GetStats();
         Vector3 savePosition = PlayerController.Instance != null
             ? PlayerController.Instance.GetPosition()
             : currentScene.initialPosition;
@@ -97,13 +97,9 @@ public class DataManager : YSingleton<DataManager>
         {
             Vector3 savePosition = pos == Vector3.zero ? sceneToLoadSO.initialPosition : pos;
             dataToSave = new Data();
-            dataToSave.playerStatsData = StatsService.Instance.GetStats();
+            StatsService.Instance.SaveData(dataToSave); // 存档对象重建之后，跨场景的持久数据要重新写入
             dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.SaveKey, savePosition);
             DynamicDataHandler.ClearDynamicData(dataToSave);
-        }
-        else
-        {
-            dataToSave.playerStatsData = StatsService.Instance.GetStats();
         }
         //上个场景是Menu则不存档
         if (lastSceneType != MyEnums.SceneType.Menu)
@@ -147,12 +143,6 @@ public class DataManager : YSingleton<DataManager>
         {
             saveable.LoadData(dataToSave);
         }
-        // 旧档缺少数值时先保留当前运行态，避免把 StatsService 置空。
-        if (data.playerStatsData != null)
-        {
-            StatsService.Instance.LoadStats(data.playerStatsData);
-        }
-
     }
 
 

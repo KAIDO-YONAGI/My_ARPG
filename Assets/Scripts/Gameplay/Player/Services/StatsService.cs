@@ -1,75 +1,96 @@
+using Gameplay.Player.Models;
 using UnityEngine;
 
-/// <summary>
-/// 玩家数值这一层的服务（Service）：持有运行时 <see cref="PlayerStatsModel"/>，把既有 API 原样转发过去。
-/// 对外是唯一入口，调用方（UI / 战斗 / 存档）继续用 StatsService.Instance.xxx()。
-///
-/// 数据与规则都在 PlayerStatsModel（普通 C#，可在 EditMode 测试里直接 new）；
-/// 存档传输格式是 PlayerStatsData（Models/PlayerStatsData.cs）；
-/// 本类不再克隆 SO，也没有运行时 SO 副本；PlayerStatsSO 只作为初始值模板使用。
-/// </summary>
-public class StatsService : YSingleton<StatsService>
+namespace Gameplay.Player.Services
 {
-    [SerializeField] private PlayerStatsSO statsConfig;
-
-    private PlayerStatsModel model;
-
-    /// <summary>运行时数值模型。UI 订阅它的事件（HealthChanged / StatsChanged）。</summary>
-    public PlayerStatsModel Model
+    /// <summary>
+    /// 玩家数值的服务层。持有运行时 <see cref="PlayerStatsModel"/>，对外提供读取与修改玩家数值的方法，
+    /// 内部把调用转发给模型。
+    ///
+    /// 调用方通过 StatsService.Instance 使用这些方法。数值的状态、规则与事件位于 PlayerStatsModel，
+    /// 它是普通 C# 类型，EditMode 测试可以直接创建。存档传输格式是 PlayerStatsData。
+    /// PlayerStatsSO 提供初始值，运行时的改动留在模型里。
+    /// </summary>
+    public class StatsService : YSingleton<StatsService>, ISaveable
     {
-        get
+        [SerializeField] private PlayerStatsSO statsConfig;
+
+        private bool registeredInSaveRegistry;
+
+        /// <summary>
+        /// 当前玩家状态：血量、速度、伤害、等级、经验、技能点。由 <see cref="OnSingletonInitialized"/>
+        /// 创建一次，之后引用保持不变。
+        /// </summary>
+        private PlayerStatsModel model;
+
+        /// 运行时数值模型的只读入口。UI、Controller、技能树从这里取得模型，订阅它的事件并读取数值。
+        public PlayerStatsModel Model => model; 
+
+        /// <summary>
+        /// 单例注册完成后的初始化钩子，由 <see cref="YSingleton{T}"/> 在 Awake 中调用。
+        /// 模型在这里建立，单例一就绪数值即可使用。
+        /// </summary>
+        protected override void OnSingletonInitialized()
         {
-            EnsureModel();
-            return model;
+            model = new PlayerStatsModel(statsConfig.CreateInitialData());
+            RegisterSelf();
+        }
+
+        private void Start() => RegisterSelf();
+
+        /// <summary>登记进 DataManager 的存档注册表，重复调用只生效一次。</summary>
+        private void RegisterSelf()
+        {
+            if (registeredInSaveRegistry || DataManager.Instance == null) return;
+
+            registeredInSaveRegistry = true;
+            DataManager.Instance.RegisterSaveableData(this);
+        }
+
+        protected override void OnDestroy()
+        {
+            if (registeredInSaveRegistry && DataManager.Instance != null)
+            {
+                DataManager.Instance.UnRegisterSaveableData(this);
+            }
+
+            registeredInSaveRegistry = false;
+            base.OnDestroy();
+        }
+
+        /// <summary>取当前状态的一份快照，供存档使用。返回拷贝，不是运行时状态本身。</summary>
+        public PlayerStatsData GetStats() => Model.ToData();
+
+        /// <summary>读档：用存档数据整体替换运行时状态。</summary>
+        public void LoadStats(PlayerStatsData data) => Model.LoadFrom(data);
+
+        public void Respawn()
+        {
+            if (Model.CurrentHealth <= 0)
+                Model.SetCurrentHealth(Model.MaxHealth);
+        }
+
+        public void UpdateMaxHealth(int amount) => Model.UpdateMaxHealth(amount);
+        public void UpdateHealth(int amount) => Model.UpdateHealth(amount);
+        public void UpdateSpeed(float amount) => Model.UpdateSpeed(amount);
+        public void UpdateDamage(int amount) => Model.UpdateDamage(amount);
+        public void UpdateSkillPoints(int amount) => Model.UpdateSkillPoints(amount);
+
+        /// <summary>增加经验并结算升级。升级规则见 PlayerStatsModel.AddExp。</summary>
+        public void AddExp(int amount) => Model.AddExp(amount);
+
+        /// <summary>单例没有场景身份，存档注册表按实例登记。</summary>
+        public DataDefinition GetDataID() => null;
+
+        /// <summary>把当前数值写进存档。</summary>
+        public void SaveData(Data data) => data.playerStatsData = GetStats();
+
+        /// <summary>从存档恢复数值。存档里没有数值段时保留当前状态。</summary>
+        public void LoadData(Data data)
+        {
+            if (data.playerStatsData == null) return;
+
+            LoadStats(data.playerStatsData);
         }
     }
-
-    protected override void OnSingletonInitialized()
-    {
-        EnsureModel(); // 单例初始化即建立模型，避免后续访问顺序问题
-    }
-
-    private void EnsureModel()
-    {
-        if (model != null) return;
-
-        PlayerStatsData initial = statsConfig != null ? statsConfig.CreateInitialData() : new PlayerStatsData();
-        model = new PlayerStatsModel(initial);
-    }
-
-    /// <summary>取当前状态的一份快照，供存档使用。返回拷贝，不是运行时状态本身。</summary>
-    public PlayerStatsData GetStats() => Model.ToData();
-
-    /// <summary>读档：用存档数据整体替换运行时状态。</summary>
-    public void LoadStats(PlayerStatsData data) => Model.LoadFrom(data);
-
-    public int GetDamage() => Model.Damage;
-    public float GetWeaponRange() => Model.WeaponRange;
-    public float GetKnockBackForce() => Model.KnockBackForce;
-    public float GetKnockBackTime() => Model.KnockBackTime;
-    public float GetStunTime() => Model.StunTime;
-    public float GetCoolDown() => Model.CoolDown;
-    public float GetSpeed() => Model.Speed;
-    public int GetMaxHealth() => Model.MaxHealth;
-    public int GetCurrentHealth() => Model.CurrentHealth;
-    public int GetSkillPoints() => Model.SkillPoints;
-    public int GetLevel() => Model.Level;
-    public int GetCurrentExp() => Model.CurrentExp;
-    public int GetExpToUpgrade() => Model.ExpToUpgrade;
-    public float GetExpMultiplier() => Model.ExpMultiplier;
-
-    public void Respawn()
-    {
-        if (Model.CurrentHealth <= 0)
-            Model.SetCurrentHealth(Model.MaxHealth);
-    }
-
-    public void UpdateMaxHealth(int amount) => Model.UpdateMaxHealth(amount);
-    public void UpdateHealth(int amount) => Model.UpdateHealth(amount);
-    public void UpdateSpeed(float amount) => Model.UpdateSpeed(amount);
-    public void UpdateDamage(int amount) => Model.UpdateDamage(amount);
-    public void UpdateSkillPoints(int amount) => Model.UpdateSkillPoints(amount);
-
-    /// <summary>增加经验并结算升级（规则见 PlayerStatsModel.AddExp）。</summary>
-    public void AddExp(int amount) => Model.AddExp(amount);
 }

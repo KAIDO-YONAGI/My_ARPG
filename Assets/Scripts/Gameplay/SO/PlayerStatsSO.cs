@@ -1,15 +1,15 @@
 using UnityEngine;
+using Gameplay.Player.Models;
 
-/// 运行时不再使用这个资产对象本身：StatsService 启动时把它的数据拷一份进
-/// <see cref="PlayerStatsModel"/>，之后所有读写都发生在 Model 上。因此
-/// Play 期间不会污染资产落盘，也不需要再"克隆一个 SO 当运行时容器"。
-/// 规则与事件见 PlayerStatsModel；数值的唯一写入口也是它。
+/// 这个资产保存玩家数值的初始值。运行时通过 CreateInitialData() 取一份拷贝放进
+/// <see cref="PlayerStatsModel"/>，Play 期间资产内容保持不变。
+/// 数值的状态、规则与事件位于 PlayerStatsModel。
 [CreateAssetMenu(fileName = "PlayerStatsSO", menuName = "Data/PlayerStatsSO", order = 0)]
 public class PlayerStatsSO : ScriptableObject
 {
     [SerializeField] private PlayerStatsData stats = new();
 
-    /// <summary>模板里的初始值（只读用途；不要把它交给运行时当状态容器）。</summary>
+    /// <summary>资产中保存的初始值。运行时使用 CreateInitialData() 导出的拷贝。</summary>
     public PlayerStatsData Data => stats;
 
     /// <summary>导出初始值的一份拷贝，供运行时模型使用。</summary>

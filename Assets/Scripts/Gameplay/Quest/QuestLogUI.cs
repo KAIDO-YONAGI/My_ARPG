@@ -34,18 +34,12 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
 
     public void HandleQuestClicked(QuestSO quest)//绑定了按钮事件
     {
-        SetCurrentQuest(quest);
+        currentQuest = quest;
+        QuestManager.Instance.OpenQuest(quest);
+
         questNameText.text = currentQuest.questName;
         questDescriptionText.text = currentQuest.questDescription;
-
-        QuestManager.Instance.QuestStateChanged(currentQuest, QuestManager.Instance.GetQuestStateFromProgress(currentQuest));
-        DisPlayObjectives();
         DisplayRewards();
-    }
-    private void SetCurrentQuest(QuestSO quest)
-    {
-        currentQuest = quest;
-        QuestManager.Instance.SetCurrentQuest(quest);
     }
     public void DisPlayObjectives()
     {
@@ -64,10 +58,6 @@ public class QuestLogUI : MonoBehaviour//UI更新有关逻辑
 
                 objectiveSlots[i].RefreshObjectives(obj.description, progress, isCompleted);
 
-                if (QuestManager.Instance.GetQuestStateFromProgress(currentQuest)
-                        == MyEnums.QuestState.Completed)//完成状态就不更新状态了
-                    continue;
-                else QuestManager.Instance.UpdateObjectiveProgress(currentQuest, obj);
             }
             else
             {

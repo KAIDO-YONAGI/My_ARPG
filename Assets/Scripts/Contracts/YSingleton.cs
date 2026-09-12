@@ -17,7 +17,7 @@ public abstract class YSingleton<T> : MonoBehaviour where T : MonoBehaviour
         if (_instance != null && _instance != this)
         {
             enabled = false; // 立即停用：Destroy 有延迟，避免销毁前 Update 继续在未初始化实例上运行
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         _instance = this as T;

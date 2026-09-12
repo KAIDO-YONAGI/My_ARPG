@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Gameplay.Player.Services;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
@@ -45,9 +46,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         {
             knockBack.Knockback(
                 attacker,
-                StatsService.Instance.GetKnockBackForce(),
-                StatsService.Instance.GetStunTime(),
-                StatsService.Instance.GetKnockBackTime());
+                StatsService.Instance.Model.KnockBackForce,
+                StatsService.Instance.Model.StunTime,
+                StatsService.Instance.Model.KnockBackTime);
         }
     }
 }

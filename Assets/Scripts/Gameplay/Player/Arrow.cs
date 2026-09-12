@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using Gameplay.Player.Services;
 
 public class Arrow : MonoBehaviour, IPoolable
 {
@@ -34,7 +35,7 @@ public class Arrow : MonoBehaviour, IPoolable
     public void OnPoolGet()
     {
         // 每次取件都按当前玩家攻击力刷新伤害
-        damage = StatsService.Instance.GetDamage();
+        damage = StatsService.Instance.Model.Damage;
         if (originalSprite != null) spriteRenderer.sprite = originalSprite;
         transform.rotation = Quaternion.identity;
         transform.SetParent(null);

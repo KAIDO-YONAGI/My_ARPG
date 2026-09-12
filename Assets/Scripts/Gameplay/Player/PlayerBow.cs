@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.InputSystem;
 using MyEnums;
+using Gameplay.Player.Services;
 public class PlayerBow : MonoBehaviour
 {
     [SerializeField] private Transform launchPoint;
@@ -115,7 +116,7 @@ public class PlayerBow : MonoBehaviour
                 arrow.transform.SetPositionAndRotation(launchPoint.position, Quaternion.identity);
             arrow.SetSourcePool(arrowPool);
             arrow.Launch(shootDirection);//先取箭并获取引用，然后发射
-            shootTimer = StatsService.Instance.GetCoolDown();//重置射击计时器，防止多箭发射
+            shootTimer = StatsService.Instance.Model.CoolDown;//重置射击计时器，防止多箭发射
 
         }
 

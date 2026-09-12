@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Gameplay.Player.Models;
+using Gameplay.Player.Services;
 
 public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 {

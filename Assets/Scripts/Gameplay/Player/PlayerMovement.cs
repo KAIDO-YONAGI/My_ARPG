@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using MyEnums;
+using Gameplay.Player.Services;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -200,7 +201,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void ResetTimer()
     {
-        timer = StatsService.Instance.GetCoolDown();
+        timer = StatsService.Instance.Model.CoolDown;
     }
     private bool IsToRunning()
     {
@@ -256,7 +257,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void SetMovement(float horizontal, float vertical)
     {
-        rb.velocity = new Vector2(horizontal, vertical) * StatsService.Instance.GetSpeed();
+        rb.velocity = new Vector2(horizontal, vertical) * StatsService.Instance.Model.Speed;
     }
 
     private void Flip()

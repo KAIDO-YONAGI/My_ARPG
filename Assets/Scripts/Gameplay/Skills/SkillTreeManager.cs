@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Gameplay.Player.Services;
 public class SkillTreeManager : MonoBehaviour
 {
     [SerializeField] private SkillSlot[] skillSlots;
@@ -32,7 +33,7 @@ public class SkillTreeManager : MonoBehaviour
         if (listeningToLevelUp || StatsService.Instance == null) return;
 
         listeningToLevelUp = true;
-        StatsService.Instance.Model.LevelUp += UpdateAbilityPoints; // 升级事件在 Model 上，不再走静态事件
+        StatsService.Instance.Model.LevelUp += UpdateAbilityPoints; // 升级事件由模型发出
     }
 
     private void UnsubscribeLevelUp()
@@ -46,7 +47,7 @@ public class SkillTreeManager : MonoBehaviour
 
     private void HandleAbilityPointSpent(SkillSlot skillSlot)
     {
-        if (StatsService.Instance.GetSkillPoints() > 0)
+        if (StatsService.Instance.Model.SkillPoints > 0)
         {
             UpdateAbilityPoints(-1);
         }
@@ -67,7 +68,7 @@ public class SkillTreeManager : MonoBehaviour
         foreach (SkillSlot slot in skillSlots)
         {
             slot.skillButton.onClick.AddListener(()=>{
-                if (StatsService.Instance.GetSkillPoints() > 0)
+                if (StatsService.Instance.Model.SkillPoints > 0)
                     slot.TryUpgradeSkill();
             });//注册事件处理器，但是由unity刷新时响应每次的事件
         }
@@ -76,6 +77,6 @@ public class SkillTreeManager : MonoBehaviour
     public void UpdateAbilityPoints(int amount)
     {
         StatsService.Instance.UpdateSkillPoints(amount);
-        pointsText.text = "Skill Points: " + StatsService.Instance.GetSkillPoints().ToString();
+        pointsText.text = "Skill Points: " + StatsService.Instance.Model.SkillPoints.ToString();
     }
 }

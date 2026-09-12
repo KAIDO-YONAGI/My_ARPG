@@ -1,5 +1,7 @@
 using TMPro;
 using UnityEngine;
+using Gameplay.Player.Models;
+using Gameplay.Player.Services;
 
 public class HealthCanvasManager : YSingleton<HealthCanvasManager>
 {
@@ -32,8 +34,6 @@ public class HealthCanvasManager : YSingleton<HealthCanvasManager>
 
     public void UpdateHealthText()
     {
-        if (model == null || healthText == null) return;
-
         if (healthTextAnimator != null)
         {
             healthTextAnimator.Play("TextUpdate");

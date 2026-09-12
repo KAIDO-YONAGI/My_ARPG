@@ -51,6 +51,13 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
     {
         currentQuest = quest;
     }
+
+    /// <summary>玩家在任务日志里打开一个任务：记为当前任务，并按当前进度刷新状态。</summary>
+    public void OpenQuest(QuestSO quest)
+    {
+        SetCurrentQuest(quest);
+        QuestStateChanged(quest, GetQuestStateFromProgress(quest));
+    }
     public bool CanvasIsActive => canvasIsActive;
     class QuestProgressData
     {
@@ -267,6 +274,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
 
         }
 
+        RefreshObjectiveProgress(quest);
         questLogUI.DisPlayObjectives();
 
     }
@@ -286,6 +294,18 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         }
 
         progressDictionary[obj] = newAmount;
+    }
+
+    /// <summary>按物品与对话历史重算任务目标的进度。已完成的任务保持冻结。</summary>
+    public void RefreshObjectiveProgress(QuestSO quest)
+    {
+        if (!questProgress.ContainsKey(quest)) return;
+        if (GetQuestStateFromProgress(quest) == MyEnums.QuestState.Completed) return;
+
+        foreach (var obj in quest.questObjectives)
+        {
+            UpdateObjectiveProgress(quest, obj);
+        }
     }
     public string GetProgressText(QuestSO quest, QuestObjective obj)
     {

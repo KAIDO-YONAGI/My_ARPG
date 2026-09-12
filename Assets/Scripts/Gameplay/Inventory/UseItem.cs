@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Gameplay.Player.Services;
 
 public class UseItem : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class UseItem : MonoBehaviour
         if (item.maxHealth > 0)
             StatsService.Instance.UpdateMaxHealth(-item.maxHealth);
 
-        int healthDiff = StatsService.Instance.GetCurrentHealth() - StatsService.Instance.GetMaxHealth();
+        int healthDiff = StatsService.Instance.Model.CurrentHealth - StatsService.Instance.Model.MaxHealth;
         if (healthDiff > 0)//如果更新前当前生命大于更新后（已经减小回去）最大生命，那就会减去healthDiff
             StatsService.Instance.UpdateHealth(healthDiff);
 

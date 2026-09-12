@@ -106,7 +106,6 @@ public class MovementController : MonoBehaviour
 
         if (newPath == null || newPath.Count == 0)
         {
-            Debug.Log("ReFindWay()找不到路径！");
             path = null;
             hasValidPath = false;
             return;
