@@ -216,13 +216,6 @@ public class UIManager : YSingleton<UIManager>
             return;
         }
 
-        // ESC 菜单打开后，不再响应其它画布的切换请求，直到 ESC 菜单关闭。
-        if (focusStack.LastOpenCanvas == CanvasToToggle.ESC)
-        {
-            ResetInputState();
-            return;
-        }
-
         // 普通按键请求和外部 RequestCanvasToggle 请求共用同一条焦点栈处理路径。
         HandleCanvasToggleRequest();
         ResetInputState();

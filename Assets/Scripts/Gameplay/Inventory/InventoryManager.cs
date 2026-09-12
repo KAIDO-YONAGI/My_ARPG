@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using Gameplay.Player.Services;
 public class InventoryManager : YSingleton<InventoryManager>
 {
+    private static readonly int IsPicked = Animator.StringToHash("isPicked");
 
     [SerializeField] private Transform hotbarParent;
     [SerializeField] private Transform backpackParent;
@@ -200,7 +201,7 @@ public class InventoryManager : YSingleton<InventoryManager>
         yield return new WaitForSeconds(stateInfo.length * 0.3f);
         loot.canBePick = true;
         loot.hasBeenPicked = false;
-        loot.animator.SetBool("isPicked", false);
+        loot.animator.SetBool(IsPicked, false);
     }
     public void SetSlotBeenClicked(InventorySlot slot)
     {

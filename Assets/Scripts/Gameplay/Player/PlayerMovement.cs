@@ -6,6 +6,9 @@ using Gameplay.Player.Services;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private static readonly int IsAttacking = Animator.StringToHash("isAttacking");
+    private static readonly int IsShooting = Animator.StringToHash("isShooting");
+    private static readonly int IsRunning = Animator.StringToHash("isRunning");
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerCombat playerCombat;
@@ -13,19 +16,21 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Joystick joystick;
     [SerializeField] private Transform visualRoot;
 
-    [Header("Input Actions")]
-    [SerializeField] private InputActionReference moveAction;
+    [Header("Input Actions")] [SerializeField]
+    private InputActionReference moveAction;
+
     [SerializeField] private InputActionReference slashAction;
     [SerializeField] private InputActionReference shootAction;
 
-    [Header("Action Finished Events")]
-    [SerializeField] private VoidEventSO slashActionFinishedEvent;
+    [Header("Action Finished Events")] [SerializeField]
+    private VoidEventSO slashActionFinishedEvent;
+
     [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
-    private int facingDirection = 1;//默认朝向为右
-    private bool canBeInterrupted = true;//是否可以被打断，攻击和射击动画期间不可被打断
+    private int facingDirection = 1; //默认朝向为右
+    private bool canBeInterrupted = true; //是否可以被打断，攻击和射击动画期间不可被打断
 
-    private float timer = 0;//计时器，暂时未使用
+    private float timer = 0; //计时器，暂时未使用
 
     private PlayerState playerState = PlayerState.Idle;
 
@@ -81,28 +86,29 @@ public class PlayerMovement : MonoBehaviour
     private void OnActionFinished()
     {
         AnimatorSM(PlayerState.Idle);
-        animator.SetBool("isAttacking", false);
-        animator.SetBool("isShooting", false);
+        animator.SetBool(IsAttacking, false);
+        animator.SetBool(IsShooting, false);
         SetCanBeInterrupted(true);
         ResetTimer();
     }
 
-    public void AnimatorSM(PlayerState newState)//用于切换动画
+    public void AnimatorSM(PlayerState newState) //用于切换动画
     {
         //退出当前动画
 
         if (playerState == PlayerState.Attacking)
         {
-            animator.SetBool("isAttacking", false);
+            animator.SetBool(IsAttacking, false);
         }
         else if (playerState == PlayerState.Shooting)
         {
-            animator.SetBool("isShooting", false);
+            animator.SetBool(IsShooting, false);
         }
         else if (playerState == PlayerState.Running)
         {
-            animator.SetBool("isRunning", false);
+            animator.SetBool(IsRunning, false);
         }
+
         // else if (playerState == PlayerState.Idle)
         // {
         // }
@@ -111,20 +117,19 @@ public class PlayerMovement : MonoBehaviour
         //进入新动画
         if (playerState == PlayerState.Attacking)
         {
-            animator.SetBool("isAttacking", true);
+            animator.SetBool(IsAttacking, true);
         }
         else if (playerState == PlayerState.Shooting)
         {
-            animator.SetBool("isShooting", true);
+            animator.SetBool(IsShooting, true);
         }
         else if (playerState == PlayerState.Running)
         {
-            animator.SetBool("isRunning", true);
+            animator.SetBool(IsRunning, true);
         }
         else if (playerState == PlayerState.KnockBack)
         {
         }
-
     }
 
     private void Update()
@@ -134,8 +139,10 @@ public class PlayerMovement : MonoBehaviour
 
         if (!canBeInterrupted)
             return;
-        else MovementSM();
+        
+        MovementSM();
     }
+
     private void MovementSM()
     {
         // 如果处于KnockBack状态，不处理其他状态转换
@@ -144,6 +151,7 @@ public class PlayerMovement : MonoBehaviour
             HandleKnockBackState();
             return;
         }
+
         bool attackPressed =
             (slashAction.action.WasPressedThisFrame() && playerCombat.IsActive) ||
             (shootAction.action.WasPressedThisFrame() && playerBow.IsActive);
@@ -160,7 +168,7 @@ public class PlayerMovement : MonoBehaviour
             AnimatorSM(PlayerState.Idle);
         }
 
-        switch (playerState)//用于执行逻辑
+        switch (playerState) //用于执行逻辑
         {
             case PlayerState.Idle:
                 HandleIdleState();
@@ -174,7 +182,6 @@ public class PlayerMovement : MonoBehaviour
             case PlayerState.Shooting:
                 HandleShootingState();
                 break;
-
         }
     }
 
@@ -199,10 +206,12 @@ public class PlayerMovement : MonoBehaviour
     {
         canBeInterrupted = value;
     }
+
     public void ResetTimer()
     {
         timer = StatsService.Instance.Model.CoolDown;
     }
+
     private bool IsToRunning()
     {
         if (joystick != null && (Mathf.Abs(joystick.Horizontal) > 0.1f || Mathf.Abs(joystick.Vertical) > 0.1f))
@@ -255,6 +264,7 @@ public class PlayerMovement : MonoBehaviour
         //将animator的horizontal参数的值设定为变量的值
         SetMovement(horizontal, vertical);
     }
+
     private void SetMovement(float horizontal, float vertical)
     {
         rb.velocity = new Vector2(horizontal, vertical) * StatsService.Instance.Model.Speed;
@@ -266,13 +276,15 @@ public class PlayerMovement : MonoBehaviour
         Transform root = GetPlayerRoot();
         root.localScale =
             new Vector3(-root.localScale.x,
-            root.localScale.y,
-            root.localScale.z);
+                root.localScale.y,
+                root.localScale.z);
     }
-    public int getFacingDirection()
+
+    public int GetFacingDirection()
     {
         return this.facingDirection;
     }
+
     public void KnockBack(Transform enemy, float force, float stunTime)
     {
         if (!isActiveAndEnabled)
@@ -293,16 +305,16 @@ public class PlayerMovement : MonoBehaviour
             return rb.transform;
         return transform;
     }
+
     public PlayerState GetPlayerState()
     {
         return playerState;
     }
+
     IEnumerator KnockBackCounter(float stunTime)
     {
         yield return new WaitForSeconds(stunTime);
         canBeInterrupted = true;
         AnimatorSM(PlayerState.Idle);
     }
-
 }
-

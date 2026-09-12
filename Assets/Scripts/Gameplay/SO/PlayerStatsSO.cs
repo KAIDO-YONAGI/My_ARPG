@@ -7,6 +7,7 @@ using Gameplay.Player.Models;
 [CreateAssetMenu(fileName = "PlayerStatsSO", menuName = "Data/PlayerStatsSO", order = 0)]
 public class PlayerStatsSO : ScriptableObject
 {
+    
     [SerializeField] private PlayerStatsData stats = new();
 
     /// <summary>资产中保存的初始值。运行时使用 CreateInitialData() 导出的拷贝。</summary>

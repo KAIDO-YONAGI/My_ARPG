@@ -7,6 +7,8 @@ using UnityEngine;
 /// </summary>
 public class NPCPatrol : MonoBehaviour
 {
+    private static readonly int IsWalking = Animator.StringToHash("isWalking");
+
     [Header("Patrol Rectangle Settings")]
     [SerializeField] private Vector2 patrolSize = new Vector2(5f, 3f); // 矩形的长和宽
     [SerializeField] private bool clockwise = true; // true为顺时针，false为逆时针
@@ -61,7 +63,7 @@ public class NPCPatrol : MonoBehaviour
 
     private void OnDisable()
     {
-        animator.SetBool("isWalking", false);
+        animator.SetBool(IsWalking, false);
     }
 
     private void Update()
@@ -91,7 +93,7 @@ public class NPCPatrol : MonoBehaviour
         }
         else
         {
-            animator.SetBool("isWalking", true);
+            animator.SetBool(IsWalking, true);
         }
 
         // 到达角落目标点
@@ -140,7 +142,7 @@ public class NPCPatrol : MonoBehaviour
     IEnumerator WaitAndMoveToNextCorner()
     {
         isWaiting = true;
-        animator.SetBool("isWalking", false);
+        animator.SetBool(IsWalking, false);
         rb.velocity = Vector2.zero;
         yield return new WaitForSeconds(waitTime);
 

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ShopKeeper : MonoBehaviour
 {
+    private static readonly int PlayerInRange = Animator.StringToHash("playerInRange");
+
     [SerializeField] private Animator logoAnimator;
     [SerializeField] private Animator shopKeeperAnimator;
     [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
@@ -26,7 +28,7 @@ public class ShopKeeper : MonoBehaviour
         shopKeeperEvent.RaiseShopKeeperEntered(this);
 
         if (logoAnimator != null)
-            logoAnimator.SetBool("playerInRange", true);
+            logoAnimator.SetBool(PlayerInRange, true);
     }
 
     private void OnTriggerExit2D(Collider2D collider)
@@ -36,7 +38,7 @@ public class ShopKeeper : MonoBehaviour
         shopKeeperEvent.RaiseShopKeeperExited(this);
 
         if (logoAnimator != null)
-            logoAnimator.SetBool("playerInRange", false);
+            logoAnimator.SetBool(PlayerInRange, false);
     }
 
     private void OnDisable()

@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class NPCWander : MonoBehaviour
 {
+    private static readonly int IsWalking = Animator.StringToHash("isWalking");
+
     [Header("Component References")]
     [SerializeField] private Animator animator;
     [SerializeField] private MovementController aStarController;
@@ -41,7 +43,7 @@ public class NPCWander : MonoBehaviour
 
     private void OnDisable()
     {
-        animator.SetBool("isWalking", false);
+        animator.SetBool(IsWalking, false);
     }
     private void Update()
     {
@@ -67,7 +69,7 @@ public class NPCWander : MonoBehaviour
         }
         else
         {
-            animator.SetBool("isWalking", true);
+            animator.SetBool(IsWalking, true);
         }
 
         if ((transform.position - targetPosition).sqrMagnitude < thresholdSqr || posToGo == Vector3.zero)//到终点则重新获取巡逻点
@@ -84,7 +86,7 @@ public class NPCWander : MonoBehaviour
     IEnumerator WaitAndContinue()
     {
         isWaiting = true;
-        animator.SetBool("isWalking", false);
+        animator.SetBool(IsWalking, false);
         rb.velocity = Vector2.zero;
         yield return new WaitForSeconds(waitTime);
 

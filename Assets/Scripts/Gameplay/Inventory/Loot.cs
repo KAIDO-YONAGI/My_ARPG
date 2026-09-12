@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using UnityEngine;
 public class Loot : MonoBehaviour, ISaveable, IPoolable
 {
+    private static readonly int IsPicked = Animator.StringToHash("isPicked");
+
     public ItemSO item;
     public SpriteRenderer sr;
     public Animator animator;
@@ -165,7 +167,7 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
         if (collision.CompareTag("Player") && canBePick)
         {
             animator.Play("Pickup");
-            animator.SetBool("isPicked", true);
+            animator.SetBool(IsPicked, true);
             lootEvent.OnEventRaised(item, quantity, this);
             hasBeenPicked = true;
         }

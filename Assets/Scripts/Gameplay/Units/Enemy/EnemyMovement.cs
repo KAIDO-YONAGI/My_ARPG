@@ -3,6 +3,10 @@ using MyEnums;
 using System.Collections.Generic;
 public class EnemyMovement : MonoBehaviour
 {
+    private static readonly int IsIdle = Animator.StringToHash("isIdle");
+    private static readonly int IsChasing = Animator.StringToHash("isChasing");
+    private static readonly int IsAttacking = Animator.StringToHash("isAttacking");
+
     private Rigidbody2D rb;
     private Transform player;
     private Animator animator;
@@ -34,20 +38,20 @@ public class EnemyMovement : MonoBehaviour
     {
         //退出当前动画
         if (enemyState == EnemyState.Idle)
-            animator.SetBool("isIdle", false);
+            animator.SetBool(IsIdle, false);
         else if (enemyState == EnemyState.Chasing)
-            animator.SetBool("isChasing", false);
+            animator.SetBool(IsChasing, false);
         else if (enemyState == EnemyState.Attacking)
-            animator.SetBool("isAttacking", false);
+            animator.SetBool(IsAttacking, false);
         //更新状态
         enemyState = newState;
         //进入新动画
         if (enemyState == EnemyState.Idle)
-            animator.SetBool("isIdle", true);
+            animator.SetBool(IsIdle, true);
         else if (enemyState == EnemyState.Chasing)
-            animator.SetBool("isChasing", true);
+            animator.SetBool(IsChasing, true);
         else if (enemyState == EnemyState.Attacking)
-            animator.SetBool("isAttacking", true);
+            animator.SetBool(IsAttacking, true);
     }
     private void Awake()
     {

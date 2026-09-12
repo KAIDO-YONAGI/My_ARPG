@@ -8,6 +8,9 @@ using MyEnums;
 using Gameplay.Player.Services;
 public class PlayerBow : MonoBehaviour
 {
+    private static readonly int AimX = Animator.StringToHash("aimX");
+    private static readonly int AimY = Animator.StringToHash("aimY");
+
     [SerializeField] private Transform launchPoint;
     [SerializeField] private Arrow arrowPrefab;
     [Header("Arrow Pool")]
@@ -68,7 +71,7 @@ public class PlayerBow : MonoBehaviour
         {
             return;
         }
-        aimDirection = new Vector2(playerMovement.getFacingDirection(), 0).normalized;
+        aimDirection = new Vector2(playerMovement.GetFacingDirection(), 0).normalized;
 
         // GetAxisRaw 对键盘返回 -1/0/1 离散值，Move action 的 WASD composite 同样是 -1/0/1，语义一致
         Vector2 move = moveAction.action.ReadValue<Vector2>();
@@ -78,12 +81,12 @@ public class PlayerBow : MonoBehaviour
         if (horizontal != 0 || vertical != 0)
         {
             aimDirection = new Vector2(horizontal, vertical).normalized;
-            anim.SetFloat("aimX", aimDirection.x);
-            anim.SetFloat("aimY", aimDirection.y);
+            anim.SetFloat(AimX, aimDirection.x);
+            anim.SetFloat(AimY, aimDirection.y);
         }
         else if (horizontal == 0 && vertical == 0)
         {
-            anim.SetFloat("aimX", aimDirection.x);
+            anim.SetFloat(AimX, aimDirection.x);
         }
     }
 
@@ -101,7 +104,7 @@ public class PlayerBow : MonoBehaviour
         }
         else
         {
-            shootDirection = new Vector2(playerMovement.getFacingDirection(), 0).normalized;
+            shootDirection = new Vector2(playerMovement.GetFacingDirection(), 0).normalized;
         }
     }
 
@@ -131,8 +134,8 @@ public class PlayerBow : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        anim.SetFloat("aimX", 0);
-        anim.SetFloat("aimY", 0);
+        anim.SetFloat(AimX, 0);
+        anim.SetFloat(AimY, 0);
 
     }
 }
