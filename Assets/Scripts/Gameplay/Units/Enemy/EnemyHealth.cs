@@ -45,9 +45,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         {
             knockBack.Knockback(
                 attacker,
-                StatsManager.Instance.GetKnockBackForce(),
-                StatsManager.Instance.GetStunTime(),
-                StatsManager.Instance.GetKnockBackTime());
+                StatsService.Instance.GetKnockBackForce(),
+                StatsService.Instance.GetStunTime(),
+                StatsService.Instance.GetKnockBackTime());
         }
     }
 }

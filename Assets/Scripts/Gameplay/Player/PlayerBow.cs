@@ -115,7 +115,7 @@ public class PlayerBow : MonoBehaviour
                 arrow.transform.SetPositionAndRotation(launchPoint.position, Quaternion.identity);
             arrow.SetSourcePool(arrowPool);
             arrow.Launch(shootDirection);//先取箭并获取引用，然后发射
-            shootTimer = StatsManager.Instance.GetCoolDown();//重置射击计时器，防止多箭发射
+            shootTimer = StatsService.Instance.GetCoolDown();//重置射击计时器，防止多箭发射
 
         }
 

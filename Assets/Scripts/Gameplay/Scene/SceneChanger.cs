@@ -133,7 +133,7 @@ public class SceneChanger : YSingleton<SceneChanger>
         ForbidInput();
         TimeManager.Instance.PauseGame();
 
-        StatsManager.Instance.Respawn(); //回血
+        StatsService.Instance.Respawn(); //回血
 
         Vector3 targetPosition = newPosition == Vector3.zero ? scene.initialPosition : newPosition;
         //如果传入位置为零向量，则使用场景预设的初始位置

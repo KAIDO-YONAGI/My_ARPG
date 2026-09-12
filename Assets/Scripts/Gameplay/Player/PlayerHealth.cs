@@ -17,13 +17,13 @@ public class PlayerHealth : YSingleton<PlayerHealth>
 
     void Start()
     {
-        StatsManager.Instance.Respawn();
+        StatsService.Instance.Respawn();
     }
     public void ChangeHealth(int amount)
     {
-        StatsManager.Instance.UpdateHealth(amount);
+        StatsService.Instance.UpdateHealth(amount);
 
-        if (StatsManager.Instance.GetCurrentHealth() <= 0)
+        if (StatsService.Instance.GetCurrentHealth() <= 0)
         {
             // GameOver 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈与阻塞体系。
             UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);

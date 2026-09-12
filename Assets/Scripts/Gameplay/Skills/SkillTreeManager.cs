@@ -8,12 +8,13 @@ public class SkillTreeManager : MonoBehaviour
     [SerializeField] private SkillSlot[] skillSlots;
     [SerializeField] private TMP_Text pointsText;
 
+    private bool listeningToLevelUp;
 
     private void OnEnable()
     {
         SkillSlot.OnAbilityPointSpent += HandleAbilityPointSpent;
         SkillSlot.OnMaxSkillLevel += HandleSkillMaxed;
-        ExpManager.OnLevelUp += UpdateAbilityPoints;
+        TrySubscribeLevelUp();
     }
 
 
@@ -21,12 +22,31 @@ public class SkillTreeManager : MonoBehaviour
     {
         SkillSlot.OnAbilityPointSpent -= HandleAbilityPointSpent;
         SkillSlot.OnMaxSkillLevel -= HandleSkillMaxed;
-        ExpManager.OnLevelUp -= UpdateAbilityPoints;
+        UnsubscribeLevelUp();
 
     }
+
+    // OnEnable 可能早于 StatsService 的 Awake，所以订阅写成可重试的；Start 一定在所有 Awake 之后。
+    private void TrySubscribeLevelUp()
+    {
+        if (listeningToLevelUp || StatsService.Instance == null) return;
+
+        listeningToLevelUp = true;
+        StatsService.Instance.Model.LevelUp += UpdateAbilityPoints; // 升级事件在 Model 上，不再走静态事件
+    }
+
+    private void UnsubscribeLevelUp()
+    {
+        if (!listeningToLevelUp) return;
+        listeningToLevelUp = false;
+
+        if (StatsService.Instance == null) return;
+        StatsService.Instance.Model.LevelUp -= UpdateAbilityPoints;
+    }
+
     private void HandleAbilityPointSpent(SkillSlot skillSlot)
     {
-        if (StatsManager.Instance.GetSkillPoints() > 0)
+        if (StatsService.Instance.GetSkillPoints() > 0)
         {
             UpdateAbilityPoints(-1);
         }
@@ -42,10 +62,12 @@ public class SkillTreeManager : MonoBehaviour
     }
     private void Start()
     {
+        TrySubscribeLevelUp();
+
         foreach (SkillSlot slot in skillSlots)
         {
             slot.skillButton.onClick.AddListener(()=>{
-                if (StatsManager.Instance.GetSkillPoints() > 0)
+                if (StatsService.Instance.GetSkillPoints() > 0)
                     slot.TryUpgradeSkill();
             });//注册事件处理器，但是由unity刷新时响应每次的事件
         }
@@ -53,7 +75,7 @@ public class SkillTreeManager : MonoBehaviour
     }
     public void UpdateAbilityPoints(int amount)
     {
-        StatsManager.Instance.UpdateSkillPoints(amount);
-        pointsText.text = "Skill Points: " + StatsManager.Instance.GetSkillPoints().ToString();
+        StatsService.Instance.UpdateSkillPoints(amount);
+        pointsText.text = "Skill Points: " + StatsService.Instance.GetSkillPoints().ToString();
     }
 }

@@ -21,14 +21,14 @@ public class PlayerCombat : MonoBehaviour
         //TODO:可以引入空间优化算法
         Collider2D[] enemis = Physics2D.OverlapCircleAll(
             attackPoint.position,
-            StatsManager.Instance.GetWeaponRange(),
+            StatsService.Instance.GetWeaponRange(),
             enemyMask);
 
         foreach (Collider2D enemy in enemis)
         {
             // 例外保留：碰撞/命中对象运行时才知道是谁，无法预引用（见重构清单 GetComponent 治理一节）
             if (!enemy.TryGetComponent<IDamageable>(out var damageable)) continue;
-            damageable.TakeDamage(StatsManager.Instance.GetDamage(), transform);
+            damageable.TakeDamage(StatsService.Instance.GetDamage(), transform);
         }
 
     }
@@ -41,6 +41,6 @@ public class PlayerCombat : MonoBehaviour
     //private void OnDrawGizmosSelected()
     //{
     //    Gizmos.color = Color.yellow;
-    //    Gizmos.DrawWireSphere(attackPoint.position, StatsManager.Instance.weaponRange);
+    //    Gizmos.DrawWireSphere(attackPoint.position, StatsService.Instance.weaponRange);
     //}
 }

@@ -34,7 +34,7 @@ public class Arrow : MonoBehaviour, IPoolable
     public void OnPoolGet()
     {
         // 每次取件都按当前玩家攻击力刷新伤害
-        damage = StatsManager.Instance.GetDamage();
+        damage = StatsService.Instance.GetDamage();
         if (originalSprite != null) spriteRenderer.sprite = originalSprite;
         transform.rotation = Quaternion.identity;
         transform.SetParent(null);

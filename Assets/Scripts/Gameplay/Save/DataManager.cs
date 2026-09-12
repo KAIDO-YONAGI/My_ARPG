@@ -59,7 +59,7 @@ public class DataManager : YSingleton<DataManager>
     public bool PrepareManualSaveData()
     {
         GameSceneSO currentScene = SceneChanger.Instance != null ? SceneChanger.Instance.GetCurrentGameScene() : null;
-        if (currentScene == null || StatsManager.Instance == null)
+        if (currentScene == null || StatsService.Instance == null)
         {
             return false;
         }
@@ -67,7 +67,7 @@ public class DataManager : YSingleton<DataManager>
         dataToSave ??= new Data();
         dataToSave.lootsStatsDic ??= new Dictionary<string, LootStatus>();
 
-        dataToSave.playerStatsData = StatsManager.Instance.GetStats();
+        dataToSave.playerStatsData = StatsService.Instance.GetStats();
         Vector3 savePosition = PlayerController.Instance != null
             ? PlayerController.Instance.GetPosition()
             : currentScene.initialPosition;
@@ -97,13 +97,13 @@ public class DataManager : YSingleton<DataManager>
         {
             Vector3 savePosition = pos == Vector3.zero ? sceneToLoadSO.initialPosition : pos;
             dataToSave = new Data();
-            dataToSave.playerStatsData = StatsManager.Instance.GetStats();
+            dataToSave.playerStatsData = StatsService.Instance.GetStats();
             dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.SaveKey, savePosition);
             DynamicDataHandler.ClearDynamicData(dataToSave);
         }
         else
         {
-            dataToSave.playerStatsData = StatsManager.Instance.GetStats();
+            dataToSave.playerStatsData = StatsService.Instance.GetStats();
         }
         //上个场景是Menu则不存档
         if (lastSceneType != MyEnums.SceneType.Menu)
@@ -147,10 +147,10 @@ public class DataManager : YSingleton<DataManager>
         {
             saveable.LoadData(dataToSave);
         }
-        // 旧档缺少数值时先保留当前运行态，避免把 StatsManager 置空。
+        // 旧档缺少数值时先保留当前运行态，避免把 StatsService 置空。
         if (data.playerStatsData != null)
         {
-            StatsManager.Instance.LoadStats(data.playerStatsData);
+            StatsService.Instance.LoadStats(data.playerStatsData);
         }
 
     }

@@ -15,8 +15,8 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
     public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
     public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
-    // 运行时绑定 StatsManager 的数值模型（事件在模型上）；初始绑定放在 Start：
-    // 面板可能随 GamePlay 根节点延迟激活，那时 StatsManager 必然已就绪。
+    // 运行时绑定 StatsService 的数值模型（事件在模型上）；初始绑定放在 Start：
+    // 面板可能随 GamePlay 根节点延迟激活，那时 StatsService 必然已就绪。
     private PlayerStatsModel model;
 
     protected override void OnSingletonInitialized()
@@ -26,7 +26,7 @@ public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
 
     private void Start()
     {
-        model = StatsManager.Instance.Model;
+        model = StatsService.Instance.Model;
         model.StatsChanged += UpdateAllStats;
         UpdateAllStats();
     }

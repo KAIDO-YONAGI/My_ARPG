@@ -1,40 +1,14 @@
 using UnityEngine;
-using System;
-
-[Serializable]
-public class PlayerStatsData
-{
-    public int damage;
-    public float weaponRange;
-    public float knockBackForce;
-    public float knockBackTime;
-    public float stunTime;
-    public float coolDown;
-    public float speed;
-    public int maxHealth;
-    public int currentHealth;
-    public int skillPoints;
-    public int level;
-    public int currentExp;
-    public int expToUpgrade;
-    public float expMultiplier;
-    /// <summary>等级上限；0 表示不限制（旧存档没有这个字段，反序列化后为 0，即不限制）。</summary>
-    public int maxLevel;
-
-    /// <summary>
-    /// 字段级拷贝。字段全是值类型，浅拷贝就够。
-    /// 存档边界用它，避免"运行时状态"和"存档数据"变成同一个对象引用。
-    /// </summary>
-    public PlayerStatsData Clone() => (PlayerStatsData)MemberwiseClone();
-}
 
 /// <summary>
-/// 玩家数值的对外门面：持有运行时 <see cref="PlayerStatsModel"/>，并把既有 API 原样转发过去。
+/// 玩家数值这一层的服务（Service）：持有运行时 <see cref="PlayerStatsModel"/>，把既有 API 原样转发过去。
+/// 对外是唯一入口，调用方（UI / 战斗 / 存档）继续用 StatsService.Instance.xxx()。
 ///
 /// 数据与规则都在 PlayerStatsModel（普通 C#，可在 EditMode 测试里直接 new）；
+/// 存档传输格式是 PlayerStatsData（Models/PlayerStatsData.cs）；
 /// 本类不再克隆 SO，也没有运行时 SO 副本；PlayerStatsSO 只作为初始值模板使用。
 /// </summary>
-public class StatsManager : YSingleton<StatsManager>
+public class StatsService : YSingleton<StatsService>
 {
     [SerializeField] private PlayerStatsSO statsConfig;
 

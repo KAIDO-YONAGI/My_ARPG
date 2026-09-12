@@ -26,7 +26,7 @@ public class PlayerStatsModel
     public event Action HealthChanged;
     /// <summary>速度、伤害等属性变化（StatsCanvasManager 订阅）。</summary>
     public event Action StatsChanged;
-    /// <summary>升级时触发一次，参数是本次升的级数（ExpManager 转发给技能树）。</summary>
+    /// <summary>升级时触发一次，参数是本次升的级数（SkillTreeManager 订阅它来发技能点）。</summary>
     public event Action<int> LevelUp;
 
     /// <summary>升级所需经验的保底值。曲线算出 0 或负数时必须被顶到这里，

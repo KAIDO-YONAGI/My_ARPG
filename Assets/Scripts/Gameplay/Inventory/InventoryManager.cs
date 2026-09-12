@@ -105,7 +105,7 @@ public class InventoryManager : YSingleton<InventoryManager>
         }
         if (item.isEXP)
         {
-            ExpManager.Instance.GainExp(quantity);
+            ExperienceController.Instance.GainExp(quantity);
             return;
         }
         //普通物品

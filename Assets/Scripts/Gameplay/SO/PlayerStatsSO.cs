@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// 运行时不再使用这个资产对象本身：StatsManager 启动时把它的数据拷一份进
+/// 运行时不再使用这个资产对象本身：StatsService 启动时把它的数据拷一份进
 /// <see cref="PlayerStatsModel"/>，之后所有读写都发生在 Model 上。因此
 /// Play 期间不会污染资产落盘，也不需要再"克隆一个 SO 当运行时容器"。
 /// 规则与事件见 PlayerStatsModel；数值的唯一写入口也是它。
