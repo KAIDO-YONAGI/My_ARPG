@@ -5,10 +5,9 @@ using Gameplay.Player.Views;
 namespace Gameplay.Player.Controllers
 {
     /// <summary>
-    /// 属性面板的控制器（纯 C#，由 StatsPanelView 创建并托管）。
+    /// 属性面板的控制器，纯 C# 类，由 StatsPanelView 创建并托管。
     /// 订阅 PlayerStatsModel.StatsChanged，把当前 damage/speed 推给 StatsPanelView.SetStats。
-    /// 画布开关/焦点/层级（ICanvasManager）是 UI 共用基础设施，由 View 自理，不经本类。
-    /// 数值规则在 PlayerStatsModel，View 只负责显示。
+    /// 画布开关、焦点与层级由 View 自理。数值规则在 PlayerStatsModel，View 只负责显示。
     /// </summary>
     public class StatsPanelController
     {

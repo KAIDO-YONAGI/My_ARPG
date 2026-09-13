@@ -5,21 +5,18 @@ namespace Gameplay.Player.Services
 {
     /// <summary>
     /// 玩家数值的服务层。持有运行时 <see cref="PlayerStatsModel"/>，负责它的生命周期与存档；
-    /// 注册/注销机制由 <see cref="SaveableService{TSelf}"/> 基类提供（静态注册表，无时序依赖）。
+    /// 注册与注销由 <see cref="SaveableService{TSelf}"/> 基类经静态 SaveRegistry 完成。
     ///
-    /// 数值的读写统一走 <see cref="Model"/>：规则（钳制、事件广播）都在模型方法内部。
-    /// Respawn 留在服务层，因为它带业务规则：仅死亡时复活回满血。
-    /// 数值的状态、规则与事件位于 PlayerStatsModel，它是普通 C# 类型，EditMode 测试可以直接创建。
-    /// 存档传输格式是 PlayerStatsData。PlayerStatsSO 提供初始值，运行时的改动留在模型里。
+    /// 数值的读写统一走 <see cref="Model"/>，规则与事件都在模型方法内部。
+    /// Respawn 带业务规则，留在服务层：仅死亡时复活回满血。
+    /// PlayerStatsModel 是普通 C# 类型，EditMode 测试可以直接创建；
+    /// 存档传输格式是 PlayerStatsData；PlayerStatsSO 提供初始值，运行时的改动留在模型里。
     /// </summary>
     public class StatsService : SaveableService<StatsService>
     {
         [SerializeField] private PlayerStatsSO statsConfig;
 
-        /// <summary>
-        /// 当前玩家状态：血量、速度、伤害、等级、经验、技能点。
-        /// 建模型与注册存档都在这里完成，单例一就绪数值即可用。
-        /// </summary>
+        /// <summary>当前玩家状态：血量、速度、伤害、等级、经验、技能点。单例就绪后即可用。</summary>
         private PlayerStatsModel model;
 
         /// <summary>运行时数值模型的唯一入口。UI、Controller、技能树从这里取得模型，订阅它的事件并读写数值。</summary>

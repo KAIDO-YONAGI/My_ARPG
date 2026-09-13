@@ -5,9 +5,10 @@ using Gameplay.Player.Controllers;
 namespace Gameplay.Player.Views
 {
     /// <summary>
-    /// 属性面板的显示层：面板唯一的场景组件，持有控件引用并托管纯 C# 的 StatsPanelController
-    /// （Start 创建并首刷，OnDestroy 销毁）。兼管画布开关/焦点/层级（ICanvasManager 是全 UI
-    /// 共用的基础设施，与数值数据流无关）。订阅模型事件与取数在 Controller，View 不接触 PlayerStatsModel。
+    /// 属性面板的显示层，面板唯一的场景组件，持有控件引用并托管纯 C# 的 StatsPanelController：
+    /// Start 时创建并首刷，OnDestroy 时销毁。
+    /// 兼管画布开关、焦点与层级，ICanvasManager 是全 UI 共用的基础设施，与数值数据流无关。
+    /// 订阅模型事件与取数在 Controller，View 只接触控件。
     /// </summary>
     public class StatsPanelView : MonoBehaviour, ICanvasManager
     {
@@ -62,7 +63,7 @@ namespace Gameplay.Player.Views
 
         private void OnToggleStatsEvent(bool state)
         {
-            // 数据一直由 Controller 事件驱动刷新（失活期间也在写），打开时无需补刷
+            // 数据由 Controller 事件驱动持续刷新，面板打开时即为最新值
             ((ICanvasManager)this).ToggleCanvas(statsCanvas, canvas, MyEnums.CanvasToToggle.Stats, state);
         }
 

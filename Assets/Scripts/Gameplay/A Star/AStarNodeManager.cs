@@ -3,8 +3,7 @@ using MyEnums;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-// 网格在本类 Awake 构建；PathFinder 与 MovementController 对它的取用全部是运行期惰性访问
-// （FindPath/坐标换算时），全仓没有 Awake 期消费者，因此不需要执行序保证。
+// 网格在本类 Awake 构建；PathFinder 与 MovementController 在运行期寻路时才读取它。
 public class AStarNodeManager : YSingleton<AStarNodeManager>
 {
 

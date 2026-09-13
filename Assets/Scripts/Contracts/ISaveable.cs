@@ -3,7 +3,7 @@ public interface ISaveable
 
     DataDefinition GetDataID();
 
-    /// <summary>登记进存档注册表。SaveRegistry 是静态类，任意生命周期阶段调用都安全，无时序依赖。</summary>
+    /// <summary>登记进存档注册表，任意生命周期阶段调用都安全。</summary>
     void RegisterSaveable()
     {
         SaveRegistry.Add(this);

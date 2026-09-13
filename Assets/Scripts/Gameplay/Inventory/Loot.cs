@@ -82,8 +82,7 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
         UnregisterSelf();
     }
 
-    /// <summary>挂进存档注册表。幂等，且跳过不参与存档的 DataDefinition。
-    /// 注册走静态 SaveRegistry，任意生命周期阶段调用都安全，无 Instance 判空必要。</summary>
+    /// <summary>挂进存档注册表。幂等，且跳过不参与存档的 DataDefinition。</summary>
     private void RegisterSelf()
     {
         if (registered) return;

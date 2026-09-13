@@ -4,9 +4,9 @@ using Gameplay.Player.Services;
 namespace Gameplay.Player.Controllers
 {
     /// <summary>
-    /// 血量域的输入侧控制器。订阅 PlayerDamagedEventSO 广播（伤害源只 Raise，不持有玩家引用），
-    /// 统一处理扣血、击退与死亡编排（GameOver 画布 + 隐藏玩家根节点）。
-    /// 显示侧的控制器是 HealthController（血量文本），两者分工：这里管输入与后果，那边管显示。
+    /// 血量域的输入侧控制器。订阅 PlayerDamagedEventSO 广播，统一处理扣血、击退
+    /// 与死亡编排：请求 GameOver 画布、隐藏玩家根节点。
+    /// 显示侧的控制器是 HealthController，负责血量文本；两者分工，这里管输入与后果。
     /// </summary>
     public class PlayerDamageController : MonoBehaviour
     {

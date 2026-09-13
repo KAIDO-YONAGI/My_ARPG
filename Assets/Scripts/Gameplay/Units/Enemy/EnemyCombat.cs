@@ -19,7 +19,7 @@ public class EnemyCombat : MonoBehaviour
 
         if (hits.Length > 0 && hits[0].enabled)//如果有目标
         {
-            // 只广播"玩家受击"：扣血/击退/死亡由 PlayerDamageController 统一处理，本类不持有玩家引用
+            // 命中后广播玩家受击；扣血、击退与死亡由 PlayerDamageController 统一处理
             playerDamagedEvent.OnPlayerDamaged(damage, transform, knockBackForce, stunTime);
         }
     }

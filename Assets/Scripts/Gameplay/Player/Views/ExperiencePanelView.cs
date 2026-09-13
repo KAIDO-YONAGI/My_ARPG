@@ -6,9 +6,9 @@ using Gameplay.Player.Controllers;
 namespace Gameplay.Player.Views
 {
     /// <summary>
-    /// 经验条与等级文本的显示层：面板唯一的场景组件，持有控件引用并托管纯 C# 的 ExperienceController
-    /// （Start 创建并首刷，OnDestroy 销毁）。
-    /// 输入订阅（击杀事件）与数据订阅（ExpChanged）都在 Controller。
+    /// 经验条与等级文本的显示层，面板唯一的场景组件，持有控件引用并托管纯 C# 的
+    /// ExperienceController：Start 时创建并首刷，OnDestroy 时销毁。
+    /// 击杀事件的订阅与经验数据的读取都在 Controller。
     /// </summary>
     public class ExperiencePanelView : MonoBehaviour
     {

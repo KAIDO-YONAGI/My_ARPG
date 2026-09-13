@@ -8,7 +8,7 @@ using UnityEngine;
 //地图数据获取也可以优化，用以解决稀疏地图的遍历问题
 //可以用带权路径替换开根计算
 //细分单元格
-[RequireComponent(typeof(AStarNodeManager))]//依赖保证（不存在会自动添加）；网格取用为运行期惰性，无执行序要求
+[RequireComponent(typeof(AStarNodeManager))]//依赖保证，不存在时自动添加
 public class AStarPathFinder : YSingleton<AStarPathFinder>
 {
 
