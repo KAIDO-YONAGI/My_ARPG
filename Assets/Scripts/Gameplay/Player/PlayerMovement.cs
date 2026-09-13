@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
 
         // 场景切换（ForbidInput/AllowInput）会禁用再启用 PlayerMovement，
         // 必须走 AnimatorSM 清掉残留动画布尔并清空速度，否则进新场景仍保持旧的移动状态
-        AnimatorSM(PlayerState.Idle);
+        AnimateMachine(PlayerState.Idle);
         if (rb != null) rb.velocity = Vector2.zero;
 
         moveAction.action.Enable();
@@ -85,14 +85,14 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     private void OnActionFinished()
     {
-        AnimatorSM(PlayerState.Idle);
+        AnimateMachine(PlayerState.Idle);
         animator.SetBool(IsAttacking, false);
         animator.SetBool(IsShooting, false);
         SetCanBeInterrupted(true);
         ResetTimer();
     }
 
-    public void AnimatorSM(PlayerState newState) //用于切换动画
+    public void AnimateMachine(PlayerState newState) //用于切换动画
     {
         //退出当前动画
 
@@ -161,11 +161,11 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (IsToRunning())
         {
-            AnimatorSM(PlayerState.Running);
+            AnimateMachine(PlayerState.Running);
         }
         else if (!IsToRunning())
         {
-            AnimatorSM(PlayerState.Idle);
+            AnimateMachine(PlayerState.Idle);
         }
 
         switch (playerState) //用于执行逻辑
@@ -191,9 +191,9 @@ public class PlayerMovement : MonoBehaviour
             return false;
 
         if (playerCombat.IsActive)
-            AnimatorSM(PlayerState.Attacking);
+            AnimateMachine(PlayerState.Attacking);
         else if (playerBow.IsActive)
-            AnimatorSM(PlayerState.Shooting);
+            AnimateMachine(PlayerState.Shooting);
         else
             return false;
 
@@ -315,6 +315,6 @@ public class PlayerMovement : MonoBehaviour
     {
         yield return new WaitForSeconds(stunTime);
         canBeInterrupted = true;
-        AnimatorSM(PlayerState.Idle);
+        AnimateMachine(PlayerState.Idle);
     }
 }

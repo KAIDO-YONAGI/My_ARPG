@@ -6,25 +6,29 @@ public class ESCMenuManager : MonoBehaviour
     [SerializeField] private ToggleCanvasEventSO toggleESCEvent;
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
+    private GameSceneSO _currentScene;
+
     private void OnEnable()
     {
         toggleESCEvent.toggleCanvasEvent += OnESC;
         sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
     }
+
     private void OnDisable()
     {
         toggleESCEvent.toggleCanvasEvent -= OnESC;
         sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded(GameSceneSO _)
+    private void OnSceneLoaded(GameSceneSO sceneLoaded)
     {
+        _currentScene = sceneLoaded;
         OnESC(false);
     }
 
     private void OnESC(bool state)
     {
-
+        if (_currentScene == null || _currentScene.sceneType == MyEnums.SceneType.Menu) return;
         if (state)
         {
             TimeManager.Instance.PauseGame();

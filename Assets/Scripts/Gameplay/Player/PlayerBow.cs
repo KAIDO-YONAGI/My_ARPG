@@ -94,7 +94,7 @@ public class PlayerBow : MonoBehaviour
                                       //新问题：瞄准要按方向键，否则会按照上一次的射击方向射击，而不是朝向,因此使用了playermovement脚本里的朝向
     {
         HandleAiming();
-        playerMovement.AnimatorSM(PlayerState.Shooting);
+        playerMovement.AnimateMachine(PlayerState.Shooting);
         Vector2 move = moveAction.action.ReadValue<Vector2>();
         float horizontal = move.x;
         float vertical = move.y;
