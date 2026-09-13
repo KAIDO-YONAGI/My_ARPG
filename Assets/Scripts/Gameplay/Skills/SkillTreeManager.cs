@@ -76,7 +76,7 @@ public class SkillTreeManager : MonoBehaviour
     }
     public void UpdateAbilityPoints(int amount)
     {
-        StatsService.Instance.UpdateSkillPoints(amount);
+        StatsService.Instance.Model.UpdateSkillPoints(amount);
         pointsText.text = "Skill Points: " + StatsService.Instance.Model.SkillPoints.ToString();
     }
 }

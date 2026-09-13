@@ -1,25 +1,49 @@
 using UnityEngine;
 using Gameplay.Player.Services;
 
-public class PlayerHealth : YSingleton<PlayerHealth>
+namespace Gameplay.Player.Controllers
 {
-    [SerializeField] private GameObject playerRoot;
-
-    void Start()
+    /// <summary>
+    /// 血量域的输入侧控制器。订阅 PlayerDamagedEventSO 广播（伤害源只 Raise，不持有玩家引用），
+    /// 统一处理扣血、击退与死亡编排（GameOver 画布 + 隐藏玩家根节点）。
+    /// 显示侧的控制器是 HealthController（血量文本），两者分工：这里管输入与后果，那边管显示。
+    /// </summary>
+    public class PlayerDamageController : MonoBehaviour
     {
-        StatsService.Instance.Respawn();
-    }
-    public void ChangeHealth(int amount)
-    {
-        StatsService.Instance.UpdateHealth(amount);
+        [SerializeField] private GameObject playerRoot;
+        [SerializeField] private PlayerDamagedEventSO playerDamagedEvent;
+        [SerializeField] private PlayerMovement movement;
 
-        if (StatsService.Instance.Model.CurrentHealth <= 0)
+        void Start()
         {
-            // GameOver 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈与阻塞体系。
-            UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);
+            StatsService.Instance.Respawn();
+        }
 
-            if (playerRoot != null)
-                playerRoot.SetActive(false);
+        private void OnEnable()
+        {
+            playerDamagedEvent.PlayerDamaged += OnDamaged;
+        }
+
+        private void OnDisable()
+        {
+            playerDamagedEvent.PlayerDamaged -= OnDamaged;
+        }
+
+        private void OnDamaged(int damage, Transform attacker, float knockBackForce, float stunTime)
+        {
+            StatsService.Instance.Model.UpdateHealth(-damage);
+
+            if (movement != null)
+                movement.KnockBack(attacker, knockBackForce, stunTime);
+
+            if (StatsService.Instance.Model.CurrentHealth <= 0)
+            {
+                // GameOver 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈与阻塞体系。
+                UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);
+
+                if (playerRoot != null)
+                    playerRoot.SetActive(false);
+            }
         }
     }
 }

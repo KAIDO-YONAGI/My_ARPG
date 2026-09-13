@@ -1,100 +1,91 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using Gameplay.Player.Models;
-using Gameplay.Player.Services;
+using Gameplay.Player.Controllers;
 
-public class StatsCanvasManager : YSingleton<StatsCanvasManager>, ICanvasManager
+namespace Gameplay.Player.Views
 {
-    [SerializeField] private TMP_Text[] statTexts;
-    [SerializeField] private CanvasGroup statsCanvas;
-    [SerializeField] private Canvas canvas;
-
-    [SerializeField] private ToggleCanvasEventSO toggleStatsEvent;
-    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
-
-    public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
-    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
-
-    // 运行时绑定 StatsService 的数值模型（事件在模型上）；初始绑定放在 Start：
-    // 面板可能随 GamePlay 根节点延迟激活，那时 StatsService 必然已就绪。
-    private PlayerStatsModel model;
-
-    protected override void OnSingletonInitialized()
+    /// <summary>
+    /// 属性面板的显示层：唯一的场景组件，持有控件引用并托管 <see cref="StatsPanelController"/>；
+    /// 兼管画布开关/焦点/层级（ICanvasManager 是全 UI 共用的基础设施，与数值数据流无关）。
+    /// 订阅模型事件与取数在 Controller，View 不接触 PlayerStatsModel。
+    /// </summary>
+    public class StatsPanelView : MonoBehaviour, ICanvasManager
     {
-        statsCanvas.alpha = 0;
-    }
+        [SerializeField] private TMP_Text[] statTexts;
+        [SerializeField] private CanvasGroup statsCanvas;
+        [SerializeField] private Canvas canvas;
 
-    private void Start()
-    {
-        model = StatsService.Instance.Model;
-        model.StatsChanged += UpdateAllStats;
-        UpdateAllStats();
-    }
+        [SerializeField] private ToggleCanvasEventSO toggleStatsEvent;
+        [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
-    private void OnEnable()
-    {
-        // 重激活时补一次刷新：失活期间错过的事件没有累积通知
-        if (model != null)
-            UpdateAllStats();
+        public ToggleCanvasEventSO ToggleCanvasEvent => toggleStatsEvent;
+        public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
-        toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
-        toggleStatsEvent.focusEvent += OnFocus;
-        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
-    }
+        private StatsPanelController controller;
 
-    private void OnDisable()
-    {
-        toggleStatsEvent.toggleCanvasEvent -= OnToggleStatsEvent;
-        toggleStatsEvent.focusEvent -= OnFocus;
-        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
-    }
+        private void Awake()
+        {
+            statsCanvas.alpha = 0;
+        }
 
-    private void OnDestroy()
-    {
-        if (model != null)
-            model.StatsChanged -= UpdateAllStats;
-    }
+        private void Start()
+        {
+            // Start 在所有 Awake 之后：此时 StatsService 必然就绪，Controller 可以立即订阅
+            controller = new StatsPanelController(this);
+            controller.Refresh();
+        }
 
-    private void OnSceneLoaded(GameSceneSO _)
-    {
-        ((ICanvasManager)this).SetCanvaInactive(statsCanvas, MyEnums.CanvasToToggle.Stats);
-    }
+        private void OnEnable()
+        {
+            // 重激活时补一次刷新：失活期间错过的事件没有累积通知
+            controller?.Refresh();
 
-    private void OnToggleStatsEvent(bool state)
-    {
-        UpdateAllStats();
-        ((ICanvasManager)this).ToggleCanvas(statsCanvas, canvas, MyEnums.CanvasToToggle.Stats, state);
-    }
+            toggleStatsEvent.toggleCanvasEvent += OnToggleStatsEvent;
+            toggleStatsEvent.focusEvent += OnFocus;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        }
 
-    private void OnFocus()
-    {
-        if (!canvasIsActive()) return;
-        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Stats, true);
-    }
+        private void OnDisable()
+        {
+            toggleStatsEvent.toggleCanvasEvent -= OnToggleStatsEvent;
+            toggleStatsEvent.focusEvent -= OnFocus;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        }
 
-    private bool canvasIsActive()
-    {
-        return statsCanvas.alpha > 0;
-    }
+        private void OnDestroy()
+        {
+            controller?.Dispose();
+            controller = null;
+        }
 
-    public void UpdateDamage()
-    {
-        if (model == null || statTexts == null || statTexts.Length < 1 || statTexts[0] == null) return;
-        statTexts[0].text = "Damage:" + model.Damage;
-    }
+        private void OnSceneLoaded(GameSceneSO _)
+        {
+            ((ICanvasManager)this).SetCanvaInactive(statsCanvas, MyEnums.CanvasToToggle.Stats);
+        }
 
-    public void UpdateSpeed()
-    {
-        if (model == null || statTexts == null || statTexts.Length < 2 || statTexts[1] == null) return;
-        statTexts[1].text = "Speed:" + model.Speed;
-    }
+        private void OnToggleStatsEvent(bool state)
+        {
+            controller?.Refresh(); // 显示前刷新数据，数据由 StatsPanelController 推入
+            ((ICanvasManager)this).ToggleCanvas(statsCanvas, canvas, MyEnums.CanvasToToggle.Stats, state);
+        }
 
-    public void UpdateAllStats()
-    {
-        if (model == null) return;
-        UpdateDamage();
-        UpdateSpeed();
+        private void OnFocus()
+        {
+            if (!canvasIsActive()) return;
+            ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Stats, true);
+        }
+
+        private bool canvasIsActive()
+        {
+            return statsCanvas.alpha > 0;
+        }
+
+        /// <summary>把当前属性画到面板：statTexts[0]=Damage，[1]=Speed。</summary>
+        public void SetStats(int damage, float speed)
+        {
+            if (statTexts == null || statTexts.Length < 1) return;
+            if (statTexts[0] != null) statTexts[0].text = "Damage:" + damage;
+            if (statTexts.Length >= 2 && statTexts[1] != null) statTexts[1].text = "Speed:" + speed;
+        }
     }
 }

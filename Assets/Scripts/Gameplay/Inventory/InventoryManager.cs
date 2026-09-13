@@ -107,7 +107,7 @@ public class InventoryManager : YSingleton<InventoryManager>
         }
         if (item.isEXP)
         {
-            StatsService.Instance.AddExp(quantity);
+            StatsService.Instance.Model.AddExp(quantity);
             return;
         }
         //普通物品

@@ -5230,7 +5230,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: What To Do?
+  m_text: Paused
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
@@ -22586,8 +22586,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Save&Load
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -37599,6 +37599,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerRoot: {fileID: 6166002366618250803}
+  playerDamagedEvent: {fileID: 11400000, guid: 6da0a155357f433880fc1b4416ec7a90, type: 2}
+  movement: {fileID: 148041525}
 --- !u!1 &9140946962347789005
 GameObject:
   m_ObjectHideFlags: 0

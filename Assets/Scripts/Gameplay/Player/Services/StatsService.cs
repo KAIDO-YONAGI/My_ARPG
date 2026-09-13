@@ -4,12 +4,13 @@ using UnityEngine;
 namespace Gameplay.Player.Services
 {
     /// <summary>
-    /// 玩家数值的服务层。持有运行时 <see cref="PlayerStatsModel"/>，对外提供读取与修改玩家数值的方法，
-    /// 内部把调用转发给模型。
+    /// 玩家数值的服务层。持有运行时 <see cref="PlayerStatsModel"/>，负责它的生命周期与存档注册。
     ///
-    /// 调用方通过 StatsService.Instance 使用这些方法。数值的状态、规则与事件位于 PlayerStatsModel，
-    /// 它是普通 C# 类型，EditMode 测试可以直接创建。存档传输格式是 PlayerStatsData。
-    /// PlayerStatsSO 提供初始值，运行时的改动留在模型里。
+    /// 数值的读写统一走 <see cref="Model"/>：规则（钳制、事件广播）都在模型方法内部，
+    /// 本类不提供转发包装，避免同一件事出现两个入口。
+    /// Respawn 留在服务层，因为它带业务规则：仅死亡时复活回满血。
+    /// 数值的状态、规则与事件位于 PlayerStatsModel，它是普通 C# 类型，EditMode 测试可以直接创建。
+    /// 存档传输格式是 PlayerStatsData。PlayerStatsSO 提供初始值，运行时的改动留在模型里。
     /// </summary>
     public class StatsService : YSingleton<StatsService>, ISaveable
     {
@@ -59,25 +60,16 @@ namespace Gameplay.Player.Services
         }
 
         /// <summary>取当前状态的一份快照，供存档使用。返回拷贝，不是运行时状态本身。</summary>
-        public PlayerStatsData GetStats() => Model.ToData();
+        private PlayerStatsData GetStats() => Model.ToData();
 
         /// <summary>读档：用存档数据整体替换运行时状态。</summary>
-        public void LoadStats(PlayerStatsData data) => Model.LoadFrom(data);
+        private void LoadStats(PlayerStatsData data) => Model.LoadFrom(data);
 
         public void Respawn()
         {
             if (Model.CurrentHealth <= 0)
                 Model.SetCurrentHealth(Model.MaxHealth);
         }
-
-        public void UpdateMaxHealth(int amount) => Model.UpdateMaxHealth(amount);
-        public void UpdateHealth(int amount) => Model.UpdateHealth(amount);
-        public void UpdateSpeed(float amount) => Model.UpdateSpeed(amount);
-        public void UpdateDamage(int amount) => Model.UpdateDamage(amount);
-        public void UpdateSkillPoints(int amount) => Model.UpdateSkillPoints(amount);
-
-        /// <summary>增加经验并结算升级。升级规则见 PlayerStatsModel.AddExp。</summary>
-        public void AddExp(int amount) => Model.AddExp(amount);
 
         /// <summary>单例没有场景身份，存档注册表按实例登记。</summary>
         public DataDefinition GetDataID() => null;

@@ -236,8 +236,9 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 256
-  konckBackForce: 2
+  knockBackForce: 2
   stunTime: 0.2
+  playerDamagedEvent: {fileID: 11400000, guid: 6da0a155357f433880fc1b4416ec7a90, type: 2}
 --- !u!114 &7544162249560536073
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,43 +1,46 @@
 using TMPro;
 using UnityEngine;
-using Gameplay.Player.Models;
-using Gameplay.Player.Services;
+using Gameplay.Player.Controllers;
 
-public class HealthCanvasManager : YSingleton<HealthCanvasManager>
+namespace Gameplay.Player.Views
 {
-    [SerializeField] private TMP_Text healthText;
-    [SerializeField] private Animator healthTextAnimator;
-
-    // 运行时绑定 StatsService 的数值模型（事件在模型上）；初始绑定放在 Start：
-    // 面板可能随 GamePlay 根节点延迟激活，那时 StatsService 必然已就绪。
-    private PlayerStatsModel model;
-
-    private void Start()
+    /// <summary>
+    /// 血量文本的显示层：唯一的场景组件，持有控件引用并托管 <see cref="HealthController"/>。
+    /// 订阅模型事件与取数都在 Controller（纯 C#，由本类创建/销毁），View 不接触 PlayerStatsModel。
+    /// </summary>
+    public class HealthView : MonoBehaviour
     {
-        model = StatsService.Instance.Model;
-        model.HealthChanged += UpdateHealthText;
-        UpdateHealthText();
-    }
+        [SerializeField] private TMP_Text healthText;
+        [SerializeField] private Animator healthTextAnimator;
 
-    private void OnEnable()
-    {
-        // 重激活时补一次刷新：失活期间错过的事件没有累积通知
-        if (model != null)
-            UpdateHealthText();
-    }
+        private HealthController controller;
 
-    private void OnDestroy()
-    {
-        if (model != null)
-            model.HealthChanged -= UpdateHealthText;
-    }
-
-    public void UpdateHealthText()
-    {
-        if (healthTextAnimator != null)
+        private void Start()
         {
-            healthTextAnimator.Play("TextUpdate");
+            // Start 在所有 Awake 之后：此时 StatsService 必然就绪，Controller 可以立即订阅
+            controller = new HealthController(this);
+            controller.Refresh();
         }
-        healthText.text = "HP:" + model.CurrentHealth + "/" + model.MaxHealth;
+
+        private void OnEnable()
+        {
+            // 重激活时补一次刷新：失活期间错过的事件没有累积通知
+            controller?.Refresh();
+        }
+
+        private void OnDestroy()
+        {
+            controller?.Dispose();
+            controller = null;
+        }
+
+        public void SetHp(int current, int max)
+        {
+            if (healthTextAnimator != null)
+            {
+                healthTextAnimator.Play("TextUpdate");
+            }
+            healthText.text = "HP:" + current + "/" + max;
+        }
     }
 }

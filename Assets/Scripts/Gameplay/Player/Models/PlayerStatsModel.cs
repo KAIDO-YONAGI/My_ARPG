@@ -15,9 +15,9 @@ namespace Gameplay.Player.Models
     [Serializable]
     public class PlayerStatsModel
     {
-        /// <summary>生命值或上限变化时触发。HealthCanvasManager 订阅。</summary>
+        /// <summary>生命值或上限变化时触发。HealthController 订阅后推给 HealthView。</summary>
         public event Action HealthChanged;
-        /// <summary>速度、伤害等属性变化时触发。StatsCanvasManager 订阅。</summary>
+        /// <summary>速度、伤害等属性变化时触发。StatsPanelController 订阅后推给 StatsPanelView。</summary>
         public event Action StatsChanged;
         /// <summary>升级时触发一次，参数是本次升的级数。SkillTreeManager 订阅它发放技能点。</summary>
         public event Action<int> LevelUp;
@@ -25,14 +25,8 @@ namespace Gameplay.Player.Models
         /// ExperienceController 订阅它刷新经验条。</summary>
         public event Action ExpChanged;
 
-        /// <summary>升级所需经验的保底值。曲线算出的结果低于 1 时采用这个值，
-        /// 升级条件始终按 <c>currentExp &gt;= expToUpgrade</c> 判定。</summary>
         public const int MinExpToUpgrade = 1;
-
-        /// <summary>阈值截断的粒度，对应公式中的 10。</summary>
         public const int ExpStepLevels = 10;
-
-        /// <summary>公式末尾的除数，取值为 4，把每级的涨幅压小。</summary>
         public const float ExpGrowthDivisor = 4f;
 
         private PlayerStatsData data;

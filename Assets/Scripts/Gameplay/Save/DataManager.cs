@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Gameplay.Player.Services;
+using Gameplay.Player.Controllers;
 [DefaultExecutionOrder(-100)]
 
 //TODO使用流程：实现了IS接口的类，以loot为例，在特定时刻使用自己接口的注册方法注册自己到DataManager
@@ -68,8 +69,8 @@ public class DataManager : YSingleton<DataManager>
         dataToSave ??= new Data();
         dataToSave.lootsStatsDic ??= new Dictionary<string, LootStatus>();
 
-        Vector3 savePosition = PlayerController.Instance != null
-            ? PlayerController.Instance.GetPosition()
+        Vector3 savePosition = PlayerLocator.Instance != null
+            ? PlayerLocator.Instance.GetPosition()
             : currentScene.initialPosition;
         dataToSave.sceneIDAndPlayerPos = new SceneAndPosition(currentScene.SaveKey, savePosition);
 
@@ -111,7 +112,7 @@ public class DataManager : YSingleton<DataManager>
                 : sceneChanger != null ? sceneChanger.GetCurrentGameScene() : null;
             Vector3 savePosition = sceneToLoadSO.sceneType == MyEnums.SceneType.Location
                 ? sceneToLoadSO.initialPosition
-                : PlayerController.Instance != null ? PlayerController.Instance.GetPosition() : Vector3.zero;
+                : PlayerLocator.Instance != null ? PlayerLocator.Instance.GetPosition() : Vector3.zero;
 
             if (saveScene != null)
             {

@@ -10,8 +10,8 @@ public class EnemyCombat : MonoBehaviour
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private float knockBackForce = 5;
     [SerializeField] private float stunTime = 0.3f;
+    [SerializeField] private PlayerDamagedEventSO playerDamagedEvent;
 
-    
     public void Attack()
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, weaponRange, playerLayer);
@@ -19,13 +19,8 @@ public class EnemyCombat : MonoBehaviour
 
         if (hits.Length > 0 && hits[0].enabled)//如果有目标
         {
-            // 玩家是常驻对象：经单例/静态定位器访问，免去对命中体的组件查找
-            var health = PlayerHealth.Instance;
-            if (health != null)
-                health.ChangeHealth(-damage);
-
-            var movement = PlayerMovement.Main;
-            if (movement != null) movement.KnockBack(transform, knockBackForce, stunTime);
+            // 只广播"玩家受击"：扣血/击退/死亡由 PlayerDamageController 统一处理，本类不持有玩家引用
+            playerDamagedEvent.OnPlayerDamaged(damage, transform, knockBackForce, stunTime);
         }
     }
 }
