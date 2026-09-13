@@ -8,9 +8,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     [SerializeField] private int currentHealth;
     [SerializeField] private int maxHealth;
     [SerializeField] private int expReward = 2;
-
-    public delegate void MonsterDefeated(int exp);//观察者模式
-    public static event MonsterDefeated OnDefeated;
+    [SerializeField] private EnemyDefeatedEventSO defeatedEvent;
 
     private EnemyKnockBack knockBack;
 
@@ -31,7 +29,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         }
         else if (currentHealth <= 0)
         {
-            OnDefeated(expReward);//事件被触发
+            defeatedEvent.OnEnemyDefeated(expReward, transform);
             Destroy(gameObject);
         }
     }

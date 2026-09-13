@@ -6,21 +6,22 @@ using Gameplay.Player.Controllers;
 namespace Gameplay.Player.Views
 {
     /// <summary>
-    /// 经验条与等级文本的显示层，面板唯一的场景组件，持有控件引用并托管纯 C# 的
-    /// ExperienceController：Start 时创建并首刷，OnDestroy 时销毁。
+    /// 经验条与等级文本的显示层，面板唯一的场景组件，持有控件与击杀通道的序列化引用，
+    /// 并托管纯 C# 的 ExperienceController：Start 时创建并首刷，OnDestroy 时销毁。
     /// 击杀事件的订阅与经验数据的读取都在 Controller。
     /// </summary>
     public class ExperiencePanelView : MonoBehaviour
     {
         [SerializeField] private Slider expSlider;
         [SerializeField] private TMP_Text currentLevelText;
+        [SerializeField] private EnemyDefeatedEventSO defeatedEvent;
 
         private ExperienceController controller;
 
         private void Start()
         {
             // Start 在所有 Awake 之后：此时 StatsService 必然就绪，Controller 可以立即订阅
-            controller = new ExperienceController(this);
+            controller = new ExperienceController(this, defeatedEvent);
             controller.Refresh();
         }
 

@@ -1198,7 +1198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdd9c8aff9b35342a8815d1b46938f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopInfo: {fileID: 0}
+  shopInfoPanel: {fileID: 0}
   shopRef: {fileID: 2012965571}
   itemNameText: {fileID: 0}
   priceText: {fileID: 0}
@@ -2169,7 +2169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdd9c8aff9b35342a8815d1b46938f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopInfo: {fileID: 0}
+  shopInfoPanel: {fileID: 0}
   shopRef: {fileID: 2012965571}
   itemNameText: {fileID: 0}
   priceText: {fileID: 0}
@@ -3540,7 +3540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdd9c8aff9b35342a8815d1b46938f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopInfo: {fileID: 0}
+  shopInfoPanel: {fileID: 0}
   shopRef: {fileID: 2012965571}
   itemNameText: {fileID: 0}
   priceText: {fileID: 0}
@@ -7832,7 +7832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdd9c8aff9b35342a8815d1b46938f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopInfo: {fileID: 0}
+  shopInfoPanel: {fileID: 0}
   shopRef: {fileID: 2012965571}
   itemNameText: {fileID: 0}
   priceText: {fileID: 0}
@@ -18352,7 +18352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdd9c8aff9b35342a8815d1b46938f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopInfo: {fileID: 0}
+  shopInfoPanel: {fileID: 0}
   shopRef: {fileID: 2012965571}
   itemNameText: {fileID: 0}
   priceText: {fileID: 0}
@@ -18744,7 +18744,7 @@ MonoBehaviour:
   - {fileID: 1262631630}
   detailsCanvaGroup: {fileID: 32366991}
   promptCanvaGroup: {fileID: 1765150851}
-  questLogUI: {fileID: 870103893}
+  questLogPanel: {fileID: 870103893}
 --- !u!1 &1634299826
 GameObject:
   m_ObjectHideFlags: 0
@@ -34224,6 +34224,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   expSlider: {fileID: 5377281527586994148}
   currentLevelText: {fileID: 5384123544236978434}
+  defeatedEvent: {fileID: 11400000, guid: f08e4faead5d4849964e57c84af5d667, type: 2}
 --- !u!114 &7199223719914852262
 MonoBehaviour:
   m_ObjectHideFlags: 0
