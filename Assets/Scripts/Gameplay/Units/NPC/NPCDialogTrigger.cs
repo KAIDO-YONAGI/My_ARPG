@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class NPCChat : MonoBehaviour
+public class NPCDialogTrigger : MonoBehaviour
 {
     private Rigidbody2D rb;
     [SerializeField] private Animator chatAnimator;

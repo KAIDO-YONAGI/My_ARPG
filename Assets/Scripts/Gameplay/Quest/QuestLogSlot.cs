@@ -3,13 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class QuestLogSlot : MonoBehaviour
 {
     [SerializeField] private TMP_Text questNameText;
     [SerializeField] private TMP_Text questLevelText;
     public QuestSO currentQuest;
-    public QuestLogUI questLogUI;
+    [FormerlySerializedAs("questLogUI")]
+    public QuestLogPanel questLogPanel;
     private CanvasGroup slotCanvas;
 
     /// <summary>本槽位的 CanvasGroup（Awake 已缓存，外部直接取，避免 GetComponent）。</summary>
@@ -65,7 +67,7 @@ public class QuestLogSlot : MonoBehaviour
 
     public void OnSlotClicked()
     {
-        questLogUI.HandleQuestClicked(currentQuest);
+        questLogPanel.HandleQuestClicked(currentQuest);
     }
 
 }

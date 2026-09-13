@@ -41,10 +41,10 @@ namespace Gameplay.Player.Services
         private void LoadStats(PlayerStatsData data) => Model.LoadFrom(data);
 
         /// <summary>把当前数值写进存档。</summary>
-        public override void SaveData(Data data) => data.playerStatsData = GetStats();
+        public override void SaveData(SaveData data) => data.playerStatsData = GetStats();
 
         /// <summary>从存档恢复数值。存档里没有数值段时保留当前状态。</summary>
-        public override void LoadData(Data data)
+        public override void LoadData(SaveData data)
         {
             if (data.playerStatsData == null) return;
 

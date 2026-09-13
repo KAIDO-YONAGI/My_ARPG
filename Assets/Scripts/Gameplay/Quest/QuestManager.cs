@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class QuestManager : YSingleton<QuestManager>, ICanvasManager
 {
@@ -35,8 +36,8 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
 
     [SerializeField] private CanvasGroup promptCanvaGroup;
 
-    [Header("QuestLogUI")] [SerializeField]
-    private QuestLogUI questLogUI;
+    [Header("QuestLogPanel")] [SerializeField, FormerlySerializedAs("questLogUI")]
+    private QuestLogPanel questLogPanel;
 
     private MyEnums.QuestState currentQuestState = MyEnums.QuestState.Idle;
 
@@ -277,7 +278,7 @@ public class QuestManager : YSingleton<QuestManager>, ICanvasManager
         }
 
         RefreshObjectiveProgress(quest);
-        questLogUI.DisPlayObjectives();
+        questLogPanel.DisPlayObjectives();
     }
 
     //更新完成条件

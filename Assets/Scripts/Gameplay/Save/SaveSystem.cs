@@ -13,13 +13,13 @@ using UnityEngine;
 //目前存档和加载太频繁，需要批量处理 done
 
 
-//DataManager做Data对象，此处做info并且打包、写文件进行存档
+//SaveDataManager 组装 SaveData 对象，此处打包成 SaveFile 写盘存档
 
-public class Save
+public class SaveFile
 {
-    public SaveInfo saveInfo;
-    public Data data;
-    public Save(SaveInfo saveInfo, Data data)
+    public SaveMetaData saveInfo;
+    public SaveData data;
+    public SaveFile(SaveMetaData saveInfo, SaveData data)
     {
         this.saveInfo = saveInfo;
         this.data = data;
@@ -47,8 +47,8 @@ public class SaveSystem : YSingleton<SaveSystem>
     public string WriteSave(MyEnums.SaveType saveType)
     {
         string saveID = System.DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-        SaveInfo saveInfo = new(saveID, saveType);
-        Save save = new(saveInfo, DataManager.Instance.GetData);
+        SaveMetaData saveInfo = new(saveID, saveType);
+        SaveFile save = new(saveInfo, SaveDataManager.Instance.GetData);
 
         string json = JsonConvert.SerializeObject(save, Formatting.Indented);
         string path=Application.persistentDataPath + $"/{saveType}_{saveID}.json";
@@ -118,9 +118,9 @@ public class SaveSystem : YSingleton<SaveSystem>
         try
         {
             string json = File.ReadAllText(savePath);
-            Save save = JsonConvert.DeserializeObject<Save>(json);
+            SaveFile save = JsonConvert.DeserializeObject<SaveFile>(json);
 
-            DataManager.Instance.LoadFromData(save.data);
+            SaveDataManager.Instance.LoadFromData(save.data);
             //触发加载场景
             GameSceneSO gameScene = GetScene(save.data);
             if (gameScene != null)
@@ -130,7 +130,7 @@ public class SaveSystem : YSingleton<SaveSystem>
                     ? save.data.sceneIDAndPlayerPos.position.ToVector3()//如果存档位置为空，会加载到场景的默认位置
                     : gameScene.initialPosition;
                 IsLoadingSaveRequest = true;
-                // 标志窗口包住整个入口调用：DataManager.OnAutoSave 在广播段内读到 true，
+                // 标志窗口包住整个入口调用：SaveDataManager.OnAutoSave 在广播段内读到 true，
                 // 读档触发的切换不会写自动存档
                 SceneChanger.Instance.RequestSceneLoad(gameScene, pos, true);
                 IsLoadingSaveRequest = false;
@@ -183,7 +183,7 @@ public class SaveSystem : YSingleton<SaveSystem>
         {
             // Continue 按钮只尝试读取至少包含场景和角色数据的系统档。
             string json = File.ReadAllText(saveFile);
-            Save save = JsonConvert.DeserializeObject<Save>(json);
+            SaveFile save = JsonConvert.DeserializeObject<SaveFile>(json);
             return save?.data != null
                 && save.data.playerStatsData != null
                 && GetScene(save.data) != null;
@@ -195,7 +195,7 @@ public class SaveSystem : YSingleton<SaveSystem>
         }
     }
 
-    private GameSceneSO GetScene(Data data)
+    private GameSceneSO GetScene(SaveData data)
     {
         string sceneID = data?.sceneIDAndPlayerPos?.sceneID;
         if (string.IsNullOrEmpty(sceneID) || SceneDataForSave.Instance == null || SceneDataForSave.Instance.gameScenes == null)

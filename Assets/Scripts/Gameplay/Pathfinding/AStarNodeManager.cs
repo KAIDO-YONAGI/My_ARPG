@@ -3,7 +3,7 @@ using MyEnums;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-// 网格在本类 Awake 构建；PathFinder 与 MovementController 在运行期寻路时才读取它。
+// 网格在本类 Awake 构建；PathFinder 与 PathFollower 在运行期寻路时才读取它。
 public class AStarNodeManager : YSingleton<AStarNodeManager>
 {
 

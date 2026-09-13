@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
+public class SaveLoadCanvasManager : MonoBehaviour, ICanvasManager
 {
     [Header("Events To Receive")]
     [SerializeField] private ToggleCanvasEventSO toggleSaveLoadCanvasEvent;
@@ -151,7 +151,7 @@ public class SaveCanvasPanelManager : MonoBehaviour, ICanvasManager
         {
             group.saveInfo = new(null, saveType);
         }
-        if (DataManager.Instance == null || !DataManager.Instance.PrepareManualSaveData())
+        if (SaveDataManager.Instance == null || !SaveDataManager.Instance.PrepareManualSaveData())
         {
             Debug.LogWarning("Manual save data is not ready.");
             return;

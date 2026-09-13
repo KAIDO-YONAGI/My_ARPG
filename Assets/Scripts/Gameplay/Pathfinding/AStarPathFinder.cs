@@ -20,10 +20,10 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
 
     private Dictionary<(int x, int y), AStarNode> NodeCellMap => AStarNodeManager.Instance.GetNodeMap();
 
-    public Stack<PathFinderDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
+    public Stack<AStarDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         if (optPos == Vector3.zero) optPos = startPos;
-        Dictionary<(int x, int y), PathFinderDetails> openDic = new();
+        Dictionary<(int x, int y), AStarDetails> openDic = new();
 
         var startCell = WorldToCell(startPos);
         var endCell = WorldToCell(endPos);
@@ -43,13 +43,13 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
         {
             return null;
         }
-        PathFinderDetails startNode = new PathFinderDetails(startCell.x, startCell.y, endCell.x, endCell.y, null);
+        AStarDetails startNode = new AStarDetails(startCell.x, startCell.y, endCell.x, endCell.y, null);
         openDic.Add(startCell, startNode);
 
         while (openDic.Count > 0)
         {
             var currentPos = SearchCheapestCost(openDic);
-            PathFinderDetails current = openDic[currentPos];
+            AStarDetails current = openDic[currentPos];
 
             openDic.Remove(currentPos);
             closeSet.Add(currentPos);
@@ -91,10 +91,10 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
 
         return true;
     }
-    private Stack<PathFinderDetails> RetracePath(PathFinderDetails endNode)
+    private Stack<AStarDetails> RetracePath(AStarDetails endNode)
     {
-        Stack<PathFinderDetails> path = new Stack<PathFinderDetails>();
-        PathFinderDetails current = endNode;
+        Stack<AStarDetails> path = new Stack<AStarDetails>();
+        AStarDetails current = endNode;
 
         while (current != null)
         {
@@ -105,7 +105,7 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
         return path;
     }
 
-    private (int x, int y) SearchCheapestCost(Dictionary<(int x, int y), PathFinderDetails> openDic)
+    private (int x, int y) SearchCheapestCost(Dictionary<(int x, int y), AStarDetails> openDic)
     {
         float minCost = float.MaxValue;
         (int x, int y) minCostPos = default;
@@ -124,9 +124,9 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
     private void AddNodeToOpen(
         (int x, int y) currentPos,
         (int x, int y) endPos,
-        Dictionary<(int x, int y), PathFinderDetails> openDic,
+        Dictionary<(int x, int y), AStarDetails> openDic,
         HashSet<(int x, int y)> closeSet,
-        PathFinderDetails current)
+        AStarDetails current)
     {
         int cx = currentPos.x;
         int cy = currentPos.y;
@@ -145,7 +145,7 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
             if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
             if (NodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(cx, cy, dx[i], dy[i])) continue;
 
-            PathFinderDetails newNode = new PathFinderDetails(nx, ny, endPos.x, endPos.y, current);
+            AStarDetails newNode = new AStarDetails(nx, ny, endPos.x, endPos.y, current);
 
             if (!openDic.ContainsKey(neighborPos))
             {

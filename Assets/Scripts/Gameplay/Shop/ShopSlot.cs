@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
 {
     //ui部分在unity中链接到队对应子对象
@@ -12,7 +13,8 @@ public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private ItemSO item;
     private int price;
 
-    [SerializeField] private ShopInfo shopInfo;
+    [FormerlySerializedAs("shopInfo")]
+    [SerializeField] private ShopInfoPanel shopInfoPanel;
     [Header("Link To Parent Shop")]
     [Tooltip("拖入父级商店面板上的 ShopManager 组件（接口无法序列化，用 Component 承载）")]
     [SerializeField] private Component shopRef;
@@ -58,17 +60,17 @@ public class ShopSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (item == null) return;
-        shopInfo.ShowItemInfo(item);
+        shopInfoPanel.ShowItemInfo(item);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        shopInfo.HideItemInfo();
+        shopInfoPanel.HideItemInfo();
     }
 
     public void OnPointerMove(PointerEventData eventData)
     {
         if (item == null) return;
-        shopInfo.FollowMouse();
+        shopInfoPanel.FollowMouse();
     }
 }

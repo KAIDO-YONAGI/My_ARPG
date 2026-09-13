@@ -20,7 +20,7 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
     private const float MovedEpsilonSqr = 0.0001f;
 
     private ObjectPool<Loot> sourcePool;
-    private DataDefinition dataDef;
+    private SaveDefinition saveDef;
 
     /// <summary>生成态基准位置：场景摆放位置（Awake）或掉落物本次出生位置（Initialize）。
     /// 存档只记录相对它的位移，没挪过就不写「已移动」，因此旧档不会把设计师
@@ -30,7 +30,7 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
     /// <summary>本次取件是一个全新掉落实体，需要把生成态基准重置到本次出生位置</summary>
     private bool needsNewBaseline;
 
-    /// <summary>是否已挂进 DataManager。注册/注销在 Awake、OnPoolGet、OnPoolCreated、
+    /// <summary>是否已挂进 SaveDataManager。注册/注销在 Awake、OnPoolGet、OnPoolCreated、
     /// OnPoolReturn、OnDestroy 里都会走到，用标记保证幂等。</summary>
     private bool registered;
 
@@ -39,7 +39,7 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
 
     private void Awake()
     {
-        dataDef = GetComponent<DataDefinition>();//自身组件一次性缓存
+        saveDef = GetComponent<SaveDefinition>();//自身组件一次性缓存
         baselinePosition = transform.position;//场景摆放位置即生成态基准
         // 场景摆放的 loot 靠这里进存档系统（它们没有池的 Get/Return 生命周期）；
         // 池化实例紧随其后由 OnPoolCreated 退回未注册态，不会混进存档。
@@ -82,7 +82,7 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
         UnregisterSelf();
     }
 
-    /// <summary>挂进存档注册表。幂等，且跳过不参与存档的 DataDefinition。</summary>
+    /// <summary>挂进存档注册表。幂等，且跳过不参与存档的 SaveDefinition。</summary>
     private void RegisterSelf()
     {
         if (registered) return;
@@ -114,9 +114,9 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
         var dataId = GetDataID();
         if (dataId == null) return;
 
-        if (!string.IsNullOrEmpty(dataId.ID) && DataManager.Instance != null)
+        if (!string.IsNullOrEmpty(dataId.ID) && SaveDataManager.Instance != null)
         {
-            DataManager.Instance.RemoveLootRegistration(dataId.ID);
+            SaveDataManager.Instance.RemoveLootRegistration(dataId.ID);
         }
 
         dataId.ID = System.Guid.NewGuid().ToString();
@@ -125,8 +125,8 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
     /// <summary>生成时对账：拿当前运行态存档数据按本对象身份套用一次。</summary>
     private void MatchSavedStateAtSpawn()
     {
-        if (DataManager.Instance == null) return;
-        LoadData(DataManager.Instance.GetData);
+        if (SaveDataManager.Instance == null) return;
+        LoadData(SaveDataManager.Instance.GetData);
     }
 
     private void OnValidate()
@@ -195,13 +195,13 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
         }
     }
 
-    public DataDefinition GetDataID()
+    public SaveDefinition GetDataID()
     {
         if (!this) return null;
-        return dataDef != null ? dataDef : (dataDef = GetComponent<DataDefinition>());
+        return saveDef != null ? saveDef : (saveDef = GetComponent<SaveDefinition>());
     }
 
-    public void SaveData(Data data)
+    public void SaveData(SaveData data)
     {
         if (data == null || data.lootsStatsDic == null) return;
 
@@ -224,7 +224,7 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
 
     }
 
-    public void LoadData(Data data)
+    public void LoadData(SaveData data)
     {
         if (data == null) return;
         if (data.lootsStatsDic == null) return;

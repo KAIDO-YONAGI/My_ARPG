@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ShopToggles : MonoBehaviour
+public class ShopCategoryToggles : MonoBehaviour
 {
     [SerializeField] private Button itemButton;
     [SerializeField] private Button weaponButton;
@@ -17,7 +17,7 @@ public class ShopToggles : MonoBehaviour
     {
         shop = shopRef as IShopInteractable;
         if (shop == null)
-            Debug.LogError("ShopToggles: shopRef 未接线或未实现 IShopInteractable。", this);
+            Debug.LogError("ShopCategoryToggles: shopRef 未接线或未实现 IShopInteractable。", this);
     }
 
     private void Start()
@@ -44,7 +44,7 @@ public class ShopToggles : MonoBehaviour
         if (shop != null)
             shop.OpenItemShop();
         else
-            Debug.LogError("ShopToggles: 商店引用缺失！", this);
+            Debug.LogError("ShopCategoryToggles: 商店引用缺失！", this);
     }
 
     public void OpenWeaponShop()
@@ -52,7 +52,7 @@ public class ShopToggles : MonoBehaviour
         if (shop != null)
             shop.OpenWeaponShop();
         else
-            Debug.LogError("ShopToggles: 商店引用缺失！", this);
+            Debug.LogError("ShopCategoryToggles: 商店引用缺失！", this);
     }
 
     public void OpenArmorShop()
@@ -60,7 +60,7 @@ public class ShopToggles : MonoBehaviour
         if (shop != null)
             shop.OpenArmorShop();
         else
-            Debug.LogError("ShopToggles: 商店引用缺失！", this);
+            Debug.LogError("ShopCategoryToggles: 商店引用缺失！", this);
     }
 
     //在销毁时移除监听器，防止内存泄漏

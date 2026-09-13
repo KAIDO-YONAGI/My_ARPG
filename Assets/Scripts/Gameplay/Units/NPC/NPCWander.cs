@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 
 public class NPCWander : MonoBehaviour
@@ -10,7 +11,8 @@ public class NPCWander : MonoBehaviour
 
     [Header("Component References")]
     [SerializeField] private Animator animator;
-    [SerializeField] private MovementController aStarController;
+    [FormerlySerializedAs("aStarController")]
+    [SerializeField] private PathFollower pathFollower;
 
     [Header("Movement Settings")]
     [SerializeField] private float speed = 2f;
@@ -36,9 +38,9 @@ public class NPCWander : MonoBehaviour
     {
         circleCenter = transform.position;
         targetPosition = circleCenter + randomDirection();
-        aStarController.ResetPath();
-        posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        threshold = aStarController.GetThreshold() * .2f;
+        pathFollower.ResetPath();
+        posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+        threshold = pathFollower.GetThreshold() * .2f;
     }
 
     private void OnDisable()
@@ -64,8 +66,8 @@ public class NPCWander : MonoBehaviour
 
         if ((transform.position - posToGo).sqrMagnitude < thresholdSqr)//到寻路节点则告知controller
         {
-            aStarController.ArrivedPos();
-            posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+            pathFollower.ArrivedPos();
+            posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
         }
         else
         {
@@ -99,8 +101,8 @@ public class NPCWander : MonoBehaviour
             {
                 targetPosition = circleCenter + (transform.position - circleCenter).normalized * patrolRadius;
             }
-            aStarController.ResetPath();
-            posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+            pathFollower.ResetPath();
+            posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
         } while (posToGo == Vector3.zero);
         isWaiting = false;
     }

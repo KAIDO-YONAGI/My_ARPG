@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// NPC按矩形路线巡逻
@@ -19,7 +20,8 @@ public class NPCPatrol : MonoBehaviour
 
     [Header("Component References")]
     [SerializeField] private Animator animator;
-    [SerializeField] private MovementController aStarController;
+    [FormerlySerializedAs("aStarController")]
+    [SerializeField] private PathFollower pathFollower;
 
     // 四个角的位置
     private Vector3[] cornerPositions = new Vector3[4];
@@ -44,9 +46,9 @@ public class NPCPatrol : MonoBehaviour
 
     private void Start()
     {
-        if(aStarController==null)
+        if(pathFollower==null)
         {
-            Debug.LogError("NPCPatrol: Missing MovementController reference.");
+            Debug.LogError("NPCPatrol: Missing PathFollower reference.");
             enabled = false;
             return;
         }
@@ -56,9 +58,9 @@ public class NPCPatrol : MonoBehaviour
         currentCornerIndex = GetNearestCornerIndex();
         targetPosition = cornerPositions[currentCornerIndex];
 
-        aStarController.ResetPath();
-        posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        threshold = aStarController.GetThreshold() * 0.2f;
+        pathFollower.ResetPath();
+        posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+        threshold = pathFollower.GetThreshold() * 0.2f;
     }
 
     private void OnDisable()
@@ -88,8 +90,8 @@ public class NPCPatrol : MonoBehaviour
         // 到达寻路节点
         if ((transform.position - posToGo).sqrMagnitude < thresholdSqr)
         {
-            aStarController.ArrivedPos();
-            posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+            pathFollower.ArrivedPos();
+            posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
         }
         else
         {
@@ -157,8 +159,8 @@ public class NPCPatrol : MonoBehaviour
         }
 
         targetPosition = cornerPositions[currentCornerIndex];
-        aStarController.ResetPath();
-        posToGo = aStarController.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+        pathFollower.ResetPath();
+        posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
 
         isWaiting = false;
     }

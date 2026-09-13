@@ -4,7 +4,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class QuestLogUI : MonoBehaviour //UI更新有关逻辑
+public class QuestLogPanel : MonoBehaviour //UI更新有关逻辑
 {
     [SerializeField] private TMP_Text questNameText;
     [SerializeField] private TMP_Text questDescriptionText;

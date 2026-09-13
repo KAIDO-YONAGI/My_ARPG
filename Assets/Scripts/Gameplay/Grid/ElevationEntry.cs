@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Elevation_Entry : MonoBehaviour
+public class ElevationEntry : MonoBehaviour
 {
     [SerializeField] private Collider2D[] mountainColliders;
     [SerializeField] private Collider2D[] edgeColliders;

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Elevation_Exit : MonoBehaviour
+public class ElevationExit : MonoBehaviour
 {
     [SerializeField] private Collider2D[] mountainColliders;
     [SerializeField] private Collider2D[] edgeColliders;

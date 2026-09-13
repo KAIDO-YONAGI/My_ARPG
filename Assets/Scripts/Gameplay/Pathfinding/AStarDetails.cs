@@ -1,20 +1,20 @@
-public class PathFinderDetails
+public class AStarDetails
 {
     private int x;
     private int y;
     private float cost;
     private float disToBeg;
     private float disToEnd;
-    private PathFinderDetails fatherNode;
+    private AStarDetails fatherNode;
 
     public float GetCost() => cost;
     public float GetDisToBeg() => disToBeg;
     public int GetX() => x;
     public int GetY() => y;
 
-    public PathFinderDetails GetFatherNode() => fatherNode;
+    public AStarDetails GetFatherNode() => fatherNode;
 
-    public PathFinderDetails(int x, int y, int endX, int endY, PathFinderDetails fatherNode)
+    public AStarDetails(int x, int y, int endX, int endY, AStarDetails fatherNode)
     {
         this.x = x;
         this.y = y;

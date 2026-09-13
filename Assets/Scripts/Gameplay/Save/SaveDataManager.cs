@@ -2,17 +2,17 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Gameplay.Player.Services;
-using Gameplay.Player.Controllers;
+using Gameplay.Player;
 
-//TODO使用流程：实现了IS接口的类，以loot为例，在特定时刻使用自己接口的注册方法注册自己到DataManager
-//DataManager订阅事件，loot脚本特定时刻拉起事件，此时DataManager负责调用loot实现的对应函数，把数据存进去
+//TODO使用流程：实现了IS接口的类，以loot为例，在特定时刻使用自己接口的注册方法注册自己到 SaveDataManager
+//SaveDataManager 订阅事件，loot 脚本特定时刻拉起事件，此时 SaveDataManager 负责调用 loot 实现的对应函数，把数据存进去
 //加载和存储基本对称
 
-//Loot脚本不需要自己拉起事件，DataManager会订阅场景加载事件，并且调用已注册的loot的对应函数
-public class DataManager : YSingleton<DataManager>
+//Loot 脚本不需要自己拉起事件，SaveDataManager 会订阅场景加载事件，并且调用已注册的loot的对应函数
+public class SaveDataManager : YSingleton<SaveDataManager>
 {
 
-    public Data GetData => dataToSave;
+    public SaveData GetData => dataToSave;
     [Header("Send")]
     [SerializeField] private DataSaveEventSO dataSavedEvent;
 
@@ -22,7 +22,7 @@ public class DataManager : YSingleton<DataManager>
 
     // 存档注册表位于 Contracts/SaveRegistry.cs，本类只做收集与分发。
 
-    private Data dataToSave = new Data();
+    private SaveData dataToSave = new SaveData();
     // 首次从主菜单进入游戏时不应写系统档，否则场景信息还没准备好。
     private MyEnums.SceneType lastSceneType = MyEnums.SceneType.Menu;
     private void OnEnable()
@@ -53,7 +53,7 @@ public class DataManager : YSingleton<DataManager>
             return false;
         }
 
-        dataToSave ??= new Data();
+        dataToSave ??= new SaveData();
         dataToSave.lootsStatsDic ??= new Dictionary<string, LootStatus>();
 
         Vector3 savePosition = PlayerLocator.Instance != null
@@ -84,7 +84,7 @@ public class DataManager : YSingleton<DataManager>
             && sceneToLoadSO.sceneType == MyEnums.SceneType.Location)
         {
             Vector3 savePosition = pos == Vector3.zero ? sceneToLoadSO.initialPosition : pos;
-            dataToSave = new Data();
+            dataToSave = new SaveData();
             StatsService.Instance.SaveData(dataToSave); // 存档对象重建之后，跨场景的持久数据要重新写入
             dataToSave.sceneIDAndPlayerPos = new(sceneToLoadSO.SaveKey, savePosition);
             DynamicDataHandler.ClearDynamicData(dataToSave);
@@ -118,7 +118,7 @@ public class DataManager : YSingleton<DataManager>
         }
     }
 
-    public void LoadFromData(Data data)//saveSystem调用
+    public void LoadFromData(SaveData data)//saveSystem调用
     {
         // 兜底防御，避免其他读取入口把空数据直接塞进运行态。
         if (data == null)

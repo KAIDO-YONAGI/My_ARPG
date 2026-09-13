@@ -4,17 +4,17 @@ using UnityEngine;
 using Gameplay.Player.Models;
 
 
-public class Data
+public class SaveData
 {
     public Dictionary<string, LootStatus> lootsStatsDic = new();//string是GUID
     public SceneAndPosition sceneIDAndPlayerPos;
     public PlayerStatsData playerStatsData;
 }
-public class SaveInfo
+public class SaveMetaData
 {
     public string saveID;//时间戳
     public MyEnums.SaveType saveType;
-    public SaveInfo(string saveID, MyEnums.SaveType saveType)
+    public SaveMetaData(string saveID, MyEnums.SaveType saveType)
     {
         this.saveID = saveID;
         this.saveType = saveType;

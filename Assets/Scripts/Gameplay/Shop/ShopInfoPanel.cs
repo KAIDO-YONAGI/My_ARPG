@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ShopInfo : MonoBehaviour
+public class ShopInfoPanel : MonoBehaviour
 {
     [SerializeField] private CanvasGroup infoPanel;
     [SerializeField] private TMP_Text itemNameText;

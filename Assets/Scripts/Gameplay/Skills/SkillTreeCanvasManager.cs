@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ToggleSkillTree : MonoBehaviour, ICanvasManager
+public class SkillTreeCanvasManager : MonoBehaviour, ICanvasManager
 {
     [SerializeField] private CanvasGroup skillsCanvas;
     [SerializeField] private Canvas canvas;

@@ -92,7 +92,7 @@ public class SceneChanger : YSingleton<SceneChanger>
 
     /// <summary>
     /// 首个场景请求放在 Start：同批所有 Awake/OnEnable 已跑完，
-    /// TimeManager/StatsService 实例与 DataManager/UIManager 的事件订阅必然就绪，广播不漏听众。
+    /// TimeManager/StatsService 实例与 SaveDataManager/UIManager 的事件订阅必然就绪，广播不漏听众。
     /// </summary>
     private void Start()
     {
@@ -237,7 +237,7 @@ public class SceneChanger : YSingleton<SceneChanger>
         bool targetFade)
     {
         // 不变量：currentScene 赋值必须在 sceneLoadedEvent 广播之前——
-        // 订阅方（画布管理器/DataManager/MenuSceneCanvasHider 等）经 GetCurrentGameScene() 回读
+        // 订阅方（画布管理器/SaveDataManager/MenuSceneCanvasHider 等）经 GetCurrentGameScene() 回读
         currentScene = loadedTarget;
         loadedScene = handle.Result.Scene;
         if (targetFade && !isInitialScene)

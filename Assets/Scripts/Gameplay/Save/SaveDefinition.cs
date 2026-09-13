@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class DataDefinition : MonoBehaviour
+public class SaveDefinition : MonoBehaviour
 {
     public MyEnums.PersistentType persistentType;
     //一个标记字段，用来决定这个 GameObject 是否参与存档

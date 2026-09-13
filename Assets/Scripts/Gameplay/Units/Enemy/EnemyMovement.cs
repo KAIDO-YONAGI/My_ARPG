@@ -1,6 +1,7 @@
 using UnityEngine;
 using MyEnums;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 public class EnemyMovement : MonoBehaviour
 {
     private static readonly int IsIdle = Animator.StringToHash("isIdle");
@@ -21,7 +22,8 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private float playerDetectRange = 5;
     [SerializeField] private Transform detectionPoint;//侦测点，可以代替OnCollisionEnter2D碰撞触发
     [SerializeField] private LayerMask playerMask;//创建公共玩家层，在unity中完成绑定
-    [SerializeField] private MovementController aStarController;
+    [FormerlySerializedAs("aStarController")]
+    [SerializeField] private PathFollower pathFollower;
 
     private float velocityCooldown = 0.2f;
     private float velocityTimer;
@@ -61,7 +63,7 @@ public class EnemyMovement : MonoBehaviour
     private void Start()
     {
         AnimatorSM(EnemyState.Idle);//注意状态改变需要在找到animator之后才开始
-        threshold = aStarController.GetThreshold();
+        threshold = pathFollower.GetThreshold();
     }
     private void Update()
     {
@@ -82,7 +84,7 @@ public class EnemyMovement : MonoBehaviour
             else if (enemyState == EnemyState.Attacking)
                 rb.velocity = Vector2.zero;
             else if (enemyState == EnemyState.Idle && !playerInRange)
-                aStarController.ResetPath();
+                pathFollower.ResetPath();
         }
     }
 
@@ -114,7 +116,7 @@ public class EnemyMovement : MonoBehaviour
 
     void Chase()
     {
-        if (aStarController == null)
+        if (pathFollower == null)
             return;
 
         if (velocityTimer > 0)
@@ -125,7 +127,7 @@ public class EnemyMovement : MonoBehaviour
         Vector3 optPos = (player.position - transform.position).normalized * .2f + startPos;
         //防止敌人产生远离玩家的路径，增加一个优化点，优先从这个点开始寻路，如果这个点不可行走才从敌人当前位置开始寻路
 
-        Vector3 posToGo = aStarController.GetPosToGo(optPos, startPos, endPos);
+        Vector3 posToGo = pathFollower.GetPosToGo(optPos, startPos, endPos);
         Vector2 direction = Vector2.zero;
         if (!(posToGo == Vector3.zero) && posToGo != null)
             direction = (posToGo - transform.position).normalized;
@@ -140,7 +142,7 @@ public class EnemyMovement : MonoBehaviour
 
         if ((transform.position - posToGo).sqrMagnitude < threshold * threshold)
         {
-            aStarController.ArrivedPos();
+            pathFollower.ArrivedPos();
         }
     }
     private void SetVelocity(Vector2 direction, float speed)

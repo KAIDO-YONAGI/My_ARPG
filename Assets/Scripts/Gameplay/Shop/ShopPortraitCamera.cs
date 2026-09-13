@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public class ShopPortraitCameraController : MonoBehaviour
+public class ShopPortraitCamera : MonoBehaviour
 {
     [SerializeField] private Vector3 followOffset = new(0f, 0f, -2f);
     [SerializeField] private bool hideWhenNoShopKeeper = true;
