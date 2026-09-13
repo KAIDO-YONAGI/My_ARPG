@@ -1,10 +1,13 @@
 using UnityEngine;
 
-public class ESCMenuManager : MonoBehaviour
+public class ESCMenuManager : MonoBehaviour, ICanvasManager
 {
     [SerializeField] private CanvasGroup ESCGroup;
     [SerializeField] private ToggleCanvasEventSO toggleESCEvent;
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
+
+    public ToggleCanvasEventSO ToggleCanvasEvent => toggleESCEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     private GameSceneSO _currentScene;
 
@@ -32,18 +35,12 @@ public class ESCMenuManager : MonoBehaviour
         if (state)
         {
             TimeManager.Instance.PauseGame();
-            ESCGroup.alpha = 1;
-            ESCGroup.interactable = true;
-            ESCGroup.blocksRaycasts = true;
         }
         else
         {
             TimeManager.Instance.ResumeGame();
-            ESCGroup.alpha = 0;
-            ESCGroup.interactable = false;
-            ESCGroup.blocksRaycasts = false;
         }
 
-        UIManager.Report(MyEnums.CanvasToToggle.ESC, state);
+        ((ICanvasManager)this).SetCanvaState(ESCGroup, MyEnums.CanvasToToggle.ESC, state);
     }
 }

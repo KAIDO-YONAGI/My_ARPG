@@ -64,7 +64,7 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     }
     private void OnToggleIntegratedCanvas(bool state)
     {
-        SetCanvaState(UICanvasPanel, state);
+        ((ICanvasManager)this).SetCanvaState(UICanvasPanel, MyEnums.CanvasToToggle.Integrated, state);
 
         isMenuOpen = state;
 
@@ -78,7 +78,7 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
         if (pageNumText != null)
             pageNumText.text = "1";
         isMenuOpen = state;
-        SetCanvaState(UICanvasPanel, isMenuOpen);
+        ((ICanvasManager)this).SetCanvaState(UICanvasPanel, MyEnums.CanvasToToggle.Integrated, isMenuOpen);
         if (isMenuOpen) ShiftPage(0);
     }
     private void OnClickMenuToggleButton()
@@ -150,13 +150,5 @@ public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,I
     private void OnIntegratedButtonClick(MyEnums.CanvasToToggle canvasToToggle)
     {
         UIManager.Instance.RequestCanvasToggle(canvasToToggle);
-    }
-
-    private void SetCanvaState(CanvasGroup canva, bool state)
-    {
-        canva.alpha = state ? 1 : 0;
-        canva.blocksRaycasts = state;
-        canva.interactable = state;
-        UIManager.Report(MyEnums.CanvasToToggle.Integrated, state);
     }
 }

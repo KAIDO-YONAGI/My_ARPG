@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DialogManager : YSingleton<DialogManager>
+public class DialogManager : YSingleton<DialogManager>, ICanvasManager
 {
 
     [Header("Dialog UI")]
@@ -14,6 +14,10 @@ public class DialogManager : YSingleton<DialogManager>
     [SerializeField] private Button[] optionButtons;
     [SerializeField] private TMP_Text[] optionTexts;
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
+
+    //Dialog 为仅上报面板：不接收 UIManager 的开关请求，因此没有开关事件资产
+    public ToggleCanvasEventSO ToggleCanvasEvent => null;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
     private int currentLineIndex = 0;
     private DialogSO currentDialog;
@@ -47,12 +51,8 @@ public class DialogManager : YSingleton<DialogManager>
             return;
         }
 
-        dialogCanvasGroup.alpha = state ? 1 : 0;
-        dialogCanvasGroup.interactable = state;
-        dialogCanvasGroup.blocksRaycasts = state;
+        ((ICanvasManager)this).SetCanvaState(dialogCanvasGroup, MyEnums.CanvasToToggle.Dialog, state);
         isDialogActive = state;
-
-        UIManager.Report(MyEnums.CanvasToToggle.Dialog, state);
     }
 
     public void StartDialog(DialogSO dialog)

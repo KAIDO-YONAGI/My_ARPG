@@ -6,11 +6,18 @@ using UnityEngine;
 /// 由 UIManager 的画布调度系统统一触发，不依赖外部直接引用。
 /// 声明：不可 ESC 关闭 + 打开时阻塞全局面板输入（玩家必须走重试流程）。
 /// </summary>
-public class GameOverCanvasManager : MonoBehaviour
+public class GameOverCanvasManager : MonoBehaviour, ICanvasManager
 {
     [SerializeField] private CanvasGroup gameOverGroup;
     [SerializeField] private ToggleCanvasEventSO toggleGameOverEvent;
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
+
+    public ToggleCanvasEventSO ToggleCanvasEvent => toggleGameOverEvent;
+    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
+
+    //声明：不可 ESC 关闭 + 打开时阻塞全局面板输入（玩家必须走重试流程）
+    public bool CloseOnEscape => false;
+    public bool BlocksGlobalInput => true;
 
     private void OnEnable()
     {
@@ -34,19 +41,12 @@ public class GameOverCanvasManager : MonoBehaviour
         if (state)
         {
             TimeManager.Instance.PauseGame();
-            gameOverGroup.alpha = 1;
-            gameOverGroup.interactable = true;
-            gameOverGroup.blocksRaycasts = true;
         }
         else
         {
-            gameOverGroup.alpha = 0;
-            gameOverGroup.interactable = false;
-            gameOverGroup.blocksRaycasts = false;
+            TimeManager.Instance.ResumeGame();
         }
 
-        UIManager.Report(
-            MyEnums.CanvasToToggle.GameOver, state,
-            closeOnEscape: false, blocksGlobalInput: true);
+        ((ICanvasManager)this).SetCanvaState(gameOverGroup, MyEnums.CanvasToToggle.GameOver, state);
     }
 }
