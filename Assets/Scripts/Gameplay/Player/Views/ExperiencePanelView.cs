@@ -6,8 +6,9 @@ using Gameplay.Player.Controllers;
 namespace Gameplay.Player.Views
 {
     /// <summary>
-    /// 经验条与等级文本的显示层：唯一的场景组件，持有控件引用并托管 <see cref="ExperienceController"/>。
-    /// 输入订阅（击杀事件）与数据订阅（ExpChanged）都在 Controller（纯 C#，由本类创建/销毁）。
+    /// 经验条与等级文本的显示层：面板唯一的场景组件，持有控件引用并托管纯 C# 的 ExperienceController
+    /// （Start 创建并首刷，OnDestroy 销毁）。
+    /// 输入订阅（击杀事件）与数据订阅（ExpChanged）都在 Controller。
     /// </summary>
     public class ExperiencePanelView : MonoBehaviour
     {
@@ -21,16 +22,6 @@ namespace Gameplay.Player.Views
             // Start 在所有 Awake 之后：此时 StatsService 必然就绪，Controller 可以立即订阅
             controller = new ExperienceController(this);
             controller.Refresh();
-        }
-
-        private void OnEnable()
-        {
-            controller?.Resume(); // 重激活：恢复击杀事件订阅并补刷（失活期间错过的事件没有累积通知）
-        }
-
-        private void OnDisable()
-        {
-            controller?.Suspend(); // 挂起：退订击杀事件（static 事件生命周期长于本面板）
         }
 
         private void OnDestroy()

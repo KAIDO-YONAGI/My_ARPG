@@ -71,6 +71,15 @@ public class SceneChanger : YSingleton<SceneChanger>
     {
         loadEventSO.LoadRequestEvent += OnLoadRequestEvent;
         retryEventSO.VoidEvent += OnRetryRequest;
+    }
+
+    /// <summary>
+    /// 首个场景请求放在 Start：同批所有 Awake/OnEnable 已跑完，
+    /// TimeManager/StatsService 实例与 DataManager 的事件订阅必然就绪。
+    /// 放 OnEnable 则依赖同批唤醒顺序（本类未挂执行序），是隐性时序契约。
+    /// </summary>
+    private void Start()
+    {
         loadEventSO.RaiseLoadRequestEvent(initScene, Vector3.zero, false);
     }
 

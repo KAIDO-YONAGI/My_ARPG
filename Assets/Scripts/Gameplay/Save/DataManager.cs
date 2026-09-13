@@ -3,8 +3,12 @@ using System.Linq;
 using UnityEngine;
 using Gameplay.Player.Services;
 using Gameplay.Player.Controllers;
-[DefaultExecutionOrder(-100)]
 
+
+// [-100] 的职责不是存档注册（那已由静态 SaveRegistry 解决，无时序依赖），
+// 而是 LoadRequestEvent 的订阅顺序：本类与 UIManager 的处理器（自动存档/重置面板）
+// 需先于 SceneChanger 自身的处理器（同步段开始卸载流程）执行。结构性解法见指南 §3.3。
+[DefaultExecutionOrder(-100)]
 //TODO使用流程：实现了IS接口的类，以loot为例，在特定时刻使用自己接口的注册方法注册自己到DataManager
 //DataManager订阅事件，loot脚本特定时刻拉起事件，此时DataManager负责调用loot实现的对应函数，把数据存进去
 //加载和存储基本对称
@@ -21,7 +25,7 @@ public class DataManager : YSingleton<DataManager>
     [SerializeField] private SceneLoadEventSO sceneLoadEventSO;
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
-    private List<ISaveable> saveables = new();
+    // 存档注册表在 Contracts/SaveRegistry.cs（静态类，注册无时序依赖）；本类只做收集与分发。
 
     private Data dataToSave = new Data();
     // 首次从主菜单进入游戏时不应写系统档，否则场景信息还没准备好。
@@ -37,18 +41,6 @@ public class DataManager : YSingleton<DataManager>
         sceneLoadedEvent.SceneLoadedEvent -= OnAutoLoad;
     }
 
-    public void RegisterSaveableData(ISaveable saveable)
-    {
-        if (!saveables.Contains(saveable))
-        {
-            saveables.Add(saveable);
-        }
-    }
-
-    public void UnRegisterSaveableData(ISaveable saveable)
-    {
-        saveables.Remove(saveable);
-    }
     public void RemoveLootRegistration(string lootId)
     {
         if (string.IsNullOrEmpty(lootId) || dataToSave == null || dataToSave.lootsStatsDic == null)
@@ -74,7 +66,7 @@ public class DataManager : YSingleton<DataManager>
             : currentScene.initialPosition;
         dataToSave.sceneIDAndPlayerPos = new SceneAndPosition(currentScene.SaveKey, savePosition);
 
-        foreach (var saveable in saveables.ToList())
+        foreach (var saveable in SaveRegistry.All.ToList())
         {
             saveable.SaveData(dataToSave);
         }
@@ -84,7 +76,7 @@ public class DataManager : YSingleton<DataManager>
     private void OnAutoSave(GameSceneSO sceneToLoadSO, Vector3 pos, bool isToFade)
     //关于位置，手动存的时候可以用玩家当前位置取代默认位置，自动存档用的是新位置或者场景默认位置
     {
-        foreach (var saveable in saveables.ToList())
+        foreach (var saveable in SaveRegistry.All.ToList())
         {
             saveable.SaveData(dataToSave);
         }
@@ -125,7 +117,7 @@ public class DataManager : YSingleton<DataManager>
 
     void OnAutoLoad(GameSceneSO _)
     {
-        foreach (var saveable in saveables.ToList())
+        foreach (var saveable in SaveRegistry.All.ToList())
         {
             saveable.LoadData(dataToSave);
         }
@@ -140,7 +132,7 @@ public class DataManager : YSingleton<DataManager>
             return;
         }
         dataToSave = data;
-        foreach (var saveable in saveables.ToList())//拷贝一份再操作，防止耗时操作中发生时序竞态修改
+        foreach (var saveable in SaveRegistry.All.ToList())//拷贝一份再操作，防止耗时操作中发生时序竞态修改
         {
             saveable.LoadData(dataToSave);
         }

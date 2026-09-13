@@ -82,10 +82,11 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
         UnregisterSelf();
     }
 
-    /// <summary>挂进 DataManager。幂等，且跳过不参与存档的 DataDefinition。</summary>
+    /// <summary>挂进存档注册表。幂等，且跳过不参与存档的 DataDefinition。
+    /// 注册走静态 SaveRegistry，任意生命周期阶段调用都安全，无 Instance 判空必要。</summary>
     private void RegisterSelf()
     {
-        if (registered || DataManager.Instance == null) return;
+        if (registered) return;
 
         var dataId = GetDataID();
         if (dataId == null) return;
@@ -97,13 +98,12 @@ public class Loot : MonoBehaviour, ISaveable, IPoolable
         saveable.RegisterSaveable();
     }
 
-    /// <summary>移出 DataManager。幂等，DataManager 缺失时只复位标记。</summary>
+    /// <summary>移出存档注册表。幂等。</summary>
     private void UnregisterSelf()
     {
         if (!registered) return;
         registered = false;
 
-        if (DataManager.Instance == null) return;
         ISaveable saveable = this;
         saveable.UnRegisterSaveable();
     }
