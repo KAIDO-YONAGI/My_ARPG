@@ -20,6 +20,10 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
 
     private Dictionary<(int x, int y), AStarNode> NodeCellMap => AStarNodeManager.Instance.GetNodeMap();
 
+    //8 邻域方向，只读共享，避免每次扩点重新分配
+    private static readonly int[] dirX = { 0, 1, 1, 1, 0, -1, -1, -1 };
+    private static readonly int[] dirY = { 1, 1, 0, -1, -1, -1, 0, 1 };
+
     public Stack<AStarDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         if (optPos == Vector3.zero) optPos = startPos;
@@ -63,21 +67,18 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
     }
     private bool NoCoverObstacleNodes((int x, int y) startCell, (int x, int y) optCell)
     {
-        float distance = Mathf.Sqrt(
-            (optCell.x - startCell.x) * (optCell.x - startCell.x) +
-            (optCell.y - startCell.y) * (optCell.y - startCell.y));
+        float vecX = optCell.x - startCell.x;
+        float vecY = optCell.y - startCell.y;
+        float distance = Mathf.Sqrt(vecX * vecX + vecY * vecY);
+        if (distance > 0) { vecX /= distance; vecY /= distance; }
 
-        float dirX = optCell.x - startCell.x;
-        float dirY = optCell.y - startCell.y;
-        float len = Mathf.Sqrt(dirX * dirX + dirY * dirY);
-        if (len > 0) { dirX /= len; dirY /= len; }
-
-        float step = 1 * GetCellSize();
+        //逐格采样，步长单位为格
+        float step = 1f;
 
         for (float threshold = step; threshold < distance; threshold += step)
         {
-            int cx = (int)Math.Round(startCell.x + dirX * threshold);
-            int cy = (int)Math.Round(startCell.y + dirY * threshold);
+            int cx = (int)Math.Round(startCell.x + vecX * threshold);
+            int cy = (int)Math.Round(startCell.y + vecY * threshold);
 
             var key = (cx, cy);
             if (NodeCellMap.TryGetValue(key, out AStarNode node))
@@ -131,19 +132,16 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
         int cx = currentPos.x;
         int cy = currentPos.y;
 
-        int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
-        int[] dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
-
         for (int i = 0; i < 8; i++)
         {
-            int nx = cx + dx[i];
-            int ny = cy + dy[i];
+            int nx = cx + dirX[i];
+            int ny = cy + dirY[i];
             var neighborPos = (x: nx, y: ny);
 
             if (closeSet.Contains(neighborPos)) continue;
-            if (!NodeCellMap.ContainsKey(neighborPos)) continue;
-            if (NodeCellMap[neighborPos].GetNodeType() != AStarNodeType.Walkable) continue;
-            if (NodeCellMap[neighborPos].GetNodeType() == AStarNodeType.Walkable && !CanWalkDiagonally(cx, cy, dx[i], dy[i])) continue;
+            if (!NodeCellMap.TryGetValue(neighborPos, out AStarNode neighbor)
+                || neighbor.GetNodeType() != AStarNodeType.Walkable) continue;
+            if (!CanWalkDiagonally(cx, cy, dirX[i], dirY[i])) continue;
 
             AStarDetails newNode = new AStarDetails(nx, ny, endPos.x, endPos.y, current);
 
@@ -165,11 +163,12 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
     {
         if (Math.Abs(dx * dy) == 1)
         {
-            var xOffset = (x + dx, y);
-            var yOffset = (x, y + dy);
+            //缺失的格子按不可走处理，避免地图边缘直接索引抛异常
+            NodeCellMap.TryGetValue((x + dx, y), out AStarNode xNeighbor);
+            NodeCellMap.TryGetValue((x, y + dy), out AStarNode yNeighbor);
 
-            if (NodeCellMap[xOffset].GetNodeType() != AStarNodeType.Walkable &&
-                NodeCellMap[yOffset].GetNodeType() != AStarNodeType.Walkable)
+            if ((xNeighbor == null || xNeighbor.GetNodeType() != AStarNodeType.Walkable) &&
+                (yNeighbor == null || yNeighbor.GetNodeType() != AStarNodeType.Walkable))
             {
                 return false;
             }

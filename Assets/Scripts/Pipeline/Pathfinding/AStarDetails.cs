@@ -30,10 +30,19 @@ public class AStarDetails
                 CalDistance(x, y, fatherNode.x, fatherNode.y);
         }
 
-        disToEnd = CalDistance(x, y, endX, endY);
+        disToEnd = Heuristic(x, y, endX, endY);
         cost = disToBeg + disToEnd;
     }
 
+    //octile 距离，仅作启发值（h），随实际距离增长以引导搜索方向
+    public static float Heuristic(int ax, int ay, int bx, int by)
+    {
+        int dx = Abs(bx - ax);
+        int dy = Abs(by - ay);
+        return dx > dy ? dy * 1.414f + (dx - dy) : dx * 1.414f + (dy - dx);
+    }
+
+    //仅用于相邻格间的步长代价：直行 1，斜行 1.414
     private float CalDistance(int ax, int ay, int bx, int by)
     {
         int distance = Abs(bx - ax) + Abs(by - ay);

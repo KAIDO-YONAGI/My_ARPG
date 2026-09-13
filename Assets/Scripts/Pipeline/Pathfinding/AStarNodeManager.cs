@@ -22,6 +22,10 @@ public class AStarNodeManager : YSingleton<AStarNodeManager>
     private float safetyMargin = 0.3f;
     private Dictionary<(int x, int y), AStarNode> nodeCellMap;
 
+    //8 邻域方向，只读共享，避免每帧重新分配
+    private static readonly int[] dirX = { 0, 1, 1, 1, 0, -1, -1, -1 };
+    private static readonly int[] dirY = { 1, 1, 0, -1, -1, -1, 0, 1 };
+
     public Dictionary<(int x, int y), AStarNode> GetNodeMap() => nodeCellMap;
     public float GetCellSize() => cellSize;
     //从Unity本身的浮点网格转化成整形的离散网格 一方面方便操作 另一方面能减少算法负担
@@ -46,28 +50,26 @@ public class AStarNodeManager : YSingleton<AStarNodeManager>
     {
         if (safetyMargin <= 0) return worldPos;
 
-        int[] dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
-        int[] dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
+        float realsafetyMargin = safetyMargin * cellSize;
         float marginX = 0, marginY = 0;
 
         for (int i = 0; i < 8; i++)
         {
-            var neighborKey = (cx + dx[i], cy + dy[i]);
-            if (nodeCellMap.TryGetValue(neighborKey, out AStarNode neighbor))
+            var neighborKey = (cx + dirX[i], cy + dirY[i]);
+            if (nodeCellMap.TryGetValue(neighborKey, out AStarNode neighbor)
+                && neighbor.GetNodeType() == AStarNodeType.Obstacle)
             {
-                if (neighbor.GetNodeType() == AStarNodeType.Obstacle)
-                {
-                    float realsafetyMargin = safetyMargin * cellSize;
-                    if (dx[i] > 0) marginX = -realsafetyMargin;
-                    else if (dx[i] < 0) marginX = realsafetyMargin;
-                    else if (dy[i] > 0) marginY = -realsafetyMargin;
-                    else if (dy[i] < 0) marginY = realsafetyMargin;
-                }
+                //每个障碍邻居独立施加推离分量再累加：对角障碍两轴都推，相反方向自然抵消
+                if (dirX[i] > 0) marginX -= realsafetyMargin;
+                else if (dirX[i] < 0) marginX += realsafetyMargin;
+                if (dirY[i] > 0) marginY -= realsafetyMargin;
+                else if (dirY[i] < 0) marginY += realsafetyMargin;
             }
         }
         Vector3 optNode = new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
         var optCell = WorldToCell(optNode);
-        if (nodeCellMap[optCell].GetNodeType() != AStarNodeType.Obstacle)
+        if (nodeCellMap.TryGetValue(optCell, out AStarNode optCellNode)
+            && optCellNode.GetNodeType() != AStarNodeType.Obstacle)
             return optNode;
         else return worldPos;
     }
