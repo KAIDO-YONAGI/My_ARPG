@@ -32262,8 +32262,7 @@ GameObject:
   - component: {fileID: 6992500781786840138}
   - component: {fileID: 1819091520131574448}
   - component: {fileID: 7590469777950019831}
-  - component: {fileID: 9138375027716410941}
-  - component: {fileID: 9138375027716410942}
+  - component: {fileID: 7590469777950019832}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -34982,6 +34981,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 5360259125137984082}
+--- !u!114 &7590469777950019832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6166002366618250803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5376714f3aeb47be9477558779c1b38f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  combat: {fileID: 1424315137}
+  bow: {fileID: 1424315136}
 --- !u!1001 &7650353239046441296
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35458,6 +35471,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7111420002568855259}
   - component: {fileID: 3384889951754387008}
+  - component: {fileID: 7898114213098828721}
   m_Layer: 0
   m_Name: StatsManager
   m_TagString: Untagged
@@ -35465,6 +35479,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &7898114213098828721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7898114213098828720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b40b6395a2a312f48b29733ed0c6e046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerRoot: {fileID: 6166002366618250803}
+  playerDamagedEvent: {fileID: 11400000, guid: 6da0a155357f433880fc1b4416ec7a90, type: 2}
+  movement: {fileID: 148041525}
 --- !u!224 &7919261848797980662 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7953370996453584490, guid: ad6c571997aade34da41c92faf999008, type: 3}
@@ -37572,35 +37601,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7aa8b31dcf3c9a8479583d49182e90a0, type: 3}
---- !u!114 &9138375027716410941
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6166002366618250803}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5376714f3aeb47be9477558779c1b38f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  combat: {fileID: 1424315137}
-  bow: {fileID: 1424315136}
---- !u!114 &9138375027716410942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6166002366618250803}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b40b6395a2a312f48b29733ed0c6e046, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerRoot: {fileID: 6166002366618250803}
-  playerDamagedEvent: {fileID: 11400000, guid: 6da0a155357f433880fc1b4416ec7a90, type: 2}
-  movement: {fileID: 148041525}
 --- !u!1 &9140946962347789005
 GameObject:
   m_ObjectHideFlags: 0

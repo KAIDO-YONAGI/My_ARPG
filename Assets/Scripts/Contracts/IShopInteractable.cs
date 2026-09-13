@@ -4,7 +4,7 @@ using UnityEngine;
 /// 商店面板对外交互接口。
 /// 面板内部控件（ShopSlot/ShopToggles 等）经 GetComponentInParent 获取，不再依赖 ShopManager 单例；
 /// 面板外部系统（ShopKeeper/相机）经 ShopKeeperEventSO 事件交互。
-/// 例外：InventorySlot 暂留单例访问（重构清单 4.2 决策）。
+/// 例外：InventorySlot 暂留单例访问。
 /// </summary>
 public interface IShopInteractable
 {

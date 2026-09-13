@@ -4,15 +4,7 @@ public class PlayerAnimationEventRelay : MonoBehaviour
 {
     [SerializeField] private PlayerCombat combat;
     [SerializeField] private PlayerBow bow;
-
-    private void Awake()
-    {
-        // 引用必须在 Inspector 里接好；不再做 GetComponentInChildren 兜底
-        if (combat == null)
-            Debug.LogError("PlayerAnimationEventRelay: combat 引用未在 Inspector 接线。", this);
-        if (bow == null)
-            Debug.LogError("PlayerAnimationEventRelay: bow 引用未在 Inspector 接线。", this);
-    }
+    
 
     public void DealDamage()
     {
