@@ -45,9 +45,8 @@ public class GameOverCanvasManager : MonoBehaviour
             gameOverGroup.blocksRaycasts = false;
         }
 
-        if (UIManager.Instance != null)
-            UIManager.Instance.ReportCanvasState(
-                MyEnums.CanvasToToggle.GameOver, state,
-                closeOnEscape: false, blocksGlobalInput: true);
+        UIManager.Report(
+            MyEnums.CanvasToToggle.GameOver, state,
+            closeOnEscape: false, blocksGlobalInput: true);
     }
 }

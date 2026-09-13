@@ -44,6 +44,6 @@ public class ESCMenuManager : MonoBehaviour
             ESCGroup.blocksRaycasts = false;
         }
 
-        UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.ESC, state);
+        UIManager.Report(MyEnums.CanvasToToggle.ESC, state);
     }
 }

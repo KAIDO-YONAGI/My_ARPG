@@ -72,11 +72,7 @@ public interface ICanvasManager
         canva.blocksRaycasts = state;
         canva.interactable = state;
 
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.ReportCanvasState(
-                canvasToToggle, state, CloseOnEscape, BlocksGlobalInput);
-        }
+        UIManager.Report(canvasToToggle, state, CloseOnEscape, BlocksGlobalInput);
     }
 
     /// <summary>

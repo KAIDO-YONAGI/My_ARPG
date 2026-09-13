@@ -111,8 +111,25 @@ public class UIManager : YSingleton<UIManager>
         focusStack.RequestClose(canvas);
     }
 
+    /// <summary>
+    /// 状态上报的安全入口：UIManager 尚未完成单例注册（各单例 Awake 顺序无保证）时静默跳过。
+    /// 外部上报一律走这里；跳过的初始 false 上报无副作用（焦点栈默认全关）。
+    /// </summary>
+    public static void Report(
+        CanvasToToggle canvas,
+        bool state,
+        bool closeOnEscape = true,
+        bool blocksGlobalInput = false)
+    {
+        if (Instance != null)
+        {
+            Instance.ReportCanvasState(canvas, state, closeOnEscape, blocksGlobalInput);
+        }
+    }
+
     // 状态回调：画布报告真实的开启或关闭状态；互斥由本组件的 mutexCanvases 列表解析，阻塞声明由面板传入。
-    public void ReportCanvasState(
+    // 仅由静态 Report 调用，保证 Instance 判空集中在唯一一处。
+    private void ReportCanvasState(
         CanvasToToggle canvas,
         bool state,
         bool closeOnEscape = true,

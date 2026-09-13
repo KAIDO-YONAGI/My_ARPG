@@ -51,7 +51,8 @@ public class DialogManager : YSingleton<DialogManager>
         dialogCanvasGroup.interactable = state;
         dialogCanvasGroup.blocksRaycasts = state;
         isDialogActive = state;
-        UIManager.Instance.ReportCanvasState(MyEnums.CanvasToToggle.Dialog, state);
+
+        UIManager.Report(MyEnums.CanvasToToggle.Dialog, state);
     }
 
     public void StartDialog(DialogSO dialog)
