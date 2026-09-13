@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ButtonSceneToggler : MonoBehaviour
 {
-    [SerializeField] private SceneLoadEventSO loadEventSO;
     [SerializeField] private GameSceneSO sceneToLoad;
     [SerializeField] private CanvasGroup ButtonCanvas;
     [SerializeField] private Vector3 newPosition;
@@ -14,6 +13,7 @@ public class ButtonSceneToggler : MonoBehaviour
         ButtonCanvas.interactable = false;
         ButtonCanvas.blocksRaycasts = false;
 
-        loadEventSO.RaiseLoadRequestEvent(sceneToLoad, newPosition, isToFade);
+        // 场景切换走 SceneChanger 的唯一入口；直接 Raise 事件只会通知订阅方，不会切场景
+        SceneChanger.Instance.RequestSceneLoad(sceneToLoad, newPosition, isToFade);
     }
 }

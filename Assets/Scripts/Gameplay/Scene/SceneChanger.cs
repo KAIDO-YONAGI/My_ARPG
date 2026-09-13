@@ -6,9 +6,9 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 using Gameplay.Player.Services;
 
 /// <summary>
-/// 场景切换管理器
-/// 负责管理场景的加载、卸载和过渡动画
-/// 使用单例模式，通过事件响应场景切换请求
+/// 场景切换管理器：负责场景的加载、卸载和过渡动画。
+/// 切换的唯一入口是 <see cref="RequestSceneLoad"/>：先广播 loadEventSO，
+/// 让订阅方在切换开始前同步收尾，再执行切换流程；先后顺序就是入口内两条语句的顺序。
 /// </summary>
 public class SceneChanger : YSingleton<SceneChanger>
 {
@@ -69,27 +69,34 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// </summary>
     private void OnEnable()
     {
-        loadEventSO.LoadRequestEvent += OnLoadRequestEvent;
+        // 重试是外部输入，经事件订阅；加载执行由 RequestSceneLoad 直接调用
         retryEventSO.VoidEvent += OnRetryRequest;
+    }
+
+    private void OnDisable()
+    {
+        retryEventSO.VoidEvent -= OnRetryRequest;
+    }
+
+    /// <summary>
+    /// 场景切换的唯一入口：先广播，后执行。
+    /// Raise 同步调用所有订阅方的处理器并等它们全部返回，订阅方在切换开始前完成收尾；
+    /// 随后才执行本类的切换流程 OnLoadRequestEvent，两步的先后就是本方法内两条语句的先后。
+    /// 触发场景切换必须调用本方法。直接 Raise loadEventSO 只会通知订阅方，不会切场景。
+    /// </summary>
+    public void RequestSceneLoad(GameSceneSO scene, Vector3 position, bool isToFade)
+    {
+        loadEventSO.RaiseLoadRequestEvent(scene, position, isToFade);
+        OnLoadRequestEvent(scene, position, isToFade);
     }
 
     /// <summary>
     /// 首个场景请求放在 Start：同批所有 Awake/OnEnable 已跑完，
-    /// TimeManager/StatsService 实例与 DataManager 的事件订阅必然就绪。
-    /// 放 OnEnable 则依赖同批唤醒顺序（本类未挂执行序），是隐性时序契约。
+    /// TimeManager/StatsService 实例与 DataManager/UIManager 的事件订阅必然就绪，广播不漏听众。
     /// </summary>
     private void Start()
     {
-        loadEventSO.RaiseLoadRequestEvent(initScene, Vector3.zero, false);
-    }
-
-    /// <summary>
-    /// 禁用时取消订阅场景加载事件
-    /// </summary>
-    private void OnDisable()
-    {
-        loadEventSO.LoadRequestEvent -= OnLoadRequestEvent;
-        retryEventSO.VoidEvent -= OnRetryRequest;
+        RequestSceneLoad(initScene, Vector3.zero, false);
     }
 
     /// <summary>
@@ -118,7 +125,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     }
 
     /// <summary>
-    /// 场景加载请求事件回调
+    /// 加载请求的执行段，由 RequestSceneLoad 在广播完成后调用
     /// </summary>
     /// <param name="scene">目标场景</param>
     /// <param name="newPosition">玩家新位置</param>
@@ -162,7 +169,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// </summary>
     private void OnRetryRequest()
     {
-        loadEventSO.RaiseLoadRequestEvent(currentScene, Vector3.zero, true);
+        RequestSceneLoad(currentScene, Vector3.zero, true);
     }
 
     /// <summary>
@@ -181,12 +188,13 @@ public class SceneChanger : YSingleton<SceneChanger>
 
         if (currentScene != null)
             yield return currentScene.sceneReference.UnLoadScene();
-        LoadScene(targetScene, targetFade); //这里是事件响应的合法调用 并非裸调用
+        LoadScene(targetScene, targetFade);
         SetPlayerPostion(targetPosition);
     }
 
     /// <summary>
-    /// 异步加载场景，禁止裸调用 需要走事件 否则订阅者收不到信息
+    /// 异步加载场景。禁止裸调用：必须经 RequestSceneLoad 入口先广播订阅方再执行，
+    /// 否则订阅者收不到切换通知。
     /// 使用 Addressables 加载场景，以 additive 模式添加
     /// </summary>
     /// <param name="targetScene">要加载的目标场景</param>

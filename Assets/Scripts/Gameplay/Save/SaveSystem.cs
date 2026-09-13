@@ -29,9 +29,6 @@ public class SaveSystem : YSingleton<SaveSystem>
 {
     public bool IsLoadingSaveRequest { get; private set; }
 
-    [Header("Send")]
-
-    [SerializeField] private SceneLoadEventSO loadEventSO;
     [Header("Receive")]
 
     [SerializeField] private DataSaveEventSO dataSavedEvent;
@@ -133,7 +130,9 @@ public class SaveSystem : YSingleton<SaveSystem>
                     ? save.data.sceneIDAndPlayerPos.position.ToVector3()//如果存档位置为空，会加载到场景的默认位置
                     : gameScene.initialPosition;
                 IsLoadingSaveRequest = true;
-                loadEventSO.RaiseLoadRequestEvent(gameScene, pos, true);
+                // 标志窗口包住整个入口调用：DataManager.OnAutoSave 在广播段内读到 true，
+                // 读档触发的切换不会写自动存档
+                SceneChanger.Instance.RequestSceneLoad(gameScene, pos, true);
                 IsLoadingSaveRequest = false;
             }
             else

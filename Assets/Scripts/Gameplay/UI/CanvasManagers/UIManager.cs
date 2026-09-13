@@ -4,7 +4,6 @@ using MyEnums;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[DefaultExecutionOrder(-100)]
 public class UIManager : YSingleton<UIManager>
 {
     // 常量保留转发，避免破坏 ICanvasManager.RefreshCanvaOrder 对 UIManager.DefaultOrder 的引用。
@@ -71,11 +70,10 @@ public class UIManager : YSingleton<UIManager>
 
     private void OnLoadScene(GameSceneSO arg0, Vector3 arg1, bool arg2)
         //UIManager作为跨场景持久单例，不会随场景卸载而disable，因此需要订阅场景加载事件来主动重置画布状态。
-        //LoadRequestEvent是同步委托，UIManager的ExecutionOrder(-100)早于SceneChanger，所以OnLoadScene
-        //会在SceneChanger开始异步卸载/加载流程之前同步执行，确保所有UI面板在场景过渡动画和旧场景卸载前被关闭。
-        //另外也有异步等待操作能为这里争取时间，但是还是要注意可能会导致冲突的时序问题
+        //本处理器在 SceneChanger.RequestSceneLoad 的广播段内同步执行，先于其切换流程，
+        //面板因此在过渡动画和旧场景卸载前被关闭。
     {
-        ResetCanvas();
+        ResetCanvases();
     }
 
     private void Update()
@@ -359,7 +357,7 @@ public class UIManager : YSingleton<UIManager>
         }
     }
 
-    private void ResetCanvas()
+    private void ResetCanvases()
     {
         focusStack.Clear();
 
