@@ -1,14 +1,20 @@
 # My_ARPG
 
-A 2D ARPG prototype built with Unity 2022.3.62f3c1.
+![Unity](https://img.shields.io/badge/Unity-2022.3.62f3c1-000000?logo=unity)
+![License](https://img.shields.io/badge/License-GPL--3.0-blue)
+![Language](https://img.shields.io/badge/C%23-74%25-512BD4?logo=csharp)
+
+A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, event-driven implementation of core RPG systems: dialogue, quests, shops, inventory, a skill tree, and save/load.
 
 > **中文文档 / Chinese:** [README.md](README.md)
 
-## Overview
+## Highlights
 
-- The current version centers on scene transitions, NPC dialogue, quests, shops, inventory, skill trees, and save/load.
-
-- The game uses 2D top-down exploration and combat, with both melee and ranged modes.
+- **Complete RPG system loop**: scene transitions, NPC dialogue (branching + conditions + history), a state-machine quest system, shops, inventory, a skill tree, and save/load.
+- **Event-driven architecture**: cross-system decoupling via ScriptableObject event channels.
+- **Three-layer decoupled A\* pathfinding**: grid management / pathfinding algorithm / MovementController — attach a component and go.
+- **2D combat**: top-down exploration with both melee and ranged modes.
+- **Engineering practices**: Addressables scene loading, Newtonsoft.Json saves, and Android build troubleshooting docs.
 
 ## Demo Video
 
@@ -16,90 +22,66 @@ A 2D ARPG prototype built with Unity 2022.3.62f3c1.
 
 > The video showcases an **earlier version** of the project. It has evolved significantly since then — controls, system implementations, and scene content have all changed — so the video may be inaccurate or outdated and is for reference only. Treat this README and the repository code as the source of truth.
 
-## Requirements
+## Table of Contents
+
+- [Requirements & Quick Start](#requirements--quick-start)
+- [Controls](#controls)
+- [Project Structure](#project-structure)
+- [Core System Architecture](#core-system-architecture)
+- [Build Guide](#build-guide)
+- [ScriptableObject Usage Tips](#scriptableobject-usage-tips)
+- [Known Limitations](#known-limitations)
+- [Credits](#credits)
+- [License](#license)
+
+## Requirements & Quick Start
+
+**Requirements**
 
 - Open the project with Unity 2022.3.62f3c1.
-
 - Main dependencies include Addressables, Cinemachine, Input System, TextMesh Pro, and the Unity 2D feature set.
 
-## Quick Start
+**Getting started**
 
-- After opening the project in Unity Hub, wait for package dependencies and Addressables data to finish importing.
-
-- The default build entry is `Assets/Scenes/InitialScene.unity`, which asynchronously loads `PersistentScene` on startup.
-
-- The title menu scene is located at `Assets/Scenes/GameScene/StartingMenu.unity`, and the main gameplay scenes are `Assets/Scenes/GameScene/Scene1.unity` and `Assets/Scenes/GameScene/Scene2.unity`.
-
-- `Assets/Scenes/TestScene.unity` can be used for isolated testing, but `InitialScene` is the better entry point for validating the full flow.
-
-## Main Features
-
-- Cross-scene loading and transitions with fade effects and persistent-scene management.
-
-- NPC dialogue supports branching, condition checks, and history tracking.
-
-- The quest system includes quest boards, a quest log, objectives, rewards, and state refresh.
-
-- The inventory and item system supports pickup, use, selling, dropping, and partial persistence.
-
-- Shops, skill trees, stat panels, and the integrated menu are wired into one UI management flow.
-
-- The save system supports saving and loading in gameplay scenes, and deleting saves in the menu scene.
-
-- A* pathfinding is used by parts of the enemy and NPC movement logic.
+1. Open the project in Unity Hub and wait for package dependencies and Addressables data to finish importing.
+2. Start from `Assets/Scenes/InitialScene.unity` (the default build entry; it asynchronously loads `PersistentScene` on startup).
+3. The title menu scene is at `Assets/Scenes/GameScene/StartingMenu.unity`; the main gameplay scenes are `Assets/Scenes/GameScene/Scene1.unity` and `Scene2.unity`.
+4. `Assets/Scenes/TestScene.unity` can be used for isolated testing, but `InitialScene` is the better entry point for validating the full flow.
 
 ## Controls
 
-- `WASD`: Move the character.
+**Keys**
 
-- `Q`: Switch between ranged and melee modes.
+| Key | Action |
+|---|---|
+| `WASD` | Move the character |
+| `Q` | Switch between ranged and melee modes |
+| `J` | Fire an arrow in archer mode |
+| `K` | Perform a sword slash in melee mode |
+| `1` | Open the stats panel |
+| `2` | Open the skill panel (left-click a skill slot to spend points and unlock skills) |
+| `F` | Interact with a shop |
+| `T` | Open or close NPC dialogue (left-click to advance dialogue or choose options) |
+| `C` | Open the quest menu |
+| `ESC` | Open the exit menu (return to title, save, or quit) |
 
-- `J`: Fire an arrow in archer mode.
+**UI basics**: Most panels can be closed with `X` and dragged by their top bar. The lower-left integrated menu can open most interfaces, but some functions require approaching an NPC, shop, or quest board first.
 
-- `K`: Perform a sword slash in melee mode.
+**Inventory & saving**
 
-- `1`: Open the stats panel.
-
-- `2`: Open the skill panel, and left-click a skill slot to spend points and unlock skills.
-
-- `F`: Interact with a shop.
-
-- `T`: Open or close NPC dialogue, and left-click to advance dialogue or choose options.
-
-- `C`: Open the quest menu.
-
-- `ESC`: Open the exit menu to return to title, save, or quit the game.
-
-- Most panels can be closed with `X` and dragged by their top bar.
-
-- The lower-left integrated menu can open most interfaces, but some functions require approaching an NPC, shop, or quest board first.
-
-## Inventory and Save Notes
-
-- Left-clicking inventory items uses them when the shop is closed and sells them when the shop is open.
-
-- Right-clicking inventory items drops them.
-
-- In gameplay scenes you can `Save` / `Load`, and in the menu scene `Save` changes to `Delete`.
-
+- Left-clicking inventory items uses them when the shop is closed and sells them when the shop is open; right-click drops them.
+- In gameplay scenes you can `Save` / `Load`; in the menu scene `Save` changes to `Delete`.
 - Dropped items are not preserved after scene transitions, reloads, or `Retry`.
-
-- Walking to the end of a wooden bridge can trigger a scene change, and the `GameOver` menu appears automatically when the character dies.
+- Walking to the end of a wooden bridge triggers a scene change, and the `GameOver` menu appears automatically when the character dies.
 
 ## Project Structure
 
 - `Assets/Scripts/UI`: UI management, dialogue, quest boards, shops, skill trees, and menu interactions.
-
 - `Assets/Scripts/Units`: Behavior scripts for enemies, NPCs, and shopkeepers.
-
 - `Assets/Scripts/Player`: Player movement, combat, equipment switching, time control, and stat management.
-
 - `Assets/Scripts/Inventory`: Inventory, slots, loot, and item-use logic.
-
 - `Assets/Scripts/SaveAndLoad`: Data structures, save interfaces, and the save/load flow.
-
 - `Assets/Scripts/Scene` and `Assets/Scripts/A Star`: Scene transition and pathfinding logic.
-
 - `Assets/Scripts/ScriptableObjects`: ScriptableObject definitions for quests, scenes, dialogue, and events.
 
 ## Core System Architecture
@@ -110,8 +92,7 @@ The save system uses an `ISaveable` interface + registry pattern to manage all p
 
 - **`ISaveable`** defines `SaveData(Data)` / `LoadData(Data)`. Implementations (Loot, InventoryManager, etc.) self-register with `DataManager` on enable.
 - **`DataManager`** holds a `List<ISaveable>` registry and invokes save/load on all entries during scene transitions.
-- **`SaveSystem`** handles serialization (Newtonsoft.Json) and file I/O, with separate manual and automatic system saves.
-- Auto-save triggers on scene transitions; manual save triggers from player actions.
+- **`SaveSystem`** handles serialization (Newtonsoft.Json) and file I/O, with separate manual and automatic saves: auto-save triggers on scene transitions, manual saves from player actions.
 - Safety: delete validates paths stay within `persistentDataPath`; loading skips corrupt files and falls back to the latest valid save.
 
 ### Dialogue System
@@ -147,44 +128,35 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 - Various event SOs (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, `SceneLoadEventSO`, etc.) decouple broadcasters from subscribers.
 - Cross-system operations—saving, quest rewards, scene loading, UI toggling—all flow through events to avoid direct references.
 
-## Build Notes
+## Build Guide
 
-> This section documents pitfalls encountered during export / build, especially around Addressables and ScriptableObjects (SOs).
+> Only the key takeaways are kept here; full Android troubleshooting lives in the Docs folder.
 
-### Addressables
+### Addressables Essentials
 
-- **Build entry & data builder**: `Build Addressables on Player Build` is enabled (`m_BuildAddressablesWithPlayerBuild = 1`), so Addressables are built automatically during export — **provided the active data builder is Packed Mode** (`m_ActivePlayerDataBuilderIndex = 3`). Switching back to "Use Asset Database" / "Simulate Groups" leaves scenes unbuilt: the exported package will be missing scenes or fail at runtime.
-
-- **Stale / missing references break the build outright**: An Addressables group that still references a deleted or renamed asset will error out — sometimes aborting the entire build. The `Scenes` group currently retains a reference to `Assets/Scenes/Menu.unity`, while the real menu scene is `Assets/Scenes/GameScene/StartingMenu.unity`. Clean up such stale entries (wrong path or broken GUID) before exporting. **After renaming or moving assets, always re-check the Addressables groups, or reopen `Window > Asset Management > Addressables > Groups` to let it refresh.**
-
-- **Content Update depends on `addressables_content_state.bin`**: An incremental Content Update requires a valid `addressables_content_state.bin` per platform (`Windows/`, `Android/`, `WebGL/`). It is git-ignored, so after a machine switch or cleanup it may be missing — run a Clean Build first to regenerate it, or Content Update will fail or behave unexpectedly.
-
-- **`ServerData/` and local runtime**: Remote group artifacts go to `ServerData/[BuildTarget]`. This repo defaults to local builds with no remote hosting (`m_CCDEnabled = 0`), so no remote is needed. If you later enable a remote catalog, ensure the `Local.LoadPath` / `Remote.LoadPath` profile values match the real host, or assets won't be found at runtime.
-
-- **Scene load entry**: The post-build entry is `InitialScene` (not in any Addressables group — packed directly by Player Settings). It then asynchronously loads `PersistentScene` and gameplay scenes via `GameSceneSO.sceneReference` (`AssetReference`). So **`InitialScene` must remain in Build Settings' Scenes list**, otherwise the build launches into nothing.
+- **The data builder must be Packed Mode**: `Build Addressables on Player Build` is enabled, but only works when the active data builder is Packed Mode (`m_ActivePlayerDataBuilderIndex = 3`). Switching back to "Use Asset Database" / "Simulate Groups" leaves scenes unbuilt — the exported package will be missing scenes or fail at runtime.
+- **Stale references break the build outright**: a group referencing a deleted/renamed asset will error out — sometimes aborting the whole build. After renaming/moving assets, re-check the Addressables groups, or reopen `Window > Asset Management > Addressables > Groups` to refresh.
+- **Content Update depends on `addressables_content_state.bin`**: stored per platform (`Windows/`, `Android/`, …) and git-ignored; if lost after a machine switch or cleanup, run a Clean Build first to regenerate it.
+- **The entry scene must stay in Build Settings**: the post-build entry is `InitialScene` (not in any Addressables group — packed directly by Player Settings); it loads everything else via `GameSceneSO.sceneReference`. Without it the build launches into nothing.
+- Remote group artifacts go to `ServerData/[BuildTarget]`; this repo defaults to local builds (`m_CCDEnabled = 0`) and needs no remote. If you later enable a remote catalog, ensure the LoadPath matches the real host.
 
 ### Android Export
 
-- **Android Release build (verified 2026-08-09)**: SDK detection stalled because `sdkmanager` did not inherit the proxy, while Release lint failed because a non-ASCII filename in `StreamingAssets` produced an AAR entry that could not be decoded. See [`Docs/UnityAndroidBuildGuide.md`](Docs/UnityAndroidBuildGuide.md) for proxy setup, removal, environment self-checks, and diagnostics — that guide is **machine-independent**: first read the real paths and proxy port on your own machine via its "Step 1: confirm the environment". Build evidence is archived in [`Docs/UnityAndroidBuildVerification.md`](Docs/UnityAndroidBuildVerification.md). The current test APK is debug-signed; configure a project keystore before publishing.
+- **Android Release build (verified 2026-08-09)**: SDK detection stalled because `sdkmanager` did not inherit the proxy; Release lint failed because a non-ASCII filename in `StreamingAssets` produced an undecodable AAR entry. See [`Docs/UnityAndroidBuildGuide.md`](Docs/UnityAndroidBuildGuide.md) for proxy setup, removal, environment self-checks, and diagnostics (**machine-independent**: first read the real paths and proxy port on your machine via its "Step 1: confirm the environment"). Build evidence is archived in [`Docs/UnityAndroidBuildVerification.md`](Docs/UnityAndroidBuildVerification.md).
+- The current test APK is debug-signed; configure a project keystore before publishing.
 
-### ScriptableObject Usage Tips
+## ScriptableObject Usage Tips
 
-- **Check references after renaming/moving**: The project leans heavily on SOs as data containers and event channels (`DialogSO`, `QuestSO`, `GameSceneSO`, the various `*EventSO`s). After renaming or moving an SO asset, fields referencing it can turn `Missing` and fail silently at runtime. After a rename, do a sweep (by GUID / `Missing`) to verify references.
-
-- **Subscribe / unsubscribe event SOs in pairs**: Custom event channels (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, …) broadcast via `UnityAction` delegates. The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `DataManager`, `SceneChanger`, `PlayerBow`, etc.). **New subscribers must follow this**, or scene transitions / object destruction will cause double-fires or null-refs.
-
-- **`GameSceneSO.ID` and `GuidSO` stable identity**: `GameSceneSO` auto-generates `ID` via `System.Guid` in `OnValidate`; `GuidSO` likewise fills its GUID when empty and marks itself dirty. So **once a SO's GUID exists, never clear or hand-edit it** — the save system (`ISaveable` / `DataManager`, which keys objects by ID) would lose the link. Also note `OnValidate` is editor-only; do not rely on it to generate IDs in a built player.
-
-- **Always assign `GameSceneSO.sceneReference`**: `sceneReference` is an `AssetReference` that must point to a scene already included in Addressables. Leaving it empty throws an `InvalidKeyException` (or similar) at runtime when the loader tries to use it. After creating a `GameSceneSO`, drag the scene into `sceneReference` and confirm the scene is present in the `Scenes` group.
-
-- **Don't store live runtime state on the SO instance**: SOs are shared assets. This project keeps runtime state in dedicated runtime classes (e.g. `QuestProgressData` holds per-objective progress in a `Dictionary<QuestObjective,int>`) rather than writing back into `QuestSO`. **Don't dump mutable runtime data into SO fields** — every reference would share the same mutated copy, and it can dirty the asset's stored value in the editor.
+- **Check references after renaming/moving**: The project leans heavily on SOs as data containers and event channels (`DialogSO`, `QuestSO`, `GameSceneSO`, the various `*EventSO`s). After renaming or moving an SO, fields referencing it can turn `Missing` and fail silently at runtime — do a sweep (by GUID / `Missing`) to verify.
+- **Subscribe / unsubscribe event SOs in pairs**: The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `DataManager`, `SceneChanger`, `PlayerBow`, etc.). New subscribers must follow this, or scene transitions / object destruction will cause double-fires or null-refs.
+- **Never hand-edit `GameSceneSO.ID` / `GuidSO` GUIDs once generated**: the save system (`ISaveable`/`DataManager`) keys objects by ID; clearing or changing a GUID breaks the link. Note `OnValidate` is editor-only — don't rely on it to generate IDs in a built player.
+- **Always assign `GameSceneSO.sceneReference`**: it's an `AssetReference` that must point to a scene already included in Addressables; leaving it empty throws an `InvalidKeyException` (or similar) at runtime.
+- **Don't store live runtime state on SO instances**: SOs are shared assets — keep runtime state in dedicated runtime classes (e.g. `QuestProgressData`), or every reference shares the same mutated copy and the asset's stored values get dirtied in the editor.
 
 ## Known Limitations
 
 - The `Settings` entry in the title scene is not implemented yet.
-
 - Some menus depend on interaction range or context state and cannot always be opened freely.
-
 - This document reflects the current project and `GameGuide.txt`; please update it when features change.
 
 ## Credits
