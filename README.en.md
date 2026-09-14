@@ -10,6 +10,12 @@ A 2D ARPG prototype built with Unity 2022.3.62f3c1.
 
 - The game uses 2D top-down exploration and combat, with both melee and ranged modes.
 
+## Demo Video
+
+- [【Unity】28th ARPG Demo Showcase](https://www.bilibili.com/video/BV1sCGH6iErJ/) (Bilibili, published 2026-05-25)
+
+> The video showcases an **earlier version** of the project. It has evolved significantly since then — controls, system implementations, and scene content have all changed — so the video may be inaccurate or outdated and is for reference only. Treat this README and the repository code as the source of truth.
+
 ## Requirements
 
 - Open the project with Unity 2022.3.62f3c1.
