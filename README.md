@@ -97,7 +97,7 @@
 采用 `ISaveable` 接口 + 注册表模式统一管理所有可持久化对象。
 
 - **`ISaveable`** 接口定义 `SaveData(Data)` / `LoadData(Data)` 方法，实现该接口的类（Loot、InventoryManager 等）在激活时注册到 `SaveRegistry`。
-- **`SaveRegistry`**（`Contracts/SaveRegistry.cs`）是静态注册表，先于一切场景实例存在，注册与注销在任何生命周期阶段调用都安全，不受 `Awake` 顺序影响；`SaveDataManager` 只做收集与分发，存读档时遍历 `SaveRegistry.All`。
+- **`SaveRegistry`** 位于 `Contracts/SaveRegistry.cs`，是静态注册表，先于一切场景实例存在，注册与注销在任何生命周期阶段调用都安全，不受 `Awake` 顺序影响；`SaveDataManager` 只做收集与分发，存读档时遍历 `SaveRegistry.All`。
 - **`SaveSystem`** 负责序列化（Newtonsoft.Json）和文件 I/O，支持手动存档与自动系统档分离：自动存档在场景切换时触发，手动存档由玩家操作触发。
 - 存档安全：删除前校验路径不超出 `persistentDataPath`；加载时自动跳过损坏存档并回退到最近的完整档。
 
@@ -166,7 +166,7 @@
 ## ScriptableObject 使用建议
 
 - **资源名 / 路径改动后检查引用**：项目大量依赖 SO 作为数据容器与事件通道（`DialogSO`、`QuestSO`、`GameSceneSO`、各种 `*EventSO` 等）。重命名或移动 SO 后，引用它的字段可能变成 `Missing` 并在运行时静默失效，建议改名后按 GUID / `Missing` 批量核对一次。
-- **事件 SO 的订阅与注销必须成对**：统一约定在 `OnEnable` 里 `+=` 订阅、`OnDisable` 里 `-=` 注销（参见 `DataManager`、`SceneChanger`、`PlayerBow` 等）。新增订阅者务必遵守，否则场景切换 / 对象销毁后会出现重复触发或空引用。
+- **事件 SO 的订阅与注销必须成对**：统一约定在 `OnEnable` 里 `+=` 订阅、`OnDisable` 里 `-=` 注销（参见 `SaveDataManager`、`SceneChanger`、`PlayerBow` 等）。新增订阅者务必遵守，否则场景切换 / 对象销毁后会出现重复触发或空引用。
 - **`GameSceneSO.ID` 与 `GuidSO` 的 GUID 生成后勿改**：存档体系（`ISaveable`/`SaveRegistry`）通过 ID 关联对象，清空或改动 GUID 会导致存档找不到目标。注意 `OnValidate` 仅在编辑器下运行，不要依赖它在运行时生成 ID。
 - **`GameSceneSO.sceneReference` 必须赋值**：它是 `AssetReference`，必须指向已纳入 Addressables 的场景资产，为空会在运行时抛 `InvalidKeyException` 之类错误。
 - **避免在 SO 实例上存游戏运行时状态**：SO 是共享资产，运行时数据应放在专门的运行时类里（如 `QuestProgressData`），否则多份引用共享同一份被篡改的数据，且容易污染编辑器中的资产值。

@@ -28,6 +28,7 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 - [Controls](#controls)
 - [Project Structure](#project-structure)
 - [Core System Architecture](#core-system-architecture)
+- [Layered Architecture](#layered-architecture)
 - [Build Guide](#build-guide)
 - [ScriptableObject Usage Tips](#scriptableobject-usage-tips)
 - [Known Limitations](#known-limitations)
@@ -76,13 +77,18 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 
 ## Project Structure
 
-- `Assets/Scripts/UI`: UI management, dialogue, quest boards, shops, skill trees, and menu interactions.
-- `Assets/Scripts/Units`: Behavior scripts for enemies, NPCs, and shopkeepers.
-- `Assets/Scripts/Player`: Player movement, combat, equipment switching, time control, and stat management.
-- `Assets/Scripts/Inventory`: Inventory, slots, loot, and item-use logic.
-- `Assets/Scripts/SaveAndLoad`: Data structures, save interfaces, and the save/load flow.
-- `Assets/Scripts/Scene` and `Assets/Scripts/A Star`: Scene transition and pathfinding logic.
-- `Assets/Scripts/ScriptableObjects`: ScriptableObject definitions for quests, scenes, dialogue, and events.
+Scripts are split into three top-level folders: cross-feature contracts, gameplay organized by feature domain, and pipeline infrastructure that is independent of gameplay.
+
+- `Assets/Scripts/Contracts`: cross-layer contracts and infrastructure — `ISaveable`, `IDamageable`, `ICanvasManager`, the static save registry `SaveRegistry`, and the singleton base `YSingleton`.
+- `Assets/Scripts/Gameplay`: one folder per feature domain, each further split into `Models/`, `Services/`, `Controllers/`, and `Views/`.
+  - `Player/`: player stats, movement, combat, equipment.
+  - `Quest/`, `Dialog/`, `Inventory/`, `Shop/`, `Skills/`: quests, dialogue, inventory, shops, and the skill tree.
+  - `Units/`: enemy, NPC, and shopkeeper behavior.
+  - `Save/`: `SaveDataManager` and the save/load flow.
+  - `Grid/`: grid data.
+- `Assets/Scripts/Pipeline`: infrastructure independent of gameplay, containing A\* pathfinding, scene transition and loading, config assets and event channels, and UI infrastructure.
+
+Layering conventions are described in [Layered Architecture](#layered-architecture).
 
 ## Core System Architecture
 
@@ -90,8 +96,8 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 
 The save system uses an `ISaveable` interface + registry pattern to manage all persistable objects.
 
-- **`ISaveable`** defines `SaveData(Data)` / `LoadData(Data)`. Implementations (Loot, InventoryManager, etc.) self-register with `DataManager` on enable.
-- **`DataManager`** holds a `List<ISaveable>` registry and invokes save/load on all entries during scene transitions.
+- **`ISaveable`** defines `SaveData(Data)` / `LoadData(Data)`. Implementations (Loot, InventoryManager, etc.) register with `SaveRegistry` on enable.
+- **`SaveRegistry`** in `Contracts/SaveRegistry.cs` is a static registry that exists before any scene instance, so registering and unregistering are safe at any lifecycle stage and do not depend on `Awake` order. `SaveDataManager` only collects and dispatches, iterating `SaveRegistry.All` when saving or loading.
 - **`SaveSystem`** handles serialization (Newtonsoft.Json) and file I/O, with separate manual and automatic saves: auto-save triggers on scene transitions, manual saves from player actions.
 - Safety: delete validates paths stay within `persistentDataPath`; loading skips corrupt files and falls back to the latest valid save.
 
@@ -128,6 +134,18 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 - Various event SOs (`VoidEventSO`, `DataSaveEventSO`, `QuestOptionsEventSO`, `SceneLoadEventSO`, etc.) decouple broadcasters from subscribers.
 - Cross-system operations—saving, quest rewards, scene loading, UI toggling—all flow through events to avoid direct references.
 
+## Layered Architecture
+
+The project uses a lightweight MVCS split: a Model holds one data aggregate's state and rules, a Service is the domain's write entry point, a Controller translates, and a View only writes widgets. The player stats line follows this split; the other feature domains keep their original Manager form.
+
+- **Write path**: input sources such as button clicks, SO event channels, and collisions enter an input-side Controller, are translated into intents, and pass through the Service write entry point into the Model, where the aggregate's rules run.
+- **Read path**: the Model raises C# events when state changes, a display-side Controller translates the data into display parameters, and the View writes widgets through `SetXxx`.
+- **Three boundaries**: rules that read only the aggregate's own fields belong in the Model; cross-aggregate rules, lifecycle, and saving belong in the Service; persistent state must be written into the Model through the Service, because state that bypasses the Model reaches neither the read path nor the save file.
+
+The full conventions — layering, the nine-step migration flow, the three test layers, risks, and completion criteria — live in the personal knowledge base at `D:\My_Docs\1TODOFiles\Learning\` in `MVCS重构方法论.md` and `MVCS笔记.md`, which are not tied to this project and are not distributed with this repository. This project's migration status, confirmed defects, and remaining items are collected in [`Docs/`](Docs/README.md): `My_ARPG_MVCS项目现状.md`, `My_ARPG_重构优化清单_未解决.md`, and `My_ARPG_重构优化清单_已解决.md`.
+
+> **Project status: the layered refactor is frozen at tag `arpg-arch-final`.** The player stats line is organized in four layers; quests, dialogue, inventory and shops, save and scene orchestration, and movement, combat, and pathfinding keep their original Manager form. The skill domain is the retained verification point: skill points belong to the stats aggregate while spending happens in the skill aggregate, so it is the only place in this project where the rule that a single write atomically changes two data aggregates can be verified.
+
 ## Build Guide
 
 > Only the key takeaways are kept here; full Android troubleshooting lives in the Docs folder.
@@ -148,8 +166,8 @@ Inter-system communication is decoupled through ScriptableObject event channels.
 ## ScriptableObject Usage Tips
 
 - **Check references after renaming/moving**: The project leans heavily on SOs as data containers and event channels (`DialogSO`, `QuestSO`, `GameSceneSO`, the various `*EventSO`s). After renaming or moving an SO, fields referencing it can turn `Missing` and fail silently at runtime — do a sweep (by GUID / `Missing`) to verify.
-- **Subscribe / unsubscribe event SOs in pairs**: The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `DataManager`, `SceneChanger`, `PlayerBow`, etc.). New subscribers must follow this, or scene transitions / object destruction will cause double-fires or null-refs.
-- **Never hand-edit `GameSceneSO.ID` / `GuidSO` GUIDs once generated**: the save system (`ISaveable`/`DataManager`) keys objects by ID; clearing or changing a GUID breaks the link. Note `OnValidate` is editor-only — don't rely on it to generate IDs in a built player.
+- **Subscribe / unsubscribe event SOs in pairs**: The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `SaveDataManager`, `SceneChanger`, `PlayerBow`, etc.). New subscribers must follow this, or scene transitions / object destruction will cause double-fires or null-refs.
+- **Never hand-edit `GameSceneSO.ID` / `GuidSO` GUIDs once generated**: the save system (`ISaveable`/`SaveRegistry`) keys objects by ID; clearing or changing a GUID breaks the link. Note `OnValidate` is editor-only — don't rely on it to generate IDs in a built player.
 - **Always assign `GameSceneSO.sceneReference`**: it's an `AssetReference` that must point to a scene already included in Addressables; leaving it empty throws an `InvalidKeyException` (or similar) at runtime.
 - **Don't store live runtime state on SO instances**: SOs are shared assets — keep runtime state in dedicated runtime classes (e.g. `QuestProgressData`), or every reference shares the same mutated copy and the asset's stored values get dirtied in the editor.
 
