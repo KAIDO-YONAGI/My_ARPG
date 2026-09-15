@@ -40,7 +40,17 @@ namespace Gameplay.Tests
         [SetUp]
         public void SetUp()
         {
-            model = new PlayerStatsModel(MakeData());
+            RecreateModel(MakeData());
+        }
+
+        /// <summary>
+        /// 换一个模型实例并重新挂上事件计数订阅。
+        /// 订阅绑在实例上，直接给 model 赋新实例会让计数永远停在 0，
+        /// 凡是需要重建模型的用例都走这里。
+        /// </summary>
+        private void RecreateModel(PlayerStatsData data)
+        {
+            model = new PlayerStatsModel(data);
             healthChangedCount = 0;
             statsChangedCount = 0;
             lastLevelsGained = 0;
@@ -216,7 +226,7 @@ namespace Gameplay.Tests
             //   13 → ((13/10)*10*1.5)/4 = 3，阈值变 16
             //   16 → ((16/10)*10*1.5)/4 = 3，阈值变 19
             //   19 → ((19/10)*10*1.5)/4 = 3，阈值变 22
-            model = new PlayerStatsModel(MakeData(expMultiplier: 1.5f));
+            RecreateModel(MakeData(expMultiplier: 1.5f));
 
             model.AddExp(10);
             Assert.AreEqual(1, model.Level);
@@ -254,7 +264,7 @@ namespace Gameplay.Tests
         [Test]
         public void ExpCurve_HugeGain_GainsSeveralLevels_AndTerminates()
         {
-            model = new PlayerStatsModel(MakeData(expMultiplier: 1.5f));
+            RecreateModel(MakeData(expMultiplier: 1.5f));
 
             // 曲线 10 / 13 / 16 / 19 / 22 / 29 / 36 / 47 / 62 / 84 / 114 / 155 / 211 / 289 …
             // 1000 点经验升 13 级，剩 182，下一级要 289
@@ -271,7 +281,7 @@ namespace Gameplay.Tests
         {
             // 算子为 0 时步长为 0，阈值恒为基准值：
             // 只是"永远每 10 点升一级"，不会退化成每次获得经验都升级。
-            model = new PlayerStatsModel(MakeData(expMultiplier: 0f));
+            RecreateModel(MakeData(expMultiplier: 0f));
 
             Assert.AreEqual(BaseExp, model.ExpToUpgrade);
 
@@ -306,7 +316,7 @@ namespace Gameplay.Tests
         [Test]
         public void AddExp_StopsAtMaxLevel()
         {
-            model = new PlayerStatsModel(MakeData(expMultiplier: 1f, maxLevel: 1));
+            RecreateModel(MakeData(expMultiplier: 1f, maxLevel: 1));
 
             model.AddExp(100);
 

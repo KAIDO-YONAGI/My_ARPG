@@ -28,6 +28,7 @@
 - [操作说明](#操作说明)
 - [项目结构](#项目结构)
 - [核心系统架构](#核心系统架构)
+- [分层架构与重构现状](#分层架构与重构现状)
 - [构建指南](#构建指南)
 - [ScriptableObject 使用建议](#scriptableobject-使用建议)
 - [已知限制](#已知限制)
@@ -76,13 +77,18 @@
 
 ## 项目结构
 
-- `Assets/Scripts/UI`：UI 管理、对话、任务板、商店、技能树和菜单交互。
-- `Assets/Scripts/Units`：敌人、NPC 和商店 NPC 的行为脚本。
-- `Assets/Scripts/Player`：玩家移动、战斗、装备切换、时间与属性管理。
-- `Assets/Scripts/Inventory`：背包、物品槽、拾取物和使用逻辑。
-- `Assets/Scripts/SaveAndLoad`：数据结构、存档接口和存读档流程。
-- `Assets/Scripts/Scene` 与 `Assets/Scripts/A Star`：场景切换和寻路相关逻辑。
-- `Assets/Scripts/ScriptableObjects`：任务、场景、对话和事件类 SO 定义。
+脚本按层分三个顶层目录：跨功能的契约、按功能域组织的玩法层、与玩法无关的管线基建。
+
+- `Assets/Scripts/Contracts`：跨层契约与基建——`ISaveable`、`IDamageable`、`ICanvasManager`、静态存档注册表 `SaveRegistry`、单例基类 `YSingleton`。
+- `Assets/Scripts/Gameplay`：按功能域分目录，域内再按层分 `Models/`、`Services/`、`Controllers/`、`Views/`。
+  - `Player/`：玩家数值（已分层）、移动、战斗、装备。
+  - `Quest/`、`Dialog/`、`Inventory/`、`Shop/`、`Skills/`：任务、对话、背包、商店、技能树。
+  - `Units/`：敌人、NPC 与商店 NPC 行为。
+  - `Save/`：`SaveDataManager` 与存读档流程。
+  - `Grid/`：网格数据。
+- `Assets/Scripts/Pipeline`：`Pathfinding/`（A\*）、`Scene/`（场景切换与加载）、`SO/`（配置资产与事件通道）、`UI/`（UI 基建）。
+
+分层约定与迁移进度见 [分层架构与重构现状](#分层架构与重构现状)。
 
 ## 核心系统架构
 
@@ -90,8 +96,8 @@
 
 采用 `ISaveable` 接口 + 注册表模式统一管理所有可持久化对象。
 
-- **`ISaveable`** 接口定义 `SaveData(Data)` / `LoadData(Data)` 方法，实现该接口的类（Loot、InventoryManager 等）在激活时自动注册到 `DataManager`。
-- **`DataManager`** 维护 `List<ISaveable>` 注册表，场景切换时统一调用所有已注册对象的存/读方法。
+- **`ISaveable`** 接口定义 `SaveData(Data)` / `LoadData(Data)` 方法，实现该接口的类（Loot、InventoryManager 等）在激活时注册到 `SaveRegistry`。
+- **`SaveRegistry`**（`Contracts/SaveRegistry.cs`）是静态注册表，先于一切场景实例存在，注册与注销在任何生命周期阶段调用都安全，不受 `Awake` 顺序影响；`SaveDataManager` 只做收集与分发，存读档时遍历 `SaveRegistry.All`。
 - **`SaveSystem`** 负责序列化（Newtonsoft.Json）和文件 I/O，支持手动存档与自动系统档分离：自动存档在场景切换时触发，手动存档由玩家操作触发。
 - 存档安全：删除前校验路径不超出 `persistentDataPath`；加载时自动跳过损坏存档并回退到最近的完整档。
 
@@ -128,6 +134,18 @@
 - 定义了多种事件 SO（`VoidEventSO`、`DataSaveEventSO`、`QuestOptionsEventSO`、`SceneLoadEventSO` 等），广播方 Raise 事件，接收方订阅回调。
 - 存档、任务奖励、场景加载、UI 切换等跨系统操作均通过事件传递，避免直接引用。
 
+## 分层架构与重构现状
+
+项目采用轻量 MVCS 分层（Model / Service / Controller / View，S 为域的写入口）。玩家数值这条线已完整迁移，其余功能域保留原有 Manager 形态。
+
+- **写路径**：输入源（按钮点击、SO 事件通道、碰撞）→ 输入侧 Controller 翻译成意图 → Service（唯一写入口）→ Model 落地聚合内规则。
+- **读路径**：Model 状态变化发 C# 事件 → 显示侧 Controller 翻译成显示参数 → View 用 `SetXxx` 写控件。
+- **三类边界**：规则只读自己字段的进 Model；跨聚合、管生命周期与存档的进 Service；持久状态必须经 Service 写进 Model，绕过 Model 的状态读路径刷不出来、存档也存不到。
+
+完整准则（分层定义、九步迁移流程、三层测试策略、风险与完成标准）在工程外的个人知识库：`D:\My_Docs\1TODOFiles\Learning\MVCS重构方法论.md` 与 `MVCS笔记.md`；本工程的迁移现状、已确认缺陷与剩余清单见同目录的 `My_ARPG_MVCS项目现状.md`。
+
+> **项目状态：分层重构已冻结（tag `arpg-arch-final`）。** 剩余未迁移的功能域（任务、对话、背包与商店、存档与场景编排、移动战斗寻路）不再继续——它们只是把已成文的九步流程再跑一遍，不产出新结论。唯一有意留下的验证点是**技能域**：它是「一次写要原子地改动两个数据聚合」这条准则目前唯一未被本工程验证的场景（技能点属于数值聚合，消耗发生在技能聚合）。
+
 ## 构建指南
 
 > 本节只保留最关键的结论，Android 完整排障见 Docs 目录文档。
@@ -149,7 +167,7 @@
 
 - **资源名 / 路径改动后检查引用**：项目大量依赖 SO 作为数据容器与事件通道（`DialogSO`、`QuestSO`、`GameSceneSO`、各种 `*EventSO` 等）。重命名或移动 SO 后，引用它的字段可能变成 `Missing` 并在运行时静默失效，建议改名后按 GUID / `Missing` 批量核对一次。
 - **事件 SO 的订阅与注销必须成对**：统一约定在 `OnEnable` 里 `+=` 订阅、`OnDisable` 里 `-=` 注销（参见 `DataManager`、`SceneChanger`、`PlayerBow` 等）。新增订阅者务必遵守，否则场景切换 / 对象销毁后会出现重复触发或空引用。
-- **`GameSceneSO.ID` 与 `GuidSO` 的 GUID 生成后勿改**：存档体系（`ISaveable`/`DataManager`）通过 ID 关联对象，清空或改动 GUID 会导致存档找不到目标。注意 `OnValidate` 仅在编辑器下运行，不要依赖它在运行时生成 ID。
+- **`GameSceneSO.ID` 与 `GuidSO` 的 GUID 生成后勿改**：存档体系（`ISaveable`/`SaveRegistry`）通过 ID 关联对象，清空或改动 GUID 会导致存档找不到目标。注意 `OnValidate` 仅在编辑器下运行，不要依赖它在运行时生成 ID。
 - **`GameSceneSO.sceneReference` 必须赋值**：它是 `AssetReference`，必须指向已纳入 Addressables 的场景资产，为空会在运行时抛 `InvalidKeyException` 之类错误。
 - **避免在 SO 实例上存游戏运行时状态**：SO 是共享资产，运行时数据应放在专门的运行时类里（如 `QuestProgressData`），否则多份引用共享同一份被篡改的数据，且容易污染编辑器中的资产值。
 

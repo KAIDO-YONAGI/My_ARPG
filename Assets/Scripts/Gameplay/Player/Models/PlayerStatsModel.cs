@@ -37,6 +37,7 @@ namespace Gameplay.Player.Models
         public PlayerStatsModel(PlayerStatsData initial)
         {
             data = initial.Clone();
+            RepairExpThreshold();
         }
 
         // ---- 只读访问器：界面读取这些属性，数据的改动走本类的写方法 ----
@@ -65,17 +66,30 @@ namespace Gameplay.Player.Models
 
         /// <summary>
         /// 读档：用存档数据整体替换运行时状态，并通知界面刷新。
-        /// 阈值是累加得到的状态，读档时直接采用存档值，不从等级重算。
+        /// 阈值是累加得到的状态，读档时直接采用存档值，不从等级重算；
+        /// 低于下限的坏档值由 <see cref="RepairExpThreshold"/> 兜底。
         /// </summary>
         public void LoadFrom(PlayerStatsData source)
         {
             if (source == null) return;
 
             data = source.Clone();
+            RepairExpThreshold();
 
             HealthChanged?.Invoke();
             StatsChanged?.Invoke();
             ExpChanged?.Invoke(); // 读档换了经验/等级，经验条必须跟着刷
+        }
+
+        /// <summary>
+        /// 阈值下限兜底。阈值低于 <see cref="MinExpToUpgrade"/> 时升级循环条件恒不成立，
+        /// 玩家会永远升不了级，所以构造与读档两个入口都要把坏值修回下限。
+        /// 与 <see cref="GrowExpToUpgrade"/> 用同一个下限，避免增长路径认为非法、读档路径认为合法。
+        /// </summary>
+        private void RepairExpThreshold()
+        {
+            if (data.expToUpgrade < MinExpToUpgrade)
+                data.expToUpgrade = MinExpToUpgrade;
         }
 
         // ---- 规则：唯一写入口 ----
