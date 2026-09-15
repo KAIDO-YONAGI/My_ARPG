@@ -16,6 +16,7 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
     public Dictionary<(int x, int y), AStarNode> GetNodeMap() => AStarNodeManager.Instance.GetNodeMap();
     public (int x, int y) WorldToCell(Vector3 worldPos) => AStarNodeManager.Instance.WorldToCell(worldPos);
     public Vector3 CellToWorld(int cx, int cy) => AStarNodeManager.Instance.CellToWorld(cx, cy);
+    public Vector3 GetWaypoint(int cx, int cy) => AStarNodeManager.Instance.GetWaypoint(cx, cy);
     public float GetCellSize() => AStarNodeManager.Instance.GetCellSize();
 
     private Dictionary<(int x, int y), AStarNode> NodeCellMap => AStarNodeManager.Instance.GetNodeMap();

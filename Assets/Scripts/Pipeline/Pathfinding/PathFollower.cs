@@ -40,7 +40,7 @@ public class PathFollower : MonoBehaviour
 
         if (path == null || path.Count == 0) return Vector3.zero;
         AStarDetails peek = path.Peek();
-        return CellToWorld(peek.GetX(), peek.GetY());
+        return GetWaypoint(peek.GetX(), peek.GetY());
     }
 
     public void ArrivedPos()
@@ -176,6 +176,11 @@ public class PathFollower : MonoBehaviour
     {
         return AStarPathFinder.Instance != null ?
             AStarPathFinder.Instance.CellToWorld(cx, cy) : Vector3.zero;
+    }
+    private Vector3 GetWaypoint(int cx, int cy)
+    {
+        return AStarPathFinder.Instance != null ?
+            AStarPathFinder.Instance.GetWaypoint(cx, cy) : Vector3.zero;
     }
 
 }

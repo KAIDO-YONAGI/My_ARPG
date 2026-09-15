@@ -36,15 +36,22 @@ public class AStarNodeManager : YSingleton<AStarNodeManager>
         return (x, y);
     }
 
+    //纯格心：WorldToCell 的严格逆运算，只用于路径几何与距离比较
     public Vector3 CellToWorld(int cx, int cy)
     {
-        Vector3 basePos = new Vector3(
+        return new Vector3(
             cx * cellSize + cellSize * 0.5f,
             cy * cellSize + cellSize * 0.5f,
             0
         );
-        return ApplySafetyMargin(cx, cy, basePos);
     }
+
+    //移动目标点：格心 + 远离障碍的推离量，只用于驱动实体移动
+    public Vector3 GetWaypoint(int cx, int cy) => ApplySafetyMargin(cx, cy, CellToWorld(cx, cy));
+
+    //推离量上限：必须小于半格，否则路点会跨进邻格
+    private const float maxMarginRatio = 0.4f;
+
     //通过额外加上擦边通过的代价来让寻路路径远离边缘，从而避免卡脚
     private Vector3 ApplySafetyMargin(int cx, int cy, Vector3 worldPos)
     {
@@ -66,12 +73,32 @@ public class AStarNodeManager : YSingleton<AStarNodeManager>
                 else if (dirY[i] < 0) marginY += realsafetyMargin;
             }
         }
+        //净推离方向本身不可走时（两侧夹墙，或地图外），推过去只会把路点顶在墙上，
+        //该轴退回格心，改由另一轴决定
+        if (marginX > 0 && IsBlocked(cx + 1, cy)) marginX = 0;
+        else if (marginX < 0 && IsBlocked(cx - 1, cy)) marginX = 0;
+        if (marginY > 0 && IsBlocked(cx, cy + 1)) marginY = 0;
+        else if (marginY < 0 && IsBlocked(cx, cy - 1)) marginY = 0;
+
+        //单轴最多累加 3 个障碍邻居（0.9 格），会超过半格；一旦超过，路点就落到邻格，
+        //跟随者会在邻格把本格节点 pop 掉，导致每帧重算路径且实体到不了目标
+        float maxMargin = maxMarginRatio * cellSize;
+        marginX = Mathf.Clamp(marginX, -maxMargin, maxMargin);
+        marginY = Mathf.Clamp(marginY, -maxMargin, maxMargin);
+
         Vector3 optNode = new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
         var optCell = WorldToCell(optNode);
         if (nodeCellMap.TryGetValue(optCell, out AStarNode optCellNode)
             && optCellNode.GetNodeType() != AStarNodeType.Obstacle)
             return optNode;
         else return worldPos;
+    }
+
+    //缺失的格子按不可走处理，与 AStarPathFinder.CanWalkDiagonally 保持一致
+    private bool IsBlocked(int cx, int cy)
+    {
+        return !nodeCellMap.TryGetValue((cx, cy), out AStarNode node)
+            || node.GetNodeType() == AStarNodeType.Obstacle;
     }
 
     private void InitMapInfo()
