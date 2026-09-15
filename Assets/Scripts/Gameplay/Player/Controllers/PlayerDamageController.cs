@@ -31,12 +31,12 @@ namespace Gameplay.Player.Controllers
 
         private void OnDamaged(int damage, Transform attacker, float knockBackForce, float stunTime)
         {
-            StatsService.Instance.Model.UpdateHealth(-damage);
+            StatsService.Instance.UpdateHealth(-damage);
 
             if (movement != null)
                 movement.KnockBack(attacker, knockBackForce, stunTime);
 
-            if (StatsService.Instance.Model.CurrentHealth <= 0)
+            if (StatsService.Instance.Stats.CurrentHealth <= 0)
             {
                 // GameOver 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈与阻塞体系。
                 UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);

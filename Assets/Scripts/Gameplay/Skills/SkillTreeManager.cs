@@ -33,7 +33,7 @@ public class SkillTreeManager : MonoBehaviour
         if (listeningToLevelUp || StatsService.Instance == null) return;
 
         listeningToLevelUp = true;
-        StatsService.Instance.Model.LevelUp += UpdateAbilityPoints; // 升级事件由模型发出
+        StatsService.Instance.Stats.LevelUp += UpdateAbilityPoints; // 升级事件由只读数值视图发出
     }
 
     private void UnsubscribeLevelUp()
@@ -42,12 +42,12 @@ public class SkillTreeManager : MonoBehaviour
         listeningToLevelUp = false;
 
         if (StatsService.Instance == null) return;
-        StatsService.Instance.Model.LevelUp -= UpdateAbilityPoints;
+        StatsService.Instance.Stats.LevelUp -= UpdateAbilityPoints;
     }
 
     private void HandleAbilityPointSpent(SkillSlot skillSlot)
     {
-        if (StatsService.Instance.Model.SkillPoints > 0)
+        if (StatsService.Instance.Stats.SkillPoints > 0)
         {
             UpdateAbilityPoints(-1);
         }
@@ -68,7 +68,7 @@ public class SkillTreeManager : MonoBehaviour
         foreach (SkillSlot slot in skillSlots)
         {
             slot.skillButton.onClick.AddListener(()=>{
-                if (StatsService.Instance.Model.SkillPoints > 0)
+                if (StatsService.Instance.Stats.SkillPoints > 0)
                     slot.TryUpgradeSkill();
             });//注册事件处理器，但是由unity刷新时响应每次的事件
         }
@@ -76,7 +76,7 @@ public class SkillTreeManager : MonoBehaviour
     }
     public void UpdateAbilityPoints(int amount)
     {
-        StatsService.Instance.Model.UpdateSkillPoints(amount);
-        pointsText.text = "Skill Points: " + StatsService.Instance.Model.SkillPoints.ToString();
+        StatsService.Instance.UpdateSkillPoints(amount);
+        pointsText.text = "Skill Points: " + StatsService.Instance.Stats.SkillPoints.ToString();
     }
 }

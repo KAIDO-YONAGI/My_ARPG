@@ -16,19 +16,19 @@ namespace Gameplay.Player.Controllers
         public HealthController(HealthView view)
         {
             this.view = view;
-            StatsService.Instance.Model.HealthChanged += Refresh;
+            StatsService.Instance.Stats.HealthChanged += Refresh;
         }
 
         public void Dispose()
         {
             if (StatsService.Instance != null)
-                StatsService.Instance.Model.HealthChanged -= Refresh;
+                StatsService.Instance.Stats.HealthChanged -= Refresh;
         }
 
         public void Refresh()
         {
-            PlayerStatsModel model = StatsService.Instance.Model;
-            view.SetHp(model.CurrentHealth, model.MaxHealth);
+            IPlayerStatsReadOnly stats = StatsService.Instance.Stats;
+            view.SetHp(stats.CurrentHealth, stats.MaxHealth);
         }
     }
 }

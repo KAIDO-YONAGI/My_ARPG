@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Gameplay.Player.Models;
+using Gameplay.Player.Services;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -139,6 +140,34 @@ namespace Gameplay.Tests
             Assert.AreEqual(2, model.SkillPoints);
             Assert.AreEqual(0, healthChangedCount);
             Assert.AreEqual(0, statsChangedCount);
+        }
+
+        [Test]
+        public void Model_CanBeViewedThroughReadOnlyStatsInterface()
+        {
+            IPlayerStatsReadOnly stats = model;
+            int healthChangedThroughInterface = 0;
+            stats.HealthChanged += () => healthChangedThroughInterface++;
+
+            Assert.AreEqual(model.Damage, stats.Damage);
+            Assert.AreEqual(model.CurrentHealth, stats.CurrentHealth);
+            Assert.AreEqual(model.MaxHealth, stats.MaxHealth);
+
+            model.UpdateHealth(-1);
+
+            Assert.AreEqual(1, healthChangedThroughInterface);
+            Assert.AreEqual(model.CurrentHealth, stats.CurrentHealth);
+        }
+
+        [Test]
+        public void StatsService_ExposesOnlyReadOnlyStatsView()
+        {
+            var statsProperty = typeof(StatsService).GetProperty("Stats");
+            var modelProperty = typeof(StatsService).GetProperty("Model");
+
+            Assert.IsNotNull(statsProperty);
+            Assert.AreEqual(typeof(IPlayerStatsReadOnly), statsProperty.PropertyType);
+            Assert.IsNull(modelProperty, "运行时 Model 不应再通过 StatsService 对外暴露");
         }
 
         [Test]

@@ -16,19 +16,19 @@ namespace Gameplay.Player.Controllers
         public StatsPanelController(StatsPanelView view)
         {
             this.view = view;
-            StatsService.Instance.Model.StatsChanged += Refresh;
+            StatsService.Instance.Stats.StatsChanged += Refresh;
         }
 
         public void Dispose()
         {
             if (StatsService.Instance != null)
-                StatsService.Instance.Model.StatsChanged -= Refresh;
+                StatsService.Instance.Stats.StatsChanged -= Refresh;
         }
 
         public void Refresh()
         {
-            PlayerStatsModel model = StatsService.Instance.Model;
-            view.SetStats(model.Damage, model.Speed);
+            IPlayerStatsReadOnly stats = StatsService.Instance.Stats;
+            view.SetStats(stats.Damage, stats.Speed);
         }
     }
 }

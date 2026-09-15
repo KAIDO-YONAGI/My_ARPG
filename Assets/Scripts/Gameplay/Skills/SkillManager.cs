@@ -21,8 +21,8 @@ public class SkillManager : MonoBehaviour
         switch (skillName)
         {
             case "MaxHealthBoost":
-                StatsService.Instance.Model.UpdateMaxHealth(1);
-                StatsService.Instance.Model.UpdateHealth(1);
+                StatsService.Instance.UpdateMaxHealth(1);
+                StatsService.Instance.UpdateHealth(1);
                 break;
             case "SwordSlash":
                 combat.SetActive(true);

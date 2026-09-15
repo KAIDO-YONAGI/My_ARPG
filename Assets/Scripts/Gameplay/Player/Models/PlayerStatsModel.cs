@@ -13,7 +13,7 @@ namespace Gameplay.Player.Models
     /// 加到阈值上。
     /// 公式：   expToUpgrade = expToUpgrade + ((expToUpgrade / 10) * 10 * expMultiplier) / 4
     [Serializable]
-    public class PlayerStatsModel
+    public class PlayerStatsModel : IPlayerStatsReadOnly
     {
         /// <summary>生命值或上限变化时触发。HealthController 订阅后推给 HealthView。</summary>
         public event Action HealthChanged;

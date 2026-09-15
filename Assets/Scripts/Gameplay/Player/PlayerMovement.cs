@@ -209,7 +209,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void ResetTimer()
     {
-        timer = StatsService.Instance.Model.CoolDown;
+        timer = StatsService.Instance.Stats.CoolDown;
     }
 
     private bool IsToRunning()
@@ -267,7 +267,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void SetMovement(float horizontal, float vertical)
     {
-        rb.velocity = new Vector2(horizontal, vertical) * StatsService.Instance.Model.Speed;
+        rb.velocity = new Vector2(horizontal, vertical) * StatsService.Instance.Stats.Speed;
     }
 
     private void Flip()

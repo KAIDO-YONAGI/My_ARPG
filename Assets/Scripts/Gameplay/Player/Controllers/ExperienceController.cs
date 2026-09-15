@@ -1,4 +1,5 @@
 using UnityEngine;
+using Gameplay.Player.Models;
 using Gameplay.Player.Services;
 using Gameplay.Player.Views;
 
@@ -22,7 +23,7 @@ namespace Gameplay.Player.Controllers
             this.defeatedEvent = defeatedEvent;
 
             defeatedEvent.EnemyDefeated += GainExp;
-            StatsService.Instance.Model.ExpChanged += Refresh;
+            StatsService.Instance.Stats.ExpChanged += Refresh;
         }
 
         public void Dispose()
@@ -30,18 +31,18 @@ namespace Gameplay.Player.Controllers
             defeatedEvent.EnemyDefeated -= GainExp;
 
             if (StatsService.Instance != null)
-                StatsService.Instance.Model.ExpChanged -= Refresh;
+                StatsService.Instance.Stats.ExpChanged -= Refresh;
         }
 
         public void Refresh()
         {
-            var model = StatsService.Instance.Model;
-            view.SetExp(model.CurrentExp, model.ExpToUpgrade, model.Level);
+            IPlayerStatsReadOnly stats = StatsService.Instance.Stats;
+            view.SetExp(stats.CurrentExp, stats.ExpToUpgrade, stats.Level);
         }
 
         private void GainExp(int exp, Transform defeatedEnemy)
         {
-            StatsService.Instance.Model.AddExp(exp); // 结算与升级判定在 Model；刷 UI 由 ExpChanged 触发
+            StatsService.Instance.AddExperience(exp); // 结算与升级判定在 Model；刷 UI 由 ExpChanged 触发
         }
     }
 }
