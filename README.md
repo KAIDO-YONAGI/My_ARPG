@@ -81,14 +81,14 @@
 
 - `Assets/Scripts/Contracts`：跨层契约与基建——`ISaveable`、`IDamageable`、`ICanvasManager`、静态存档注册表 `SaveRegistry`、单例基类 `YSingleton`。
 - `Assets/Scripts/Gameplay`：按功能域分目录，域内再按层分 `Models/`、`Services/`、`Controllers/`、`Views/`。
-  - `Player/`：玩家数值（已分层）、移动、战斗、装备。
+  - `Player/`：玩家数值、移动、战斗、装备。
   - `Quest/`、`Dialog/`、`Inventory/`、`Shop/`、`Skills/`：任务、对话、背包、商店、技能树。
   - `Units/`：敌人、NPC 与商店 NPC 行为。
   - `Save/`：`SaveDataManager` 与存读档流程。
   - `Grid/`：网格数据。
-- `Assets/Scripts/Pipeline`：`Pathfinding/`（A\*）、`Scene/`（场景切换与加载）、`SO/`（配置资产与事件通道）、`UI/`（UI 基建）。
+- `Assets/Scripts/Pipeline`：与玩法无关的基建，含 A\* 寻路、场景切换与加载、配置资产与事件通道、UI 基建。
 
-分层约定与迁移进度见 [分层架构与重构现状](#分层架构与重构现状)。
+分层约定见 [分层架构与重构现状](#分层架构与重构现状)。
 
 ## 核心系统架构
 
@@ -136,15 +136,15 @@
 
 ## 分层架构与重构现状
 
-项目采用轻量 MVCS 分层（Model / Service / Controller / View，S 为域的写入口）。玩家数值这条线已完整迁移，其余功能域保留原有 Manager 形态。
+项目采用轻量 MVCS 分层：Model 承载一个数据聚合的状态与规则，Service 是域的写入口，Controller 承担翻译，View 只写控件。玩家数值这条线按此分层，其余功能域是原有的 Manager 形态。
 
-- **写路径**：输入源（按钮点击、SO 事件通道、碰撞）→ 输入侧 Controller 翻译成意图 → Service（唯一写入口）→ Model 落地聚合内规则。
-- **读路径**：Model 状态变化发 C# 事件 → 显示侧 Controller 翻译成显示参数 → View 用 `SetXxx` 写控件。
-- **三类边界**：规则只读自己字段的进 Model；跨聚合、管生命周期与存档的进 Service；持久状态必须经 Service 写进 Model，绕过 Model 的状态读路径刷不出来、存档也存不到。
+- **写路径**：按钮点击、SO 事件通道、碰撞这类输入源进入输入侧 Controller，被翻译成意图，经 Service 这个唯一写入口落进 Model，聚合内规则在 Model 里执行。
+- **读路径**：Model 状态变化发 C# 事件，显示侧 Controller 把数据翻译成显示参数，View 用 `SetXxx` 写控件。
+- **三类边界**：规则只读自己字段的进 Model；跨聚合、管生命周期与存档的进 Service；持久状态必须经 Service 写进 Model，绕过 Model 的状态读路径刷不出来，也存不进存档。
 
-完整准则（分层定义、九步迁移流程、三层测试策略、风险与完成标准）在工程外的个人知识库 `D:\My_Docs\1TODOFiles\Learning\`：`MVCS重构方法论.md` 与 `MVCS笔记.md`，工程无关、不随本仓库分发。本工程的迁移现状、已确认缺陷与剩余清单已随冻结快照收进 [`Docs/`](Docs/README.md)：`My_ARPG_MVCS项目现状.md`、`My_ARPG_重构优化清单_未解决.md`、`My_ARPG_重构优化清单_已解决.md`。知识库有独立 git 仓库，冻结时对应提交为 `96083b0`。
+完整准则、九步迁移流程、三层测试策略、风险与完成标准在个人知识库 `D:\My_Docs\1TODOFiles\Learning\` 的 `MVCS重构方法论.md` 与 `MVCS笔记.md`，这两份不绑定具体工程，不随本仓库分发。本工程的迁移现状、已确认缺陷与剩余清单收在 [`Docs/`](Docs/README.md) 的 `My_ARPG_MVCS项目现状.md`、`My_ARPG_重构优化清单_未解决.md`、`My_ARPG_重构优化清单_已解决.md`。
 
-> **项目状态：分层重构已冻结（tag `arpg-arch-final`）。** 剩余未迁移的功能域（任务、对话、背包与商店、存档与场景编排、移动战斗寻路）不再继续——它们只是把已成文的九步流程再跑一遍，不产出新结论。唯一有意留下的验证点是**技能域**：它是「一次写要原子地改动两个数据聚合」这条准则目前唯一未被本工程验证的场景（技能点属于数值聚合，消耗发生在技能聚合）。
+> **项目状态：分层重构冻结于 tag `arpg-arch-final`。** 玩家数值线按四层组织；任务、对话、背包与商店、存档与场景编排、移动战斗寻路保留原有的 Manager 形态。技能域是保留的验证点：技能点属于数值聚合，消耗发生在技能聚合，「一次写要原子地改动两个数据聚合」这条准则在本工程只有它能验证。
 
 ## 构建指南
 

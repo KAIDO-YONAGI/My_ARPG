@@ -45,8 +45,7 @@ namespace Gameplay.Tests
 
         /// <summary>
         /// 换一个模型实例并重新挂上事件计数订阅。
-        /// 订阅绑在实例上，直接给 model 赋新实例会让计数永远停在 0，
-        /// 凡是需要重建模型的用例都走这里。
+        /// 订阅绑在实例上，需要重建模型的用例都走这里。
         /// </summary>
         private void RecreateModel(PlayerStatsData data)
         {

@@ -82,9 +82,9 @@ namespace Gameplay.Player.Models
         }
 
         /// <summary>
-        /// 阈值下限兜底。阈值低于 <see cref="MinExpToUpgrade"/> 时升级循环条件恒不成立，
-        /// 玩家会永远升不了级，所以构造与读档两个入口都要把坏值修回下限。
-        /// 与 <see cref="GrowExpToUpgrade"/> 用同一个下限，避免增长路径认为非法、读档路径认为合法。
+        /// 阈值下限兜底：低于 <see cref="MinExpToUpgrade"/> 的阈值会让升级循环条件恒不成立，
+        /// 玩家永远升不了级，因此构造与读档两个入口都把阈值修回下限。
+        /// <see cref="GrowExpToUpgrade"/> 抬高阈值时受同一个下限约束。
         /// </summary>
         private void RepairExpThreshold()
         {
