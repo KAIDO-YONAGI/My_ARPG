@@ -19,6 +19,7 @@ omnisharp.json
 .codegraph/
 .reasonix/
 .zcode/
+*.targets
 
 # Visual Studio / Rider
 *.csproj
