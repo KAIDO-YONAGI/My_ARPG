@@ -147,7 +147,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
-  sceneToLoad: {fileID: 11400000, guid: 7c55136055a6e324ba090da1c0385003, type: 2}
+  sceneToLoad:
+  - {fileID: 11400000, guid: 7c55136055a6e324ba090da1c0385003, type: 2}
   ButtonCanvas: {fileID: 0}
   newPosition: {x: 0, y: 0, z: 0}
   isToFade: 1

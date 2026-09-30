@@ -22613,14 +22613,6 @@ PrefabInstance:
       value: Teleport
       objectReference: {fileID: 0}
     - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
-      propertyPath: scene
-      value: 
-      objectReference: {fileID: 11400000, guid: 8204cbcd9f1fdd24089340a46384f020, type: 2}
-    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
-      propertyPath: sceneToGo
-      value: 
-      objectReference: {fileID: 11400000, guid: 8204cbcd9f1fdd24089340a46384f020, type: 2}
-    - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
       propertyPath: position.x
       value: 10.5
       objectReference: {fileID: 0}
@@ -22629,8 +22621,8 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
-      propertyPath: sceneToLoad
-      value: 
+      propertyPath: sceneToLoad.Array.data[0]
+      value:
       objectReference: {fileID: 11400000, guid: 8204cbcd9f1fdd24089340a46384f020, type: 2}
     - target: {fileID: 596127641512037498, guid: d32678e832dfec34bb8d1f6ff1be164a, type: 3}
       propertyPath: newPosition.x

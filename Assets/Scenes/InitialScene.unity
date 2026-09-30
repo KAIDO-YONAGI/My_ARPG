@@ -151,11 +151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a81adb439162844db041ee45d2f280d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  persistentScene:
-    m_AssetGUID: 823843722642c914dba2fb270e6b288d
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
+  persistentScenes:
+  - {fileID: 11400000, guid: 7c55136055a6e324ba090da1c0385003, type: 2}
 --- !u!4 &2062852558
 Transform:
   m_ObjectHideFlags: 0

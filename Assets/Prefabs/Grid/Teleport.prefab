@@ -105,5 +105,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadEventSO: {fileID: 11400000, guid: 79deee51228bde84381ed09fafcb2ae1, type: 2}
   newPosition: {x: 0, y: 0, z: 0}
-  sceneToLoad: {fileID: 0}
+  sceneToLoad: []
   isToFade: 1

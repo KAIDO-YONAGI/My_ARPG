@@ -68,9 +68,16 @@ public class SaveDataManager : YSingleton<SaveDataManager>
 
         return true;
     }
-    private void OnAutoSave(GameSceneSO sceneToLoadSO, Vector3 pos, bool isToFade)
+    private void OnAutoSave(List<GameSceneSO> scenesToLoadSO, Vector3 pos, bool isToFade)
     //关于位置，手动存的时候可以用玩家当前位置取代默认位置，自动存档用的是新位置或者场景默认位置
     {
+        // 场景组语义：存档键跟随首个内容场景（组内第一个 Location/Menu 场景 SO）。
+        GameSceneSO sceneToLoadSO = scenesToLoadSO != null && scenesToLoadSO.Count > 0 ? scenesToLoadSO[0] : null;
+        if (sceneToLoadSO == null)
+        {
+            return;
+        }
+
         foreach (var saveable in SaveRegistry.All.ToList())
         {
             saveable.SaveData(dataToSave);

@@ -1,14 +1,15 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
+using System.Collections.Generic;
 using Gameplay.Player.Services;
 
 /// <summary>
-/// 场景切换管理器：负责场景的加载、卸载和过渡动画。
+/// 场景切换管理器：负责场景组的加载、卸载和过渡动画。
 /// 切换的唯一入口是 <see cref="RequestSceneLoad"/>：先广播 loadEventSO，
 /// 让订阅方在切换开始前同步收尾，再执行切换流程；先后顺序就是入口内两条语句的顺序。
+/// 采用多场景加载：每次请求针对一个完整 Additive 场景组，整组卸载旧内容场景后按顺序加载；
+/// PersistentSceneRegistry 注册的常驻场景不参与卸载。
 /// </summary>
 public class SceneChanger : YSingleton<SceneChanger>
 {
@@ -16,21 +17,28 @@ public class SceneChanger : YSingleton<SceneChanger>
     [SerializeField] private Vector3 initialPosition = Vector3.zero;
 
     [SerializeField] private float fadeDuration = 1f;
-    [SerializeField] private GameSceneSO initScene;
+
+    [Tooltip("启动时自动加载的初始场景组。按列表顺序以 Additive 模式加载，通常配置为菜单场景组。")]
+    [SerializeField] private List<GameSceneSO> firstSceneToLoad = new List<GameSceneSO>();
+
     [SerializeField] private GameObject player;
     [SerializeField] private CanvasGroup fadeCanva;
 
     /// <summary>过渡动画播放器数组</summary>
-    ///     
+    ///
     [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
 
-    /// <summary>重试请求事件：死亡后重载当前场景，由 RetryButton 广播</summary>
+    /// <summary>重试请求事件：死亡后重载当前场景组，由 RetryButton 广播</summary>
     [SerializeField] private VoidEventSO retryEventSO;
 
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     [SerializeField] private Animator[] transitionImagesDuringFade;
     [SerializeField] private Object[] objectsToUnableWhileMenuOrReset;
 
+    /// <summary>当前已加载的内容场景组（不含常驻场景）</summary>
+    private readonly List<GameSceneSO> currentScenes = new List<GameSceneSO>();
+
+    /// <summary>最近一次整组加载完成后的首个内容场景，供 GetCurrentScene/GetCurrentGameScene 回读</summary>
     private GameSceneSO currentScene;
 
     /// <summary>已加载的场景对象</summary>
@@ -53,11 +61,20 @@ public class SceneChanger : YSingleton<SceneChanger>
     // 供存档系统在切场前读取当前场景 SO。
     public GameSceneSO GetCurrentGameScene()
     {
-        return currentScene;
+        return currentScenes.Count > 0 ? currentScenes[0] : null;
     }
 
     /// <summary>
-    /// 唤醒时初始化单例并加载首个场景
+    /// 当前已加载的场景组副本（整组重载用；
+    /// 返回副本是因为本类加载流程中会 Clear 原列表，不能把原引用传回去）。
+    /// </summary>
+    public List<GameSceneSO> GetCurrentScenes()
+    {
+        return new List<GameSceneSO>(currentScenes);
+    }
+
+    /// <summary>
+    /// 唤醒时初始化单例并设置玩家初始位置
     /// </summary>
     protected override void OnSingletonInitialized()
     {
@@ -65,7 +82,7 @@ public class SceneChanger : YSingleton<SceneChanger>
     }
 
     /// <summary>
-    /// 启用时订阅场景加载事件
+    /// 启用时订阅重试事件
     /// </summary>
     private void OnEnable()
     {
@@ -81,22 +98,22 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// <summary>
     /// 场景切换的唯一入口：先广播，后执行。
     /// Raise 同步调用所有订阅方的处理器并等它们全部返回，订阅方在切换开始前完成收尾；
-    /// 随后才执行本类的切换流程 OnLoadRequestEvent，两步的先后就是本方法内两条语句的先后。
+    /// 随后才执行本类的切换流程，两步的先后就是本方法内语句的先后。
     /// 触发场景切换必须调用本方法。直接 Raise loadEventSO 只会通知订阅方，不会切场景。
     /// </summary>
-    public void RequestSceneLoad(GameSceneSO scene, Vector3 position, bool isToFade)
+    public void RequestSceneLoad(List<GameSceneSO> scenes, Vector3 position, bool isToFade)
     {
-        loadEventSO.RaiseLoadRequestEvent(scene, position, isToFade);
-        OnLoadRequestEvent(scene, position, isToFade);
+        loadEventSO.RaiseLoadRequestEvent(scenes, position, isToFade);
+        OnLoadRequestEvent(scenes, position, isToFade);
     }
 
     /// <summary>
-    /// 首个场景请求放在 Start：同批所有 Awake/OnEnable 已跑完，
+    /// 首个场景组请求放在 Start：同批所有 Awake/OnEnable 已跑完，
     /// TimeManager/StatsService 实例与 SaveDataManager/UIManager 的事件订阅必然就绪，广播不漏听众。
     /// </summary>
     private void Start()
     {
-        RequestSceneLoad(initScene, Vector3.zero, false);
+        RequestSceneLoad(firstSceneToLoad, Vector3.zero, false);
     }
 
     /// <summary>
@@ -121,27 +138,28 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// <param name="newPosition">新位置坐标</param>
     private void SetPlayerPostion(Vector3 newPosition)
     {
+        if (player == null) return;
         player.transform.position = newPosition;
     }
 
     /// <summary>
     /// 加载请求的执行段，由 RequestSceneLoad 在广播完成后调用
     /// </summary>
-    /// <param name="scene">目标场景</param>
+    /// <param name="scenes">目标场景组</param>
     /// <param name="newPosition">玩家新位置</param>
     /// <param name="isToFade">是否显示过渡动画</param>
-    private void OnLoadRequestEvent(GameSceneSO scene, Vector3 newPosition, bool isToFade)
+    private void OnLoadRequestEvent(List<GameSceneSO> scenes, Vector3 newPosition, bool isToFade)
     {
-        if (scene == null)
+        if (scenes == null || scenes.Count == 0)
         {
-            Debug.LogWarning("[SceneChanger] 收到空场景加载请求，已忽略。");
+            Debug.LogWarning("[SceneChanger] 收到空场景组加载请求，已忽略。");
             return;
         }
 
         // 加载窗口内拒绝新请求，避免同一时间启动多条卸载/加载协程。
         if (isLoading)
         {
-            Debug.LogWarning($"[SceneChanger] 加载进行中，忽略新的加载请求: {scene.name}");
+            Debug.LogWarning($"[SceneChanger] 加载进行中，忽略新的加载请求: {scenes[0].name}");
             return;
         }
 
@@ -152,65 +170,117 @@ public class SceneChanger : YSingleton<SceneChanger>
 
         StatsService.Instance.Respawn(); //回血
 
-        Vector3 targetPosition = newPosition == Vector3.zero ? scene.initialPosition : newPosition;
-        //如果传入位置为零向量，则使用场景预设的初始位置
+        Vector3 targetPosition = newPosition == Vector3.zero ? GetInitialPosition(scenes) : newPosition;
+        //如果传入位置为零向量，则使用场景组预设的初始位置
         if (isToFade && !isInitialScene)
         {
             PlayLoadingAnimation("FadeIn");
         }
 
-        StartCoroutine(UnloadAndLoadNew(scene, targetPosition, isToFade)); //卸载当前场景
+        StartCoroutine(UnloadCurrentScenes(scenes, targetPosition, isToFade)); //卸载当前场景组
+    }
+
+    /// <summary>场景组的默认出生点：取首个有效场景 SO 的初始位置。</summary>
+    private Vector3 GetInitialPosition(List<GameSceneSO> scenes)
+    {
+        foreach (GameSceneSO scene in scenes)
+        {
+            if (scene != null)
+                return scene.initialPosition;
+        }
+        return Vector3.zero;
     }
 
     /// <summary>
-    /// 重试请求回调：重载当前所在场景。
+    /// 重试请求回调：重载当前所在场景组。
     /// 位置传零向量，复用 OnLoadRequestEvent 的初始位置兜底；
     /// 回血、复活玩家、收起 GameOver 面板均由本次加载流程统一处理，此处不再重复。
     /// </summary>
     private void OnRetryRequest()
     {
-        RequestSceneLoad(currentScene, Vector3.zero, true);
+        RequestSceneLoad(GetCurrentScenes(), Vector3.zero, true);
     }
 
     /// <summary>
-    /// 卸载当前场景协程
-    /// 等待淡入动画完成后卸载旧场景，然后加载新场景
+    /// 卸载当前场景组协程
+    /// 等待淡入动画完成后卸载旧内容场景组，然后按顺序加载新场景组
     /// </summary>
-    /// <param name="targetScene">要加载的目标场景</param>
-    /// <param name="targetPosition">玩家在目标场景中的位置</param>
+    /// <param name="targetScenes">要加载的目标场景组</param>
+    /// <param name="targetPosition">玩家在目标场景组中的位置</param>
     /// <param name="targetFade">是否播放过渡动画</param>
-    private IEnumerator UnloadAndLoadNew(
-        GameSceneSO targetScene,
+    private IEnumerator UnloadCurrentScenes(
+        List<GameSceneSO> targetScenes,
         Vector3 targetPosition,
         bool targetFade)
     {
         yield return new WaitForSecondsRealtime(fadeDuration);
 
-        if (currentScene != null)
-            yield return currentScene.sceneReference.UnLoadScene();
-        LoadScene(targetScene, targetFade);
-        SetPlayerPostion(targetPosition);
+        for (int i = currentScenes.Count - 1; i >= 0; i--)
+        {
+            GameSceneSO scene = currentScenes[i];
+            if (scene == null || string.IsNullOrEmpty(scene.sceneName))
+                continue;
+
+            if (PersistentSceneRegistry.IsPersistent(scene))
+            {
+                Debug.LogWarning(
+                    $"[SceneChanger] Skipped unload of registered persistent scene '{scene.sceneName}'.");
+                continue;
+            }
+
+            Scene loaded = SceneManager.GetSceneByName(scene.sceneName);
+            if (loaded.IsValid() && loaded.isLoaded)
+                yield return SceneManager.UnloadSceneAsync(loaded);
+        }
+
+        currentScenes.Clear();
+        yield return LoadScenesRoutine(targetScenes, targetPosition, targetFade);
     }
 
     /// <summary>
-    /// 异步加载场景。禁止裸调用：必须经 RequestSceneLoad 入口先广播订阅方再执行，
+    /// 按列表顺序以 Additive 模式加载场景组，全部完成后调用 OnLoadCompleted。
+    /// 禁止裸调用：必须经 RequestSceneLoad 入口先广播订阅方再执行，
     /// 否则订阅者收不到切换通知。
-    /// 使用 Addressables 加载场景，以 additive 模式添加
     /// </summary>
-    /// <param name="targetScene">要加载的目标场景</param>
-    /// <param name="targetFade">是否播放过渡动画</param>
-    private void LoadScene(GameSceneSO targetScene, bool targetFade)
+    private IEnumerator LoadScenesRoutine(
+        List<GameSceneSO> targetScenes,
+        Vector3 targetPosition,
+        bool targetFade)
     {
-        if (targetScene == null) return;
+        GameSceneSO firstLoaded = null;
+        foreach (GameSceneSO scene in targetScenes)
+        {
+            if (scene == null || string.IsNullOrEmpty(scene.sceneName))
+                continue;
 
-        if (targetScene.sceneType == MyEnums.SceneType.Menu)
-            SetObjects(false);
+            if (!Application.CanStreamedLevelBeLoaded(scene.sceneName))
+            {
+                Debug.LogError(
+                    $"[SceneChanger] Scene '{scene.sceneName}' ({scene.name}) is not in Build Settings; " +
+                    "add it via File > Build Settings before loading. Skipped.");
+                continue;
+            }
 
-        else if (targetScene.sceneType == MyEnums.SceneType.Location)
-            SetObjects(true);
-        // 闭包捕获本次目标（参数）：防止加载期间字段被覆写导致完成回调记录错场景
-        var loadingOption = targetScene.sceneReference.LoadSceneAsync(LoadSceneMode.Additive);
-        loadingOption.Completed += handle => OnLoadCompleted(handle, targetScene, targetFade);
+            if (scene.sceneType == MyEnums.SceneType.Menu)
+                SetObjects(false);
+            else if (scene.sceneType == MyEnums.SceneType.Location)
+                SetObjects(true);
+
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(scene.sceneName, LoadSceneMode.Additive);
+            while (loadOperation != null && !loadOperation.isDone)
+                yield return null;
+
+            if (firstLoaded == null)
+                firstLoaded = scene;
+            currentScenes.Add(scene);
+        }
+
+        if (firstLoaded != null)
+        {
+            loadedScene = SceneManager.GetSceneByName(firstLoaded.sceneName);
+        }
+        SetPlayerPostion(targetPosition);
+        OnLoadCompleted(firstLoaded, targetFade);
     }
 
     private void SetObjects(bool state)
@@ -225,21 +295,16 @@ public class SceneChanger : YSingleton<SceneChanger>
     }
 
     /// <summary>
-    /// 场景加载完成回调
+    /// 场景组加载完成回调
     /// 更新当前场景引用，播放淡出动画
     /// </summary>
-    /// <param name="handle">异步操作句柄</param>
-    /// <param name="loadedTarget">本次实际加载的场景</param>
+    /// <param name="loadedTarget">本次加载的场景组首个场景</param>
     /// <param name="targetFade">本次加载是否需要播放淡出动画</param>
-    private void OnLoadCompleted(
-        AsyncOperationHandle<SceneInstance> handle,
-        GameSceneSO loadedTarget,
-        bool targetFade)
+    private void OnLoadCompleted(GameSceneSO loadedTarget, bool targetFade)
     {
         // 不变量：currentScene 赋值必须在 sceneLoadedEvent 广播之前——
         // 订阅方（画布管理器/SaveDataManager/MenuSceneCanvasHider 等）经 GetCurrentGameScene() 回读
         currentScene = loadedTarget;
-        loadedScene = handle.Result.Scene;
         if (targetFade && !isInitialScene)
         {
             PlayLoadingAnimation("FadeOut");

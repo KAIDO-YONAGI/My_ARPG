@@ -8,6 +8,21 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/InitialScene.unity
     guid: 5895ee76906b8924c949d89dc91a5a98
+  - enabled: 1
+    path: Assets/Scenes/GameScene/PersistentScene.unity
+    guid: 823843722642c914dba2fb270e6b288d
+  - enabled: 1
+    path: Assets/Scenes/GameScene/StartingMenu.unity
+    guid: 39b4c5c3f91378d4b922675c04cb10bf
+  - enabled: 1
+    path: Assets/Scenes/GameScene/Scene1.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/GameScene/Scene2.unity
+    guid: 3f115ced3216f104b801fcb47a064dec
+  - enabled: 1
+    path: Assets/Scenes/TestScene.unity
+    guid: 83530df144431804eb8350e1f609697c
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: c8873074a15622d4abd18414e5a10159, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: da9f4b8c6a46f284990529895901b2dd, type: 3}

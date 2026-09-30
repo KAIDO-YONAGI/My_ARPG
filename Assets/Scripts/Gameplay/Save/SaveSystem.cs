@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -132,7 +133,7 @@ public class SaveSystem : YSingleton<SaveSystem>
                 IsLoadingSaveRequest = true;
                 // 标志窗口包住整个入口调用：SaveDataManager.OnAutoSave 在广播段内读到 true，
                 // 读档触发的切换不会写自动存档
-                SceneChanger.Instance.RequestSceneLoad(gameScene, pos, true);
+                SceneChanger.Instance.RequestSceneLoad(new List<GameSceneSO> { gameScene }, pos, true);
                 IsLoadingSaveRequest = false;
             }
             else

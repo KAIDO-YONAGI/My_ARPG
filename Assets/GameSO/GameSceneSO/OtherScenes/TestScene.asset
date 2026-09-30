@@ -12,11 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09a4ebb01acc81c41889f97c05800566, type: 3}
   m_Name: TestScene
   m_EditorClassIdentifier: 
-  sceneName: 
-  sceneReference:
-    m_AssetGUID: 83530df144431804eb8350e1f609697c
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
+  ID: 4e755685-4712-48bf-9e18-d14e88a3ace6
+  sceneAsset: {fileID: 102900000, guid: 83530df144431804eb8350e1f609697c, type: 3}
+  sceneName: TestScene
   sceneType: 0
   initialPosition: {x: 0, y: 0, z: 0}

@@ -68,7 +68,7 @@ public class UIManager : YSingleton<UIManager>
         }
     }
 
-    private void OnLoadScene(GameSceneSO arg0, Vector3 arg1, bool arg2)
+    private void OnLoadScene(List<GameSceneSO> arg0, Vector3 arg1, bool arg2)
         //UIManager作为跨场景持久单例，不会随场景卸载而disable，因此需要订阅场景加载事件来主动重置画布状态。
         //本处理器在 SceneChanger.RequestSceneLoad 的广播段内同步执行，先于其切换流程，
         //面板因此在过渡动画和旧场景卸载前被关闭。

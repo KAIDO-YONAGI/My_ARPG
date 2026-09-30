@@ -92,3 +92,6 @@ Assets/StreamingAssets/aa/
 
 # ========== Materials (本地大体积资源, git 出库仅留磁盘) ==========
 /Materials/
+
+# ========== Export (框架导出与 unitypackage 打包源, 产物随包分发, 不入库) ==========
+/Export/
