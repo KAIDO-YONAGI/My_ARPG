@@ -14,7 +14,7 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 - **Event-driven architecture**: cross-system decoupling via ScriptableObject event channels.
 - **Three-layer decoupled A\* pathfinding**: grid management / pathfinding algorithm / MovementController — attach a component and go.
 - **2D combat**: top-down exploration with both melee and ranged modes.
-- **Engineering practices**: Addressables scene loading, Newtonsoft.Json saves, and Android build troubleshooting docs.
+- **Engineering practices**: multi-scene additive loading, Newtonsoft.Json saves, and Android build troubleshooting docs.
 
 ## Demo Video
 
@@ -40,12 +40,12 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 **Requirements**
 
 - Open the project with Unity 2022.3.62f3c1.
-- Main dependencies include Addressables, Cinemachine, Input System, TextMesh Pro, and the Unity 2D feature set.
+- Main dependencies include Cinemachine, Input System, TextMesh Pro, and the Unity 2D feature set.
 
 **Getting started**
 
-1. Open the project in Unity Hub and wait for package dependencies and Addressables data to finish importing.
-2. Start from `Assets/Scenes/InitialScene.unity` (the default build entry; it asynchronously loads `PersistentScene` on startup).
+1. Open the project in Unity Hub and wait for package dependencies and assets to finish importing.
+2. Start from `Assets/Scenes/InitialScene.unity`; as the build entry it additively loads the persistent scene group.
 3. The title menu scene is at `Assets/Scenes/GameScene/StartingMenu.unity`; the main gameplay scenes are `Assets/Scenes/GameScene/Scene1.unity` and `Scene2.unity`.
 4. `Assets/Scenes/TestScene.unity` can be used for isolated testing, but `InitialScene` is the better entry point for validating the full flow.
 
@@ -144,19 +144,20 @@ The project uses a lightweight MVCS split: a Model holds one data aggregate's st
 
 The full conventions — layering, the nine-step migration flow, the three test layers, risks, and completion criteria — live in the personal knowledge base at `D:\My_Docs\1TODOFiles\Learning\` in `MVCS重构方法论.md` and `MVCS笔记.md`, which are not tied to this project and are not distributed with this repository. This project's migration status, confirmed defects, and remaining items are collected in [`Docs/`](Docs/README.md): `My_ARPG_MVCS项目现状.md`, `My_ARPG_重构优化清单_未解决.md`, and `My_ARPG_重构优化清单_已解决.md`.
 
-> **Project status: the layered refactor is frozen at tag `arpg-arch-final`.** The player stats line is organized in four layers; quests, dialogue, inventory and shops, save and scene orchestration, and movement, combat, and pathfinding keep their original Manager form. The skill domain is the retained verification point: skill points belong to the stats aggregate while spending happens in the skill aggregate, so it is the only place in this project where the rule that a single write atomically changes two data aggregates can be verified.
+> **Project status: the layered refactor is frozen.** The player stats line is organized in four layers; quests, dialogue, inventory and shops, save and scene orchestration, and movement, combat, and pathfinding keep their original Manager form. The skill domain is the retained verification point: skill points belong to the stats aggregate while spending happens in the skill aggregate, so it is the only place in this project where the rule that a single write atomically changes two data aggregates can be verified.
 
 ## Build Guide
 
 > Only the key takeaways are kept here; full Android troubleshooting lives in the Docs folder.
 
-### Addressables Essentials
+### Scene Loading
 
-- **The data builder must be Packed Mode**: `Build Addressables on Player Build` is enabled, but only works when the active data builder is Packed Mode (`m_ActivePlayerDataBuilderIndex = 3`). Switching back to "Use Asset Database" / "Simulate Groups" leaves scenes unbuilt — the exported package will be missing scenes or fail at runtime.
-- **Stale references break the build outright**: a group referencing a deleted/renamed asset will error out — sometimes aborting the whole build. After renaming/moving assets, re-check the Addressables groups, or reopen `Window > Asset Management > Addressables > Groups` to refresh.
-- **Content Update depends on `addressables_content_state.bin`**: stored per platform (`Windows/`, `Android/`, …) and git-ignored; if lost after a machine switch or cleanup, run a Clean Build first to regenerate it.
-- **The entry scene must stay in Build Settings**: the post-build entry is `InitialScene` (not in any Addressables group — packed directly by Player Settings); it loads everything else via `GameSceneSO.sceneReference`. Without it the build launches into nothing.
-- Remote group artifacts go to `ServerData/[BuildTarget]`; this repo defaults to local builds (`m_CCDEnabled = 0`) and needs no remote. If you later enable a remote catalog, ensure the LoadPath matches the real host.
+Scene loading runs through `SceneManager` in additive mode, with `SceneChanger.RequestSceneLoad` as the single entry point.
+
+- **Entry scene**: the build entry is `InitialScene`, packed directly by Build Settings. Its `InitialLoad` registers `persistentScenes` with `PersistentSceneRegistry` and loads them additively one by one; these scenes survive later transitions.
+- **Scene groups**: `GameSceneSO` identifies a scene by `sceneName`, kept in sync with `sceneAsset` in the editor. `SceneChanger` loads each entry in list order with `LoadSceneAsync`, unloads the previous group in reverse order while skipping persistent scenes, and accepts one request per loading window.
+- **Broadcast, then execute**: `RequestSceneLoad` raises `SceneLoadEventSO` first so subscribers can finish up before the transition starts, then runs the loading flow.
+- **Scenes must be in Build Settings**: both `SceneChanger` and `InitialLoad` pre-check with `Application.CanStreamedLevelBeLoaded` and log an error for missing scenes. Currently enabled: `InitialScene`, `GameScene/PersistentScene`, `GameScene/StartingMenu`, `GameScene/Scene1`, `GameScene/Scene2`, `TestScene`.
 
 ### Android Export
 
@@ -167,8 +168,8 @@ The full conventions — layering, the nine-step migration flow, the three test 
 
 - **Check references after renaming/moving**: The project leans heavily on SOs as data containers and event channels (`DialogSO`, `QuestSO`, `GameSceneSO`, the various `*EventSO`s). After renaming or moving an SO, fields referencing it can turn `Missing` and fail silently at runtime — do a sweep (by GUID / `Missing`) to verify.
 - **Subscribe / unsubscribe event SOs in pairs**: The repo convention is to subscribe (`+=`) in `OnEnable` and unsubscribe (`-=`) in `OnDisable` (see `SaveDataManager`, `SceneChanger`, `PlayerBow`, etc.). New subscribers must follow this, or scene transitions / object destruction will cause double-fires or null-refs.
-- **Never hand-edit `GameSceneSO.ID` / `GuidSO` GUIDs once generated**: the save system (`ISaveable`/`SaveRegistry`) keys objects by ID; clearing or changing a GUID breaks the link. Note `OnValidate` is editor-only — don't rely on it to generate IDs in a built player.
-- **Always assign `GameSceneSO.sceneReference`**: it's an `AssetReference` that must point to a scene already included in Addressables; leaving it empty throws an `InvalidKeyException` (or similar) at runtime.
+- **Never hand-edit save identifiers once generated**: the `ISaveable` system keys objects by `SaveDefinition` ID, and changing one breaks the link. A scene's save key is `GameSceneSO.SaveKey`, which takes the scene file's GUID in the editor. `OnValidate` is editor-only — don't rely on it to generate IDs in a built player.
+- **Keep `GameSceneSO.sceneName` valid**: it drives which scene loads at runtime, kept in sync with `sceneAsset` in the editor. When empty, `SceneChanger` and `InitialLoad` log an error and skip that scene.
 - **Don't store live runtime state on SO instances**: SOs are shared assets — keep runtime state in dedicated runtime classes (e.g. `QuestProgressData`), or every reference shares the same mutated copy and the asset's stored values get dirtied in the editor.
 
 ## Known Limitations

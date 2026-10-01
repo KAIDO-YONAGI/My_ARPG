@@ -14,7 +14,7 @@
 - **事件驱动架构**：基于 ScriptableObject 事件通道的跨系统解耦通信。
 - **三层解耦 A\* 寻路**：网格管理 / 寻路算法 / MovementController 各自独立，挂载即可用。
 - **2D 战斗**：俯视角探索，近战与远程两种模式。
-- **工程化实践**：Addressables 场景加载、Newtonsoft.Json 存档、Android 导出排障文档。
+- **工程化实践**：多场景组叠加加载、Newtonsoft.Json 存档、Android 导出排障文档。
 
 ## 演示视频
 
@@ -40,12 +40,12 @@
 **环境要求**
 
 - 推荐使用 Unity 2022.3.62f3c1 打开项目。
-- 主要依赖包括 Addressables、Cinemachine、Input System、TextMesh Pro 和 Unity 2D 功能包。
+- 主要依赖包括 Cinemachine、Input System、TextMesh Pro 和 Unity 2D 功能包。
 
 **启动流程**
 
-1. 用 Unity Hub 打开项目，等待包依赖和 Addressables 数据导入完成。
-2. 从 `Assets/Scenes/InitialScene.unity` 启动（默认构建入口，会在启动时异步加载 `PersistentScene`）。
+1. 用 Unity Hub 打开项目，等待包依赖与资源导入完成。
+2. 从 `Assets/Scenes/InitialScene.unity` 启动，它作为构建入口叠加加载常驻场景组。
 3. 标题菜单位于 `Assets/Scenes/GameScene/StartingMenu.unity`，主要游戏场景为 `Assets/Scenes/GameScene/Scene1.unity` 和 `Scene2.unity`。
 4. `Assets/Scenes/TestScene.unity` 可用于独立调试，但要验证完整流程时更建议从 `InitialScene` 启动。
 
@@ -144,19 +144,20 @@
 
 完整准则、九步迁移流程、三层测试策略、风险与完成标准在个人知识库 `D:\My_Docs\1TODOFiles\Learning\` 的 `MVCS重构方法论.md` 与 `MVCS笔记.md`，这两份不绑定具体工程，不随本仓库分发。本工程的迁移现状、已确认缺陷与剩余清单收在 [`Docs/`](Docs/README.md) 的 `My_ARPG_MVCS项目现状.md`、`My_ARPG_重构优化清单_未解决.md`、`My_ARPG_重构优化清单_已解决.md`。
 
-> **项目状态：分层重构冻结于 tag `arpg-arch-final`。** 玩家数值线按四层组织；任务、对话、背包与商店、存档与场景编排、移动战斗寻路保留原有的 Manager 形态。技能域是保留的验证点：技能点属于数值聚合，消耗发生在技能聚合，「一次写要原子地改动两个数据聚合」这条准则在本工程只有它能验证。
+> **项目状态：分层重构已冻结。** 玩家数值线按四层组织；任务、对话、背包与商店、存档与场景编排、移动战斗寻路保留原有的 Manager 形态。技能域是保留的验证点：技能点属于数值聚合，消耗发生在技能聚合，「一次写要原子地改动两个数据聚合」这条准则在本工程只有它能验证。
 
 ## 构建指南
 
 > 本节只保留最关键的结论，Android 完整排障见 Docs 目录文档。
 
-### Addressables 要点
+### 场景加载
 
-- **数据构建器必须为 Packed Mode**：项目已开启 `Build Addressables on Player Build`，但前提是活动数据构建器为 Packed Mode（`m_ActivePlayerDataBuilderIndex = 3`）。误切回 Use Asset Database / Simulate Groups 会导致导出包中场景缺失或运行时报错。
-- **失效引用会直接卡断构建**：组里引用了已删除/重命名资源时构建会报错甚至整体失败。改资源名/路径后，记得同步检查 Addressables 组，或重新打开 `Window > Asset Management > Addressables > Groups` 让它刷新。
-- **Content Update 依赖 `addressables_content_state.bin`**：该文件按平台存放在 `Windows/`、`Android/` 等目录，且已被 `.gitignore` 忽略；换机器或清理后若丢失，需先做一次 Clean Build 重建。
-- **入口场景必须在 Build Settings 里**：打包后的运行入口是 `InitialScene`（不在 Addressables 组内，由 Player Settings 直接打进包），它再通过 `GameSceneSO.sceneReference` 异步加载其余场景；缺失会导致空包启动。
-- 远程组产物输出到 `ServerData/[BuildTarget]`；本仓库默认本地构建（`m_CCDEnabled = 0`），无需远端。若将来启用远程目录，须保证 LoadPath 与实际托管地址一致。
+场景加载走 `SceneManager` 叠加模式，入口是 `SceneChanger.RequestSceneLoad`。
+
+- **入口场景**：构建入口是 `InitialScene`，由 Build Settings 直接打进包。它的 `InitialLoad` 把 `persistentScenes` 注册进 `PersistentSceneRegistry` 并逐个叠加加载，这些场景在后续切换中保留。
+- **场景组**：`GameSceneSO` 以 `sceneName` 标识场景，编辑器下由 `sceneAsset` 同步。`SceneChanger` 按列表顺序逐个 `LoadSceneAsync`，切换时反向遍历卸载旧组并跳过常驻场景；一次加载窗口内只受理一条请求。
+- **先广播后执行**：`RequestSceneLoad` 先 Raise `SceneLoadEventSO`，让订阅方在切换开始前完成收尾，随后执行加载流程。
+- **场景须在 Build Settings 内**：`SceneChanger` 与 `InitialLoad` 都用 `Application.CanStreamedLevelBeLoaded` 预检，缺失的场景记 `LogError` 并跳过。当前启用 `InitialScene`、`GameScene/PersistentScene`、`GameScene/StartingMenu`、`GameScene/Scene1`、`GameScene/Scene2`、`TestScene`。
 
 ### Android 导出
 
@@ -167,8 +168,8 @@
 
 - **资源名 / 路径改动后检查引用**：项目大量依赖 SO 作为数据容器与事件通道（`DialogSO`、`QuestSO`、`GameSceneSO`、各种 `*EventSO` 等）。重命名或移动 SO 后，引用它的字段可能变成 `Missing` 并在运行时静默失效，建议改名后按 GUID / `Missing` 批量核对一次。
 - **事件 SO 的订阅与注销必须成对**：统一约定在 `OnEnable` 里 `+=` 订阅、`OnDisable` 里 `-=` 注销（参见 `SaveDataManager`、`SceneChanger`、`PlayerBow` 等）。新增订阅者务必遵守，否则场景切换 / 对象销毁后会出现重复触发或空引用。
-- **`GameSceneSO.ID` 与 `GuidSO` 的 GUID 生成后勿改**：存档体系（`ISaveable`/`SaveRegistry`）通过 ID 关联对象，清空或改动 GUID 会导致存档找不到目标。注意 `OnValidate` 仅在编辑器下运行，不要依赖它在运行时生成 ID。
-- **`GameSceneSO.sceneReference` 必须赋值**：它是 `AssetReference`，必须指向已纳入 Addressables 的场景资产，为空会在运行时抛 `InvalidKeyException` 之类错误。
+- **存档标识生成后勿改**：`ISaveable` 体系经 `SaveDefinition` 的 ID 关联对象，改动会让存档找不到目标；场景的存档键是 `GameSceneSO.SaveKey`，编辑器下取场景文件的 GUID。`OnValidate` 仅在编辑器下运行，不要依赖它在运行时生成 ID。
+- **`GameSceneSO.sceneName` 必须有效**：运行时按它加载场景，编辑器下由 `sceneAsset` 同步；为空时 `SceneChanger` 与 `InitialLoad` 会记 `LogError` 并跳过该场景。
 - **避免在 SO 实例上存游戏运行时状态**：SO 是共享资产，运行时数据应放在专门的运行时类里（如 `QuestProgressData`），否则多份引用共享同一份被篡改的数据，且容易污染编辑器中的资产值。
 
 ## 已知限制
