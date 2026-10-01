@@ -95,3 +95,7 @@ Assets/StreamingAssets/aa/
 
 # ========== Export (框架导出与 unitypackage 打包源, 产物随包分发, 不入库) ==========
 /Export/
+
+# ========== FrameWork (外部框架样本, 随 unitypackage 分发, 不入库) ==========
+/Assets/FrameWork/
+/Assets/FrameWork.meta
