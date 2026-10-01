@@ -18,22 +18,22 @@ MonoBehaviour:
   m_GUID: ca89086cea36d4c43acf80f9c931cb81
   m_SerializeEntries:
   - m_GUID: 2cda990e2423bbf4892e6590ba056729
-    m_Address: Assets/Scenes/Scene1.unity
+    m_Address: Assets/Scenes/GameScene/Scene1.unity
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 39b4c5c3f91378d4b922675c04cb10bf
-    m_Address: Assets/Scenes/Menu.unity
+    m_Address: Assets/Scenes/GameScene/StartingMenu.unity
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3f115ced3216f104b801fcb47a064dec
-    m_Address: Assets/Scenes/Scene2.unity
+    m_Address: Assets/Scenes/GameScene/Scene2.unity
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 823843722642c914dba2fb270e6b288d
-    m_Address: Assets/Scenes/PersistentScene.unity
+    m_Address: Assets/Scenes/GameScene/PersistentScene.unity
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
