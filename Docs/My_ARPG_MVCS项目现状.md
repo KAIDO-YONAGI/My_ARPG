@@ -184,14 +184,12 @@ SkillSystemModel（纯C#）：per-skill 等级/解锁、前置依赖图、规则
 
 `PlayerStatsModelTests` 是玩家数值这条线的回归网：改 `PlayerStatsModel`、`StatsService`、`ExperienceController` 之前先跑绿。
 
-当前执行 `PlayerStatsModelTests` 的 24 个用例中 21 个通过、3 个失败：`ExpCurve_HugeGain_GainsSeveralLevels_AndTerminates`、`ExpCurve_WithZeroBase_IsFlooredToKeepCurveAlive`、`LoadFrom_FloorsGarbageThresholdToAtLeastOne`。本次新增的 `Model_CanBeViewedThroughReadOnlyStatsInterface` 与 `StatsService_ExposesOnlyReadOnlyStatsView` 均通过；剩余失败集中在原有经验曲线与读档阈值预期，和本次 Service/Model 边界调整无关。
-
 ### 3.2 建议先落地的测试
 
 | 编号 | 内容 | 层 |
 | --- | --- | --- |
 | T1 | 存档往返：掉落物的位置与拾取状态只记改动量 | 一 |
-| T2 | 场景接线检查：事件 SO、`ShopSlot.shopRef`、掉落物 ID、`sceneReference`、Addressables 失效引用 | 二 |
+| T2 | 场景接线检查：事件 SO、`ShopSlot.shopRef`、掉落物 ID、`GameSceneSO.sceneName` | 二 |
 | T3 | D1 复现：出售经验道具时金币照加、道具不移除 | 一 |
 | T4 | 任务面板只读回归：打开任务面板不改变任务进度 | 一 / 二 |
 | T5 | PlayMode 发烟：进场景、注册的掉落物数等于场景里的数量、存档往返 | 三 |

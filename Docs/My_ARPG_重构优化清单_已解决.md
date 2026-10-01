@@ -1,7 +1,7 @@
 # My_ARPG 重构优化清单 · 已解决归档
 
 > 2026-09-13 从《My_ARPG_重构优化清单》拆分。本文档只保留**已完成/已关闭项**，作为实现与验证记录存档；
-> 未完成与待评估项（asmdef、xLua、数据驱动/状态机、多场景加载、GameJam 按需迁移、事件总线重评估、事件可视化工具可行性）见《My_ARPG_重构优化清单_未解决.md》。
+> 未完成与待评估项（asmdef、xLua、数据驱动/状态机、GameJam 按需迁移、事件总线重评估、事件可视化工具可行性）见《My_ARPG_重构优化清单_未解决.md》。
 > 章节标题沿用原文档编号，便于与历史执行记录对照。
 
 ---
@@ -75,7 +75,7 @@
 | 4.8 事件可视化工具 | ❌ 当时决策不做 → **2026-09-13 重启可行性探讨，移至未解决清单** |
 | 4.9 xLua | ⏸ 用户决策：下轮 → **方案附录移至未解决清单** |
 | 4.10 对象池 | ✅ 完成（迁 GameJam ObjectPool + 两消费点）。数据驱动/状态机两项留存 → 未解决清单 |
-| 4.11 多场景加载 | ⏸ 维持缓办 → 未解决清单 |
+| 4.11 多场景加载 | ✅ 完成。`SceneChanger` 以场景组为单位叠加加载，`InitialLoad` 注册常驻场景，`GameSceneSO` 改用 `sceneName` |
 | 4.12 FinshCombat 别名 | ✅ 已删。**发现清单前提已过时**：Slash.anim 动画事件早已使用新拼写 FinishCombat，别名实际零引用 |
 | 4.13 Materials | ✅ `git rm -r --cached`（704 文件出库，磁盘保留）+ `.gitignore` 加 `/Materials/` |
 | 4.14 TimeManager 计数版 | ✅ 完成（消除现存不对称 bug）。其余 GameJam 成果按需迁移 → 未解决清单 |
@@ -171,7 +171,7 @@ GameJam2607 存在独立框架目录 `D:\Unity\Projects\GameJam2607\Assets\Frame
 
 **My_ARPG 原状**（回填前）：画布复位依赖 UIManager 订阅 `LoadRequestEvent` 在切换**请求**时 `ResetCanvas()`；`sceneLoadedEvent` 完成广播只有 DataManager 一个订阅者。现在两层并存：请求时 UIManager 统一关、完成后各画布自复位。
 
-> 原 2.4（多场景加载缓办依据）与 2.5（按需迁移候选清单）随对应未完成项移至未解决清单第 4、5 节。
+> 原 2.5（按需迁移候选清单）随对应未完成项移至未解决清单第 4 节。
 
 ---
 

@@ -215,7 +215,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File `
 
    输出里 `Signer #1 certificate DN` 若仍是 `CN=Android Debug`，说明还没配项目自己的 keystore
    （`Project Settings > Player > Publishing Settings`）。
-5. **装机冒烟**：安装到真机后至少跑通「启动场景 → Addressables 加载 → 存档读写」三条路径。
+5. **装机冒烟**：安装到真机后至少跑通「启动 → 场景切换 → 存档读写」三条路径。
 6. **留一条记录**：把你机器上的实际值（日期、Unity 版本、Editor 路径、产物路径、自检结果）追加到
    [`UnityAndroidBuildVerification.md`](UnityAndroidBuildVerification.md)，供下次排查对照。
 

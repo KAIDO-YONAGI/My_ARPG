@@ -11,9 +11,8 @@
 | 2 | xLua 热更新 MVP（含完整方案附录） | 4.9 | ⏸ 已排期（依赖 4.3 已就绪） | 下轮 |
 | 3 | 技能/物品效果数据驱动 + 状态机基类 | 4.10 剩余 | ⏸ 留存 | 随排期 |
 | 4 | GameJam 成果按需迁移（Audio 三件套等） | 4.14 剩余 | ⏸ 随需 | 有需求时 |
-| 5 | 多场景加载（含 GameJam 方案明细） | 4.11 / 2.4 | ⏸ 缓办 | 有多场景需求时 |
-| 6 | 事件总线 | 3.2 | ❌ 维持不采用 | 通道数明显增多时重评估 |
-| 7 | **事件引用可视化插件 · 可行性探讨** | 3.3 / 4.8 | 🔍 本次新增探讨（2026-09-13） | 见第 7 节结论 |
+| 5 | 事件总线 | 3.2 | ❌ 维持不采用 | 通道数明显增多时重评估 |
+| 6 | **事件引用可视化插件 · 可行性探讨** | 3.3 / 4.8 | 🔍 本次新增探讨（2026-09-13） | 见第 6 节结论 |
 
 ---
 
@@ -54,44 +53,29 @@
 - ArrayPool（My_ARPG 无此场景）；
 - VolumeManager（硬耦合 GameJam 的 AgeManager，且 My_ARPG 是内置渲染管线——2026-09-08 已确认，无 URP 包与管线资产）；
 - Rewind 接口层（无回溯玩法需求，仅当未来做时缓/幽灵回放时整体搬）；
-- SceneArtAssetsTrigger（依赖多场景寻址模式，随第 5 节缓办）;
+- SceneArtAssetsTrigger;
 - PlayerAnimationController（重度耦合年龄玩法，只借鉴 SO 映射模式）。
 
-**框架小件**：`IntEventSO`/`FloatEventSO`（My_ARPG 事件 SO 家族缺这两个基础类型，HealthHeartUI 迁移时必带）、`PersistentSceneRegistry`（多场景缓办时随迁）。
+**框架小件**：`IntEventSO`/`FloatEventSO`（My_ARPG 事件 SO 家族缺这两个基础类型，HealthHeartUI 迁移时必带）。
 
-## 5. 多场景加载（原 4.11/2.4，缓办）
-
-GameJam 方案完整但**迁移非纯拷贝**，按已定决策单列缓办：
-
-**GameJam 实现**（`FrameWork/Scripts/Scene/SceneChanger.cs`，284 行）：
-- 场景加载以列表为单位：`:23` `List<GameSceneSO> firstSceneToLoad`；事件签名 `SceneLoadEventSO.cs:9` 为 `event Action<List<GameSceneSO>, Vector3, bool>`。
-- `:219-240` `LoadScenesRoutine`：按列表顺序逐个 `SceneManager.LoadSceneAsync(scene.sceneName, LoadSceneMode.Additive)` 叠加加载。
-- `:189-214` `UnloadCurrentScenes`：从后往前卸载，`PersistentSceneRegistry.IsPersistent` 的常驻场景跳过。
-- `PersistentSceneRegistry.cs`（44 行）：静态 HashSet 注册常驻场景名。
-- `:271` 全部完成后广播 `sceneLoadedEvent`。
-
-**My_ARPG 适配成本**（缓办原因）：
-- `SO/GameSceneSO.cs:7` 是单个 `AssetReference`，My_ARPG 走 Addressables；合并两套需改 GameSceneSO 结构 + SceneChanger 加载/卸载循环 + `SceneLoadEventSO` 签名（现为 `Action<GameSceneSO,Vector3,bool>`），签名变更波及 4 个发布方（Teleport/SaveSystem/RetryManager/ButtonSceneToggler）与 3 个订阅方（SceneChanger/UIManager/DataManager）。
-- 待有多场景需求（如主场景+光照场景+UI 场景分离）时再立项。
-
-## 6. 事件总线（原 3.2，维持不采用）
+## 5. 事件总线（原 3.2，维持不采用）
 
 做法：建中心化 `EventBus`，所有通道集中定义。如实评估：解决通道集中定义；不解决订阅关系可见性；成本是 12 条通道全量重接线并放弃 SO 资产 Inspector 工作流。当前规模下收益不覆盖成本。**维持不采用**（待通道数量或跨系统事件明显增多时重新评估）。
 
-> 注：第 7 节的可视化工具恰是"维持 SO 方案"的补丁——SO 工作流的短板是关系不可见，补齐后更无必要上总线。
+> 注：第 6 节的可视化工具恰是"维持 SO 方案"的补丁——SO 工作流的短板是关系不可见，补齐后更无必要上总线。
 
-## 7. 事件引用可视化插件 · 可行性探讨（原 3.3/4.8，2026-09-13）
+## 6. 事件引用可视化插件 · 可行性探讨（原 3.3/4.8，2026-09-13）
 
 原 2026-09-08 决策"不做"；本次基于当前代码实测重新评估实现路径。原方案存档：Editor 窗口枚举全部事件 SO 资产 + `GetInvocationList` 展示订阅链 + 发布计数埋点，成本一个 Editor 脚本的量级。
 
-### 7.1 现状实测（2026-09-13，代码为准）
+### 6.1 现状实测（2026-09-13，代码为准）
 
 - 事件类 **11 个**，位于 `Assets/Scripts/Gameplay/SO/Events/`，**全部直接继承 ScriptableObject、无公共基类**；每类 1~2 个 field-like `public event Action…` 通道（`ToggleCanvasEventSO` 为 toggle + focus 双通道）。
 - 事件资产约 **24 个**：VoidEvents 5、ToggleCanvasEvents 9、InventorySlotsStatsEvents 3、Events 根目录 7。
 - 订阅方惯例：`OnEnable += / OnDestroy -=`（或 Start/OnDestroy 生命周期）；发布方调各类的 `RaiseXxx()` 公开方法。
 - 推论：失活对象（如菜单场景未激活的 GamePlay UI 根下管理器）不在订阅链上——**快照式查看器查不到它们是语义正确而非缺陷**，解读时须知。
 
-### 7.2 三个实现层次（按性价比排序）
+### 6.2 三个实现层次（按性价比排序）
 
 **L1 运行时订阅链查看器（Play 模式，约半天）**
 
@@ -116,17 +100,17 @@ GameJam 方案完整但**迁移非纯拷贝**，按已定决策单列缓办：
 - 阻碍：事件类**无公共基类**——要么引入 `BaseEventSO` 让 11 个类统一继承（碰运行时代码，一次性小改但扩散面广），要么编辑器侧反射向后备字段 `Delegate.Combine` 注入计数 stub（后续用户 `+=` 会保留它，但 `-=` 语义对不上，脆弱）。
 - 折中：排查具体事件时在 `RaiseXxx` 里临时 `Debug.LogError` 打调用栈即可（现有排障手段），无需工具化。三档里性价比最低。
 
-### 7.3 技术风险与成本
+### 6.3 技术风险与成本
 
 - 落点 `Assets/Editor/EventGraph/`：Editor 目录的程序集天然不进构建，**零运行时代码改动、零包依赖**（L3 才需碰运行时，且可不做）。
 - 多通道类按"类型内全部 event 字段"反射枚举，天然覆盖 `ToggleCanvasEventSO` 这类双通道，无需特判。
 - 规模：资产 ~24、引用点几十处，远低于性能敏感区。
 - 主要工作量在 L2 的 prefab/场景引用解析细节（override、nested prefab），用 API 而非文本解析可规避大半。
 
-### 7.4 结论
+### 6.4 结论
 
 **可行性高**：L1+L2 合计约 1.5 天，纯 Editor 工具，不动运行时代码；L3 不做或痛点出现再做。
-与第 6 节的关系：可视化工具补齐 SO 事件方案的可见性短板后，更无必要上事件总线。
+与第 5 节的关系：可视化工具补齐 SO 事件方案的可见性短板后，更无必要上事件总线。
 立项触发条件建议：下次事件链路排查耗时超过半天，或新增事件通道前需要全局总览时。
 
 ---
