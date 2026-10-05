@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using MyEnums;
 using UnityEngine;
 
-//TODO 可能的优化：小顶堆存开启列表，动态A*，距离算法的优化
+//TODO 可能的优化：动态A*，距离算法的优化
 //关于网格和世界坐标的转化 由于转化关系，需要先导航到这个网格中心点才能开始导航
 //地图数据获取也可以优化，用以解决稀疏地图的遍历问题
-//可以用带权路径替换开根计算
 //细分单元格
 [RequireComponent(typeof(AStarNodeManager))]//依赖保证，不存在时自动添加
 public class AStarPathFinder : YSingleton<AStarPathFinder>
@@ -25,10 +24,19 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
     private static readonly int[] dirX = { 0, 1, 1, 1, 0, -1, -1, -1 };
     private static readonly int[] dirY = { 1, 1, 0, -1, -1, -1, 0, 1 };
 
+    //开表簿记：某格是否仍在开表中、以及它当前最优的 g。扩展顺序交给 AStarOpenHeap。
+    //三者都跨次寻路复用：FindPath 全程同步、不可重入，清空即可，避免每次寻路重新分配（原先单条路径 15~80KB）。
+    private readonly Dictionary<(int x, int y), AStarDetails> openDic = new();
+    private readonly HashSet<(int x, int y)> closeSet = new();
+    private readonly AStarOpenHeap heap = new();
+
     public Stack<AStarDetails> FindPath(Vector3 optPos, Vector3 startPos, Vector3 endPos)
     {
         if (optPos == Vector3.zero) optPos = startPos;
-        Dictionary<(int x, int y), AStarDetails> openDic = new();
+
+        openDic.Clear();
+        closeSet.Clear();
+        heap.Clear();
 
         var startCell = WorldToCell(startPos);
         var endCell = WorldToCell(endPos);
@@ -43,25 +51,28 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
             startCell = optCell;
         }
 
-        HashSet<(int x, int y)> closeSet = new();
         if ((!NodeCellMap.ContainsKey(startCell)) || (!NodeCellMap.ContainsKey(endCell)) || startCell == endCell)
         {
             return null;
         }
         AStarDetails startNode = new AStarDetails(startCell.x, startCell.y, endCell.x, endCell.y, null);
         openDic.Add(startCell, startNode);
+        heap.Push(startCell, startNode.GetCost(), startNode.GetDisToBeg());
 
-        while (openDic.Count > 0)
+        while (heap.Count > 0)
         {
-            var currentPos = SearchCheapestCost(openDic);
-            AStarDetails current = openDic[currentPos];
+            AStarOpenHeap.Entry entry = heap.Pop();
+            //已关闭的格子（openDic 里没了），或被更优 g 取代的过期条目，直接丢弃
+            if (!openDic.TryGetValue(entry.Pos, out AStarDetails current)) continue;
+            if (entry.G > current.GetDisToBeg()) continue;
 
+            var currentPos = entry.Pos;
             openDic.Remove(currentPos);
             closeSet.Add(currentPos);
 
             if (currentPos == endCell) return RetracePath(current);
 
-            AddNodeToOpen(currentPos, endCell, openDic, closeSet, current);
+            AddNodeToOpen(currentPos, endCell, current);
         }
 
         return null;
@@ -107,27 +118,9 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
         return path;
     }
 
-    private (int x, int y) SearchCheapestCost(Dictionary<(int x, int y), AStarDetails> openDic)
-    {
-        float minCost = float.MaxValue;
-        (int x, int y) minCostPos = default;
-        foreach (var node in openDic)
-        {
-            float currentCost = node.Value.GetCost();
-            if (minCost > currentCost)
-            {
-                minCost = currentCost;
-                minCostPos = node.Key;
-            }
-        }
-        return minCostPos;
-    }
-
     private void AddNodeToOpen(
         (int x, int y) currentPos,
         (int x, int y) endPos,
-        Dictionary<(int x, int y), AStarDetails> openDic,
-        HashSet<(int x, int y)> closeSet,
         AStarDetails current)
     {
         int cx = currentPos.x;
@@ -146,16 +139,16 @@ public class AStarPathFinder : YSingleton<AStarPathFinder>
 
             AStarDetails newNode = new AStarDetails(nx, ny, endPos.x, endPos.y, current);
 
-            if (!openDic.ContainsKey(neighborPos))
+            if (!openDic.TryGetValue(neighborPos, out AStarDetails existing))
             {
                 openDic.Add(neighborPos, newNode);
+                heap.Push(neighborPos, newNode.GetCost(), newNode.GetDisToBeg());
             }
-            else
+            else if (newNode.GetDisToBeg() < existing.GetDisToBeg())
             {
-                if (newNode.GetDisToBeg() < openDic[neighborPos].GetDisToBeg())
-                {
-                    openDic[neighborPos] = newNode;
-                }
+                //旧条目留在堆里，出堆时按 G 判过期；平局规则见 AStarOpenHeap
+                openDic[neighborPos] = newNode;
+                heap.Push(neighborPos, newNode.GetCost(), newNode.GetDisToBeg());
             }
         }
     }
