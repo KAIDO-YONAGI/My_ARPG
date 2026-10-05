@@ -26,12 +26,32 @@
 
 - 取得父租约 `ec977814-b875-4904-a0bb-e62172c1c5b9`（`DSH-Main`，
   AccessMode `write`，覆盖 7 个业务根与 `README.md` / `README.en.md` / `Docs`）。
-- 作业期间观测到**不入租约注册表**的并发写入：工作区里出现用户本人的未提交改动
-  （`SceneChanger` 移除重试订阅与 `Respawn()`、`PlayerDamageController` 接管重试复活、
-  `SaveDataManager` 回灌跳过 `GetDataID()` 为空的固定槽位服务），以及
-  `Docs/README.md`、`Docs/My_ARPG_重构优化清单_已解决.md`、
-  `Docs/My_ARPG_重构优化清单_未解决.md` 三个跟踪文件被删除。
+- 作业期间工作区出现用户本人的未提交改动（`SceneChanger` 移除重试订阅与
+  `Respawn()`、`PlayerDamageController` 接管重试复活、`SaveDataManager` 回灌跳过
+  `GetDataID()` 为空的固定槽位服务），以及 `Docs/README.md`、
+  `Docs/My_ARPG_重构优化清单_已解决.md`、`Docs/My_ARPG_重构优化清单_未解决.md`
+  三个跟踪文件被删除。
 - 处置：用户确认上述改动均为其本人所做，不回退；三个删除保持删除；
   库内写入照常，共享路径的修复按工作区现状重新落回。
-- 结论：租约注册表对“不入表的外部写入”没有约束力。权威顺序第 2 条（以当前工作区为准）
-  是这类情况下的实际兜底；发现冲突时必须报告用户，不得静默覆盖。
+
+- **更正（同日，撤回一条错误结论）**：本条目初版写的是「作业期间观测到**不入租约
+  注册表**的并发写入」并据此断言「租约注册表对不入表的外部写入没有约束力」。该断言
+  已撤回，依据如下：
+  1. 注册表**不留已释放租约的历史**：每个 agent 只落一个 `<AgentName>_<hash>.txt`，
+     `Release` 即删（`WorkingAgent.ps1:490`、`:207`），`Status` 只列活动租约。
+     因此两次 `Status` 快照在原理上无法判定「是否有别的写入者曾入表」。
+  2. 时间线不支持该推断：`SaveDataManager.cs` 18:15:00、`SceneChanger.cs` 18:15:19、
+     `PersistentScene.unity` 18:16:25 均**早于** `WorkingAgent/` 目录的创建时间
+     18:19:36；`PlayerDamageController.cs` 为 18:21:13。即三次改动发生在协议载体尚不
+     存在时，当时既无业务根、也无 `Concurrency_Guide` 可参与——该事件落在协议的
+     操作条件之外，不能用作评价协议有效性的证据。
+  3. 同期我**未发现任何第二种 agent 会话的证据**。初版援引的
+     `.zcode/plans/plan-sess_a2068891-….md` 是 `2026-08-17` 的旧计划，
+     `.idea/workspace.xml` 并不存在。把推断当观测写出，本身是本轮要防的错误。
+- 本轮被证实的协议违规只有一处，且在我这一侧：全程**未发送任何 `Heartbeat`**。
+  释放时服务端回读本租约为 `heartbeatAgeSeconds: 1528.7`、`suspectedStale: true`；
+  按协议准则，这 25 分钟内我才是「疑似陈旧」的一方。
+- 仍然成立的规则（与上述更正不冲突）：权威顺序第 2 条「以当前工作区为准」+「发现冲突
+  即报告用户、不得静默覆盖」是并发写入的现实兜底。人在自己的 IDE 里直接编辑，按构造
+  不会去取租约；这是协议的边界，不是协议失效——判断某次冲突能否归因于协议，必须先确认
+  该次冲突是否落在协议的操作条件之内。
