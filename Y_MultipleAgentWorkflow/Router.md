@@ -46,6 +46,16 @@ Agent、修改文件或使用会改变状态的工具之前，必须先用
 项目专属验证统一走 `Workflow\Project_Validation_Guide.md`。该指南只登记本工程已确认的
 命令与状态变更；未确认的打成空白条目，不凭其他工程推断。
 
+## 模型入口
+
+`AGENTS.md` 与 `CLAUDE.md`（项目根）各含一个由本工作流维护的导航块，用
+`<!-- Y_MultipleAgentWorkflow:BEGIN -->` / `<!-- Y_MultipleAgentWorkflow:END -->`
+标记包住，两块内容一致，可用脚本按标记幂等更新。本机实测：两个文件都会被装载为
+工作区指令。
+
+约定：**块内只放指向本文件的指针**，业务事实一律留在本目录，避免同一事实出现第二个
+载体。入口文件的选择（`EntryMode`）由用户拍板，不是安装 Skill 的默认行为。
+
 ## 全局并发资源
 
 同一工作树上的多个 Agent 共用以下资源，写入前必须在租约里声明：
@@ -70,6 +80,8 @@ Agent、修改文件或使用会改变状态的工具之前，必须先用
 | 文档 ID | 路径 | 状态 |
 |---|---|---|
 | `ROOT-ROUTER` | `Router.md` | Active |
+| `ENTRY-AGENTS` | `AGENTS.md` | Active |
+| `ENTRY-CLAUDE` | `CLAUDE.md` | Active |
 | `WF-CONFIG-METHOD` | `Workflow_Configuration_Guide.md` | Active |
 | `WF-ROUTER` | `Workflow\Router.md` | Active |
 | `WF-PROJECT-VALIDATION` | `Workflow\Project_Validation_Guide.md` | Active |

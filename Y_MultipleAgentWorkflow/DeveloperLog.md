@@ -10,8 +10,9 @@
   二级：`Architecture.{Layering,Composition,AssemblyPlan}`、
   `Gameplay.{PlayerStats,Units,Dialog,Quest,InventoryShop,Skills}`。
 - 分类依据来自只读盘点（5 路并行调查 + 3 路补齐），不是按源码目录形状切分。
-- 模型入口未修改（`EntryMode=None`）；全仓本就不存在 `AGENTS.md` / `CLAUDE.md` /
-  项目级 Skill，入口职责由根 `Router.md` 的“必读起点”承担。
+- 模型入口初始化时未修改（`EntryMode=None`）；全仓本就不存在 `AGENTS.md` / `CLAUDE.md` /
+  项目级 Skill，入口职责暂由根 `Router.md` 的“必读起点”承担。
+  **该状态已于同日变更：用户拍板建立两个模型入口文件，见本文件末条。**
 - 项目验证模式选 `Guide`，落地在 `Workflow\Project_Validation_Guide.md`。
 
 ## 2026-10-05：权威文档库建立
@@ -55,3 +56,23 @@
   即报告用户、不得静默覆盖」是并发写入的现实兜底。人在自己的 IDE 里直接编辑，按构造
   不会去取租约；这是协议的边界，不是协议失效——判断某次冲突能否归因于协议，必须先确认
   该次冲突是否落在协议的操作条件之内。
+
+## 2026-10-05：模型入口接入（用户拍板）
+
+- 决策：按 `references/configuration-method.md` §7 的两个方案，用户选择**精简入口**形态，
+  并选择**两个文件都建**——`AGENTS.md` 与 `CLAUDE.md`（项目根）。
+  该节原文要求“先检查现有规则和链接，再让用户选择”，且“未选择前不修改”；本仓库原本
+  没有任何入口文件，故两个方案都落在“新建”上，差异只在形态：块内**只放指向根 Router
+  的指针**，不内联业务路由表摘要，避免同一事实出现第二个载体。
+- 流程失误（记录在案）：初始化时把用户对入口模式的回答「工作流有定义」直接解读为
+  `EntryMode=None` 并结案，**跳过了让用户在两个方案中选择这一步**。该选择此后由用户
+  明确拍板补上。
+- 块格式：用 `<!-- Y_MultipleAgentWorkflow:BEGIN -->` / `…:END -->` 包住，块外内容
+  各自独立；两个文件的块内容一致，可按标记幂等更新。skill 未提供导航块模板或标记约定，
+  该格式为本工程自定义。
+- 落地效果（实测，非推断）：两个文件建立后立即被本机 harness 装载为工作区指令，
+  即入口确实生效。此前“DSH 读哪个入口文件未经核验”的悬置项就此关闭。
+- 已纳入根 Router 文档索引：`ENTRY-AGENTS`、`ENTRY-CLAUDE` 两行，受结构校验逐条解析；
+  入口文件若被删除或改名，校验会失败。
+- 未处理：`references/distribution.md:4` 记载适配器来自 Codex / Claude / **ZCode** 三家，
+  而 ZCode 读取哪个入口文件本工程无依据可查，故未为它建立入口；需要时另行确认。
