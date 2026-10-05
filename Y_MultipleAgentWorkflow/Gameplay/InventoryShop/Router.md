@@ -29,21 +29,23 @@
 
 - `workflow:Gameplay.InventoryShop`
 - `path:Y_MultipleAgentWorkflow\Gameplay\InventoryShop`
-- `path:Assets\Scripts\Gameplay\Inventory`
-- `path:Assets\Scripts\Gameplay\Shop`
+- 背包实现脚本 `InventoryManager`、`InventorySlot`、`UseItem`、`Loot`、`BackpackCanvasManager`
+- 商店实现脚本 `ShopManager`、`ShopSlot`、`ShopInfoPanel`、`ShopCategoryToggles`、`ShopPortraitCamera`
+- 配置与事件资产 `ItemSO`、`InventorySlotsStatsSO`、`LootEventSO`
+- 场景与预制体接线 常驻场景、背包与商店画布
 
 ## 能力边界
 
 **Active 能力**
-- `InventoryShop_Guide.md`（ID `GP-INVENTORYSHOP-GUIDE`）是本域当前实现的权威描述：背包槽位与堆叠、拾取/丢弃/使用、金币与商店买卖、`ItemSO` 共同配置约定。
-- 本域真实实现分散在 `Assets/Scripts/Gameplay/Inventory`、`Assets/Scripts/Gameplay/Shop`、`Assets/Scripts/Pipeline/SO/ItemSO.cs`、`Assets/Scripts/Pipeline/SO/Events/{InventorySlotsStatsSO,LootEventSO}.cs`、`Assets/Scripts/Gameplay/Dialog/HistoryManager/ItemHistoryManager.cs`、`Assets/Scripts/Gameplay/Units/ShopKeeper/ShopKeeper.cs`。
+- `InventoryShop_Guide.md` 是本域当前实现的权威描述，ID 为 `GP-INVENTORYSHOP-GUIDE`，覆盖背包槽位与堆叠、拾取与丢弃、物品使用、金币与商店买卖、`ItemSO` 共同配置约定。
+- 本域实现类型：`InventoryManager`、`InventorySlot`、`UseItem`、`Loot`、`BackpackCanvasManager`、`ShopManager`、`ShopSlot`、`ShopInfoPanel`、`ShopCategoryToggles`、`ShopPortraitCamera`、`ItemHistoryManager`、`ShopKeeper`；配置与事件类型：`ItemSO`、`InventorySlotsStatsSO`、`LootEventSO`。
 
 **Proposal**
-- 无。旧文档 `Docs/My_ARPG_MVCS项目现状.md:109` 提出的 `InventoryModel`/`InventoryService`/`ItemEffectService`/`ShopModel`/`ShopService` 拆分方向只是旧文档设想，代码中不存在对应类型，本 Router 不把它记为已确认能力。
+- 无。
 
 **需要用户确认**
-- 背包与商店是否按旧文档方向做分层重构（现状是单管理器形态）。
-- 背包内容与金币不入档是否有意（`SaveData` 无相关字段）；若要入档需先定 DTO 边界。
-- 出售 `isEXP`/`isGold` 物品的语义：允许出售则需改分支，禁止出售则需明确拒绝反馈。
-- `ItemSO.stackableSize = 0` 的 `Bow.asset` 是设计意图还是配置遗漏。
-- 出售价格是否应继续取商店槽位价格（当前可能命中已失活槽位的旧值）。
+- 背包与商店是否重构为 `InventoryModel`、`InventoryService`、`ItemEffectService`、`ShopModel`、`ShopService` 五个类型；当前形态由单个管理器承担全部职责。
+- 背包内容与金币是否入库：`SaveData` 的字段不含背包与金币，入库前需先定 DTO 边界。
+- 出售 `isEXP` 与 `isGold` 物品的语义：允许出售需改分支，禁止出售需给出拒绝反馈。
+- `Bow` 物品配置资产的 `stackableSize` 取 0，是设计意图还是配置遗漏。
+- 出售价格是否应取商店槽位价格；失活槽位可能保留旧价格并参与成交。

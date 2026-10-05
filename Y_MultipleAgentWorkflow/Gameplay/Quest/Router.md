@@ -26,13 +26,21 @@
 ## 并发资源
 
 - `workflow:Gameplay.Quest`
-- `path:Assets/Scripts/Gameplay/Quest/`
-- `path:Y_MultipleAgentWorkflow/Gameplay/Quest/`
+- 脚本区：任务域运行时脚本目录
+- 文档区：本 Router 与 `Quest_Guide.md` 所在目录
 
 ## 能力边界
 
-- Active：本域权威文档为 `Quest_Guide.md`（`GP-QUEST-GUIDE`），覆盖状态机与面板显隐、进度存储与重算、奖励通道、任务板/任务面板分层。
-- Active：任务奖励只经 `InventorySlotsStatsSO`（`QuestRewardEvent.asset`）事件通道交付，`QuestManager` 不持背包引用；改动接收侧须同时核对 `InventoryShop\Router.md`。
-- Active：任务进度不落 SO、也未接入存档，`QuestObjective.currentAmount` 为死字段；不得把资产上的 `currentAmount` 当进度来源。
-- Proposal：`QuestManager` 的职责拆分（`QuestProgressModel`/`QuestRuntimeModel`/`QuestService`/`QuestLogView`，见旧文档 `Docs/My_ARPG_MVCS项目现状.md:107`）尚未实施，属方案而非现状。
-- 需要用户确认：为 `Completed` 增加发奖幂等标记、或把任务进度接入存档，须由用户确认后再动。
+**Active 能力**
+
+- 本域权威文档为 `Quest_Guide.md`（ID `GP-QUEST-GUIDE`），覆盖状态机与面板显隐、进度存储与重算、奖励通道、任务板与任务面板分层。
+- 任务奖励只经 `InventorySlotsStatsSO` 的事件通道交付，`QuestManager` 不持背包引用；改动接收侧须同时核对 `InventoryShop\Router.md`。
+- 任务进度只存在 `QuestManager` 的内存字典里，未接入存档；资产上的 `QuestObjective.currentAmount` 是零读写字段，进度来源只看内存字典。
+
+**Proposal**
+
+- 按 `QuestProgressModel`、`QuestRuntimeModel`、`QuestService`、`QuestLogView` 拆分 `QuestManager` 职责的方案待用户确认。
+
+**需要用户确认**
+
+- 为 `Completed` 增加发奖幂等标记，或把任务进度接入存档。

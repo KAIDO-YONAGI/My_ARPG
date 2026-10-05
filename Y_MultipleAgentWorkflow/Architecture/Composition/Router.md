@@ -27,8 +27,7 @@
 
 - `workflow:Architecture.Composition`
 - `path:Y_MultipleAgentWorkflow\Architecture\Composition\`
-- `path:Assets\Scripts\Contracts\`（只读证据源；写入需 Gameplay/Assets 域授权）
-- `path:Assets\Scripts\Pipeline\UI\SystemCanvasManagers\`（只读证据源；写入门槛同上）
+- 契约脚本目录与系统画布管理脚本目录以只读证据源身份登记；写入这两处需 Gameplay 域与资产域授权。
 
 ## 能力边界
 
@@ -39,10 +38,10 @@ Active 能力：
 
 Proposal：
 
-- `Architecture\AssemblyPlan\AssemblyPlan_Proposal.md`（`ARCH-ASSEMBLY-PLAN`）涉及程序集拆分前后的组合边界，但**未实施**，不得作为当前能力引用。
+- `Architecture\AssemblyPlan\AssemblyPlan_Proposal.md`（`ARCH-ASSEMBLY-PLAN`）涉及程序集拆分前后的组合边界，尚未实施，按提案记录引用。
 
 需要用户确认的事项：
 
 - 把 19 个具体单例收敛回 6 个合规项（合并/下沉历史三件套与寻路三件套）属于架构决策，需用户确认后才可立项。
 - 为 `SaveRegistry.Clear()` 建立局间复位调用点会改动重开新局流程，需用户确认时机。
-- 本域 Router 不含写入 `Assets/**` 的授权；如需修改被本域描述的源码，须路由到对应业务域的 Router。
+- 本域 Router 不含脚本目录的写入授权；如需修改被本域描述的源码，须路由到对应业务域的 Router。

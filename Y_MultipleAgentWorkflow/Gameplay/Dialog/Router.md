@@ -26,13 +26,21 @@
 ## 并发资源
 
 - `workflow:Gameplay.Dialog`
-- `path:Assets/Scripts/Gameplay/Dialog/`
-- `path:Y_MultipleAgentWorkflow/Gameplay/Dialog/`
+- 脚本区：对话域运行时脚本目录及其中的 HistoryManager 子目录
+- 文档区：本 Router 与 `Dialog_Guide.md` 所在目录
 
 ## 能力边界
 
-- Active：本域权威文档为 `Dialog_Guide.md`（`GP-DIALOG-GUIDE`），覆盖会话流程、对话树数据模型、Refuse 判定、历史记录、NPC 触发链。
-- Active：`HistoryManager\` 目前是域内子目录（`ConversationHistoryManager` / `ItemHistoryManager` / `VisitedHistoryManager`），**未建立下级 Router**，其事实在 `Dialog_Guide.md` 的 §2.4 与 §3。
-- Active：对话的开关画布请求由 NPC 触发器承接（`DialogManager.ToggleCanvasEvent` 为 null），改动此归属需同时核对 `Dialog_Guide.md` §2.5 与 `Units\Router.md`。
-- Proposal：`VisitedHistoryManager` 为空类，位置条件（`DialogManager.cs:185` 的 TODO）未实现；补齐前不得据此写实现性文档。
-- 需要用户确认：新增 `HistoryManager\Router.md` 或改变对话画布开关归属，须由用户确认后再动。
+**Active 能力**
+
+- 本域权威文档为 `Dialog_Guide.md`（ID `GP-DIALOG-GUIDE`），覆盖会话流程、对话树数据模型、Refuse 判定、历史记录的写入与读取、NPC 触发链、对话画布开关归属。
+- HistoryManager 子目录承载 `ConversationHistoryManager`、`ItemHistoryManager`、`VisitedHistoryManager` 三个管理器，未建立下级 Router，事实记在 `Dialog_Guide.md` 的 §2.4 与 §3。
+- 对话画布的开关请求由 NPC 触发器承接，`DialogManager.ToggleCanvasEvent` 返回 null；改动这一归属需同时核对 `Dialog_Guide.md` §2.5 与 `Units\Router.md`。
+
+**Proposal**
+
+- `VisitedHistoryManager` 是空类，`DialogManager` 内的位置检测 TODO 处于待实现状态；补齐前不据此写实现性文档。
+
+**需要用户确认**
+
+- 新增 HistoryManager 的下级 Router，或改变对话画布开关的归属。
