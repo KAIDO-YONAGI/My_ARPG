@@ -11,12 +11,12 @@
 |---|---|
 | `分层` `Layering` `三层` | 本文 §2.1 |
 | `Contracts` `契约层` | 本文 §2.1、§3.4 |
-| `Pipeline` `管线层` | 本文 §2.1、§3.3 |
+| `Pipeline` `管线层` | 本文 §2.1 |
 | `依赖方向` `反向依赖` | 本文 §2.2 |
-| `asmdef` `程序集` `Assembly-CSharp` | 本文 §2.5、§3.1 |
-| `命名空间` `namespace` `全局命名空间` | 本文 §2.4、§3.2 |
+| `asmdef` `程序集` `Assembly-CSharp` | 本文 §2.7、§3.1 |
+| `命名空间` `namespace` `全局命名空间` | 本文 §2.5、§3.2 |
 | `MVCS` `Model` `View` `Controller` `Service` | 本文 §2.3 |
-| `唯一写入口` `只读接口` `StatsService` | 本文 §2.3、§3.5 |
+| `唯一写入口` `只读接口` `StatsService` | 本文 §2.4、§3.5 |
 | `YSingleton` `单例基类` | 本文 §2.6 |
 | `测试` `[Test]` `回归网` | 本文 §2.7 |
 
@@ -96,10 +96,30 @@
 
 ## 3. 约定与硬边界
 
-1. **0 个 asmdef ⇒ 全工程一个程序集。** 改动任何源码都触发整个 `Assembly-CSharp` 重编；分层只靠命名约定与纪律，编译器不拦截跨层引用。
-2. **全局命名空间是共用的。** 产品代码里 111 个类的标识符在一个全局池里，编辑器侧那 1 个编辑器脚本同池；新类型重名会直接编译失败，失败点可能出现在无关文件。往带命名空间的目录加类时，类名已在全局池里被引用会出歧义。
-3. **`SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`。** 注册动作在基类里，漏调 `base.OnSingletonInitialized()` 不报错、不警告，该服务会漏掉 `SaveRegistry` 登记，存读档时被静默跳过。
-4. **`Contracts` 不得反向 using `Gameplay` 或 `Pipeline`。** 契约层被所有域引用，反向依赖会形成环；当前 0 处。
-5. **`StatsService.Instance.Stats` 是只读视图，接口上不带写方法。** 测试断言 `StatsService` 不暴露具体 Model。
-6. **改 `PlayerStatsData` 的字段名等于坏档。** 字段名就是存档 JSON 键；类名可以改，字段名不可以。
-7. **纯 C# 层不得引用 `MonoBehaviour` 生命周期**，包括 `PlayerStatsModel`、三个显示侧 Controller 与 `CanvasFocusStack`；EditMode 测试依赖这条。
+### 3.1 0 个 asmdef ⇒ 全工程一个程序集
+
+改动任何源码都触发整个 `Assembly-CSharp` 重编；分层只靠命名约定与纪律，编译器不拦截跨层引用。
+
+### 3.2 全局命名空间是共用的
+
+产品代码里 111 个类的标识符在一个全局池里，编辑器侧那 1 个编辑器脚本同池；新类型重名会直接编译失败，失败点可能出现在无关文件。往带命名空间的目录加类时，类名已在全局池里被引用会出歧义。
+
+### 3.3 `SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`
+
+注册动作在基类里，漏调 `base.OnSingletonInitialized()` 不报错、不警告，该服务会漏掉 `SaveRegistry` 登记，存读档时被静默跳过。
+
+### 3.4 `Contracts` 不得反向 using `Gameplay` 或 `Pipeline`
+
+契约层被所有域引用，反向依赖会形成环；当前 0 处。
+
+### 3.5 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法
+
+测试断言 `StatsService` 不暴露具体 Model。
+
+### 3.6 改 `PlayerStatsData` 的字段名等于坏档
+
+字段名就是存档 JSON 键；类名可以改，字段名不可以。
+
+### 3.7 纯 C# 层不得引用 `MonoBehaviour` 生命周期
+
+包括 `PlayerStatsModel`、三个显示侧 Controller 与 `CanvasFocusStack`；EditMode 测试依赖这条。

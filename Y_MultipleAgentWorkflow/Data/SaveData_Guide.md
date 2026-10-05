@@ -9,14 +9,14 @@
 | 线索 | 指向 |
 |---|---|
 | `存档`、`读档`、`SaveSystem`、`SaveData` | §2.1 三层结构、§2.2 落盘规则 |
-| `字段改名`、`旧档兼容`、`JSON schema`、`JsonProperty` | §3 第 1~3 条 |
-| `SaveKey`、`sceneID`、`场景键`、`GameSceneSO.ID` | §2.4、§3 第 4~6 条 |
-| `SaveDefinition`、`lootsStatsDic`、`GUID 撞档`、`掉落实例` | §2.4 |
-| `ISaveable`、`SaveRegistry`、`SaveableService`、`注册/注销` | §2.1、§3 第 13~15 条 |
-| `persistentDataPath`、`SaveInfo`、`DeleteSave`、`路径越界` | §2.2、§2.6 |
-| `Continue`、`坏档回退`、`GetLatestLoadableSavePath` | §2.6 |
-| `IsLoadingSaveRequest`、`自动存档`、`重新开始` | §2.5、§3 第 8~10 条 |
-| `保存面板`、`saveLoadButtonGroups`、`手动存档` | §2.7 |
+| `字段改名`、`旧档兼容`、`JSON schema`、`JsonProperty` | §2.3、§3.1–§3.3 |
+| `SaveKey`、`sceneID`、`场景键`、`GameSceneSO.ID` | §2.4、§3.4–§3.5 |
+| `SaveDefinition`、`lootsStatsDic`、`GUID 撞档`、`掉落实例` | §2.4、§3.6 |
+| `ISaveable`、`SaveRegistry`、`SaveableService`、`注册/注销` | §2.1、§3.13–§3.14 |
+| `persistentDataPath`、`SaveInfo`、`DeleteSave`、`路径越界` | §2.2、§2.6、§2.7 |
+| `Continue`、`坏档回退`、`GetLatestLoadableSavePath` | §2.2、§2.6 |
+| `IsLoadingSaveRequest`、`自动存档`、`重新开始` | §2.5、§3.9 |
+| `保存面板`、`saveLoadButtonGroups`、`手动存档` | §2.7、§3.8 |
 
 ## 2. 当前实现
 
@@ -88,19 +88,66 @@ if (lastSceneType != SceneType.Menu) { … dataSavedEvent.RaiseDataSaveEvent(Sys
 
 ## 3. 约定与硬边界
 
-1. **改公有字段名等于改 JSON 键。** 涉及 `SaveData`、`SaveMetaData`、`LootStatus`、`SceneAndPosition`、`SerializableVector3` 与 `PlayerStatsData`，前五个类型集中在同一个存档数据类型文件里。没有 `[JsonProperty]` 兜底，改名后旧档对应值读成默认值。加字段安全，缺失字段取默认值。
-2. **`SaveType` 的成员顺序就是 JSON 里的整数。** `SystemSave` 为 0、`PlayerSave` 为 1，存档 JSON 中写为 `"saveType": 0`。插入或重排成员会让旧档被当成另一种档。
-3. **`SaveType` 的成员名同时是文件名前缀。** `SaveSystem` 用枚举 `ToString()` 拼文件名，改名后 `GetSavesPath` 找不到任何旧文件。
-4. **场景键只能用 `SaveKey`，`GameSceneSO.ID` 不可用于存档。** `ID` 由 `OnValidate` 生成且不落盘，跨会话与打包都会变。改 `SaveKey` 的算法等于让全部旧档变成不可加载，`IsLoadableSaveFile` 的 `GetScene` 条件直接失败。
-5. **`SaveKey` 的编辑器分支与非编辑器分支取值不同**：编辑器取场景资产 GUID，包体取 `GameSceneSO` 资产名。
-6. **`lootsStatsDic` 的键是裸 GUID，没有场景维度。** 两个场景里的掉落物只要 ID 相同就是同一条存档记录。新增场景里的掉落物实例必须逐个改 ID，在场景里覆盖 `propertyPath: ID`，否则会继承预制体烘焙的 ID，并与同源实例共用一个条目。
-7. **掉落物身份的三个入口分工不同。** `SaveDefinition.OnValidate` 只在 ID 为空时补发，且只在编辑器跑；`Loot.RegisterSelf` 只在 ID 为空时补发；`Loot.AssignNewIdentity` 在池取件时强制换发新 GUID 并删掉旧 ID 的条目；`Loot.Initialize` 保留原 ID，原地重掉的同一实体沿用原 ID。
-8. **手动存档必须走 `SaveDataManager.PrepareManualSaveData()` 再 `WriteSave`。** 前者重算 `sceneIDAndPlayerPos` 并让所有注册者写进 `dataToSave`；直接 `WriteSave` 会落盘上一次的 `sceneIDAndPlayerPos`。当前唯一调用点是面板。
-9. **读档入口的顺序不可调整。** `LoadFromData` 必须在 `RequestSceneLoad` 之前，且标志位要包住 `RequestSceneLoad`。从其它地方直接 `RequestSceneLoad` 而不置标志时，ReadWrite 场景会走重置分支，把刚读出的 `lootsStatsDic` 清空。
-10. **`OnAutoLoad` 只回灌按 GUID 参与动态数据的对象**，判据是 `GetDataID() != null`。广播段 `OnAutoSave` 先抓快照。新增固定槽位服务时，状态必须在 `LoadFromData` 阶段写完整，`OnAutoLoad` 不补固定槽位服务。
-11. **`dataToSave` 与运行态是同一个对象。** `WriteSave` 直接序列化 `SaveDataManager.Instance.GetData`，`Loot.SaveData` 直接改这个字典。落盘前任何对 `dataToSave` 的写入都会进文件。
-12. **保存文件名只有毫秒精度。** 格式为 `yyyyMMdd_HHmmss_fff`，两次保存落在同一毫秒会互相覆盖。
-13. **注册与注销必须幂等且成对。** `SaveRegistry.Add` 靠 `Contains` 去重，`Remove` 只删第一处，重复注册要靠调用方自己的 `registered` 标记。
-14. **静态表的生命周期由引擎控制。** `ResetStatics` 在每次进 Play 前清空，`Awake` 顺序不作为依赖。
-15. **读档位置与 `Vector3.zero` 语义重叠。** `SaveSystem` 只兜底 `null`，而 `SceneChanger` 把 `(0,0,0)` 视为使用场景初始点。
-16. **Location 到 Location 的自动存档不记玩家真实坐标。** `SaveDataManager` 取目标场景的 `initialPosition`，真实坐标只出现在手动存档与切回 Menu 的分支。
+### 3.1 改公有字段名等于改 JSON 键
+
+涉及 `SaveData`、`SaveMetaData`、`LootStatus`、`SceneAndPosition`、`SerializableVector3` 与 `PlayerStatsData`，前五个类型集中在同一个存档数据类型文件里。没有 `[JsonProperty]` 兜底，改名后旧档对应值读成默认值。加字段安全，缺失字段取默认值。
+
+### 3.2 `SaveType` 的成员顺序就是 JSON 里的整数
+
+`SystemSave` 为 0、`PlayerSave` 为 1，存档 JSON 中写为 `"saveType": 0`。插入或重排成员会让旧档被当成另一种档。
+
+### 3.3 `SaveType` 的成员名同时是文件名前缀
+
+`SaveSystem` 用枚举 `ToString()` 拼文件名，改名后 `GetSavesPath` 找不到任何旧文件。
+
+### 3.4 场景键只能用 `SaveKey`，`GameSceneSO.ID` 不可用于存档
+
+`ID` 由 `OnValidate` 生成且不落盘，跨会话与打包都会变。改 `SaveKey` 的算法等于让全部旧档变成不可加载，`IsLoadableSaveFile` 的 `GetScene` 条件直接失败。
+
+### 3.5 `SaveKey` 的编辑器分支与非编辑器分支取值不同
+
+编辑器取场景资产 GUID，包体取 `GameSceneSO` 资产名。
+
+### 3.6 `lootsStatsDic` 的键是裸 GUID，没有场景维度
+
+两个场景里的掉落物只要 ID 相同就是同一条存档记录。新增场景里的掉落物实例必须逐个改 ID，在场景里覆盖 `propertyPath: ID`，否则会继承预制体烘焙的 ID，并与同源实例共用一个条目。
+
+### 3.7 掉落物身份的三个入口分工不同
+
+`SaveDefinition.OnValidate` 只在 ID 为空时补发，且只在编辑器跑；`Loot.RegisterSelf` 只在 ID 为空时补发；`Loot.AssignNewIdentity` 在池取件时强制换发新 GUID 并删掉旧 ID 的条目；`Loot.Initialize` 保留原 ID，原地重掉的同一实体沿用原 ID。
+
+### 3.8 手动存档必须走 `SaveDataManager.PrepareManualSaveData()` 再 `WriteSave`
+
+前者重算 `sceneIDAndPlayerPos` 并让所有注册者写进 `dataToSave`；直接 `WriteSave` 会落盘上一次的 `sceneIDAndPlayerPos`。当前唯一调用点是面板。
+
+### 3.9 读档入口的顺序不可调整
+
+`LoadFromData` 必须在 `RequestSceneLoad` 之前，且标志位要包住 `RequestSceneLoad`。从其它地方直接 `RequestSceneLoad` 而不置标志时，ReadWrite 场景会走重置分支，把刚读出的 `lootsStatsDic` 清空。
+
+### 3.10 `OnAutoLoad` 只回灌按 GUID 参与动态数据的对象
+
+判据是 `GetDataID() != null`。广播段 `OnAutoSave` 先抓快照。新增固定槽位服务时，状态必须在 `LoadFromData` 阶段写完整，`OnAutoLoad` 不补固定槽位服务。
+
+### 3.11 `dataToSave` 与运行态是同一个对象
+
+`WriteSave` 直接序列化 `SaveDataManager.Instance.GetData`，`Loot.SaveData` 直接改这个字典。落盘前任何对 `dataToSave` 的写入都会进文件。
+
+### 3.12 保存文件名只有毫秒精度
+
+格式为 `yyyyMMdd_HHmmss_fff`，两次保存落在同一毫秒会互相覆盖。
+
+### 3.13 注册与注销必须幂等且成对
+
+`SaveRegistry.Add` 靠 `Contains` 去重，`Remove` 只删第一处，重复注册要靠调用方自己的 `registered` 标记。
+
+### 3.14 静态表的生命周期由引擎控制
+
+`ResetStatics` 在每次进 Play 前清空，`Awake` 顺序不作为依赖。
+
+### 3.15 读档位置与 `Vector3.zero` 语义重叠
+
+`SaveSystem` 只兜底 `null`，而 `SceneChanger` 把 `(0,0,0)` 视为使用场景初始点。
+
+### 3.16 Location 到 Location 的自动存档不记玩家真实坐标
+
+`SaveDataManager` 取目标场景的 `initialPosition`，真实坐标只出现在手动存档与切回 Menu 的分支。

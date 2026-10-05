@@ -11,11 +11,11 @@
 | `血量` `HP` `扣血` `回血` `Respawn` | §2.2、§2.9、§3.2 |
 | `重试` `RetryRequestEvent` `RetryButton` `GameOver` | §2.9、§3.2 |
 | `经验` `升级` `LevelUp` `阈值` `expToUpgrade` `经验曲线` | §2.4、§3.1 |
-| `技能点` `SkillPoints` `加点` | §2.4、§3.1 |
+| `技能点` `SkillPoints` `加点` | §2.4、§3.7 |
 | `攻击力` `速度` `武器范围` `击退` `冷却` | §2.2、§2.5 |
 | `StatsService` `Stats` `IPlayerStatsReadOnly` `只读视图` | §2.1、§2.2、§3.5 |
 | `PlayerStatsSO` `初始值` `模板` | §2.6、§3.3 |
-| `playerStatsData` `读档` `存档数值` `坏档` | §2.7、§3.4 |
+| `playerStatsData` `读档` `存档数值` `坏档` | §2.7、§3.8 |
 | `26 个测试` `EditMode` `回归网` | §2.8 |
 
 ## 2. 当前实现
@@ -142,11 +142,34 @@ expToUpgrade = Mathf.Max(1, expToUpgrade + step)  // 下限仍受 MinExpToUpgrad
 
 ## 3. 约定与硬边界
 
-1. **升序迭代是收敛的，阈值为 1 时按级数消耗**。`GrowExpToUpgrade` 保证阈值不低于 1，循环条件里含这一项；阈值为 1 时每级只扣 1 点经验，`AddExp(n)` 的迭代次数是 n 次。
-2. **重试复活必须「先回血、后重载」**。链路是 `RetryButton.HandleRetry()` 广播重试请求事件 → `PlayerDamageController.OnRetryRequest` → 先 `StatsService.Instance.Respawn()` → 再 `SceneChanger.Instance.RequestSceneLoad(SceneChanger.Instance.GetCurrentScenes(), Vector3.zero, true)`。
-3. **不要写 `PlayerStatsSO.Data`**。它返回模板本体；取初始值走 `CreateInitialData()`。
-4. **`PlayerStatsData` 的字段名不可改**。Newtonsoft 按字段名序列化；类名可以改。
-5. **`Stats` 在 `StatsService.Awake` 完成前是 null**。`model` 在 `OnSingletonInitialized` 里创建，该钩子由 `YSingleton.Awake` 调用。三个 View 都在 `Start` 建 Controller，`SkillTreeManager` 额外做了可重试订阅。
-6. **`IPlayerStatsReadOnly` 是唯一的对外读类型**。`StatsService` 不暴露具体 `Model`，`PlayerStatsModelTests` 用反射锁死这一点。加写操作就加 Service 方法，把 Model 留在内部。
-7. **`UpdateSkillPoints` 不发事件**。唯一消费者是写入者 `SkillTreeManager`，写完自己刷文本；新增消费者需自己刷。
-8. **`LoadData` 的 null 语义是「保留现状」**。`playerStatsData` 为 null 时它直接返回，空数值段不会把运行时数值清零。
+### 3.1 升序迭代是收敛的，阈值为 1 时按级数消耗
+
+`GrowExpToUpgrade` 保证阈值不低于 1，循环条件里含这一项；阈值为 1 时每级只扣 1 点经验，`AddExp(n)` 的迭代次数是 n 次。
+
+### 3.2 重试复活必须「先回血、后重载」
+
+链路是 `RetryButton.HandleRetry()` 广播重试请求事件 → `PlayerDamageController.OnRetryRequest` → 先 `StatsService.Instance.Respawn()` → 再 `SceneChanger.Instance.RequestSceneLoad(SceneChanger.Instance.GetCurrentScenes(), Vector3.zero, true)`。
+
+### 3.3 不要写 `PlayerStatsSO.Data`
+
+它返回模板本体；取初始值走 `CreateInitialData()`。
+
+### 3.4 `PlayerStatsData` 的字段名不可改
+
+Newtonsoft 按字段名序列化；类名可以改。
+
+### 3.5 `Stats` 在 `StatsService.Awake` 完成前是 null
+
+`model` 在 `OnSingletonInitialized` 里创建，该钩子由 `YSingleton.Awake` 调用。三个 View 都在 `Start` 建 Controller，`SkillTreeManager` 额外做了可重试订阅。
+
+### 3.6 `IPlayerStatsReadOnly` 是唯一的对外读类型
+
+`StatsService` 不暴露具体 `Model`，`PlayerStatsModelTests` 用反射锁死这一点。加写操作就加 Service 方法，把 Model 留在内部。
+
+### 3.7 `UpdateSkillPoints` 不发事件
+
+唯一消费者是写入者 `SkillTreeManager`，写完自己刷文本；新增消费者需自己刷。
+
+### 3.8 `LoadData` 的 null 语义是「保留现状」
+
+`playerStatsData` 为 null 时它直接返回，空数值段不会把运行时数值清零。

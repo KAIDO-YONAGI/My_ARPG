@@ -43,16 +43,16 @@
 
 **Active 能力**
 
-- 声明并维护单位九个脚本的当前实现：敌人 4 个 `EnemyMovement`、`EnemyCombat`、`EnemyHealth`、`EnemyKnockBack`；NPC 4 个 `NPCStateController`、`NPCWander`、`NPCPatrol`、`NPCDialogTrigger`；店主 1 个 `ShopKeeper`。同时声明无统一基类、全局命名空间、`EnemyHealth` 是唯一 `IDamageable` 实现者这一现状（§2.0）。
-- 声明单位与 `PathFollower` 的移动契约：各自持实例、只调 `GetPosToGo`/`ArrivedPos`/`ResetPath`/`GetThreshold` 四个方法、`Vector3.zero` 表示无路、阈值语义与重算规则（§2.5 §3.1 §3.2）。
-- 声明单位的三条对外通道与订阅方：`PlayerDamagedEventSO` 对 `PlayerDamageController`、`EnemyDefeatedEventSO` 对 `ExperienceController`、`ShopKeeperEventSO` 对 `ShopManager` 与 `ShopPortraitCamera`，以及敌人反向读 `StatsService.Instance.Stats` 的击退数值耦合（§2.2 §2.4 §3.4）。
-- 声明 `NPCStateController` 的互斥 `enabled` 行为切换、`NPCDialogTrigger` 的 `isKinematic` 接管约定（§2.3 §3.6 §3.7）。
+- 声明并维护单位九个脚本的当前实现：敌人 4 个 `EnemyMovement`、`EnemyCombat`、`EnemyHealth`、`EnemyKnockBack`；NPC 4 个 `NPCStateController`、`NPCWander`、`NPCPatrol`、`NPCDialogTrigger`；店主 1 个 `ShopKeeper`。同时声明无统一基类、全局命名空间、`EnemyHealth` 是唯一 `IDamageable` 实现者这一现状（`Units_Guide.md` §2.0）。
+- 声明单位与 `PathFollower` 的移动契约：各自持实例、只调 `GetPosToGo`/`ArrivedPos`/`ResetPath`/`GetThreshold` 四个方法、`Vector3.zero` 表示无路、阈值语义与重算规则（`Units_Guide.md` §2.5 §3.1 §3.2）。
+- 声明单位的三条对外通道与订阅方：`PlayerDamagedEventSO` 对 `PlayerDamageController`、`EnemyDefeatedEventSO` 对 `ExperienceController`、`ShopKeeperEventSO` 对 `ShopManager` 与 `ShopPortraitCamera`，以及敌人反向读 `StatsService.Instance.Stats` 的击退数值耦合（`Units_Guide.md` §2.2 §2.4 §3.4）。
+- 声明 `NPCStateController` 的互斥 `enabled` 行为切换、`NPCDialogTrigger` 的 `isKinematic` 接管约定（`Units_Guide.md` §2.3 §3.6 §3.7）。
 
 **不在本域范围，请转到对应 Router**
 
-- 寻路算法、网格构建、开表堆、`AStarDetails`、空壳的 `ObjectsMapManager` → 尚未建立权威文档。
-- 商店买卖、库存结算、`IShopInteractable` 面板逻辑 → `Gameplay\InventoryShop\Router.md`。
-- 对话推进规则、`DialogManager`、`DialogSO` 分支 → `Gameplay\Dialog\Router.md`。
-- 玩家数值、击退与硬直数值本身 → `Gameplay\PlayerStats\Router.md`。
-- 玩家攻击命中侧的 `PlayerCombat.DealDamage` 与 `Arrow` → `Gameplay\PlayerStats\Router.md`。
-- 事件总线机制与 MVC 边界 → `Architecture\Router.md`。
+- 寻路算法、网格构建、开表堆、`AStarDetails`、`ObjectsMapManager` → `..\..\Architecture\Layering\Router.md`、`..\..\Architecture\Composition\Router.md`。
+- 商店买卖、库存结算、`IShopInteractable` 面板逻辑 → `..\InventoryShop\Router.md`。
+- 对话推进规则、`DialogManager`、`DialogSO` 分支 → `..\Dialog\Router.md`。
+- 玩家数值、击退与硬直数值本身 → `..\PlayerStats\Router.md`。
+- 玩家攻击命中侧的 `PlayerCombat.DealDamage` 与 `Arrow` → `..\PlayerStats\Router.md`。
+- 事件总线机制与 MVC 边界 → `..\..\Architecture\Router.md`。

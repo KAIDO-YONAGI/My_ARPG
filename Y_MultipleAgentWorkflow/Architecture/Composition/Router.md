@@ -39,4 +39,4 @@ Active 能力：
 
 Proposal：
 
-- `Architecture\AssemblyPlan\AssemblyPlan_Proposal.md` 的文档 ID 为 `ARCH-ASSEMBLY-PLAN`，涉及程序集拆分前后的组合边界，尚未实施，按提案记录引用。
+- `..\AssemblyPlan\AssemblyPlan_Proposal.md` 的文档 ID 为 `ARCH-ASSEMBLY-PLAN`，涉及程序集拆分前后的组合边界，尚未实施，按提案记录引用。

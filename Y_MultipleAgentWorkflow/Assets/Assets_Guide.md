@@ -9,17 +9,17 @@
 
 | 线索 | 指向 |
 |---|---|
-| `GameSO` / `ScriptableObject 资产` / `CreateAssetMenu` | 第 2 节，目录契约与数量 |
-| `新增物品` / `ItemSO` / `Gold 物品资产` | 2.2 配置类资产清单 |
-| `新增任务` / `QuestSO` | 2.2；任务判定语义见 Gameplay 的 Quest 子域 |
-| `新增对话` / `DialogSO` / `RefuseDialogSO` | 2.3 对话资产的组织方式 |
-| `SkillSO` / `skillName` / 技能开关 | 2.4 |
-| `GameSceneSO` / `场景资产` | 2.5；加载语义见 SceneFlow 域 |
-| `资产命名` / `目录约定` | 第 3 节 |
-| `StreamingAssets` / `GameGuide` | 2.6 与第 3 节硬约束 |
-| `中文文件名` / `非 ASCII` / Android 构建失败 | 3.3 与 2.6 |
-| `Config` 还是 `Event` | 2.1 资产分类 |
-| `生成器` / `批量创建资产` / `手工创建资产` | 2.7 |
+| `GameSO` / `ScriptableObject 资产` / `CreateAssetMenu` | §2.1 分类与数量、§2.7 手工创建与菜单分组、§3.1 目录与命名约定 |
+| `新增物品` / `ItemSO` / `Gold 物品资产` | §2.2 配置类资产清单 |
+| `新增任务` / `QuestSO` | §2.2 配置类资产清单；任务判定语义见 Gameplay 的 Quest 子域 |
+| `新增对话` / `DialogSO` / `RefuseDialogSO` | §2.2 配置类资产清单、§2.3 对话资产的组织方式 |
+| `SkillSO` / `skillName` / 技能开关 | §2.4 技能资产的字段级契约 |
+| `GameSceneSO` / `场景资产` | §2.5 GameSceneSO 资产；加载语义见 SceneFlow 域 |
+| `资产命名` / `目录约定` | §3.1 目录与命名约定 |
+| `StreamingAssets` / `GameGuide` | §2.6 StreamingAssets 现状、§3.3 StreamingAssets 硬约束 |
+| `中文文件名` / `非 ASCII` / Android 构建失败 | §3.3.1 文件名必须是 ASCII、§2.6 StreamingAssets 现状 |
+| `Config` 还是 `Event` | §2.1 分类与数量、§3.2 配置与运行时事件的边界 |
+| `生成器` / `批量创建资产` / `手工创建资产` | §2.7 全部 GameSO 资产均为手工创建 |
 
 ## 2. 当前实现
 
@@ -99,7 +99,7 @@ StreamingAssets 目录下只有一个有效文件：`GameGuide` 指南文件，1
 ### 3.1 目录与命名约定
 
 - **目录**：GameSO 目录下按用途分目录。事件通道统一放在 Events 目录，再分 `VoidEvents`、`ToggleCanvasEvents`、`InventorySlotsStatsEvents`。
-- **配置资产命名跟随类名或语义名**：`CharacterSO` 放在以角色名命名的文件夹根部；`ToggleCanvasEvents` 下的资产命名为 `Toggle<枚举后缀>Event`，与 `MyEnums.CanvasToToggle` 的成员一一对应，见 `EventChannels_Guide.md` 的 2.3。
+- **配置资产命名跟随类名或语义名**：`CharacterSO` 放在以角色名命名的文件夹根部；`ToggleCanvasEvents` 下的资产命名为 `Toggle<枚举后缀>Event`，与 `MyEnums.CanvasToToggle` 的成员一一对应，见 `EventChannels_Guide.md` §2.3。
 - **`VoidEventSO` 资产必须带语义前缀**：该规则写在 `VoidEventSO` 的源码注释里，要求资产名含语义前缀，例如 `SlashActionFinishedEventSO`，并禁止再创建无语义的资产名。
 - **`GuidSO` 派生类不要手动改 `guid`**：`OnValidate` 只在为空时补发，手动清空会在下次 Inspector 校验时换成新值。
 
@@ -111,8 +111,16 @@ StreamingAssets 目录下只有一个有效文件：`GameGuide` 指南文件，1
 
 ### 3.3 StreamingAssets 硬约束
 
-1. **该目录下的文件名必须是 ASCII。** 非 ASCII 文件名会让 Android Release 构建在 AGP 解包 AAR 阶段抛 `java.nio.charset.MalformedInputException`，报 `malformed input off : 8, length : 1`，堆栈落在 `com.android.builder.aar.AarExtractor`。文件内容可以用 UTF-8 中文，受约束的只是文件名。
-2. **Android 上该目录位于 APK 内，`System.IO` 与 `Process` 无法当普通文件访问。** 包内条目挂在 APK 的资源目录下，`Path.Combine(Application.streamingAssetsPath, ...)` 产生的路径在 Android 上无法用 `File.Exists` 命中，因此 `OpenTxtWithSystem` 会走 `LogError` 分支。
-3. **改完包内条目必须复核**：复核脚本直接扫 ZIP 条目，要求指南文件条目存在，且非 ASCII 条目为 0。
+#### 3.3.1 该目录下的文件名必须是 ASCII
+
+非 ASCII 文件名会让 Android Release 构建在 AGP 解包 AAR 阶段抛 `java.nio.charset.MalformedInputException`，报 `malformed input off : 8, length : 1`，堆栈落在 `com.android.builder.aar.AarExtractor`。文件内容可以用 UTF-8 中文，受约束的只是文件名。
+
+#### 3.3.2 Android 上该目录位于 APK 内，`System.IO` 与 `Process` 无法当普通文件访问
+
+包内条目挂在 APK 的资源目录下，`Path.Combine(Application.streamingAssetsPath, ...)` 产生的路径在 Android 上无法用 `File.Exists` 命中，因此 `OpenTxtWithSystem` 会走 `LogError` 分支。
+
+#### 3.3.3 改完包内条目必须复核
+
+复核脚本直接扫 ZIP 条目，要求指南文件条目存在，且非 ASCII 条目为 0。
 
 全工程路径含目录名的非 ASCII 数量为 **0**。

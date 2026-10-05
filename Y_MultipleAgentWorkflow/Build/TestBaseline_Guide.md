@@ -13,8 +13,8 @@
 | `PlayMode 测试` | §2.7 |
 | `测试总数` / `测试全绿` / `用例数` | §2.2、§2.3 |
 | `test-framework` / `NUnit` | §2.1 |
-| `Test Runner 跑不出来` / `asmdef` | §3.2 |
-| `改 PlayerStatsModel 前先跑什么` | §2.4 |
+| `Test Runner 跑不出来` / `asmdef` | §3.2、§3.6 |
+| `改 PlayerStatsModel 前先跑什么` | §2.5 |
 | `哪些域没有测试` | §2.5 |
 | `测试退出码` / `testResults` XML | §2.6 |
 
@@ -79,13 +79,30 @@ headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：
 
 ### 2.7 无 PlayMode 测试
 
-52 个用例全为 `[Test]`（§2.2），`[UnityTest]` 为 0，仓库中不存在显式的 PlayMode 测试。“进场景 / 场景切换 / 存档往返”这类路径目前靠手工验证，真机冒烟见 `AndroidBuild_Guide.md` §2.7。
+52 个用例全为 `[Test]`，见 §2.2；`[UnityTest]` 为 0，仓库中不存在显式的 PlayMode 测试。“进场景 / 场景切换 / 存档往返”这类路径目前靠手工验证，真机冒烟见 `AndroidBuild_Guide.md` §2.7。
 
 ## 3. 约定与硬边界
 
-1. **`Tests/Editor` 这个目录名是承重的**：它让测试落进预定义编辑器程序集 `Assembly-CSharp-Editor`。移动测试目录、或把测试挪出 `Editor` 子目录，都会改变程序集归属并影响编译与枚举。
-2. **新增 asmdef 会排除现有测试**：当前 0 asmdef 是“测试能自动被 Test Runner 看到”的前提。引入 asmdef 后这 5 个文件改由新程序集编译，必须显式引用 `UnityEngine.TestRunner`、`UnityEditor.TestRunner`、test-framework 与产品程序集，否则编译不通过或测试无法被枚举。
-3. **不要用 IDE 用的 MSBuild 目标文件判断测试是否被排除**：它只把测试源文件从 MSBuild/IDE 项目模型摘掉，注释明确 Unity 编译与 Test Runner 不受影响。后果：IDE 里没有补全、跳转与 Find Usages，但测试照跑。
-4. **退出码不是成功判据**：判据是 `testResults` XML 根节点的 `result` 与失败计数。
-5. **测试数量**：5 个文件、52 个 `[Test]`（§2.2）。
-6. **同一工程不能同时开两个 Editor 实例**：跑 headless 测试前必须关掉已打开的该工程实例。
+### 3.1 `Tests/Editor` 这个目录名是承重的
+
+它让测试落进预定义编辑器程序集 `Assembly-CSharp-Editor`。移动测试目录、或把测试挪出 `Editor` 子目录，都会改变程序集归属并影响编译与枚举。
+
+### 3.2 新增 asmdef 会排除现有测试
+
+当前 0 asmdef 是“测试能自动被 Test Runner 看到”的前提。引入 asmdef 后这 5 个文件改由新程序集编译，必须显式引用 `UnityEngine.TestRunner`、`UnityEditor.TestRunner`、test-framework 与产品程序集，否则编译不通过或测试无法被枚举。
+
+### 3.3 不要用 IDE 用的 MSBuild 目标文件判断测试是否被排除
+
+它只把测试源文件从 MSBuild/IDE 项目模型摘掉，注释明确 Unity 编译与 Test Runner 不受影响。后果：IDE 里没有补全、跳转与 Find Usages，但测试照跑。
+
+### 3.4 退出码不是成功判据
+
+判据是 `testResults` XML 根节点的 `result` 与失败计数。
+
+### 3.5 测试数量
+
+5 个文件、52 个 `[Test]`，见 §2.2。
+
+### 3.6 同一工程不能同时开两个 Editor 实例
+
+跑 headless 测试前必须关掉已打开的该工程实例。

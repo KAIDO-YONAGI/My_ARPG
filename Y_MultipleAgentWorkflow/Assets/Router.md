@@ -9,16 +9,16 @@
 
 | 线索 | 权威文档 |
 |---|---|
-| `GameSO` / `ScriptableObject 资产` / `CreateAssetMenu` / `资产目录约定` / `资产命名` | `Assets_Guide.md` |
-| `ItemSO` / `QuestSO` / `DialogSO` / `RefuseDialogSO` / `CharacterSO` / `SkillSO` / `PlayerStatsSO` / `LocationSO` | `Assets_Guide.md` |
-| `GameSceneSO 资产` / `场景资产` / `sceneType` | `Assets_Guide.md`，加载语义归 SceneFlow 域 |
-| `StreamingAssets` / `GameGuide` / `中文文件名` / `非 ASCII 文件名` / Android 构建失败 | `Assets_Guide.md` |
-| `生成器` / `批量创建资产` / `手工创建资产` | `Assets_Guide.md` |
-| `事件通道` / `事件SO` / `EventSO` / `VoidEventSO` / `ToggleCanvasEventSO` | `EventChannels_Guide.md` |
-| `订阅` / `OnEnable +=` / `OnDisable -=` / `Raise` / `发布` | `EventChannels_Guide.md` |
-| `事件不生效` / `接线断了` / `Inspector 没拖` / `改名事件资产` | `EventChannels_Guide.md` 第 3.3 节检查清单 |
-| `canvasToToggle` / `toggleCanvasEvents` | `EventChannels_Guide.md` |
-| `InventorySlotsStatsSO` | `EventChannels_Guide.md` |
+| `GameSO` / `ScriptableObject 资产` / `CreateAssetMenu` / `资产目录约定` / `资产命名` | `Assets_Guide.md §2.1`、`Assets_Guide.md §2.7`、`Assets_Guide.md §3.1` |
+| `ItemSO` / `QuestSO` / `DialogSO` / `RefuseDialogSO` / `CharacterSO` / `SkillSO` / `PlayerStatsSO` / `LocationSO` | `Assets_Guide.md §2.2`、`Assets_Guide.md §2.3` |
+| `GameSceneSO 资产` / `场景资产` / `sceneType` | `Assets_Guide.md §2.5`，加载语义归 SceneFlow 域 |
+| `StreamingAssets` / `GameGuide` / `中文文件名` / `非 ASCII 文件名` / Android 构建失败 | `Assets_Guide.md §2.6`、`Assets_Guide.md §3.3.1` |
+| `生成器` / `批量创建资产` / `手工创建资产` | `Assets_Guide.md §2.7` |
+| `事件通道` / `事件SO` / `EventSO` / `VoidEventSO` / `ToggleCanvasEventSO` | `EventChannels_Guide.md §2.1`、`EventChannels_Guide.md §2.2`、`EventChannels_Guide.md §2.5` |
+| `订阅` / `OnEnable +=` / `OnDisable -=` / `Raise` / `发布` | `EventChannels_Guide.md §2.4`、`EventChannels_Guide.md §3.1` |
+| `事件不生效` / `接线断了` / `Inspector 没拖` / `改名事件资产` | `EventChannels_Guide.md §3.3` 检查清单 |
+| `canvasToToggle` / `toggleCanvasEvents` | `EventChannels_Guide.md §2.5`、`EventChannels_Guide.md §3.2` |
+| `InventorySlotsStatsSO` | `EventChannels_Guide.md §2.1`、`EventChannels_Guide.md §2.3` |
 
 ## 下级导航
 

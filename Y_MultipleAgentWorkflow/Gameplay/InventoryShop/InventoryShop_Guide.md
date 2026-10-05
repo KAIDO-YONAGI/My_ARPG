@@ -17,7 +17,7 @@
 | `物品史` / `ItemHistoryManager` / `RecordItem` | §2.4 |
 | `掉落` / `Loot` / `丢弃` / `DropByClick` | §2.2 |
 | `ItemSO` / `配置物品` | §2.7 |
-| `ShopKeeper` / `商店不打开` | §2.6 |
+| `ShopKeeper` / `商店不打开` | §2.5、§2.6 |
 
 ## 2. 当前实现
 
@@ -91,11 +91,34 @@
 
 ## 3. 约定与硬边界
 
-1. **`stackableSize` 必须 ≥ 1**，取 0 的物品进不了背包：`AddItem` 与 `SpaceRemaining` 都以它算容量，此时 `HasSpaceForItem` 恒为 false。
-2. **空槽 `itemSO` 必须是 null**：`IsEmpty` 与 `SpaceRemaining` 的分支都依赖它；手改场景槽位时把数量留 0 又留着 `itemSO`，会在 `UpdateUI` 里被清空。
-3. **出售必须先 `SetSlotBeenClicked`**：`UpdateInventorySlots` 的负数分支只认这个字段，未设置时只打一条 `Debug.Log("No slot been Marked")`，随后保留物品。
-4. **金币的写入点是 `UpdateGold` 与 `isGold` 分支，两处都必须同步 `goldAmountText`**：文本是硬引用，为空即抛 `NullReferenceException`。
-5. **`isGold` 与 `isEXP` 分支先于数量正负判断**：这两类物品走加钱或加经验并 `return` 的路径，不参与槽位增删。
-6. **交易失败静默**：金币不足或背包无空间时 `HandleShopping` 直接返回，没有 UI 反馈，也没有事件。
-7. **背包与金币不入档**：`SaveData` 的字段不含它们，域内唯一实现 `ISaveable` 的对象是 `Loot`；读档后回到本局运行值。
-8. **槽位顺序即优先级**：`Start` 里 hotbar 先于 backpack 拼接，改动层级会改变入包顺序与背包满时的表现。
+### 3.1 `stackableSize` 必须 ≥ 1
+
+取 0 的物品进不了背包：`AddItem` 与 `SpaceRemaining` 都以它算容量，此时 `HasSpaceForItem` 恒为 false。
+
+### 3.2 空槽 `itemSO` 必须是 null
+
+`IsEmpty` 与 `SpaceRemaining` 的分支都依赖它；手改场景槽位时把数量留 0 又留着 `itemSO`，会在 `UpdateUI` 里被清空。
+
+### 3.3 出售必须先 `SetSlotBeenClicked`
+
+`UpdateInventorySlots` 的负数分支只认这个字段，未设置时只打一条 `Debug.Log("No slot been Marked")`，随后保留物品。
+
+### 3.4 金币的写入点是 `UpdateGold` 与 `isGold` 分支，两处都必须同步 `goldAmountText`
+
+文本是硬引用，为空即抛 `NullReferenceException`。
+
+### 3.5 `isGold` 与 `isEXP` 分支先于数量正负判断
+
+这两类物品走加钱或加经验并 `return` 的路径，不参与槽位增删。
+
+### 3.6 交易失败静默
+
+金币不足或背包无空间时 `HandleShopping` 直接返回，没有 UI 反馈，也没有事件。
+
+### 3.7 背包与金币不入档
+
+`SaveData` 的字段不含它们，域内唯一实现 `ISaveable` 的对象是 `Loot`；读档后回到本局运行值。
+
+### 3.8 槽位顺序即优先级
+
+`Start` 里 hotbar 先于 backpack 拼接，改动层级会改变入包顺序与背包满时的表现。

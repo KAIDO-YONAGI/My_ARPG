@@ -9,15 +9,15 @@
 
 | 线索 | 权威文档 |
 |---|---|
-| `SceneChanger` / `RequestSceneLoad` / 加载唯一入口 | `SceneFlow_Guide.md` §2.1 |
-| `GameSceneSO` / `sceneName` / `SaveKey` / 场景键 | `SceneFlow_Guide.md` §2.2 §2.7 |
-| `场景组` / `Additive` / `firstSceneToLoad` / `sceneToLoad` / `Teleport` | `SceneFlow_Guide.md` §2.3 §2.8 |
-| `常驻场景` / `PersistentSceneRegistry` | `SceneFlow_Guide.md` §2.4 |
-| 初始场景 / `InitialLoad` / `persistentScenes` | `SceneFlow_Guide.md` §2.5 |
-| 构建场景列表 / `EditorBuildSettings` / 场景未入构建 | `SceneFlow_Guide.md` §2.9 |
-| `Addressables` / `AssetReference` | `SceneFlow_Guide.md` §2.9 |
-| 加载并发 / 请求被忽略 / `isLoading` | `SceneFlow_Guide.md` §2.1 |
-| 重试 / `RetryButton` / 整组重载 | `SceneFlow_Guide.md` §2.8 |
+| `SceneChanger` / `RequestSceneLoad` / 加载唯一入口 | `SceneFlow_Guide.md §2.1` |
+| `GameSceneSO` / `sceneName` / `SaveKey` / 场景键 | `SceneFlow_Guide.md §2.2`、`SceneFlow_Guide.md §2.7` |
+| `场景组` / `Additive` / `firstSceneToLoad` / `sceneToLoad` / `Teleport` | `SceneFlow_Guide.md §2.3`、`SceneFlow_Guide.md §2.6`、`SceneFlow_Guide.md §2.8` |
+| `常驻场景` / `PersistentSceneRegistry` | `SceneFlow_Guide.md §2.4` |
+| 初始场景 / `InitialLoad` / `persistentScenes` | `SceneFlow_Guide.md §2.5` |
+| 构建场景列表 / `EditorBuildSettings` / 场景未入构建 | `SceneFlow_Guide.md §2.3`、`SceneFlow_Guide.md §2.9` |
+| `Addressables` / `AssetReference` | `SceneFlow_Guide.md §2.9` |
+| 加载并发 / 请求被忽略 / `isLoading` | `SceneFlow_Guide.md §2.1` |
+| 重试 / `RetryButton` / 整组重载 | `SceneFlow_Guide.md §2.8` |
 
 ## 下级导航
 

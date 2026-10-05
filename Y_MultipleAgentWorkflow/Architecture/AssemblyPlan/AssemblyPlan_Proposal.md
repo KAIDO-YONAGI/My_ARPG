@@ -5,17 +5,17 @@
 文档 ID：`ARCH-ASSEMBLY-PLAN`
 状态：`Proposal`
 最后更新：`2026-10-05`
-权威范围：记录程序集拆分、热更接入、效果数据驱动、事件机制演进五项**未实施**设计的目标、理由、当前状态与前置依赖。已实现架构的事实见 `Architecture\Composition\Composition_Guide.md` 与各业务域 Guide。
+权威范围：记录程序集拆分、热更接入、效果数据驱动、事件机制演进五项**未实施**设计的目标、理由、当前状态与前置依赖。已实现架构的事实见 `..\Composition\Composition_Guide.md` 与各业务域 Guide。
 
 ## 1. 触发线索
 
 | 线索 | 指向 |
 |---|---|
-| `asmdef`、`Assembly Definition`、`程序集拆分`、`编译时间` | §3.1 |
-| `xLua`、`热更`、`LuaManager`、`LuaScripts` | §3.2 |
-| `效果数据驱动`、`状态机基类`、`switch(skillName)` | §3.3 |
-| `事件总线`、`EventBus`、`通道集中定义` | §3.4 |
-| `事件引用可视化`、`订阅链查看器`、`接线图`、`EventGraph` | §3.5 |
+| `asmdef`、`Assembly Definition`、`程序集拆分`、`编译时间` | 本文 §3.1 |
+| `xLua`、`热更`、`LuaManager`、`LuaScripts` | 本文 §3.2 |
+| `效果数据驱动`、`状态机基类`、`switch(skillName)` | 本文 §3.3 |
+| `事件总线`、`EventBus`、`通道集中定义` | 本文 §3.4 |
+| `事件引用可视化`、`订阅链查看器`、`接线图`、`EventGraph` | 本文 §3.5 |
 
 ## 2. 当前实现
 
@@ -29,7 +29,9 @@
 | 4 | 事件总线 | 未实施，当前决策为维持不采用 |
 | 5 | 事件引用可视化插件 | 未实施，现有可行性探讨 |
 
-## 3. 未实施设计（逐项：目标 / 理由 / 当前状态 / 前置依赖）
+## 3. 未实施设计
+
+每项按目标、理由、当前状态、前置依赖四要素记录。
 
 ### 3.1 Assembly Definition 拆分
 
@@ -37,7 +39,7 @@
 - **理由**：程序集边界是唯一能在编译期强制依赖方向的机制；拆分同时缩短增量编译时间。
 - **当前状态：未实施**。工程内 Assembly Definition 资产数量为 **0**，测试程序集下同为 **0**；5 个测试类型 `AStarOpenHeapTests` `CanvasFocusStackTests` `ObjectPoolTests` `PlayerStatsModelTests` `PlayerStatsSOTests` 仍在预定义程序集里。
 - **前置依赖**：
-  1. 反向引用先消除。已识别的候选是 `ICanvasManager` 的默认实现直读 `UIManager.Instance`，即 `Contracts` 层指向 `UI` 层的硬引用，见 `Architecture\Composition\Composition_Guide.md` §2.6。
+  1. 反向引用先消除。已识别的候选是 `ICanvasManager` 的默认实现直读 `UIManager.Instance`，即 `Contracts` 层指向 `UI` 层的硬引用，见 `..\Composition\Composition_Guide.md` §2.6。
   2. 测试程序集的 Assembly Definition 需与产品程序集同步建立，测试程序集才能看见被测类型。
 
 ### 3.2 xLua 热更新 MVP
@@ -49,7 +51,7 @@
   1. xLua 插件源码与 native 插件需先导入：工程当前无 xLua 源码；托管依赖现有 `Newtonsoft` 一项，xLua 的 native 插件待补齐。
   2. Addressables 已接入，`AddressableAssetsData` 配置已存在，热更下发可直接复用。
   3. `XLuaGenConfig` 的桥接类型清单按当前代码选型后生成 Wrap 代码。
-  4. 初始化顺序：`LuaManager.Init` 放在 `InitialLoad.Awake` 最前，会早于各内容场景实例；`OnSingletonInitialized` 惯用法见 `Architecture\Composition\Composition_Guide.md` §2.3.1。
+  4. 初始化顺序：`LuaManager.Init` 放在 `InitialLoad.Awake` 最前，会早于各内容场景实例；`OnSingletonInitialized` 惯用法见 `..\Composition\Composition_Guide.md` §2.3.1。
 
 ### 3.3 技能/物品效果数据驱动 + 状态机基类
 
@@ -82,4 +84,4 @@
 
 1. **本文件任何条目都不得被写成「已实现」。** 引用本域内容时必须带 `Proposal` 状态与「未实施」限定语。
 2. **拆分与热更须在消除反向引用后动手。** 见 §3.1 前置依赖 1。
-3. **事件机制的现行约定不在本域。** 事件 SO 的订阅与退订纪律属于各业务域 Guide 与 `Architecture\Composition\Composition_Guide.md` §2.6；本域记录事件总线的设计条目，不定义事件契约。
+3. **事件机制的现行约定不在本域。** 事件 SO 的订阅与退订纪律属于各业务域 Guide 与 `..\Composition\Composition_Guide.md` §2.6；本域记录事件总线的设计条目，不定义事件契约。

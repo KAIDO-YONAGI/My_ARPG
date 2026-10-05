@@ -15,14 +15,14 @@
 
 | 线索 | 指向 |
 |---|---|
-| `敌人` `Enemy` `怪物` `追击` `Chase` | §2.1、§2.2、§3.1 |
-| `击退` `KnockBack` `硬直` `stun` `knockBackForce` | §2.2、§2.5、§3.4 |
-| `受击` `扣血` `死亡` `expReward` `IDamageable` | §2.2、§2.4 |
-| `NPC` `巡逻` `Patrol` `游荡` `Wander` `挂机` | §2.3、§3.2 |
-| `对话` `Chat` `Dialog` `Interaction Icon` | §2.3、§3.3 |
-| `店主` `ShopKeeper` `商店触发` `进入范围` | §2.4、§3.5 |
+| `敌人` `Enemy` `怪物` `追击` `Chase` | §2.1、§2.2 |
+| `击退` `KnockBack` `硬直` `stun` `knockBackForce` | §2.2、§3.4、§3.5 |
+| `受击` `扣血` `死亡` `expReward` `IDamageable` | §2.0、§2.2 |
+| `NPC` `巡逻` `Patrol` `游荡` `Wander` `挂机` | §2.3、§3.6 |
+| `对话` `Chat` `Dialog` `Interaction Icon` | §2.3、§3.7 |
+| `店主` `ShopKeeper` `商店触发` `进入范围` | §2.4、§3.8 |
 | `PathFollower` `GetPosToGo` `ArrivedPos` `ResetPath` `卡住` `不移动` | §2.5、§3.1 |
-| `Awake` `OnEnable` `isKinematic` `时序` | §2.3、§3.2 |
+| `Awake` `OnEnable` `isKinematic` `时序` | §2.3、§3.7 |
 | `没有基类` `脚本清单` `职责划分` | §2.0 |
 
 ## 2. 当前实现
@@ -104,12 +104,38 @@
 
 ## 3. 约定与硬边界
 
-1. **`GetPosToGo` 返回 `Vector3.zero` 是「无路」的唯一信号**。三个行为脚本都写了 `posToGo == Vector3.zero` 分支，零向量不作为合法路点处理。
-2. **到点必须调 `ArrivedPos()`，换目标必须先 `ResetPath()`**。`PathFollower` 的路点是 `Stack`，只有 `ArrivedPos` 会弹栈。`AStarNodeManager` 的注释另有一处警告：路点跨格时跟随者会在邻格弹出本格节点，导致每帧重算路径。
-3. **`GetThreshold()` 依赖 `AStarNodeManager` 已 Awake**。网格管理器未就绪时它返回 `0f`，并以 `Debug.LogWarning` 收尾，该警告仅在编辑器输出。
-4. **敌人被击退的数值来自玩家，方向来自攻击者**。`EnemyHealth.TakeDamage` 是唯一读 `StatsService` 的单位代码，且这里没有 null 守卫，`YSingleton.Instance` 在 Awake 前为 null。敌人自身序列化的 `knockBackForce` 是给玩家的值。
-5. **`EnemyMovement` 的 KnockBack 态是全停态**。进入后 `Update` 整段不执行，由 `EnemyKnockBack.StunTimer` 协程在 `knockBackTime + stunTime` 后调回 `Idle`。
-6. **NPC 行为组件出厂是 disabled 的**。`NPCStateController.Start` 的 `SwitchState(DefaultState)` 是唯一的初始启用点，绕过它会绕过互斥，两个行为脚本会同时写 `rb.velocity`。
-7. **`NPCDialogTrigger` 在 Chat 期间把刚体设成 `isKinematic = true` 并写死 `velocity = 0`**，退出时只恢复 `isKinematic = false`；速度接管落在下一个行为组件的 `OnEnable` 上，新增行为组件必须自己清速度。
-8. **店主与玩家的接口只有 `ShopKeeperEventSO` 一条**。`ShopKeeper` 不实现 `IShopInteractable`，该接口由 `ShopManager` 实现；新增一个店只挂预制体并接同一个通道资产，不改代码。`ShopManager` 的 `activeShopKeeper` 是当前店主的唯一记录点。
-9. **商品列表按场景实例覆写，落在场景实例上**。预制体三个列表为空，加店必须在场景实例里填，示例见 Scene1 场景实例。
+### 3.1 `GetPosToGo` 返回 `Vector3.zero` 是「无路」的唯一信号
+
+三个行为脚本都写了 `posToGo == Vector3.zero` 分支，零向量不作为合法路点处理。
+
+### 3.2 到点必须调 `ArrivedPos()`，换目标必须先 `ResetPath()`
+
+`PathFollower` 的路点是 `Stack`，只有 `ArrivedPos` 会弹栈。`AStarNodeManager` 的注释记录了这条约定的一处后果：路点跨格时跟随者会在邻格弹出本格节点，每帧重算路径。
+
+### 3.3 `GetThreshold()` 依赖 `AStarNodeManager` 已 Awake
+
+网格管理器未就绪时它返回 `0f`，并以 `Debug.LogWarning` 收尾，该警告仅在编辑器输出。
+
+### 3.4 敌人被击退的数值来自玩家，方向来自攻击者
+
+`EnemyHealth.TakeDamage` 是唯一读 `StatsService` 的单位代码，这里没有 null 守卫，`YSingleton.Instance` 在 Awake 前为 null。敌人自身序列化的 `knockBackForce` 是给玩家的值。
+
+### 3.5 `EnemyMovement` 的 KnockBack 态是全停态
+
+进入后 `Update` 整段不执行，由 `EnemyKnockBack.StunTimer` 协程在 `knockBackTime + stunTime` 后调回 `Idle`。
+
+### 3.6 NPC 行为组件出厂是 disabled 的
+
+`NPCStateController.Start` 的 `SwitchState(DefaultState)` 是唯一的初始启用点，绕过它会绕过互斥，两个行为脚本会同时写 `rb.velocity`。
+
+### 3.7 `NPCDialogTrigger` 在 Chat 期间把刚体设成 `isKinematic = true` 并写死 `velocity = 0`
+
+退出时只恢复 `isKinematic = false`；速度接管落在下一个行为组件的 `OnEnable` 上，新增行为组件必须自己清速度。
+
+### 3.8 店主与玩家的接口只有 `ShopKeeperEventSO` 一条
+
+`ShopKeeper` 不实现 `IShopInteractable`，该接口由 `ShopManager` 实现；增开一个店主的做法是挂同一套预制体并接同一个通道资产，代码不变。`ShopManager` 的 `activeShopKeeper` 是当前店主的唯一记录点。
+
+### 3.9 商品列表按场景实例覆写，落在场景实例上
+
+预制体三个列表为空，加店必须在场景实例里填，示例见 Scene1 场景实例。

@@ -34,5 +34,5 @@
 **Active 能力**
 
 - 本域权威文档为 `Quest_Guide.md`（ID `GP-QUEST-GUIDE`），覆盖状态机与面板显隐、进度存储与重算、奖励通道、任务板与任务面板分层。
-- 任务奖励只经 `InventorySlotsStatsSO` 的事件通道交付，`QuestManager` 不持背包引用；改动接收侧须同时核对 `InventoryShop\Router.md`。
+- 任务奖励只经 `InventorySlotsStatsSO` 的事件通道交付，`QuestManager` 不持背包引用；改动接收侧须同时核对 `..\InventoryShop\Router.md`。
 - 任务进度只存在 `QuestManager` 的内存字典里，未接入存档；资产上的 `QuestObjective.currentAmount` 是零读写字段，进度来源只看内存字典。

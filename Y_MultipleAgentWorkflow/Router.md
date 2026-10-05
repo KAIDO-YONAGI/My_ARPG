@@ -46,7 +46,7 @@
 
 ## 模型入口
 
-`AGENTS.md` 与 `CLAUDE.md` 各含一个由本工作流维护的导航块，用
+`..\AGENTS.md` 与 `..\CLAUDE.md` 各含一个由本工作流维护的导航块，用
 `<!-- Y_MultipleAgentWorkflow:BEGIN -->` 与 `<!-- Y_MultipleAgentWorkflow:END -->` 标记
 包住，两块内容一致，可按标记幂等更新。两个文件都会被客户端装载为工作区指令。
 
@@ -55,7 +55,7 @@
 ## 全局并发资源
 
 同一工作树上的多个 Agent 共用以下资源。写入前在租约里声明：文件类资源用 `path:` 前缀加
-该资源的实际路径，其余按 `Concurrency_Guide.md` 的命名规则声明。
+该资源的实际路径，其余按 `Workflow\Concurrency_Guide.md` 的命名规则声明。
 
 | 资源 | 说明 |
 |---|---|
@@ -76,8 +76,8 @@
 | 文档 ID | 路径 | 状态 |
 |---|---|---|
 | `ROOT-ROUTER` | `Router.md` | Active |
-| `ENTRY-AGENTS` | `AGENTS.md` | Active |
-| `ENTRY-CLAUDE` | `CLAUDE.md` | Active |
+| `ENTRY-AGENTS` | `..\AGENTS.md` | Active |
+| `ENTRY-CLAUDE` | `..\CLAUDE.md` | Active |
 | `WF-CONFIG-METHOD` | `Workflow_Configuration_Guide.md` | Active |
 | `WF-GUIDE` | `Workflow\Workflow_Guide.md` | Active |
 | `WF-ROUTER` | `Workflow\Router.md` | Active |

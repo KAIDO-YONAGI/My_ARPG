@@ -11,12 +11,13 @@
 |---|---|
 | `Android 构建` / `打包 APK` | §2.1、§2.4 产物位置 |
 | `Detecting Android SDK` 卡住 / `Checking Android SDK and components` | §2.2 |
-| `lintVitalAnalyzeRelease` / `ExtractAarTransform` / `AarExtractor` | §2.3 |
+| `lintVitalAnalyzeRelease` | §3.1 |
+| `ExtractAarTransform` / `AarExtractor` | §2.3 |
 | `MalformedInputException` / `malformed input off` | §2.3 |
 | `StreamingAssets 中文名` | §2.3 |
 | `sdkmanager 代理` / `gradle.properties` / `UNITY_ANDROID_PROXY_*` | §2.2、§2.6 环境自检 |
-| `keystore` / `签名` / `apksigner verify` | §2.5 签名现状、§3 硬边界 |
-| `Release 构建失败排查` | §3 |
+| `keystore` / `签名` / `apksigner verify` | §2.5 签名现状、§2.7 签名校验、§3.6 |
+| `Release 构建失败排查` | §2.3、§3.1 |
 | `构建产物在哪` | §2.4 |
 
 ## 2. 当前实现
@@ -89,10 +90,28 @@ Console 无 error → 产物存在且非空 → 包内条目名全 ASCII → 签
 
 ## 3. 约定与硬边界
 
-1. **禁止用关闭 lintVital 来修复 AAR 报错**。
-2. **包内目录名必须 ASCII**：会进包的目录首当其冲的是 StreamingAssets，其中不得出现中文名。
-3. **`-Action Install` 是机器级副作用，不是项目级操作**：它改 Editor 安装目录、用户级 Gradle 配置与用户环境变量，会影响使用这些 Editor 的所有项目。Unity Hub 覆盖或修复 Editor 后必须重跑一次。
-4. **`GradleManaged = False` 意味着 Gradle 代理属性来自脚本之外**：用户级 Gradle 配置里的代理条目可能由其他工具或人工写入且不带脚本标记。`Remove` 只删自己带标记的块，不动这些条目。
-5. **Unity 已启动时用户环境变量不会注入既有进程**，但批处理内的默认值仍立即生效。切换代理端口后要重跑 `Install` 并重启 Unity。
-6. **`CN=Android Debug` 的产物不得对外发布**（§2.5）。
-7. **本域不改工程设置**：修改 Player 设置属于配置域，见 `ProjectConfig_Guide.md`。
+### 3.1 禁止用关闭 lintVital 来修复 AAR 报错
+
+### 3.2 包内目录名必须 ASCII
+
+会进包的目录首当其冲的是 StreamingAssets，其中不得出现中文名。
+
+### 3.3 `-Action Install` 是机器级副作用，不是项目级操作
+
+它改 Editor 安装目录、用户级 Gradle 配置与用户环境变量，会影响使用这些 Editor 的所有项目。Unity Hub 覆盖或修复 Editor 后必须重跑一次。
+
+### 3.4 `GradleManaged = False` 意味着 Gradle 代理属性来自脚本之外
+
+用户级 Gradle 配置里的代理条目可能由其他工具或人工写入且不带脚本标记。`Remove` 只删自己带标记的块，不动这些条目。
+
+### 3.5 Unity 已启动时用户环境变量不会注入既有进程
+
+但批处理内的默认值仍立即生效。切换代理端口后要重跑 `Install` 并重启 Unity。
+
+### 3.6 `CN=Android Debug` 的产物不得对外发布
+
+签名现状见 §2.5。
+
+### 3.7 本域不改工程设置
+
+修改 Player 设置属于配置域，见 `ProjectConfig_Guide.md`。

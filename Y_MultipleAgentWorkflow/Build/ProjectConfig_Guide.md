@@ -118,9 +118,26 @@
 
 ## 3. 约定与硬边界
 
-1. **改播放器设置资产会静默改变构建产物契约**：`companyName` 与 `productName` 决定产物文件名与 Application 标识，产物名即由 `productName` 派生，见 `AndroidBuild_Guide.md` §2.4；`applicationIdentifier.Android` 决定安装升级链。
-2. **场景顺序是有语义的，不能重排**：`InitialScene` 必须是索引 0，它是构建入口；`TestScene` 保持末位，不参与正式流程。`SceneChanger` 与 `InitialLoad` 依赖场景在构建场景列表内，并用 `Application.CanStreamedLevelBeLoaded` 预检，缺失场景会被 `LogError` 跳过。
-3. **不要给测试加 asmdef 而不改引用**：当前 0 asmdef，现有 52 个用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
-4. **不要依赖仓库外依赖能解析**：包清单里的 `file:` 依赖指向仓库外且被忽略规则排除的目录。全新克隆上编辑器会报包解析失败。
-5. **IDE 用的 MSBuild 目标文件只影响 IDE，不影响 Unity**：它把测试源文件从 MSBuild 项目模型移除，文件内注释明确“Unity 自己的编译、以及 Unity Test Runner 完全不受影响”。后果：IDE 里测试文件没有补全与跳转，但能编译能跑；**IDE 里搜不到不等于测试被排除**。
-6. **包清单与锁定清单必须一起改**：只改包清单会让两者不一致，Unity 会在下次解析时重写锁定清单。
+### 3.1 改播放器设置资产会静默改变构建产物契约
+
+`companyName` 与 `productName` 决定产物文件名与 Application 标识，产物名即由 `productName` 派生，见 `AndroidBuild_Guide.md` §2.4；`applicationIdentifier.Android` 决定安装升级链。
+
+### 3.2 场景顺序是有语义的，不能重排
+
+`InitialScene` 必须是索引 0，它是构建入口；`TestScene` 保持末位，不参与正式流程。`SceneChanger` 与 `InitialLoad` 依赖场景在构建场景列表内，并用 `Application.CanStreamedLevelBeLoaded` 预检，缺失场景会被 `LogError` 跳过。
+
+### 3.3 不要给测试加 asmdef 而不改引用
+
+当前 0 asmdef，现有 52 个用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
+
+### 3.4 不要依赖仓库外依赖能解析
+
+包清单里的 `file:` 依赖指向仓库外且被忽略规则排除的目录。全新克隆上编辑器会报包解析失败。
+
+### 3.5 IDE 用的 MSBuild 目标文件只影响 IDE，不影响 Unity
+
+它把测试源文件从 MSBuild 项目模型移除，文件内注释明确“Unity 自己的编译、以及 Unity Test Runner 完全不受影响”。后果：IDE 里测试文件没有补全与跳转，但能编译能跑；**IDE 里搜不到不等于测试被排除**。
+
+### 3.6 包清单与锁定清单必须一起改
+
+只改包清单会让两者不一致，Unity 会在下次解析时重写锁定清单。

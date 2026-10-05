@@ -14,7 +14,7 @@
 | `代理状态` / `sdkmanager 代理` | §3 C4–C8 |
 | `产物在哪` / `apk 检查` | §3 C9–C10、§4 |
 | `签名校验` / `apksigner` | §3 C11 |
-| `环境变量` / `Gradle 全局配置` | §6 |
+| `环境变量` / `Gradle 全局配置` | §5 |
 | `进程能不能停` / `能不能并发跑` | §4 |
 
 ## 2. 前置环境检查
@@ -120,7 +120,7 @@
     -testResults "D:\Unity\Projects\My_ARPG\Logs\test-editmode.xml" `
     -logFile "D:\Unity\Projects\My_ARPG\Logs\test-editmode.log"
   ```
-- 成功判定：看结果 XML 根节点的 `result` 与失败计数；退出码不可靠。
+- 成功判定：以结果 XML 根节点的 `result` 与失败计数为准，不取退出码。
 - 前提：没有编辑器实例开着这个工程。
 
 ## 4. 进程与产物处理
@@ -130,10 +130,9 @@
 - **只读命令可重复**：C1–C4、C7、C9–C11。
 - **产物位置**：`Builds\Android`；本机 `Builds\` 下只有这一个子目录。忽略规则排除 `Builds\`，产物不入库。
 - **日志位置**：C12 的 `-testResults` 与 `-logFile` 参数指向 `Logs\`，结果文件名 `test-editmode.xml`、日志文件名 `test-editmode.log`；忽略规则排除 `Logs\`，日志不入库。
-- **无 CI**：仓库内没有 CI 配置目录，C9–C12 的结果只存在于本机。
-- **验证后留档**：构建验证结果按模板追加到构建验证记录。
+- **结果留存**：C9–C12 的结果落在本机。
 
-## 6. 环境变量
+## 5. 环境变量
 
 | 名称 | 作用 | 当前值 |
 |---|---|---|

@@ -98,11 +98,34 @@
 
 ## 3. 约定与硬边界
 
-1. **进度只活在 `questProgress` 字典里**。`QuestObjective.currentAmount` 是资产上的零读写字段，改进度须改运行时数据。
-2. **进度重算的时机只有 `QuestStateChanged`**。拾取物品与结束对话都不触发刷新，面板关闭期间显示的是上次重算的陈旧值，下次打开或切换状态时才重算。
-3. **奖励只有事件通道**：`QuestManager` 与背包之间没有直接引用，改奖励发放要改 `InventorySlotsStatsSO` 的订阅侧。两个管理器需指向同一资产实例，否则事件静默不达；当前常驻场景已指向同一资产。
-4. **`Completed` 没有幂等保护**：任何重复进入 `Completed` 分支的调用都会再发一次奖励。当前拦截只在 UI 层，完成后三组按钮全部关闭，槽位 `interactable` 置假。
-5. **进入 `Completed` 的唯一数据前提是 `IsQuestObjDone`**：该判定对状态已是 `Completed` 的任务直接返回真。
-6. **任务板需要先装载再开面板**。少了 `OnLoadQuestEventRaised`，`currentBoardLoadQuests` 为 null，`GetFirstIncompletedQuest` 会抛 `NullReferenceException`。
-7. **`IsDisplayingQuestBoard` 用引用相等判定**：`questsOnBoard` 是各板实例自己的 List 对象，这也是哪块板开的、哪块板负责关的依据。
-8. **目标进度只认物品史与对话史**：`targetLocation` 没有实现分支；角色类目标一旦对话过就直接记满。
+### 3.1 进度只活在 `questProgress` 字典里
+
+`QuestObjective.currentAmount` 是资产上的零读写字段，改进度须改运行时数据。
+
+### 3.2 进度重算的时机只有 `QuestStateChanged`
+
+拾取物品与结束对话都不触发刷新，面板关闭期间显示的是上次重算的陈旧值，下次打开或切换状态时才重算。
+
+### 3.3 奖励只有事件通道
+
+`QuestManager` 与背包之间没有直接引用，改奖励发放要改 `InventorySlotsStatsSO` 的订阅侧。两个管理器需指向同一资产实例，否则事件静默不达；当前常驻场景已指向同一资产。
+
+### 3.4 `Completed` 没有幂等保护
+
+任何重复进入 `Completed` 分支的调用都会再发一次奖励。当前拦截只在 UI 层，完成后三组按钮全部关闭，槽位 `interactable` 置假。
+
+### 3.5 进入 `Completed` 的唯一数据前提是 `IsQuestObjDone`
+
+该判定对状态已是 `Completed` 的任务直接返回真。
+
+### 3.6 任务板需要先装载再开面板
+
+少了 `OnLoadQuestEventRaised`，`currentBoardLoadQuests` 为 null，`GetFirstIncompletedQuest` 会抛 `NullReferenceException`。
+
+### 3.7 `IsDisplayingQuestBoard` 用引用相等判定
+
+`questsOnBoard` 是各板实例自己的 List 对象，这也是哪块板开的、哪块板负责关的依据。
+
+### 3.8 目标进度只认物品史与对话史
+
+`targetLocation` 没有实现分支；角色类目标一旦对话过就直接记满。

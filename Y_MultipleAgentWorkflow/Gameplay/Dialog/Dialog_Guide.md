@@ -12,7 +12,7 @@
 | `对话`、`Dialog`、`DialogManager` | §2.1 会话流程 |
 | `DialogSO`、`对话树`、`nextDialogOptions`、`parentDialog` | §2.2 数据模型 |
 | `RefuseDialogSO`、`isDefaultChat`、`requireItems`、`拒绝对话` | §2.3 Refuse 判定 |
-| `onlyTriggeredOnce`、`一次性对话`、`重复对话` | §2.3 与 §3 第 2 条 |
+| `onlyTriggeredOnce`、`一次性对话`、`重复对话` | §2.3 与 §3.2 |
 | `ConversationHistoryManager`、`HasChatedWith`、`RecordDialogHasChated` | §2.4 对话史 |
 | `ItemHistoryManager`、`HasPickedOverAmount` | §2.4 物品史 |
 | `NPCDialogTrigger`、`NPCStateController`、`Chat` 状态 | §2.5 NPC 触发链 |
@@ -87,10 +87,30 @@
 
 ## 3. 约定与硬边界
 
-1. **选项节点至少需要一句台词**。`StartDialog` 进入 `ShowDialog()` 时若 `dialogLines` 为空会直接 `EndDialog()`，`ShowChoices()` 因此不会被调用，纯选项节点会一闪而过地结束对话。
-2. **`onlyTriggeredOnce` 依赖父节点的 `isDefaultChat` 策略**。缺少父侧拒绝节点时该字段不生效，表现为分支可以反复进入。
-3. **对话史的键是 `GetInstanceID()`**，只在单次进程生命内有效，不随存档持久化，查询对话史只能按运行时实例 ID 进行。
-4. **Refuse 判定读背包域写的物品史**。`RecordItem(..., -removed)` 是带符号累加，卖出与使用会让数量回退甚至为负，`requireItems` 的门槛可能在满足之后再次失效；背包域任何记账口径的改动都会影响对话可进入性。
-5. **对话画布的开关请求由 NPC 触发器承接**：触发器订阅 `ToggleDialogEvent`，`DialogManager` 的 `ToggleCanvasEvent` 返回 null。按键开对话与关对话的改点在触发器。
-6. **`ForeceEndDialog()` 只清状态与画布**。切场景、离开 NPC 触发范围、收到关闭请求都走它，本次对话的历史记录只由 `EndDialog()` 写入。
-7. **`dialogLines[i].speaker` 无空值保护**：`ShowDialog()` 直接取 `characterPortrait` 与 `characterName`，漏配说话人会抛 `NullReferenceException`。
+### 3.1 选项节点至少需要一句台词
+
+`StartDialog` 进入 `ShowDialog()` 时若 `dialogLines` 为空会直接 `EndDialog()`，`ShowChoices()` 因此不会被调用，纯选项节点会一闪而过地结束对话。
+
+### 3.2 `onlyTriggeredOnce` 依赖父节点的 `isDefaultChat` 策略
+
+缺少父侧拒绝节点时该字段不生效，表现为分支可以反复进入。
+
+### 3.3 对话史的键是 `GetInstanceID()`
+
+只在单次进程生命内有效，不随存档持久化，查询对话史只能按运行时实例 ID 进行。
+
+### 3.4 Refuse 判定读背包域写的物品史
+
+`RecordItem(..., -removed)` 是带符号累加，卖出与使用会让数量回退甚至为负，`requireItems` 的门槛可能在满足之后再次失效；背包域任何记账口径的改动都会影响对话可进入性。
+
+### 3.5 对话画布的开关请求由 NPC 触发器承接
+
+触发器订阅 `ToggleDialogEvent`，`DialogManager` 的 `ToggleCanvasEvent` 返回 null。按键开对话与关对话的改点在触发器。
+
+### 3.6 `ForeceEndDialog()` 只清状态与画布
+
+切场景、离开 NPC 触发范围、收到关闭请求都走它，本次对话的历史记录只由 `EndDialog()` 写入。
+
+### 3.7 `dialogLines[i].speaker` 无空值保护
+
+`ShowDialog()` 直接取 `characterPortrait` 与 `characterName`，漏配说话人会抛 `NullReferenceException`。

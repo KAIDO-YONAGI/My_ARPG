@@ -9,14 +9,14 @@
 
 | 线索 | 权威文档 |
 |---|---|
-| `存档`、`读档`、`SaveData`、`SaveSystem`、`SaveFile` | `SaveData_Guide.md` |
-| `JSON schema`、`字段改名`、`旧档兼容`、`Newtonsoft` | `SaveData_Guide.md` |
-| `SaveKey`、`sceneID`、`场景键`、`SceneDataForSave` | `SaveData_Guide.md` |
-| `SaveDefinition`、`lootsStatsDic`、`GUID 撞档`、`掉落物 ID` | `SaveData_Guide.md` |
-| `ISaveable`、`SaveRegistry`、`SaveableService`、`注册/注销` | `SaveData_Guide.md` |
-| `persistentDataPath`、`DeleteSave`、`坏档回退`、`Continue` | `SaveData_Guide.md` |
-| `IsLoadingSaveRequest`、`自动存档`、`手动存档`、`保存面板` | `SaveData_Guide.md` |
-| `DynamicDataHandler`、`重新开始`、`局间复位` | `SaveData_Guide.md` |
+| `存档`、`读档`、`SaveData`、`SaveSystem`、`SaveFile` | `SaveData_Guide.md` §2.1、§2.2、§2.3 |
+| `JSON schema`、`字段改名`、`旧档兼容`、`Newtonsoft` | `SaveData_Guide.md` §2.3、§3.1–§3.3 |
+| `SaveKey`、`sceneID`、`场景键`、`SceneDataForSave` | `SaveData_Guide.md` §2.4、§3.4–§3.5 |
+| `SaveDefinition`、`lootsStatsDic`、`GUID 撞档`、`掉落物 ID` | `SaveData_Guide.md` §2.4、§3.6–§3.7 |
+| `ISaveable`、`SaveRegistry`、`SaveableService`、`注册/注销` | `SaveData_Guide.md` §2.1、§3.13–§3.14 |
+| `persistentDataPath`、`DeleteSave`、`坏档回退`、`Continue` | `SaveData_Guide.md` §2.2、§2.6 |
+| `IsLoadingSaveRequest`、`自动存档`、`手动存档`、`保存面板` | `SaveData_Guide.md` §2.5、§2.7、§3.8–§3.9 |
+| `DynamicDataHandler`、`重新开始`、`局间复位` | `SaveData_Guide.md` §2.1、§2.5 |
 
 ## 下级导航
 

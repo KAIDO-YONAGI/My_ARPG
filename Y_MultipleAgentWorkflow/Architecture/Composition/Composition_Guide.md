@@ -9,16 +9,16 @@
 
 | 线索 | 指向 |
 |---|---|
-| `单例`、`YSingleton`、`Instance` | §2.1、§2.2 |
-| `单例预算`、`单例数量`、`又加了一个单例` | §2.2 |
-| `初始化顺序`、`Awake 顺序`、`Instance 为 null` | §2.3 |
-| `OnSingletonInitialized` | §2.3.1 |
-| `可重试订阅`、`TrySubscribe`、`订阅空引用` | §2.3.2 |
-| `isLoading`、`IsLoadingSaveRequest`、`标志位/窗口` | §2.3.3 |
-| `执行顺序`、`DefaultExecutionOrder`、`10000` | §2.4 |
-| `SaveRegistry`、`注册表`、`Domain Reload`、`局间复位` | §2.5 |
-| `ICanvasManager`、`焦点栈`、`sortingOrder`、`UIManager.Instance` | §2.6 |
-| `重试`、`RetryRequestEvent`、`Respawn`、`重载当前场景组` | §2.3.4 |
+| `单例`、`YSingleton`、`Instance` | 本文 §2.1、§2.2 |
+| `单例预算`、`单例数量`、`又加了一个单例` | 本文 §2.2 |
+| `初始化顺序`、`Awake 顺序`、`Instance 为 null` | 本文 §2.3 |
+| `OnSingletonInitialized` | 本文 §2.3.1 |
+| `可重试订阅`、`TrySubscribe`、`订阅空引用` | 本文 §2.3.2 |
+| `isLoading`、`IsLoadingSaveRequest`、`标志位/窗口` | 本文 §2.3.3 |
+| `执行顺序`、`DefaultExecutionOrder`、`10000` | 本文 §2.4 |
+| `SaveRegistry`、`注册表`、`Domain Reload`、`局间复位` | 本文 §2.5 |
+| `ICanvasManager`、`焦点栈`、`sortingOrder`、`UIManager.Instance` | 本文 §2.6 |
+| `重试`、`RetryRequestEvent`、`Respawn`、`重载当前场景组` | 本文 §2.3.4 |
 
 ## 2. 当前实现
 
@@ -108,10 +108,30 @@
 
 ## 3. 约定与硬边界
 
-1. **单例初始化钩子内不做跨单例调用。** 钩子在各实例自己的 `Awake` 内执行，`Awake` 顺序无保证；在钩子里读另一个 `Instance` 会随场景层级顺序变成空引用。跨单例协作走 §2.3.2 的重试订阅或 §2.3.3 的窗口标志；广播段内的先后约束见 §2.3.4。
-2. **派生类重写 `Awake` 时必须调 `base.Awake()`。** 漏调会让 `_instance` 永不赋值、`Instance` 全局为 null，同时重复实例销毁逻辑失效，同场景两份实例各自运行，过程中无异常、无日志。
-3. **重写 `SaveableService.OnSingletonInitialized` 时必须调 `base`。** 注册发生在 base 里，漏调则该服务不进 `SaveRegistry`，存档不报错但永远少一段数据。
-4. **`SaveRegistry.All` 遍历前必须拷贝，且不得在遍历中注册或注销。** 现存调用点统一写作 `SaveRegistry.All.ToList()`。
-5. **`CanvasToToggle.Default` 不参与任何流程。** 它无索引，语义为默认界面，同时是 ESC 判断依据；`UIManager.ReportCanvasState` 与 `CanvasFocusStack.ReportState` 都直接 return。新枚举成员必须加在 `Default` 之前，加在后面会静默丢失画布能力。
-6. **画布要能被 UIManager 主动关闭，其 `ToggleCanvasEventSO` 必须登记进 `UIManager.toggleCanvasEvents`。** 未登记的画布只能上报状态与刷新层级，`IsClosableCanvas` 返回 false，ESC 与互斥关闭都不会作用于它；此时若向它发关闭请求，焦点栈与真实显隐会错位。
-7. **`EditorSettings` 的 Domain Reload 状态与静态状态必须成对。** 持 static 可变状态的新类，要么加 `RuntimeInitializeOnLoadMethod(SubsystemRegistration)` 复位，现例为 `SaveRegistry` 与 `PersistentSceneRegistry`，要么保证订阅方成对退订；Domain Reload 关闭时静态状态会跨 Play 存活。
+### 3.1 单例初始化钩子内不做跨单例调用
+
+钩子在各实例自己的 `Awake` 内执行，`Awake` 顺序无保证；在钩子里读另一个 `Instance` 会随场景层级顺序变成空引用。跨单例协作走 §2.3.2 的重试订阅或 §2.3.3 的窗口标志；广播段内的先后约束见 §2.3.4。
+
+### 3.2 派生类重写 `Awake` 时必须调 `base.Awake()`
+
+漏调会让 `_instance` 永不赋值、`Instance` 全局为 null，同时重复实例销毁逻辑失效，同场景两份实例各自运行，过程中无异常、无日志。
+
+### 3.3 重写 `SaveableService.OnSingletonInitialized` 时必须调 `base`
+
+注册发生在 base 里，漏调则该服务不进 `SaveRegistry`，存档不报错但永远少一段数据。
+
+### 3.4 `SaveRegistry.All` 遍历前必须拷贝，且不得在遍历中注册或注销
+
+现存调用点统一写作 `SaveRegistry.All.ToList()`。
+
+### 3.5 `CanvasToToggle.Default` 不参与任何流程
+
+它无索引，语义为默认界面，同时是 ESC 判断依据；`UIManager.ReportCanvasState` 与 `CanvasFocusStack.ReportState` 都直接 return。新枚举成员必须加在 `Default` 之前，加在后面会静默丢失画布能力。
+
+### 3.6 画布要能被 UIManager 主动关闭，其 `ToggleCanvasEventSO` 必须登记进 `UIManager.toggleCanvasEvents`
+
+未登记的画布只能上报状态与刷新层级，`IsClosableCanvas` 返回 false，ESC 与互斥关闭都不会作用于它；此时若向它发关闭请求，焦点栈与真实显隐会错位。
+
+### 3.7 `EditorSettings` 的 Domain Reload 状态与静态状态必须成对
+
+持 static 可变状态的新类，要么加 `RuntimeInitializeOnLoadMethod(SubsystemRegistration)` 复位，现例为 `SaveRegistry` 与 `PersistentSceneRegistry`，要么保证订阅方成对退订；Domain Reload 关闭时静态状态会跨 Play 存活。

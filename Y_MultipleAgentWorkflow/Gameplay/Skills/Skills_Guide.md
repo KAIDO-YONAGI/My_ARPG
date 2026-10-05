@@ -9,7 +9,7 @@
 
 | 线索 | 指向 |
 |---|---|
-| `技能树` / `技能面板` / `SkillTree` | §2.1、§2.3 |
+| `技能树` / `技能面板` / `SkillTree` | §2.1、§2.3、§2.4 |
 | `技能点` / `SkillPoints` / `pointsText` | §2.2 |
 | `解锁` / `isUnlocked` / `CanUnlockSkill` / `前置` | §2.1 |
 | `升级技能` / `TryUpgradeSkill` / `maxLevel` | §2.1 |
@@ -65,12 +65,38 @@
 
 ## 3. 约定与硬边界
 
-1. **扣点发生在事件订阅方**：任何广播 `OnAbilityPointSpent` 的路径都依赖 `SkillTreeManager` 处于激活且已订阅；它失活时升级照常加等级，技能点保持不变。
-2. **`skillName` 字符串即协议**：`SkillManager` 用 `switch (skillSO.skillName)` 派发，改技能名或复制资产时漏改字符串会静默失效。
-3. **两个 static 事件必须成对退订**：`OnAbilityPointSpent` 与 `OnMaxSkillLevel` 都是 static，清空手段是订阅方在 `OnDisable` 退订；Domain Reload 关闭时残留订阅会跨局呼叫已销毁对象。
-4. **根技能由场景预先解锁**：`isUnlocked` 是序列化字段，技能按钮预制体默认为 0，初始解锁来源是场景与预制体实例上的赋值，代码里没有开局解锁根节点的逻辑。
-5. **前置条件要求前置槽位满级**：`CanUnlockSkill` 要求前置槽位的 `currentLevel` 达到其 `maxLevel`；只解锁不点满不会放行后续节点。
-6. **同一个 `SkillSO` 可被多个槽位复用且各自计数**：`currentLevel` 在槽位上，场景里 23 个槽位共用 `MaxHealthBoost`，因此等级上限按槽位各自计算。
-7. **技能等级与解锁不入档，技能点入档**：读档后技能树回到场景接线初值，技能点恢复存档值。
-8. **`UpdateAbilityPoints` 是点数文本的唯一刷新入口**：绕过它直接写 `StatsService.UpdateSkillPoints` 会让 `pointsText` 与实际值不一致。
-9. **按钮回调只挂不退订**：`skillButton.onClick.AddListener` 传的是匿名闭包，`OnDisable` 只退订两个 static 事件，不做 `RemoveListener`。`Start` 每个实例只跑一次，正常生命周期下不会叠加。
+### 3.1 扣点发生在事件订阅方
+
+任何广播 `OnAbilityPointSpent` 的路径都依赖 `SkillTreeManager` 处于激活且已订阅；它失活时升级照常加等级，技能点保持不变。
+
+### 3.2 `skillName` 字符串即协议
+
+`SkillManager` 用 `switch (skillSO.skillName)` 派发，改技能名或复制资产时漏改字符串会静默失效。
+
+### 3.3 两个 static 事件必须成对退订
+
+`OnAbilityPointSpent` 与 `OnMaxSkillLevel` 都是 static，清空手段是订阅方在 `OnDisable` 退订；Domain Reload 关闭时残留订阅会跨局呼叫已销毁对象。
+
+### 3.4 根技能由场景预先解锁
+
+`isUnlocked` 是序列化字段，技能按钮预制体默认为 0，初始解锁来源是场景与预制体实例上的赋值，代码里没有开局解锁根节点的逻辑。
+
+### 3.5 前置条件要求前置槽位满级
+
+`CanUnlockSkill` 要求前置槽位的 `currentLevel` 达到其 `maxLevel`；只解锁不点满不会放行后续节点。
+
+### 3.6 同一个 `SkillSO` 可被多个槽位复用且各自计数
+
+`currentLevel` 在槽位上，场景里 23 个槽位共用 `MaxHealthBoost`，因此等级上限按槽位各自计算。
+
+### 3.7 技能等级与解锁不入档，技能点入档
+
+读档后技能树回到场景接线初值，技能点恢复存档值。
+
+### 3.8 `UpdateAbilityPoints` 是点数文本的唯一刷新入口
+
+绕过它直接写 `StatsService.UpdateSkillPoints` 会让 `pointsText` 与实际值不一致。
+
+### 3.9 按钮回调只挂不退订
+
+`skillButton.onClick.AddListener` 传的是匿名闭包，`OnDisable` 只退订两个 static 事件，不做 `RemoveListener`。`Start` 每个实例只跑一次，正常生命周期下不会叠加。

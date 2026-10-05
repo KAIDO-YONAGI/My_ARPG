@@ -16,13 +16,13 @@
 | 线索 | 指向 |
 |---|---|
 | `SceneChanger` / `RequestSceneLoad` / `SceneToggler` / `ButtonSceneToggler` | §2.1 唯一入口与调用方 |
-| `GameSceneSO` / `sceneName` / `sceneType` / `SaveKey` | §2.2 场景 SO 契约 |
-| `场景组` / `Additive` / `firstSceneToLoad` / `sceneToLoad` | §2.3 组语义与加载顺序 |
+| `GameSceneSO` / `sceneName` / `sceneType` / `SaveKey` | §2.2 场景 SO 契约、§2.7 存档键来源 |
+| `场景组` / `Additive` / `firstSceneToLoad` / `sceneToLoad` | §2.3 组语义与加载顺序、§2.6 加载完成后的启动内容、§2.8 切场触发点与重试 |
 | `常驻场景` / `PersistentSceneRegistry` / `IsPersistent` | §2.4 常驻注册表 |
 | 初始场景 / `InitialLoad` / `persistentScenes` | §2.5 启动声明 |
 | `存档键` / `sceneIDAndPlayerPos` / `SceneDataForSave` | §2.7 存档键来源 |
 | `Teleport` / `传送` / `重试` / `RetryButton` | §2.8 切场触发点与重试 |
-| 构建场景列表 / `EditorBuildSettings` / `CanStreamedLevelBeLoaded` | §2.9 构建场景列表 |
+| 构建场景列表 / `EditorBuildSettings` / `CanStreamedLevelBeLoaded` | §2.3 组语义与加载顺序、§2.5 启动声明、§2.9 构建场景列表 |
 | `Addressables` / `AssetReference` | §2.9 Addressables 现状 |
 | `isLoading` / 加载窗口 / 并发请求 | §2.1 加载窗口守卫 |
 
@@ -84,10 +84,30 @@ Addressables 在代码层零引用：对全部产品脚本检索 `Addressables`�
 
 ## 3. 约定与硬边界
 
-1. **切场一律经 `RequestSceneLoad`**：直接调 `RaiseLoadRequestEvent` 只通知订阅方，不切场景；新增的切场触发点也必须经该入口，否则 `UIManager` 的画布重置与 `SaveDataManager` 的自动存档等同步收尾全部缺失。
-2. **场景必须进构建场景列表**：`Application.CanStreamedLevelBeLoaded` 为假时只报错并跳过该场景，整组其余场景照常加载。
-3. **常驻场景不进任何 `sceneToLoad` 或 `firstSceneToLoad` 组**：`Teleport` 与 `ButtonSceneToggler` 的 Tooltip 明写这条。组内第一个元素决定 `currentScene` 与存档键。
-4. **`sceneName` 为空即静默跳过**：卸载段与加载段都用 `string.IsNullOrEmpty(scene.sceneName)` 过滤，这类 GameSceneSO 整条被忽略。
-5. **存档键取 `SaveKey`**：`ID` 由 `OnValidate` 生成且不落盘；`SaveKey` 的取值与 `AssetReference.AssetGUID` 对齐。
-6. **`SceneDataForSave.gameScenes` 必须覆盖所有可能写进场景键的 GameSceneSO**：反查靠线性遍历 `SaveKey`，漏项使读档时 `SaveSystem.GetScene` 返回 null。
-7. **重试链先回血再请求**：回血晚于广播段会把死亡态血量写进该广播段抓取的存档快照。
+### 3.1 切场一律经 `RequestSceneLoad`
+
+直接调 `RaiseLoadRequestEvent` 只通知订阅方，不切场景；新增的切场触发点也必须经该入口，否则 `UIManager` 的画布重置与 `SaveDataManager` 的自动存档等同步收尾全部缺失。
+
+### 3.2 场景必须进构建场景列表
+
+`Application.CanStreamedLevelBeLoaded` 为假时只报错并跳过该场景，整组其余场景照常加载。
+
+### 3.3 常驻场景不进任何 `sceneToLoad` 或 `firstSceneToLoad` 组
+
+`Teleport` 与 `ButtonSceneToggler` 的 Tooltip 明写这条。组内第一个元素决定 `currentScene` 与存档键。
+
+### 3.4 `sceneName` 为空即静默跳过
+
+卸载段与加载段都用 `string.IsNullOrEmpty(scene.sceneName)` 过滤，这类 GameSceneSO 整条被忽略。
+
+### 3.5 存档键取 `SaveKey`
+
+`ID` 由 `OnValidate` 生成且不落盘；`SaveKey` 的取值与 `AssetReference.AssetGUID` 对齐。
+
+### 3.6 `SceneDataForSave.gameScenes` 必须覆盖所有可能写进场景键的 GameSceneSO
+
+反查靠线性遍历 `SaveKey`，漏项使读档时 `SaveSystem.GetScene` 返回 null。
+
+### 3.7 重试链先回血再请求
+
+回血晚于广播段会把死亡态血量写进该广播段抓取的存档快照。

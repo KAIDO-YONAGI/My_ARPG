@@ -9,17 +9,17 @@
 
 | 线索 | 指向 |
 |---|---|
-| `事件通道` / `EventSO` / `事件SO` | 第 2 节 |
-| `新增事件` / `新建通道` | 2.6 与 3.3 检查清单 |
-| `改名事件` / `重命名事件资产` | 3.3 检查清单 |
-| `VoidEventSO` / `OnEventRaised` | 2.1、2.2 |
-| `ToggleCanvasEventSO` / `canvasToToggle` | 2.3 与 3.2 |
-| `SceneLoadedEvent` / `SceneLoadEvent` | 2.2、2.5 |
-| `订阅` / `OnEnable +=` / `OnDisable -=` | 2.4 与 3.1 |
-| `Raise` / `OnEventRaised` / `发布` | 2.4 与 3.1 |
-| `事件不生效` / `接线断了` / `Inspector 没拖` | 3.3 检查清单 |
-| `事件资产在哪` / `Events 目录` | 2.3 |
-| `InventorySlotsStatsSO` | 2.1、2.3 |
+| `事件通道` / `EventSO` / `事件SO` | §2.1 清单、§2.2 类型契约 |
+| `新增事件` / `新建通道` | §2.6 新增标准动作、§3.3 检查清单 |
+| `改名事件` / `重命名事件资产` | §3.3 检查清单 |
+| `VoidEventSO` / `OnEventRaised` | §2.1 清单、§2.2 类型契约 |
+| `ToggleCanvasEventSO` / `canvasToToggle` | §2.5 内部契约、§3.2 canvasToToggle 必须唯一 |
+| `SceneLoadedEvent` / `SceneLoadEvent` | §2.1 清单、§2.4 发布点 |
+| `订阅` / `OnEnable +=` / `OnDisable -=` | §2.4 订阅与发布惯例、§3.1 订阅必须成对 |
+| `Raise` / `OnEventRaised` / `发布` | §2.2 发布方法命名、§2.4 发布惯例 |
+| `事件不生效` / `接线断了` / `Inspector 没拖` | §3.3 检查清单 |
+| `事件资产在哪` / `Events 目录` | §2.3 事件资产的组织方式 |
+| `InventorySlotsStatsSO` | §2.1 清单、§2.3 组织方式 |
 
 ## 2. 当前实现
 
@@ -125,9 +125,9 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 
 ### 2.6 新增一个事件通道的标准动作
 
-1. 新建类时把它放在事件通道目录，`[CreateAssetMenu(menuName = "Events/<类名>")]`，包一层 `public event Action<...>` 加一个发布方法，照抄同族命名风格，见 2.2。
+1. 新建类时把它放在事件通道目录，`[CreateAssetMenu(menuName = "Events/<类名>")]`，包一层 `public event Action<...>` 加一个发布方法，照抄同族命名风格，见 §2.2。
 2. 在 Events 目录或多实例子目录右键 `Create > Events > ...` 建资产，随即改名；默认文件名是类名，`VoidEventSO` 必须补语义前缀。
-3. 发布方用 `[SerializeField]` 拖该资产；订阅方在 `OnEnable` 与 `OnDisable` 成对 `+=` 与 `-=`；两侧都拖到同一个资产，见 3.3。
+3. 发布方用 `[SerializeField]` 拖该资产；订阅方在 `OnEnable` 与 `OnDisable` 成对 `+=` 与 `-=`；两侧都拖到同一个资产，见 §3.3。
 4. 画布开关通道要给资产设 `canvasToToggle`，并把资产加进常驻场景中 `UIManager` 的 `toggleCanvasEvents` 列表。
 
 ## 3. 约定与硬边界
@@ -150,7 +150,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 |---|---|---|
 | 1 | 通道类本身：事件名、发布方法签名 | 通道类源码 |
 | 2 | 发布方：`[SerializeField]` 拖了该资产 | 按该资产 GUID 检索场景、预制体与资产 |
-| 3 | 订阅方：`OnEnable +=` 与 `OnDisable -=` | 2.4 列出的 22 个订阅方各自核对成对改动 |
+| 3 | 订阅方：`OnEnable +=` 与 `OnDisable -=` | §2.4 列出的 22 个订阅方各自核对成对改动 |
 | 4 | 场景与预制体里的资产引用 | 按 GUID 计数，改名后引用数不应为 0 |
 | 5 | toggle 通道：`canvasToToggle` 值唯一，且已登记进 `UIManager.toggleCanvasEvents` | `MyEnums.CanvasToToggle` 与 `UIManager` |
 | 6 | 常驻场景内管理器持有的通道 | 确认它是常驻场景 `PersistentScene` 里的对象 |

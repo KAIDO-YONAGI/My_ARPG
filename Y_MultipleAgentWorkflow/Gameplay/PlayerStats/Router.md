@@ -9,14 +9,15 @@
 
 | 线索 | 权威文档 |
 |---|---|
-| `血量` `HP` `扣血` `回血` `Respawn` | `PlayerStats_Guide.md` |
-| `经验` `升级` `LevelUp` `经验曲线` `expToUpgrade` `maxLevel` | `PlayerStats_Guide.md` |
-| `技能点` `SkillPoints` `加点` | `PlayerStats_Guide.md` |
-| `攻击力` `速度` `武器范围` `击退` `冷却` | `PlayerStats_Guide.md` |
-| `StatsService` `Stats` `IPlayerStatsReadOnly` `只读视图` | `PlayerStats_Guide.md` |
-| `PlayerStatsModel` `PlayerStatsData` `PlayerStatsSO` `拷贝语义` | `PlayerStats_Guide.md` |
-| `playerStatsData` `读档` `坏档` `存档数值` | `PlayerStats_Guide.md` |
-| `PlayerDamaged` `EnemyDefeated` `AddExperience` | `PlayerStats_Guide.md` |
+| `血量` `HP` `扣血` `回血` `Respawn` | `PlayerStats_Guide.md` §2.2 §2.9 §3.2 |
+| `经验` `升级` `LevelUp` `经验曲线` `expToUpgrade` `maxLevel` | `PlayerStats_Guide.md` §2.4 §3.1 |
+| `技能点` `SkillPoints` `加点` | `PlayerStats_Guide.md` §2.4 §3.7 |
+| `攻击力` `速度` `武器范围` `击退` `冷却` | `PlayerStats_Guide.md` §2.2 §2.5 |
+| `StatsService` `Stats` `IPlayerStatsReadOnly` `只读视图` | `PlayerStats_Guide.md` §2.1 §2.2 §3.5 |
+| `PlayerStatsModel` `PlayerStatsData` `PlayerStatsSO` `拷贝语义` | `PlayerStats_Guide.md` §2.1 §2.3 §2.6 |
+| `playerStatsData` `读档` `坏档` `存档数值` | `PlayerStats_Guide.md` §2.7 §3.8 |
+| `PlayerDamaged` `EnemyDefeated` `AddExperience` | `PlayerStats_Guide.md` §2.2 §2.9 |
+| `PlayerCombat` `DealDamage` `Arrow` `攻击命中` | `PlayerStats_Guide.md` §2.9 |
 
 ## 下级导航
 
