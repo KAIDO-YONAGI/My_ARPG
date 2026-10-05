@@ -1,5 +1,11 @@
 # My_ARPG MVCS 项目现状
 
+> **文档状态**：`Reference` — 本文已被工作流文档库取代，不再是现行权威。
+> 现行权威：`Y_MultipleAgentWorkflow\Architecture\Layering\Layering_Guide.md`、`Y_MultipleAgentWorkflow\Architecture\Composition\Composition_Guide.md`。
+> 最后核验：`2026-10-05`（§3.1 测试计数按实测修正为 5 文件 52 例；§1 小节编号重复已修正）。
+> 与工作区未提交改动的差异：重试/复活编排已从 `SceneChanger` 迁至 `PlayerDamageController`（订阅 `RetryRequestEvent`），`SaveDataManager` 的回灌循环改为跳过 `GetDataID()` 为空的固定槽位服务；本文 §4 相关表述以工作区为准，详见 `Y_MultipleAgentWorkflow\SceneFlow\SceneFlow_Guide.md`。
+> 保留原因：作为重构过程的历史基线与交叉证据，不参与现行决策。
+
 本文记录 My_ARPG 分层重构的工程现状：已迁移的线、未迁移的域、已确认缺陷、待办与测试现状。只写当前成立的事实，路径与代码一致。
 
 ## 1. 玩家数值这条线已经分层
@@ -50,7 +56,7 @@
 
 跨域调用写方法的现状：`InventoryManager` 的经验道具走 `StatsService.AddExperience`，`UseItem` 走 `StatsService` 的血量、速度、伤害和上限命令；命令最终进入 Model，写方法自带守卫，`AddExp` 忽略非正数，血量钳制在写方法内，单聚合不变量不被绕过。数值域没有需要一次原子改两个聚合的用例，`StatsService` 因此不复制规则，只承担生命周期、边界和 `Respawn`。
 
-### 1.5 当前边界结论
+### 1.4 当前边界结论
 
 玩家数值线采用轻量 MVCS，而不是把每个动作继续细分成更多层：
 
@@ -59,7 +65,7 @@
 - `IPlayerStatsReadOnly` 只暴露查询与事件，业务类不再拿到具体 Model，也不能绕过 Service 修改数值。
 - Service 的转发方法只负责边界，不复制 Model 的规则；因此不会形成两套实现。
 
-### 1.4 经验曲线与守卫
+### 1.5 经验曲线与守卫
 
 ```text
 expToUpgrade += ((expToUpgrade / 10) * 10 * expMultiplier) / 4
@@ -79,7 +85,7 @@ expToUpgrade += ((expToUpgrade / 10) * 10 * expMultiplier) / 4
 
 读档原样采用存档里的阈值，不从等级反算；低于下限的阈值在 `LoadFrom` 与构造函数里统一修回 `MinExpToUpgrade`。阈值低于下限时升级循环条件恒不成立，玩家永远升不了级。兜底落在 Model 而不是 `PlayerStatsData`——后者是存档传输格式，不带规则。
 
-### 1.5 事件
+### 1.6 事件
 
 | 事件 | 触发时机 | 订阅者 |
 | --- | --- | --- |
@@ -171,16 +177,17 @@ SkillSystemModel（纯C#）：per-skill 等级/解锁、前置依赖图、规则
 
 ### 3.1 现有用例
 
-`Assets/Tests/Editor/` 下 4 个文件，命名空间 `Gameplay.Tests`，共 46 个用例：
+`Assets/Tests/Editor/` 下 5 个文件，命名空间 `Gameplay.Tests`，共 52 个用例：
 
 | 文件 | 用例数 | 覆盖 |
 | --- | --- | --- |
 | `PlayerStatsModelTests.cs` | 24 | 钳制规则、事件广播、经验曲线、等级上限、拷贝语义、`ExpChanged`、只读接口与 Service 边界 |
 | `CanvasFocusStackTests.cs` | 15 | Canvas 焦点栈的开闭顺序、order 计算、ESC 行为 |
+| `AStarOpenHeapTests.cs` | 6 | A* 开表的 F 升序出堆、F 相同时偏好更大 G、同格重复入堆、清空后可复用、随机输入有序性、交错出入堆恒取最小 |
 | `ObjectPoolTests.cs` | 5 | 对象池的预热注册、Get/Return 回调、池内对象销毁后的选取 |
 | `PlayerStatsSOTests.cs` | 2 | 模板的拷贝语义 |
 
-加上 Addressables 包自带的 1 个，Test Runner 里共 47 个。工程里 0 个 asmdef，产品代码全在预定义程序集 `Assembly-CSharp` 里。
+上表是本工程自己的用例，全部在 `Assets/Tests/Editor/` 下。这里不写 Test Runner 的总条目数：Addressables 包自带测试程序集，其条目数随包版本变化（当前包内 `[Test]` 达数百条），会随包升级漂移，不适合作为本工程基线。工程里 0 个 asmdef，产品代码全在预定义程序集 `Assembly-CSharp` 里；5 个测试文件均无 `[UnityTest]`、无 PlayMode 测试。
 
 `PlayerStatsModelTests` 是玩家数值这条线的回归网：改 `PlayerStatsModel`、`StatsService`、`ExperienceController` 之前先跑绿。
 

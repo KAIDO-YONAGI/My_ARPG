@@ -12,7 +12,7 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 
 - **Complete RPG system loop**: scene transitions, NPC dialogue (branching + conditions + history), a state-machine quest system, shops, inventory, a skill tree, and save/load.
 - **Event-driven architecture**: cross-system decoupling via ScriptableObject event channels.
-- **Three-layer decoupled A\* pathfinding**: grid management / pathfinding algorithm / MovementController — attach a component and go.
+- **Three-layer decoupled A\* pathfinding**: grid management / pathfinding algorithm / PathFollower — attach a component and go.
 - **2D combat**: top-down exploration with both melee and ranged modes.
 - **Engineering practices**: multi-scene additive loading, Newtonsoft.Json saves, and Android build troubleshooting docs.
 
@@ -57,8 +57,7 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 |---|---|
 | `WASD` | Move the character |
 | `Q` | Switch between ranged and melee modes |
-| `J` | Fire an arrow in archer mode |
-| `K` | Perform a sword slash in melee mode |
+| `J` | Fire an arrow in ranged mode; perform a sword slash in melee mode (`Slash` and `Shoot` share one key; press `Q` to pick the mode) |
 | `1` | Open the stats panel |
 | `2` | Open the skill panel (left-click a skill slot to spend points and unlock skills) |
 | `F` | Interact with a shop |
@@ -121,11 +120,11 @@ State-machine-based quest management with multi-objective types and automatic st
 
 ### A* Pathfinding System
 
-Three-layer decoupled architecture: grid management, pathfinding algorithm, and path consumption are independent. NPCs and enemies only need a `MovementController` component to use pathfinding.
+Three-layer decoupled architecture: grid management, pathfinding algorithm, and path consumption are independent. NPCs and enemies only need a `PathFollower` component to use pathfinding.
 
 - **`AStarNodeManager`** — Grid data layer. Auto-builds a node map from Tilemaps and Collider2Ds, with walkable/obstacle marking, world↔cell coordinate conversion, and safety margins to prevent wall-hugging.
 - **`AStarPathFinder`** — Algorithm layer. Standard A* with 8-directional movement, diagonal pass-through checks (`CanWalkDiagonally`), and start-point optimization (`NoCoverObstacleNodes` for direct line-of-sight shortcuts).
-- **`MovementController`** — Consumption layer. Attachable to any GameObject, provides `GetPosToGo()` for the current waypoint and `ArrivedPos()` to consume nodes. Includes automatic path rebuilding (triggers when the target moves beyond a threshold, compares old vs. new path before swapping) and a cooldown timer to prevent excessive recalculations. Path visualized via Gizmos in Scene View.
+- **`PathFollower`** — Consumption layer. Attachable to any GameObject; `GetPosToGo(optPos, startPos, endPos)` returns the next waypoint and `ArrivedPos()` consumes a reached node. Includes automatic path rebuilding (triggers when the target moves beyond a threshold, compares old vs. new path before swapping) and a cooldown timer to prevent excessive recalculations. Path visualized via Gizmos in Scene View.
 
 ### Event-Driven Architecture
 
@@ -142,7 +141,7 @@ The project uses a lightweight MVCS split: a Model holds one data aggregate's st
 - **Read path**: the Model raises C# events when state changes, a display-side Controller translates the data into display parameters, and the View writes widgets through `SetXxx`.
 - **Three boundaries**: rules that read only the aggregate's own fields belong in the Model; cross-aggregate rules, lifecycle, and saving belong in the Service; persistent state must be written into the Model through the Service, because state that bypasses the Model reaches neither the read path nor the save file.
 
-This project's migration status, confirmed defects, and remaining items are collected in [`Docs/`](Docs/README.md): `My_ARPG_MVCS项目现状.md`, `My_ARPG_重构优化清单_未解决.md`, and `My_ARPG_重构优化清单_已解决.md`.
+This project's migration status, confirmed defects, unimplemented designs, and per-system conventions live in [`Y_MultipleAgentWorkflow/`](Y_MultipleAgentWorkflow/Router.md): the root Router is the entry point, layering boundaries are in `Architecture/Layering/Layering_Guide.md`, composition and initialization order in `Architecture/Composition/Composition_Guide.md`, and every gameplay, scene, asset, save, and build domain has its own Router and Guide. The historical baseline docs (the refactor checklists formerly indexed under `Docs/`) are no longer the current authority.
 
 > **Project status: the layered refactor is frozen.** The player stats line is organized in four layers; quests, dialogue, inventory and shops, save and scene orchestration, and movement, combat, and pathfinding keep their original Manager form. The skill domain is the retained verification point: skill points belong to the stats aggregate while spending happens in the skill aggregate, so it is the only place in this project where the rule that a single write atomically changes two data aggregates can be verified.
 

@@ -12,7 +12,7 @@
 
 - **完整的 RPG 系统闭环**：场景切换、NPC 对话（分支 + 条件 + 历史）、任务系统（状态机）、商店、背包、技能树、存读档。
 - **事件驱动架构**：基于 ScriptableObject 事件通道的跨系统解耦通信。
-- **三层解耦 A\* 寻路**：网格管理 / 寻路算法 / MovementController 各自独立，挂载即可用。
+- **三层解耦 A\* 寻路**：网格管理 / 寻路算法 / PathFollower 各自独立，挂载即可用。
 - **2D 战斗**：俯视角探索，近战与远程两种模式。
 - **工程化实践**：多场景组叠加加载、Newtonsoft.Json 存档、Android 导出排障文档。
 
@@ -57,8 +57,7 @@
 |---|---|
 | `WASD` | 移动角色 |
 | `Q` | 切换远程 / 近战模式 |
-| `J` | 弓箭手射箭 |
-| `K` | 剑士挥砍 |
+| `J` | 远程模式下射箭；近战模式下挥砍（`Slash` 与 `Shoot` 共用同一按键，按 `Q` 决定当前模式） |
 | `1` | 打开能力面板 |
 | `2` | 打开技能面板（左键技能槽消耗技能点解锁技能） |
 | `F` | 与商店交互 |
@@ -121,11 +120,11 @@
 
 ### A* 寻路系统
 
-采用三层解耦架构：网格管理、寻路算法、路径消费各自独立，NPC 和敌人只需挂载 `MovementController` 即可获得寻路能力。
+采用三层解耦架构：网格管理、寻路算法、路径消费各自独立，NPC 和敌人只需挂载 `PathFollower` 即可获得寻路能力。
 
 - **`AStarNodeManager`** — 网格数据层。从 Tilemap 和 Collider2D 自动构建节点地图，支持可步行/障碍节点标记，提供世界坐标↔网格坐标转换和安全边距（避免贴墙移动）。
 - **`AStarPathFinder`** — 寻路算法层。标准 A* 实现，支持 8 方向移动、对角线通行检查（`CanWalkDiagonally`）、起点优化（`NoCoverObstacleNodes` 直接直线移动到最优起点）。
-- **`MovementController`** — 路径消费层。可挂载到任意 GameObject，提供 `GetPosToGo()` 获取当前目标点、`ArrivedPos()` 消费节点。内置重寻路机制（目标移动超过阈值时自动重建路径，新旧路径比较后决定是否替换）和冷却计时器防止频繁重算。Scene View 中通过 Gizmos 可视化路径。
+- **`PathFollower`** — 路径消费层。可挂载到任意 GameObject，`GetPosToGo(optPos, startPos, endPos)` 返回下一个目标点、`ArrivedPos()` 消费已到达的节点。内置重寻路机制（目标移动超过阈值时自动重建路径，新旧路径比较后决定是否替换）和冷却计时器防止频繁重算。Scene View 中通过 Gizmos 可视化路径。
 
 ### 事件驱动
 
@@ -142,7 +141,7 @@
 - **读路径**：Model 状态变化发 C# 事件，显示侧 Controller 把数据翻译成显示参数，View 用 `SetXxx` 写控件。
 - **三类边界**：规则只读自己字段的进 Model；跨聚合、管生命周期与存档的进 Service；持久状态必须经 Service 写进 Model，绕过 Model 的状态读路径刷不出来，也存不进存档。
 
-本工程的迁移现状、已确认缺陷与剩余清单收在 [`Docs/`](Docs/README.md) 的 `My_ARPG_MVCS项目现状.md`、`My_ARPG_重构优化清单_未解决.md`、`My_ARPG_重构优化清单_已解决.md`。
+本工程的迁移现状、已确认缺陷、未实施设计与各系统约定收在 [`Y_MultipleAgentWorkflow/`](Y_MultipleAgentWorkflow/Router.md)：入口是根 Router，分层边界见 `Architecture/Layering/Layering_Guide.md`，组合与初始化时序见 `Architecture/Composition/Composition_Guide.md`，各玩法域与场景、资源、存档、构建各有自己的 Router 与 Guide。历史基线文档（`.codegraph`、原 `Docs/` 索引所述的重构清单）已不再作为现行权威。
 
 > **项目状态：分层重构已冻结。** 玩家数值线按四层组织；任务、对话、背包与商店、存档与场景编排、移动战斗寻路保留原有的 Manager 形态。技能域是保留的验证点：技能点属于数值聚合，消耗发生在技能聚合，「一次写要原子地改动两个数据聚合」这条准则在本工程只有它能验证。
 
