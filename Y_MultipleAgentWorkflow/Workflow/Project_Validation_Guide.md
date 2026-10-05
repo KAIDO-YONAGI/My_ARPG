@@ -11,6 +11,7 @@
 |---|---|
 | `怎么验证` / `验证流程` | §3 命令清单 |
 | `跑测试` / `EditMode 测试` / `testResults` | §3 C12 |
+| `单元测试` / `新增用例` / `测试放哪` | §3 C12 |
 | `代理状态` / `sdkmanager 代理` | §3 C4–C8 |
 | `产物在哪` / `apk 检查` | §3 C9–C10、§4 |
 | `签名校验` / `apksigner` | §3 C11 |
@@ -122,6 +123,7 @@
   ```
 - 成功判定：以结果 XML 根节点的 `result` 与失败计数为准，不取退出码。
 - 前提：没有编辑器实例开着这个工程。
+- 用例位置：EditMode 用例统一放在 `Assets\Tests\Editor\`，该目录的承重作用与新增用例的约定见 `..\Build\TestBaseline_Guide.md` §3.1。
 
 ## 4. 进程与产物处理
 
@@ -142,4 +144,4 @@
 | `GRADLE_USER_HOME` | 设置后，用户级 Gradle 配置位置随之改变 | 未设置 |
 | `%APPDATA%\UnityHub\secondaryInstallPath.json`，属环境面 | Editor 安装根目录的来源，C2 依赖它 | 可读出 `D:\Unity\Editor` |
 
-补充事实：工程内没有项目级的环境变量文件，也没有 .NET 构建属性文件；环境相关状态来自用户环境或 Editor 安装目录。
+补充事实：工程内没有项目级的环境变量文件；环境相关状态来自用户环境或 Editor 安装目录。

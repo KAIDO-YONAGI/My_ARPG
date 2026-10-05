@@ -20,7 +20,7 @@ maintenance count changes here.
 
 **本轮实际核验（均为只读，未运行 Unity、未修改工程文件）**
 
-- 产物位置与体量：`Builds/` 下仅 `Android/`，`My_ARPG-release.apk` 为 28,509,358 字节，最后写入 2026-08-09 18:06:23；`My_ARPG.apk` 为 45,437,354 字节，最后写入 2026-08-09 17:21:03。
+- 产物位置与体量：`Builds/` 下仅 `Android/`，`My_ARPG-release.apk` 为 28,509,358 字节，最后写入 2026-08-09 18:06:23。
 - StreamingAssets：目录下仅含 `GameGuide.txt` 及其元文件，1372 字节，非 ASCII 改名修复已落地。
 - 代理现状：`Configure-UnityAndroidProxy.ps1 -Action Status -SkipNetworkCheck` 输出 `State = Patched`、`SdkManagersFound = 1`、`GradleManaged = False`、`UserProxyHost/Port = 127.0.0.1 / 7890`；被补丁文件为 Editor 内置 cmdline-tools 6.0 的 `sdkmanager.bat`，其中含 UNITY_ANDROID_PROXY 标记块与注入 `%UNITY_ANDROID_SDKMANAGER_PROXY_ARGS%` 后的调用行，同目录存在 `.unity-android-proxy.original` 备份；用户级 `gradle.properties` 含六行 `systemProp.*` 代理属性，不含脚本标记。
 - Editor 与工具链：`D:\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe` 存在；内置 build-tools 有 `33.0.2`、`34.0.0`，各含 `apksigner.bat`。
@@ -29,3 +29,18 @@ maintenance count changes here.
 - 全仓检索 `-buildTarget` / `-executeMethod` / `BuildPipeline.` / `BuildPlayerOptions` 均无命中；唯一命中为 `-runTests -testPlatform EditMode`。
 
 **维护计数**：`0/5` → 本轮为首次建立，未触发维护周期变更。
+
+## 2026-10-05 单元测试目录约定
+
+**写入的文件**
+
+- `TestBaseline_Guide.md`（`BUILD-TESTBASELINE-GUIDE`，Active）：§3.1 增加「新增单元测试统一放在 `Assets\Tests\Editor\`，命名空间用 `Gameplay.Tests`」，§1 线索表加入 `新增单元测试` / `测试放哪`，指向 §3.1。
+
+**依据的证据路径**
+
+- `Assets\Tests\Editor\` 下的 5 个测试文件；执行侧入口 `..\Workflow\Project_Validation_Guide.md` §3 C12。
+
+**已核验**
+
+- 测试目录下 5 个文件、0 个 asmdef，命名空间均为 `Gameplay.Tests`，与 §2.1 一致。
+- 删除旧包后 `Builds\Android\` 只剩 `My_ARPG-release.apk`。

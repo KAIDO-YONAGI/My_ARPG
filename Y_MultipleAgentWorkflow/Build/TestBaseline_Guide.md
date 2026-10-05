@@ -14,6 +14,7 @@
 | `测试总数` / `测试全绿` / `用例数` | §2.2、§2.3 |
 | `test-framework` / `NUnit` | §2.1 |
 | `Test Runner 跑不出来` / `asmdef` | §3.2、§3.6 |
+| `新增单元测试` / `测试放哪` | §3.1 |
 | `改 PlayerStatsModel 前先跑什么` | §2.5 |
 | `哪些域没有测试` | §2.5 |
 | `测试退出码` / `testResults` XML | §2.6 |
@@ -86,6 +87,8 @@ headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：
 ### 3.1 `Tests/Editor` 这个目录名是承重的
 
 它让测试落进预定义编辑器程序集 `Assembly-CSharp-Editor`。移动测试目录、或把测试挪出 `Editor` 子目录，都会改变程序集归属并影响编译与枚举。
+
+新增单元测试统一放在 `Assets\Tests\Editor\`，命名空间用 `Gameplay.Tests`。
 
 ### 3.2 新增 asmdef 会排除现有测试
 
