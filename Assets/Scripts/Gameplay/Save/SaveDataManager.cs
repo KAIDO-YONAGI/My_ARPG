@@ -121,6 +121,14 @@ public class SaveDataManager : YSingleton<SaveDataManager>
     {
         foreach (var saveable in SaveRegistry.All.ToList())
         {
+            // 只回灌按 GUID 参与动态数据的场景物体（如 Loot）：它们随场景重新实例化，
+            // 必须按存档恢复拾取态与位移，回灌是必需的。
+            // GetDataID() 为 null 的是固定槽位服务（SaveableService 派生，如 StatsService），
+            // 状态跨场景持久，读档已由 LoadFromData 应用；在这里回灌只会把广播段抓的旧快照
+            // 覆盖回运行时，静默撤销加载窗口内的状态变更（例如重试复活回血）。
+            if (saveable.GetDataID() == null)
+                continue;
+
             saveable.LoadData(dataToSave);
         }
     }

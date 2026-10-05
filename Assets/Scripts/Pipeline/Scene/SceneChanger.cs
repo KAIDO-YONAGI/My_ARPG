@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
-using Gameplay.Player.Services;
 
 /// <summary>
 /// 场景切换管理器：负责场景组的加载、卸载和过渡动画。
@@ -27,9 +26,6 @@ public class SceneChanger : YSingleton<SceneChanger>
     /// <summary>过渡动画播放器数组</summary>
     ///
     [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
-
-    /// <summary>重试请求事件：死亡后重载当前场景组，由 RetryButton 广播</summary>
-    [SerializeField] private VoidEventSO retryEventSO;
 
     [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
     [SerializeField] private Animator[] transitionImagesDuringFade;
@@ -82,20 +78,6 @@ public class SceneChanger : YSingleton<SceneChanger>
     }
 
     /// <summary>
-    /// 启用时订阅重试事件
-    /// </summary>
-    private void OnEnable()
-    {
-        // 重试是外部输入，经事件订阅；加载执行由 RequestSceneLoad 直接调用
-        retryEventSO.VoidEvent += OnRetryRequest;
-    }
-
-    private void OnDisable()
-    {
-        retryEventSO.VoidEvent -= OnRetryRequest;
-    }
-
-    /// <summary>
     /// 场景切换的唯一入口：先广播，后执行。
     /// Raise 同步调用所有订阅方的处理器并等它们全部返回，订阅方在切换开始前完成收尾；
     /// 随后才执行本类的切换流程，两步的先后就是本方法内语句的先后。
@@ -109,7 +91,7 @@ public class SceneChanger : YSingleton<SceneChanger>
 
     /// <summary>
     /// 首个场景组请求放在 Start：同批所有 Awake/OnEnable 已跑完，
-    /// TimeManager/StatsService 实例与 SaveDataManager/UIManager 的事件订阅必然就绪，广播不漏听众。
+    /// TimeManager 实例与 SaveDataManager/UIManager 的事件订阅必然就绪，广播不漏听众。
     /// </summary>
     private void Start()
     {
@@ -168,8 +150,6 @@ public class SceneChanger : YSingleton<SceneChanger>
         ForbidInput();
         TimeManager.Instance.PauseGame();
 
-        StatsService.Instance.Respawn(); //回血
-
         Vector3 targetPosition = newPosition == Vector3.zero ? GetInitialPosition(scenes) : newPosition;
         //如果传入位置为零向量，则使用场景组预设的初始位置
         if (isToFade && !isInitialScene)
@@ -189,16 +169,6 @@ public class SceneChanger : YSingleton<SceneChanger>
                 return scene.initialPosition;
         }
         return Vector3.zero;
-    }
-
-    /// <summary>
-    /// 重试请求回调：重载当前所在场景组。
-    /// 位置传零向量，复用 OnLoadRequestEvent 的初始位置兜底；
-    /// 回血、复活玩家、收起 GameOver 面板均由本次加载流程统一处理，此处不再重复。
-    /// </summary>
-    private void OnRetryRequest()
-    {
-        RequestSceneLoad(GetCurrentScenes(), Vector3.zero, true);
     }
 
     /// <summary>
