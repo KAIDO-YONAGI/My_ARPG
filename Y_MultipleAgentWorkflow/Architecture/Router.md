@@ -37,15 +37,10 @@
 
 **Active**
 
-- `Architecture\Composition\Composition_Guide.md`：单例清单与预算，共 19 个具体单例；初始化时序的三套手写解法；全工程唯一 `DefaultExecutionOrder(10000)` 的真实语义；`SaveRegistry` 登记处契约；UI 画布焦点栈契约。
-- `Architecture\Layering\Layering_Guide.md`：三层目录判定标准；跨层依赖方向实测结论；MVCS 四层归属与命名空间现状。细节以该域 Router 与 Guide 为准，本文件不复制。
+- `Architecture\Composition\Composition_Guide.md`：单例清单与预算，共 19 个具体单例；初始化时序的三套手写解法；全工程唯一 `DefaultExecutionOrder(10000)` 的语义；`SaveRegistry` 登记处契约；UI 画布焦点栈契约。
+- `Architecture\Layering\Layering_Guide.md`：三层目录判定标准；跨层依赖方向；MVCS 四层归属与命名空间。细节以该域 Router 与 Guide 为准，本文件不复制。
 - `Architecture\Composition\Router.md`、`Architecture\AssemblyPlan\Router.md`、`Architecture\Layering\Router.md`：三个下级域的线索路由入口。
 
 **Proposal（未实施）**
 
-- `Architecture\AssemblyPlan\AssemblyPlan_Proposal.md`：`Assembly Definition` 拆分、xLua 热更 MVP、技能与物品效果的数据驱动加状态机基类、事件总线维持不采用、事件引用可视化插件，共五项设计，各附目标、理由、当前状态与前置依赖。
-
-**需要用户确认的事项**
-
-- 是否把 `Architecture` 下三个子域的单例与依赖收敛动作立项：合并超预算单例、消除契约层到 UI 层的反向引用、引入 asmdef。三项均属架构决策并会改动产品代码，超出本域授权。
-- 是否授权修订项目现状文档中已过期的事实条目；本域对该文档所在目录只有只读权限。
+- `Architecture\AssemblyPlan\AssemblyPlan_Proposal.md`：`Assembly Definition` 拆分、xLua 热更 MVP、技能与物品效果的数据驱动加状态机基类、事件总线维持不采用、事件引用可视化插件，共五项设计。

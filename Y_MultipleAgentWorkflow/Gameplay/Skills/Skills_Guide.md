@@ -3,13 +3,7 @@
 文档 ID：`GP-SKILLS-GUIDE`
 状态：`Active`
 最后更新：`2026-10-05`
-核验日期：`2026-10-05`
 权威范围：本域负责技能槽位状态与解锁依赖、技能点收支、技能效果分发这条链路；技能点的存取字段与升级事件归 `Gameplay.PlayerStats`，武器在战斗中的实际行为归战斗域的 `PlayerCombat` 与 `ShiftEquipment`，面板显隐基建归 UI 域的 `ICanvasManager` 与 `UIManager`。
-上游来源：
-- 技能实现：`SkillSlot`、`SkillTreeManager`、`SkillManager`、`SkillTreeCanvasManager`
-- 配置与资产：`SkillSO`、技能配置资产 `MaxHealthBoost` 与 `CombatUnlock`
-- 依赖类型：`PlayerStatsModel`、`PlayerStatsData`、`StatsService`、`PlayerCombat`、`ShiftEquipment`
-- 场景接线：常驻场景、技能按钮预制体
 
 ## 1. 触发线索
 
@@ -22,7 +16,6 @@
 | `SkillManager` / `技能没效果` | §2.4 |
 | `SkillSO` / 技能改名 | §2.4、§3 |
 | `OnAbilityPointSpent` / `OnMaxSkillLevel` | §2.3、§3 |
-| `分层重构` / `SkillService` | §2.5 |
 
 ## 2. 当前实现
 
@@ -70,10 +63,6 @@
 
 `SkillTreeCanvasManager` 只负责技能面板的开关、焦点与场景切换复位，不参与技能逻辑。
 
-### 2.5 分层现状与待定项
-
-技能域当前由 `SkillSlot`、`SkillTreeManager`、`SkillManager`、`SkillTreeCanvasManager` 与配置类型 `SkillSO` 共同承担状态、规则、事件与 UI 四类职责，职责分布见 §2.3 与 §2.4。把这些职责拆到 `SkillSystemModel`、`SkillService`、`SkillEffectApplier`、`SkillTreeController` 四个类型属于待用户确认项，Router 记录该决策点。
-
 ## 3. 约定与硬边界
 
 1. **扣点发生在事件订阅方**：任何广播 `OnAbilityPointSpent` 的路径都依赖 `SkillTreeManager` 处于激活且已订阅；它失活时升级照常加等级，技能点保持不变。
@@ -84,27 +73,4 @@
 6. **同一个 `SkillSO` 可被多个槽位复用且各自计数**：`currentLevel` 在槽位上，场景里 23 个槽位共用 `MaxHealthBoost`，因此等级上限按槽位各自计算。
 7. **技能等级与解锁不入档，技能点入档**：读档后技能树回到场景接线初值，技能点恢复存档值。
 8. **`UpdateAbilityPoints` 是点数文本的唯一刷新入口**：绕过它直接写 `StatsService.UpdateSkillPoints` 会让 `pointsText` 与实际值不一致。
-9. **按钮回调只挂不退订**：`skillButton.onClick.AddListener` 传的是匿名闭包，`OnDisable` 只退订两个 static 事件，不做 `RemoveListener`。`Start` 每个实例只跑一次，正常生命周期下不会叠加；这些闭包没有解除路径，槽位与 manager 的生命周期被拆开时会留下悬空委托。
-
-## 4. 已知缺陷与风险
-
-1. **点数校验与扣减分裂在两个类、两个时刻**：校验在 onClick 闭包与 `HandleAbilityPointSpent`，写入在事件回调里，中间隔着 static 事件广播。
-2. **技能效果按名字字符串分发**：改名或新增同名资产即静默失效，机制见 §3 第 2 条。
-3. **未覆盖的技能名静默无效果**：现有 24 个槽位只用 `MaxHealthBoost` 与 `SwordSlash` 两个名字，新增 `SkillSO` 的名字一旦不在名单里，就只扣点数、没有效果，也没有日志。
-4. **点数不足时点击没有反馈**：onClick 里只判断技能点大于 0，不满足则什么都不发生，`UpdateUI` 也不提示原因。
-5. **`UnsubscribeLevelUp` 在 `StatsService.Instance` 为空时无法真正退订**：标记已经置回 false，`LevelUp` 委托残留且无法再补退订。
-6. **`SkillSlot.UpdateUI` 没有 `skillSO` 空守卫**：`OnValidate` 先判空再调用，`Unlock` 与 `TryUpgradeSkill` 这两条运行期路径配上预制体默认的空引用时，由外部调用会抛 NRE。
-7. **满级解锁是全局扫描**：`HandleSkillMaxed` 遍历全部 24 个槽位并对所有满足条件者解锁，多棵互不相干的技能树挂在同一个 manager 下时会互相放行。
-8. **技能域没有回归网**：编辑器用例 `ObjectPoolTests`、`PlayerStatsSOTests`、`CanvasFocusStackTests`、`PlayerStatsModelTests`、`AStarOpenHeapTests` 都不覆盖 `SkillSlot`、`SkillTreeManager`、`SkillManager`。
-
-## 5. 未核验事项
-
-以下结论来自静态阅读，运行期行为待编辑器实测。
-
-- `SkillTreeManager`、`SkillManager` 与 24 个 `SkillSlot` 都在同一个常驻场景里，同属一个技能面板分组，因此只有一棵技能树挂在这个 manager 下。静态读到的是 guid 与数组接线。
-- 场景里 3 个 `isUnlocked` 为 1 的槽位是设计上的三个根节点，其余 21 个靠前置满级解锁。
-- `SkillManager.combat` 引用的是玩家身上的 `PlayerCombat`，`SwordSlash` 的语义是解锁剑模式。
-- `SkillTreeManager.pointsText` 已接线且非空。
-- `SkillTreeManager.OnEnable` 可能早于 `StatsService.Awake` 执行；实际执行顺序由场景与脚本顺序决定。
-- 技能等级与解锁不入档、每局重置是当前设计意图。
-- 技能按钮预制体上空的 `preRiquriedForSkillUnlock_List` 不影响场景实例，场景实例用预制体实例修改项覆盖这个值。
+9. **按钮回调只挂不退订**：`skillButton.onClick.AddListener` 传的是匿名闭包，`OnDisable` 只退订两个 static 事件，不做 `RemoveListener`。`Start` 每个实例只跑一次，正常生命周期下不会叠加。

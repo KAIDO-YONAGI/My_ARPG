@@ -39,13 +39,3 @@
 **Active 能力**
 - `InventoryShop_Guide.md` 是本域当前实现的权威描述，ID 为 `GP-INVENTORYSHOP-GUIDE`，覆盖背包槽位与堆叠、拾取与丢弃、物品使用、金币与商店买卖、`ItemSO` 共同配置约定。
 - 本域实现类型：`InventoryManager`、`InventorySlot`、`UseItem`、`Loot`、`BackpackCanvasManager`、`ShopManager`、`ShopSlot`、`ShopInfoPanel`、`ShopCategoryToggles`、`ShopPortraitCamera`、`ItemHistoryManager`、`ShopKeeper`；配置与事件类型：`ItemSO`、`InventorySlotsStatsSO`、`LootEventSO`。
-
-**Proposal**
-- 无。
-
-**需要用户确认**
-- 背包与商店是否重构为 `InventoryModel`、`InventoryService`、`ItemEffectService`、`ShopModel`、`ShopService` 五个类型；当前形态由单个管理器承担全部职责。
-- 背包内容与金币是否入库：`SaveData` 的字段不含背包与金币，入库前需先定 DTO 边界。
-- 出售 `isEXP` 与 `isGold` 物品的语义：允许出售需改分支，禁止出售需给出拒绝反馈。
-- `Bow` 物品配置资产的 `stackableSize` 取 0，是设计意图还是配置遗漏。
-- 出售价格是否应取商店槽位价格；失活槽位可能保留旧价格并参与成交。

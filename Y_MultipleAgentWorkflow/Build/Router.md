@@ -35,19 +35,5 @@
 
 - `AndroidBuild_Guide.md`：Android 构建环境自检顺序；两类已知故障的根因与幂等修复，即代理未继承与非 ASCII 的 StreamingAssets 名；产物位置与签名现状。
 - `ProjectConfig_Guide.md`：重现阶段一份可构建工程所需的最小事实，含 Editor 版本、包依赖、场景列表与顺序、Player/Build 配置原值、程序集结构、Addressables 状态。
-- `TestBaseline_Guide.md`：测试位置与框架、52 个用例的分布、覆盖与零覆盖域、纯 C# 选型及其边界、asmdef 风险。
-- 可复用的只读核验命令在 `..\Workflow\Project_Validation_Guide.md` 中逐条标注出处，涵盖代理状态查询、产物与签名检查。
-
-**Proposal**
-
-- 无。本域不提出尚未落地的测试计划或构建改造方案。
-
-**需要用户确认后才能写入的空白项**
-
-1. **Android Player 构建命令**：仓库内不存在 Android 打包命令——对全仓的 markdown、脚本、批处理、清单与源码检索 `-buildTarget`、`-executeMethod`、`BuildPipeline`、`BuildPlayerOptions` 均无命中，唯一命中的是测试用的 `-runTests -testPlatform`。已知做法是在编辑器里执行一次非 Development 构建。在用户给出命令之前，本域不书写任何打包命令。
-2. **构建输出契约**：`.apk` 还是 `.aab`、Development 还是 Release、输出目录与文件名规则。
-3. **测试通过判据**：退出码不可靠，需要 `testResults` XML 的具体判定规则与固定的结果文件路径。
-4. **PlayMode 验证方式**：仓库内 `[UnityTest]` 为 0，这条路径目前靠手工验证；是否补自动化测试待定。
-5. **正式发布流程**：keystore 的来源与保管方式；当前产物为 `CN=Android Debug`，属发布阻断项。
-6. **Addressables 内容**：`Scenes` 组是否为需在打包前构建的内容，还是遗留配置。
-7. **工作目录**：验证命令当前硬编码本机工程绝对路径与 Editor 安装绝对路径，是否要求路径无关。
+- `TestBaseline_Guide.md`：测试位置与框架、52 个用例的分布、覆盖与零覆盖域、纯 C# 选型及其边界、asmdef 约束。
+- 只读检查命令见 `..\Workflow\Project_Validation_Guide.md`，涵盖代理状态查询、产物与签名检查。

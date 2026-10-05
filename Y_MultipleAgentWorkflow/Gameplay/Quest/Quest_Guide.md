@@ -3,9 +3,7 @@
 文档 ID：`GP-QUEST-GUIDE`
 状态：`Active`
 最后更新：`2026-10-05`
-核验日期：`2026-10-05`
 权威范围：任务域当前代码与资产的实际行为，含任务状态机与面板显隐、目标进度 `QuestProgressData` 的存储与重算、奖励经事件通道交付、任务板与任务面板的分层、任务日志槽位刷新。背包内部堆叠与记账规则、对话域的会话流程、存档系统的读写实现分别归背包域、对话域与存档域文档，本指南只在任务进度未落档这一事实上引用存档。
-上游来源：任务域运行时脚本；数据资产类型 `QuestSO`、`QuestProgressData` 相关字段；事件类型 `LoadQuestEventSO`、`QuestOptionsEventSO`、`InventorySlotsStatsSO`；选项按钮 `QuestOptionsButton`；背包记账方 `InventoryManager`；任务配置资产实例 `PickAndChat`、`DefaultQuest`、`Shopping`；任务板预制体 `QuestBoard`。
 
 ## 1. 触发线索
 
@@ -17,7 +15,6 @@
 | `奖励`、`发奖`、`QuestRewardRequest` | §2.3 奖励通道 |
 | `任务板`、`QuestBoardManager`、`任务面板`、`QuestLogPanel` | §2.4 分层 |
 | `QuestLogSlot`、`槽位`、`任务日志` | §2.5 视图 |
-| `目标不更新`、`进度不刷新`、`重复发奖` | §4 已知缺陷 |
 
 ## 2. 当前实现
 
@@ -67,11 +64,11 @@
 
 `RaiseRewardEvent` 逐条读 `quest.rewards`，调用 `QuestRewardRequest.RaiseInventoryUpdateRequest(item, 0, quantity)`，价格位传 0，数量走第三个参数。`QuestRewardRequest` 是序列化的 `InventorySlotsStatsSO`。
 
-连接验证：`QuestRewardEvent` 事件资产同时赋给 `InventoryManager` 与 `QuestManager` 的 `QuestRewardRequest` 字段，两侧指向同一资产实例。接收侧 `InventoryManager.HandleQuestReward` 调 `UpdateInventorySlots(item, amount)`；金币类物品累加 `goldAmount` 并调用 `ItemHistoryManager.RecordItem`。
+`QuestRewardEvent` 事件资产同时赋给 `InventoryManager` 与 `QuestManager` 的 `QuestRewardRequest` 字段，两侧指向同一资产实例。接收侧 `InventoryManager.HandleQuestReward` 调 `UpdateInventorySlots(item, amount)`；金币类物品累加 `goldAmount` 并调用 `ItemHistoryManager.RecordItem`。
 
-`RaiseRewardEvent` 只在 `QuestStateChanged` 的 `Completed` 分支触发，没有已发奖的幂等标记。
+`RaiseRewardEvent` 只在 `QuestStateChanged` 的 `Completed` 分支触发。
 
-任务资产实例：`PickAndChat` 有 2 个目标，集 3 个蘑菇属物品类、与 Purple Bob 对话属角色类，另有 3 条奖励；`DefaultQuest` 的目标与奖励都为空；`Shopping` 亦为任务配置实例。需求量为 0 的空目标会被判为已完成，`DefaultQuest` 因无目标而 `IsQuestObjDone` 恒真。
+任务资产实例：`PickAndChat` 有 2 个目标，集 3 个蘑菇属物品类、与 Purple Bob 对话属角色类，另有 3 条奖励；`DefaultQuest` 的目标与奖励都为空；`Shopping` 是任务配置实例。需求量为 0 的空目标会被判为已完成，`DefaultQuest` 因无目标而 `IsQuestObjDone` 恒真。
 
 ### 2.4 分层：任务板与任务面板
 
@@ -105,27 +102,7 @@
 2. **进度重算的时机只有 `QuestStateChanged`**。拾取物品与结束对话都不触发刷新，面板关闭期间显示的是上次重算的陈旧值，下次打开或切换状态时才重算。
 3. **奖励只有事件通道**：`QuestManager` 与背包之间没有直接引用，改奖励发放要改 `InventorySlotsStatsSO` 的订阅侧。两个管理器需指向同一资产实例，否则事件静默不达；当前常驻场景已指向同一资产。
 4. **`Completed` 没有幂等保护**：任何重复进入 `Completed` 分支的调用都会再发一次奖励。当前拦截只在 UI 层，完成后三组按钮全部关闭，槽位 `interactable` 置假。
-5. **进入 `Completed` 的唯一数据前提是 `IsQuestObjDone`**：该判定对状态已是 `Completed` 的任务直接返回真，因此它承担不了已发奖判据。
+5. **进入 `Completed` 的唯一数据前提是 `IsQuestObjDone`**：该判定对状态已是 `Completed` 的任务直接返回真。
 6. **任务板需要先装载再开面板**。少了 `OnLoadQuestEventRaised`，`currentBoardLoadQuests` 为 null，`GetFirstIncompletedQuest` 会抛 `NullReferenceException`。
 7. **`IsDisplayingQuestBoard` 用引用相等判定**：`questsOnBoard` 是各板实例自己的 List 对象，这也是哪块板开的、哪块板负责关的依据。
-8. **目标进度只认物品史与对话史**：`targetLocation` 没有实现分支；角色类目标一旦对话过就直接记满，与击杀、护送等语义无关。
-
-## 4. 已知缺陷与风险
-
-1. **重复发奖无数据层保护**：每次 `QuestStateChanged(quest, Completed)` 都会 `RaiseRewardEvent`，`OpenQuest` 也会重放当前状态。一旦已完成任务仍可被打开，例如槽位 CanvasGroup 被 `ResetSlotState` 复位，奖励会重复发放。
-2. **空值保护缺失**：`questLogPanel.DisPlayObjectives()` 与 `SetCanvaState` 对 accept、decline、complete、details、prompt 五组都不判空，未接线即抛 NRE。`QuestLogPanel.DisPlayObjectives` 同样不判 `currentQuest` 为空，而 `OnReFreshQuestState` 的自动提升分支可能调用到它，面板实例尚未点过任何任务时即崩溃路径。
-3. **面板与管理器各存一份 `currentQuest`**：`CloseQuestBoard` 只清管理器那份，`QuestLogPanel.currentQuest` 不清，关闭再打开时面板可能短暂显示上一个任务的数据。
-4. **`GetQuestStateFromProgress` 与 `IsAllQuestsCompleted` 用字典索引器取键**：传入未注册的 `QuestSO` 会抛 `KeyNotFoundException`。`QuestStateChanged` 自己有 `ContainsKey` 守卫，这两个读取接口没有。
-5. **`currentAmount` 遗留字段**：资产里仍在序列化，代码零读写，容易被误认为进度来源。
-6. **任务进度未接入存档**：`questProgress` 是纯内存字典，存档侧无任务域引用，读档后任务状态与进度丢失。
-7. **`QuestManager` 单类承担四种职责**：面板显隐、状态机、发奖、任务数据。按 `QuestProgressModel`、`QuestRuntimeModel`、`QuestService`、`QuestLogView` 拆分职责的方案仍在 Proposal 阶段。
-8. **未使用的引入**：`QuestBoardManager` 与 `QuestLogPanel` 各有一处未使用的 `Unity.VisualScripting` 引入，属编译噪声。
-
-## 5. 未核验事项
-
-- 假设：`QuestStateChanged` 在 `Completed` 时的重复发奖在现网资产里不可达，靠槽位 `interactable` 为假拦住；点击路径未运行 Unity 验证。
-- 假设：`DetailsCanvaGroup` 与 `promptCanvaGroup` 在无任务时显示白板提示属预期表现，`SetNoQuestsState` 是实现处，设计依据待确认。
-- 假设：任务面板保持只读、打开面板不改变任务进度这一目标成立；代码上打开面板会重算进度并重放状态，是否产生可观察差异待编辑器实测。
-- 假设：`targetLocation` 类目标当前没有任何线上配置；未逐个检查任务配置资产的 `targetLocation` 字段。
-- 假设：六个 `questLogSlots` 与三个选项按钮的实际交互符合 §2.1 与 §2.5 的描述；只核对了接线数据，运行期表现待编辑器实测。
-- 假设：Scene1 与 Scene2 中 6 块任务板的 `questsOnBoard` 覆盖都是有意的配置；只核对了数组值与引用映射，关卡设计意图待确认。
+8. **目标进度只认物品史与对话史**：`targetLocation` 没有实现分支；角色类目标一旦对话过就直接记满。

@@ -15,7 +15,6 @@
 | 租约操作 | `WorkingAgent` 租约脚本 |
 | 租约回归测试 | `Test-WorkingAgent` 租约回归测试 |
 | 本工程可执行的验证命令 | `Project_Validation_Guide.md` |
-| 已确证但需用户拍板的决策点 | `OpenDecisions_Proposal.md` |
 | 跨项目的通用配置方法 | `..\Workflow_Configuration_Guide.md` |
 
 ## 下级导航
@@ -34,5 +33,5 @@
 
 - Active：7 个业务根的路由与维护规则、WorkingAgent 租约协议、结构与索引校验脚本。租约协议
   涵盖 `Acquire`、`Heartbeat`、`UpdateScope`、`Wait`、`Release`、`Status`。
-- 需要用户确认：新增顶级分类、迁移或删除既有权威、改变工作区级规则、修改模型入口文件。
+- 新增顶级分类、迁移或删除既有权威、改变工作区级规则、修改模型入口文件，必须取得用户确认。
 - 业务事实由各业务根的 Guide 与 Design 拥有，本域拥有流程与结构规则。

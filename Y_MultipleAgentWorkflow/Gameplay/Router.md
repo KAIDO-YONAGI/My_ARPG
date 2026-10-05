@@ -36,6 +36,4 @@
 
 - Active：本 Router 只做线索分派与下级导航；各子域的实现事实一律以对应 Guide 为准。
 - Active：`Dialog_Guide.md` 与 `Quest_Guide.md` 已建立，这两个子域的线索直接落到对应 Guide。
-- Active：跨域隐性依赖登记在子域 Guide 的「约定与硬边界」中——对话 Refuse 分支读物品史，任务目标读物品史与对话史；改动任一侧的记账口径前需同时查对话域与任务域。
-- Proposal：`PlayerStats`、`Units`、`InventoryShop`、`Skills` 四个子域的线索行落在各自 Router，权威内容以其 Guide 为准。
-- 需要用户确认：新增或重命名子域 Router、改动下级导航结构，须由用户确认后再动。
+- Active：跨域依赖登记在子域 Guide 的「约定与硬边界」中——对话 Refuse 分支读物品史，任务目标读物品史与对话史；改动任一侧的记账口径前需同时查对话域与任务域。

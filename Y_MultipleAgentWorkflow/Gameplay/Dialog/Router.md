@@ -15,7 +15,6 @@
 | `onlyTriggeredOnce`、`一次性对话`、`重复对话` | `Dialog_Guide.md` |
 | `ConversationHistoryManager`、`ItemHistoryManager`、`对话史`、`物品史` | `Dialog_Guide.md` |
 | `NPCDialogTrigger`、`NPCStateController`、`Chat` 状态、`按键开对话` | `Dialog_Guide.md` |
-| `对话框不显示`、`选项没出现`、`按钮重复触发` | `Dialog_Guide.md` |
 
 ## 下级导航
 
@@ -36,11 +35,3 @@
 - 本域权威文档为 `Dialog_Guide.md`（ID `GP-DIALOG-GUIDE`），覆盖会话流程、对话树数据模型、Refuse 判定、历史记录的写入与读取、NPC 触发链、对话画布开关归属。
 - HistoryManager 子目录承载 `ConversationHistoryManager`、`ItemHistoryManager`、`VisitedHistoryManager` 三个管理器，未建立下级 Router，事实记在 `Dialog_Guide.md` 的 §2.4 与 §3。
 - 对话画布的开关请求由 NPC 触发器承接，`DialogManager.ToggleCanvasEvent` 返回 null；改动这一归属需同时核对 `Dialog_Guide.md` §2.5 与 `Units\Router.md`。
-
-**Proposal**
-
-- `VisitedHistoryManager` 是空类，`DialogManager` 内的位置检测 TODO 处于待实现状态；补齐前不据此写实现性文档。
-
-**需要用户确认**
-
-- 新增 HistoryManager 的下级 Router，或改变对话画布开关的归属。

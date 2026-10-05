@@ -59,7 +59,7 @@
 
 | 资源 | 说明 |
 |---|---|
-| `git:index` | 共享暂存区；`push_to_github.bat` 会全量暂存并推 master，并发期误提交风险高 |
+| `git:index` | 共享暂存区；`push_to_github.bat` 会执行全量 `git add -A` 并推送 master |
 | `runtime:UnityEditor` | 本机同时只应有一个编辑器实例；陈旧的锁文件不代表实例存活 |
 | `workflow:root` | 仅在变更根结构时使用 |
 | `codegraph:index` | codegraph 的索引库，重建需独占 |
@@ -83,7 +83,6 @@
 | `WF-ROUTER` | `Workflow\Router.md` | Active |
 | `WF-CONCURRENCY-GUIDE` | `Workflow\Concurrency_Guide.md` | Active |
 | `WF-PROJECT-VALIDATION` | `Workflow\Project_Validation_Guide.md` | Active |
-| `WF-OPEN-DECISIONS` | `Workflow\OpenDecisions_Proposal.md` | Proposal |
 | `BUS-ARCHITECTURE` | `Architecture\Router.md` | Active |
 | `BUS-ARCHITECTURE-LAYERING` | `Architecture\Layering\Router.md` | Active |
 | `ARCH-LAYERING-GUIDE` | `Architecture\Layering\Layering_Guide.md` | Active |

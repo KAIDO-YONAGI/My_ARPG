@@ -3,9 +3,8 @@
 文档 ID：`SCENE-FLOW-GUIDE`
 状态：`Active`
 最后更新：`2026-10-05`
-核验日期：`2026-10-05`
 权威范围：场景组加载管线，由场景切换脚本组、启动加载脚本 `InitialLoad` 与场景 SO 契约 `GameSceneSO` 组成，覆盖加载入口、场景组语义、常驻场景注册、存档键来源与构建场景列表依赖。存档读写与存档 schema 归 Data 域；UI 画布管理与事件通道定义归资产域与玩法域；Addressables 包的构建配置不在本域。
-上游来源：
+
 - 场景管线代码：`SceneChanger`、`PersistentSceneRegistry`、`Teleport`、`SceneDataForSave`、`CameraPixelSnap`
 - 启动加载代码 `InitialLoad`，场景 SO 契约 `GameSceneSO`
 - 切场与重试代码：`ButtonSceneToggler`、`RetryButton`
@@ -52,7 +51,7 @@
 
 `PersistentSceneRegistry` 是纯静态类，内部用 `static readonly HashSet<string> SceneNames` 按 `sceneName` 记录，对外提供 `Register(IEnumerable<GameSceneSO>)`、`Register(GameSceneSO)`、`IsPersistent(GameSceneSO)` 与 `IsPersistent(string)`。`SceneChanger` 在卸载循环里查询它，命中时常驻场景打 Warning 并跳过。
 
-它跨场景存活的原因：数据放在静态字段上，不挂在任何 MonoBehaviour 或场景对象上，场景卸载不回收它，这属 Unity 静态生命周期语义，运行期行为待编辑器实测。会话与局间复位由 `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] Reset()` 清空 `SceneNames`，它在每次进入播放模式时被调用，关闭 Domain Reload 时同样触发。`Register` 只 Add 不 Clear，同一会话内重复注册是幂等写入。
+会话与局间复位由 `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] Reset()` 清空 `SceneNames`，它在每次进入播放模式时被调用，关闭 Domain Reload 时同样触发。`Register` 只 Add 不 Clear，同一会话内重复注册是幂等写入。
 
 ### 2.5 常驻场景在初始场景中的声明
 
@@ -60,7 +59,7 @@
 
 ### 2.6 加载完成后的启动内容
 
-`SceneChanger.Start()` 自调用 `RequestSceneLoad(firstSceneToLoad, Vector3.zero, false)`，注释说明放在 Start 是为了让同批 `Awake` 与 `OnEnable` 的订阅方就绪。常驻场景里的 `SceneChanger` 配置 `firstSceneToLoad = [MenuScene]`，它的 `player` 与 `objectsToUnableWhileMenuOrReset` 都指向玩家根节点。
+`SceneChanger.Start()` 自调用 `RequestSceneLoad(firstSceneToLoad, Vector3.zero, false)`，调用点放在 Start 是为了让同批 `Awake` 与 `OnEnable` 的订阅方就绪。常驻场景里的 `SceneChanger` 配置 `firstSceneToLoad = [MenuScene]`，它的 `player` 与 `objectsToUnableWhileMenuOrReset` 都指向玩家根节点。
 
 ### 2.7 存档键来源
 
@@ -75,7 +74,7 @@
 - 进游戏：开始按钮预制体的 `sceneToLoad = [Scene1]`，该预制体只在 StartingMenu 场景中实例化。
 - 回菜单：标题按钮预制体的 `sceneToLoad = [MenuScene]`，该预制体只在常驻场景中实例化。
 - 关卡互传：传送预制体内嵌 `SceneToggler`，预制体自身的 `sceneToLoad` 为空数组，关卡场景实例把它覆盖成 Scene1 到 Scene2 与 Scene2 到 Scene1。
-- 重试：`RetryButton.HandleRetry` 做三件事，隐藏按钮、调 `ForceResumeGame`、调 `retryEventSO.OnEventRaised()`；真正的整组重载在 `PlayerDamageController.OnRetryRequest`，先 `StatsService.Instance.Respawn()` 回血，再 `RequestSceneLoad(GetCurrentScenes(), Vector3.zero, true)`。回血必须早于广播段，`PlayerDamageController` 的注释写明原因：广播段里的 `SaveDataManager.OnAutoSave` 同步把运行态写进存档快照，晚于快照就会把死亡态血量落盘；回灌侧由 `SaveDataManager.OnAutoLoad` 的 `GetDataID() == null` 守卫跳过固定槽位服务，复活血量得以保留在运行时。
+- 重试：`RetryButton.HandleRetry` 做三件事，隐藏按钮、调 `ForceResumeGame`、调 `retryEventSO.OnEventRaised()`；真正的整组重载在 `PlayerDamageController.OnRetryRequest`，先 `StatsService.Instance.Respawn()` 回血，再 `RequestSceneLoad(GetCurrentScenes(), Vector3.zero, true)`。回血早于广播段，`PlayerDamageController` 的注释写明原因：广播段里的 `SaveDataManager.OnAutoSave` 同步把运行态写进存档快照；回灌侧由 `SaveDataManager.OnAutoLoad` 的 `GetDataID() == null` 守卫跳过固定槽位服务，复活血量保留在运行时。
 
 ### 2.9 构建场景列表与 Addressables 现状
 
@@ -86,29 +85,9 @@ Addressables 在代码层零引用：对全部产品脚本检索 `Addressables`�
 ## 3. 约定与硬边界
 
 1. **切场一律经 `RequestSceneLoad`**：直接调 `RaiseLoadRequestEvent` 只通知订阅方，不切场景；新增的切场触发点也必须经该入口，否则 `UIManager` 的画布重置与 `SaveDataManager` 的自动存档等同步收尾全部缺失。
-2. **场景必须进构建场景列表**：`Application.CanStreamedLevelBeLoaded` 为假时只报错并跳过该场景，整组其余场景照常加载，因此缺条目的表现是一条 Error 加该场景缺席，不会抛异常。
-3. **常驻场景不进任何 `sceneToLoad` 或 `firstSceneToLoad` 组**：`Teleport` 与 `ButtonSceneToggler` 的 Tooltip 明写这条。组内第一个元素决定 `currentScene` 与存档键，把常驻场景放首位会让存档键指向错误场景。
+2. **场景必须进构建场景列表**：`Application.CanStreamedLevelBeLoaded` 为假时只报错并跳过该场景，整组其余场景照常加载。
+3. **常驻场景不进任何 `sceneToLoad` 或 `firstSceneToLoad` 组**：`Teleport` 与 `ButtonSceneToggler` 的 Tooltip 明写这条。组内第一个元素决定 `currentScene` 与存档键。
 4. **`sceneName` 为空即静默跳过**：卸载段与加载段都用 `string.IsNullOrEmpty(scene.sceneName)` 过滤，这类 GameSceneSO 整条被忽略。
-5. **存档键取 `SaveKey`**：`ID` 由 `OnValidate` 生成且不落盘，改用它即坏旧档；`SaveKey` 的取值与 `AssetReference.AssetGUID` 对齐。
-6. **`SceneDataForSave.gameScenes` 必须覆盖所有可能写进场景键的 GameSceneSO**：反查靠线性遍历 `SaveKey`，漏项会让读档时 `SaveSystem.GetScene` 返回 null，该档被判为不可加载。
-7. **重试链先回血再请求**：顺序反了会把死亡态血量写进广播段抓取的存档快照。
-
-## 4. 已知缺陷与风险
-
-1. **【高】初始场景登记的常驻场景指向菜单场景资产**：初始场景的 `persistentScenes` 只登记菜单场景资产，而常驻场景不在任何 GameSceneSO 组内。按资产引用静态推断的后果链是：从初始场景启动时常驻场景不被加载，`SceneChanger.Start()` 不执行，`firstSceneToLoad` 不触发，`PersistentSceneRegistry` 注册的实际是 StartingMenu；起始菜单里的开始按钮预制体调用 `SceneChanger.Instance.RequestSceneLoad` 会因 `Instance` 为 null 抛 NullReferenceException。运行期行为待编辑器实测。
-2. **【低】重试场景 SO 资产是旧 schema 且零引用**：该资产没有 `sceneName` 与 `sceneAsset`，只有 `sceneReference` 的 GUID、`ID` 与 `sceneType = Retry`。全工程没有代码、场景或预制体引用它。它一旦被接进某个 `sceneToLoad` 组，会命中空 `sceneName` 的静默跳过分支，连 Error 都不打，因为过滤发生在 `Application.CanStreamedLevelBeLoaded` 校验之前。重试语义由 `RetryButton` 到 `RetryRequestEvent` 再到 `PlayerDamageController.OnRetryRequest` 的整组重载承载，不需要场景 SO。运行期行为待编辑器实测。
-3. **【中】预制体保留多余的序列化键**：开始按钮与标题按钮预制体保留 `loadEventSO` 与 `retryEventSO` 两个键，而 `ButtonSceneToggler` 的字段只有 `sceneToLoad`、`ButtonCanvas`、`newPosition` 与 `isToFade`；传送预制体的 `SceneToggler` 段同样保留 `loadEventSO`，常驻场景里另有一条场景侧覆盖。Unity 反序列化会忽略这些键，功能不受影响，在 Inspector 保存这些预制体时它们会被静默清理。
-4. **【中】Addressables 配置会在 Player 构建时产出 bundle**：`m_Enabled` 与 `m_BuildAddressablesWithPlayerBuild` 都为 1，而代码路径对 Addressables 零调用。这不影响场景加载正确性，只增加构建产物与耗时。
-5. **【低】TestScene 是构建内的孤儿**：测试场景在构建场景列表内且有对应的 GameSceneSO 资产，但没有任何场景或预制体引用该资产，全工程 GUID 检索只命中资产自身及其元数据。
-6. **【低】`SceneChanger.Start()` 与 `InitialLoad` 的相对顺序没有显式控制**：两者都在 Awake/Start 阶段发起 Additive 加载，源码只用注释声明「放在 Start 让订阅方就绪」，没有 `DefaultExecutionOrder` 保护，工程内唯一的执行序属性在 `CameraPixelSnap` 上，语义无关。两个场景当前互不共存，暂无实际冲突。
-
-## 5. 未核验事项
-
-1. 假设：静态 `HashSet` 在场景卸载与加载循环中不会被清空，`PersistentSceneRegistry` 的注册结果因此跨场景存活；`SubsystemRegistration` 只在进入播放模式时复位一次。运行期行为待编辑器实测。
-2. 假设：从初始场景启动的实际表现就是第 4 节第 1 条描述的失败链。这是基于场景资产引用与脚本引用的静态推断。运行期行为待编辑器实测。
-3. 假设：`GameSceneSO.SaveKey` 的编辑器分支对同名的多个 `t:SceneAsset` 会命中正确的那一个，遍历时只比对文件名、无路径去重；当前工程场景名唯一，因此未暴露。运行期行为待编辑器实测。
-4. 假设：打包后 `SaveKey` 走返回资产名的分支，取值与编辑器下返回的场景文件 GUID 不同；二者对旧档是否等价未验证。运行期行为待编辑器实测。
-5. 假设：标题按钮从关卡内回菜单时会走 `SetObjects(false)` 隐藏玩家根节点，且 StartingMenu 因常驻注册而不被 `SceneChanger` 卸载。运行期行为待编辑器实测。
-6. 假设：`Application.CanStreamedLevelBeLoaded` 在编辑器播放模式下对构建场景列表内启用的场景返回 true。运行期行为待编辑器实测。
-7. 假设：传送预制体的空 `sceneToLoad` 数组不会被任何运行路径使用，当前两处场景实例都覆盖为 1 条，因此不会触发 `OnLoadRequestEvent` 的空组告警。运行期行为待编辑器实测。
-8. 假设：`CameraPixelSnap` 的 `OnPreCull` 与 `OnPostRender` 在 URP 下不被调用，工程的渲染管线设置内没有 URP/HDRP 资产，走 Built-in 管线；该脚本属本目录而不属场景加载语义，未纳入上文分析。运行期行为待编辑器实测。
+5. **存档键取 `SaveKey`**：`ID` 由 `OnValidate` 生成且不落盘；`SaveKey` 的取值与 `AssetReference.AssetGUID` 对齐。
+6. **`SceneDataForSave.gameScenes` 必须覆盖所有可能写进场景键的 GameSceneSO**：反查靠线性遍历 `SaveKey`，漏项使读档时 `SaveSystem.GetScene` 返回 null。
+7. **重试链先回血再请求**：回血晚于广播段会把死亡态血量写进该广播段抓取的存档快照。

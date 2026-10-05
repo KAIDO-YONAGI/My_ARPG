@@ -3,14 +3,7 @@
 文档 ID：`GP-INVENTORYSHOP-GUIDE`
 状态：`Active`
 最后更新：`2026-10-05`
-核验日期：`2026-10-05`
 权威范围：本域负责背包槽位数据与堆叠、拾取与丢弃、物品使用、金币与商店买卖这条链路；玩家数值域的内部规则归 `Gameplay.PlayerStats`，掉落物存档格式的内部规则归存档域，任务与对话如何发起奖励归各自域。
-上游来源：
-- 背包实现：`InventoryManager`、`InventorySlot`、`UseItem`、`Loot`、`BackpackCanvasManager`
-- 商店实现：`ShopManager`、`ShopSlot`、`ShopInfoPanel`、`ShopCategoryToggles`、`ShopPortraitCamera`
-- 配置与事件：`ItemSO`、`InventorySlotsStatsSO`、`LootEventSO`
-- 历史与单位：`ItemHistoryManager`、`ShopKeeper`
-- 场景接线：常驻场景、背包与商店画布
 
 ## 1. 触发线索
 
@@ -77,7 +70,7 @@
 - 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`：`InventoryManager` 订 3 条，`ShopManager` 订 4 条，`BackpackCanvasManager` 订 3 条；场景加载事件统一用来复位画布。
 - 面板显隐走 `ICanvasManager` 的默认实现，并把状态上报 `UIManager`。`ShopManager` 与 `BackpackCanvasManager` 都实现该接口，并把 `ToggleCanvasEvent`、`SceneLoadedEvent` 暴露出去供 `UIManager` 注册。
 - 面板内部控件取父级商店的方式是 `[SerializeField] Component shopRef` 加 `as IShopInteractable`，因为接口无法序列化；引用为空时打 `Debug.LogError`。`ShopSlot` 与 `ShopCategoryToggles` 都走这条路。
-- `InventorySlot` 直接走 `ShopManager.Instance`，`IShopInteractable` 的注释把这条记为暂留单例访问。
+- `InventorySlot` 直接走 `ShopManager.Instance`。
 - 商店头像相机订阅同一 `ShopKeeperEventSO`，无 keeper 时按 `hideWhenNoShopKeeper` 关闭 Camera，`LateUpdate` 跟目标偏移。
 - 悬停信息面板只读 `ItemSO` 的展示字段与五个数值字段，负数与零不显示。
 
@@ -98,34 +91,11 @@
 
 ## 3. 约定与硬边界
 
-1. **`stackableSize` 必须 ≥ 1**，取 0 的物品永远进不了背包：`AddItem` 与 `SpaceRemaining` 都以它算容量，此时 `HasSpaceForItem` 恒为 false。`Bow` 是现存反例，见 §4。
+1. **`stackableSize` 必须 ≥ 1**，取 0 的物品进不了背包：`AddItem` 与 `SpaceRemaining` 都以它算容量，此时 `HasSpaceForItem` 恒为 false。
 2. **空槽 `itemSO` 必须是 null**：`IsEmpty` 与 `SpaceRemaining` 的分支都依赖它；手改场景槽位时把数量留 0 又留着 `itemSO`，会在 `UpdateUI` 里被清空。
-3. **出售必须先 `SetSlotBeenClicked`**：`UpdateInventorySlots` 的负数分支只认这个字段，未设置时只打一条 `Debug.Log("No slot been Marked")`，随后静默保留物品。从别处直接调 `SellItem` 会留下这个语义缺口。
+3. **出售必须先 `SetSlotBeenClicked`**：`UpdateInventorySlots` 的负数分支只认这个字段，未设置时只打一条 `Debug.Log("No slot been Marked")`，随后保留物品。
 4. **金币的写入点是 `UpdateGold` 与 `isGold` 分支，两处都必须同步 `goldAmountText`**：文本是硬引用，为空即抛 `NullReferenceException`。
-5. **`isGold` 与 `isEXP` 分支先于数量正负判断**：这两类物品走加钱或加经验并 `return` 的路径，不参与槽位增删，任何新的负数量交易都会先撞上它们。
+5. **`isGold` 与 `isEXP` 分支先于数量正负判断**：这两类物品走加钱或加经验并 `return` 的路径，不参与槽位增删。
 6. **交易失败静默**：金币不足或背包无空间时 `HandleShopping` 直接返回，没有 UI 反馈，也没有事件。
 7. **背包与金币不入档**：`SaveData` 的字段不含它们，域内唯一实现 `ISaveable` 的对象是 `Loot`；读档后回到本局运行值。
 8. **槽位顺序即优先级**：`Start` 里 hotbar 先于 backpack 拼接，改动层级会改变入包顺序与背包满时的表现。
-
-## 4. 已知缺陷与风险
-
-1. **出售 `isEXP` 道具：加钱、留物、经验被拦。** 交易走 `UpdateInventorySlots` 的 `isEXP` 分支，位置在扣金币之后，因此出售照样进账；`return` 跳过通用出售分支，道具留在背包里；`PlayerStatsModel.AddExp` 忽略非正数，只留一条警告。
-2. **出售 `isGold` 道具会倒扣金币。** 同一路径把 `quantity` 取 -1 加到 `goldAmount` 上，金币减 1 后 `return`，道具一并留在背包里，后果比缺陷 1 更反直觉。
-3. **`stackableSize` 为 0 的物品拾取即原地弹回。** `Bow` 取 0，`AddItem` 返回 0，余量走 `DropLoot(item, quantity, lootObj)` 的原地重掉分支，把掉落物位移到玩家脚下并在 0.3 倍动画时长后恢复 `canBePick`，玩家站在物品上会反复触发拾取动画。
-4. **`PopulateShopItems` 对多余槽位只 `SetActive(false)`。** `ShopSlot.item` 与 `price` 保留上一个分类的旧值，而 `SellItem` 遍历整个 `shopSlots` 数组，可能命中失活槽位并按过期价格成交。
-5. **任务奖励溢出到地面。** `HandleQuestReward` 忽略 `price` 直接 `UpdateInventorySlots(item, amount)`，而奖励由 `QuestManager` 发出；背包装不下时余量被 `DropLoot` 掉在玩家脚下，奖励变成可丢失的地面物。
-6. **序列化引用缺空守卫。** `useItem` 为空时使用物品直接抛 NRE，`lootPrefab` 为空时 `ObjectPool` 构造即抛 NRE。
-7. **`InventoryManager` 同时承担背包数据、金币、拾取、商店校验、掉落池、物品使用六类职责。**
-8. **本域没有回归网。** 编辑器用例 `ObjectPoolTests`、`PlayerStatsSOTests`、`CanvasFocusStackTests`、`PlayerStatsModelTests`、`AStarOpenHeapTests` 都不覆盖 `InventoryManager`、`InventorySlot`、`UseItem`、`ShopManager`。
-
-## 5. 未核验事项
-
-以下结论来自静态阅读，运行期行为待编辑器实测。
-
-- `InventoryManager.ShoppingRequest` 与 `ShopManager.InventoryUpdateRequest` 在常驻场景中指向同一个 `InventorySlotsStatsSO` 资产，`QuestRewardRequest` 与 `QuestManager` 的引用同理。
-- `InventoryManager`、`ShopManager`、`BackpackCanvasManager` 的常驻场景实例在整局游戏内不卸载，背包内容与金币因此跨游戏场景保留。脚本 guid 已被常驻场景引用，其余行为待实测。
-- `hotbarParent` 与 `backpackParent` 下所有 `InventorySlot` 都处于激活状态，`GetComponentsInChildren` 会跳过失活对象。
-- `ShopSlot.shopRef` 与 `ShopCategoryToggles.shopRef` 已在场景与预制体中接线，`Awake` 里的 `LogError` 因此不会触发。
-- `ShopManager.shopSlots` 的数组长度覆盖三类商品列表的最大长度，`PopulateShopItems` 不会截断。
-- `Bow` 的 `stackableSize` 取 0 是设计意图，代表不可拾取的展示物。
-- 商店出售按商店槽位价格成交是当前设计意图。
