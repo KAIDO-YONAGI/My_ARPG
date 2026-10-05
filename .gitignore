@@ -99,3 +99,8 @@ Assets/StreamingAssets/aa/
 # ========== FrameWork (外部框架样本, 随 unitypackage 分发, 不入库) ==========
 /Assets/FrameWork/
 /Assets/FrameWork.meta
+
+# ========== 工作流文档库 ==========
+# 文档库的 Build 业务域与 Unity 构建产物目录同名，显式收回以纳入版本控制
+!Y_MultipleAgentWorkflow/Build/
+!Y_MultipleAgentWorkflow/Build/**
