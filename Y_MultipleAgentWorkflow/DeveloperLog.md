@@ -76,3 +76,31 @@
   入口文件若被删除或改名，校验会失败。
 - 未处理：`references/distribution.md:4` 记载适配器来自 Codex / Claude / **ZCode** 三家，
   而 ZCode 读取哪个入口文件本工程无依据可查，故未为它建立入口；需要时另行确认。
+
+## 2026-10-05：写法规范落地与全库重写（用户拍板）
+
+- 用户给出的写法要求：除特别说明外全部按当前状态陈述；不写不存在的与过时的内容；不加变更
+  记录、修订补丁与版本说明；不用括号夹注解释；少用否定与转折句式；整体精简；**并且不写
+  资产路径**。同轮确认的两项口径：资产只写名称与职责、代码只写类型名与方法名；
+  DeveloperLog 保留时间线，不参与本次清理。
+- 规范落在 `Workflow\Workflow_Guide.md` 的「文档写法」一节，作为各写手共同遵循的唯一文本，
+  同文件另有「写法自查」指向检查器。
+- 新增机械检查器 `Workflow\Scripts\Check-DocStyle.ps1`：逐份文档检查资产路径、被禁扩展名、
+  行号、来历叙述、修订小节与括号密度，发现 error 时退出码为 1。库内引用与包 ID 先遮蔽再判定。
+- 全库重写：10 路写手并行改写 35 份文档——16 份域 Guide、8 份 Router、2 份 Proposal、
+  Workflow 域 4 份；DeveloperLog 全部未改。规范同时写入 `Workflow_Guide.md`。
+- 检查器自身修掉两次误报：把包 ID `com.unity.*` 当成 `.unity` 扩展名引用；把库内相对路径
+  `Assets\Router.md` 当成资产路径。另有大小写不敏感导致把 APK 内部条目前缀 `assets/`
+  误判为工程资产目录。
+- **发现并修复一处真实缺陷**：`.gitignore` 的 `[Bb]uild/` 规则命中了文档库的 `Build` 业务域，
+  该域 4 份文档此前从未纳入版本控制。已追加 `!Y_MultipleAgentWorkflow/Build/` 与
+  `!Y_MultipleAgentWorkflow/Build/**` 收回，`git ls-files` 由 0 条转为可跟踪。
+- 恢复被过度封禁而丢失的信息：`Build\ProjectConfig_Guide.md` 的 15 条依赖恢复为完整包 ID；
+  `Workflow\Project_Validation_Guide.md` 恢复全部命令操作数，并把文档简称与位置对成一张表。
+  口径收敛为：只封资产路径与代码路径及行号，工程配置、工具脚本与文档的路径保留，
+  验证命令必须能照着执行。
+- 校验结果：结构校验 115 pass / 0 warning / 0 error（含 WorkingAgent 回归）；写法检查
+  37 份文档 0 error / 15 warning，余下多为章节号与并列枚举；标题数逐文件比对无减少，
+  改动只落在措辞与失效内容。
+- 未处理：Skill 安装进来的 `Workflow_Configuration_Guide.md` 属于跨项目方法文档，不是本工程
+  文档，未参与本轮重写；其正文含其他工程的验证案例，重跑初始化会覆盖该文件。
