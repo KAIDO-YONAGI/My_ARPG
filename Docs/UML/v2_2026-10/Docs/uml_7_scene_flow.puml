@@ -1,0 +1,189 @@
+@startuml Scene_Flow
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 34
+skinparam ranksep 55
+
+title 场景流程与常驻场景
+caption v2_2026-10 · 常驻场景 / 切换执行段
+
+left to right direction
+
+package "切换触发点" {
+  class SceneToggler {
+    + newPosition : Vector3
+    + sceneToLoad : List<GameSceneSO>
+    + isToFade : bool
+    - OnTriggerEnter2D(collider : Collider2D) : void
+  }
+
+  class ButtonSceneToggler {
+    + sceneToLoad : List<GameSceneSO>
+    + ButtonCanvas : CanvasGroup
+    + newPosition : Vector3
+    + isToFade : bool
+    + HandleSceneToggle() : void
+  }
+
+  class RetryButton {
+    + ButtonCanvas : CanvasGroup
+    + retryEventSO : VoidEventSO
+    + HandleRetry() : void
+  }
+
+  class PlayerDamageController {
+    + retryEventSO : VoidEventSO
+    - OnRetryRequest() : void
+  }
+
+  class SaveSystem <<单例>> {
+    + IsLoadingSaveRequest : bool
+    + LoadSave(saveType : SaveType, savePath : string) : bool
+  }
+}
+
+package "切换核心" {
+  class SceneChanger <<单例>> {
+    + initialPosition : Vector3
+    + fadeDuration : float
+    + firstSceneToLoad : List<GameSceneSO>
+    + player : GameObject
+    + fadeCanva : CanvasGroup
+    + loadEventSO : SceneLoadEventSO
+    + sceneLoadedEvent : SceneLoadedEventSO
+    - currentScenes : List<GameSceneSO>
+    - currentScene : GameSceneSO
+    - loadedScene : Scene
+    - isInitialScene : bool
+    - isLoading : bool
+    + RequestSceneLoad(scenes : List<GameSceneSO>, position, isToFade) : void
+    + GetCurrentScene() : Scene
+    + GetCurrentGameScene() : GameSceneSO
+    + GetCurrentScenes() : List<GameSceneSO>
+    - OnLoadRequestEvent(scenes : List<GameSceneSO>, newPosition, isToFade) : void
+    - UnloadCurrentScenes(scenes : List<GameSceneSO>, isToFade) : IEnumerator
+    - LoadScenesRoutine(scenes : List<GameSceneSO>, position) : IEnumerator
+    - OnLoadCompleted(loadedTarget : GameSceneSO, targetFade) : void
+    - GetInitialPosition(scenes : List<GameSceneSO>) : Vector3
+    - SetObjects(state : bool) : void
+    - ForbidInput() : void
+    - AllowInput() : void
+  }
+
+  class SceneDataForSave <<单例>> {
+    + gameScenes : List<GameSceneSO>
+  }
+
+  class ConfinerFinder {
+    - confiner : CinemachineConfiner2D
+    - OnSceneLoaded(scene : Scene, mode : LoadSceneMode) : void
+    - FindConfiner() : IEnumerator
+  }
+}
+
+package "契约与通道" {
+  class GameSceneSO <<配置资产>> {
+    + ID : string
+    + sceneName : string
+    + sceneType : SceneType
+    + initialPosition : Vector3
+    + SaveKey : string
+  }
+
+  enum SceneType {
+    Location
+    Menu
+    Retry
+  }
+
+  class SceneLoadEventSO <<事件通道>> {
+    + LoadRequestEvent : event Action<List<GameSceneSO>, Vector3, bool>
+    + RaiseLoadRequestEvent(scenes : List<GameSceneSO>, position, isToFade) : void
+  }
+
+  class SceneLoadedEventSO <<事件通道>> {
+    + SceneLoadedEvent : event Action<GameSceneSO>
+    + RaiseSceneLoadedEvent(currentScene : GameSceneSO) : void
+  }
+
+  class VoidEventSO <<事件通道>>
+}
+
+package "加载完成的订阅方" {
+  class UIManager <<单例>>
+  class SaveDataManager <<单例>>
+  class MenuSceneCanvasHider
+  class TimeManager <<单例>>
+  class SceneManager <<Unity 引擎>>
+}
+
+package "启动与常驻" {
+  class InitialLoad {
+    + persistentScenes : List<GameSceneSO>
+    - Awake() : void
+    - LoadPersistentScenes() : IEnumerator
+  }
+
+  class PersistentSceneRegistry <<静态类>> {
+    + Register(scenes : IEnumerable<GameSceneSO>) : void
+    + Register(scene : GameSceneSO) : void
+    + IsPersistent(scene : GameSceneSO) : bool
+    + IsPersistent(sceneName : string) : bool
+    - Reset() : void
+  }
+}
+
+SceneToggler --> SceneChanger : RequestSceneLoad
+ButtonSceneToggler --> SceneChanger : RequestSceneLoad
+RetryButton --> VoidEventSO : 广播重试请求
+VoidEventSO --> PlayerDamageController : 订阅重试请求
+PlayerDamageController --> SceneChanger : 重载当前场景组
+SceneChanger *-- GameSceneSO : 当前场景组
+SceneChanger --> PersistentSceneRegistry : 卸载时跳过常驻场景
+SceneDataForSave o-- GameSceneSO : 反查表
+GameSceneSO --> SceneType : 场景类型
+InitialLoad --> PersistentSceneRegistry : 注册常驻场景
+InitialLoad --> GameSceneSO : persistentScenes
+ConfinerFinder --> SceneManager : sceneLoaded 回调
+"切换触发点" ..> "切换核心" : 读档反查切场
+"切换核心" ..> "契约与通道" : 广播加载完成
+"切换核心" ..> "加载完成的订阅方" : 加载与暂停
+"契约与通道" ..> "加载完成的订阅方" : 订阅与广播
+
+
+
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  切换的唯一入口是 RequestSceneLoad：先广播 SceneLoadEventSO，再进入切换执行段。
+  执行段由 isLoading 标记包住，窗口内的新请求只打 Warning 并被忽略，标记在 OnLoadCompleted 复位。
+  卸载段按倒序逐个 UnloadSceneAsync，命中常驻场景注册表即跳过；加载段按正序用
+  Application.CanStreamedLevelBeLoaded 校验，校验失败只记录错误并继续下一个。
+  组内第一个成功加载的场景决定 currentScene 与存档键。
+  重试链先调 StatsService.Respawn 回血，再整组重载当前场景组。
+  包间虚线收拢了原先逐个类画的接线：SaveSystem 读档时既请求 SceneChanger 切场，
+  也用 SaveKey 反查 SceneDataForSave。
+  SceneChanger 先广播 SceneLoadEventSO、加载完成后广播 SceneLoadedEventSO，
+  并在切换期间对 TimeManager 做 PauseGame 与 ForceResumeGame、经 SceneManager 加载与卸载场景。
+  SceneLoadEventSO 广播时由 UIManager 复位全部画布、SaveDataManager 抓存档快照；
+  SceneLoadedEventSO 广播时由 SaveDataManager 回灌动态数据、MenuSceneCanvasHider 按场景显隐画布。
+end legend
+@enduml

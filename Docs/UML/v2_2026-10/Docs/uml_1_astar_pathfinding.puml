@@ -1,0 +1,156 @@
+@startuml AStar_Pathfinding
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+
+title AStar 寻路系统
+
+caption v2_2026-10 · 网格层 / 算法层 / 跟随层
+
+enum AStarNodeType {
+  Obstacle
+  Walkable
+}
+
+package "网格层" {
+  class AStarNodeManager <<单例>> {
+    + tilemaps : Tilemap[]
+    + obstacleLayers : LayerMask
+    - cellSize : float
+    - safetyMargin : float
+    + GetCellSize() : float
+    + CellToWorld(cx : int, cy : int) : Vector3
+    + GetWaypoint(cx : int, cy : int) : Vector3
+    - ApplySafetyMargin(cx, cy : int, worldPos : Vector3) : Vector3
+    - IsBlocked(cx : int, cy : int) : bool
+    - InitMapInfo() : void
+    - InitiateNodes() : void
+    - ProcessColliderObstacles() : void
+    - ProcessTile(layerName : string, cx : int, cy : int) : void
+    - ProcessTileWithSubdivision(layerName, cellPos, subdivision) : void
+  }
+
+  class AStarNode {
+    - x : int
+    - y : int
+    - nodeType : AStarNodeType
+    + GetX() : int
+    + GetY() : int
+    + GetNodeType() : AStarNodeType
+    + SetNodeType(newType : AStarNodeType) : void
+  }
+
+  class ObjectsMapManager <<单例>> {
+    - objects : Dictionary<string, PositionInfo>
+  }
+}
+
+package "算法层" {
+  class AStarPathFinder <<单例>> {
+    - heap : AStarOpenHeap
+    + FindPath(optPos, startPos, endPos : Vector3) : Stack<AStarDetails>
+    + CellToWorld(cx : int, cy : int) : Vector3
+    + GetWaypoint(cx : int, cy : int) : Vector3
+    + GetCellSize() : float
+    - NoCoverObstacleNodes(startCell, optCell : (int, int)) : bool
+    - RetracePath(endNode : AStarDetails) : Stack<AStarDetails>
+    - AddNodeToOpen(x, y, endX, endY, fatherNode, disToBeg, cost) : void
+    - CanWalkDiagonally(x : int, y : int, dx : int, dy : int) : bool
+  }
+
+  class AStarDetails {
+    - x : int
+    - y : int
+    - cost : float
+    - disToBeg : float
+    - disToEnd : float
+    - fatherNode : AStarDetails
+    + GetX() : int
+    + GetY() : int
+    + GetCost() : float
+    + GetDisToBeg() : float
+    + GetFatherNode() : AStarDetails
+    + {static} Heuristic(ax : int, ay : int, bx : int, by : int) : float
+  }
+
+  class AStarOpenHeap {
+    + Push(pos : (int, int), f : float, g : float) : void
+    + Pop() : Entry
+    + Clear() : void
+    + Count : int
+    - {static} Better(a : Entry, b : Entry) : bool
+  }
+
+  class Entry <<值类型>> {
+    + Pos : (int, int)
+    + F : float
+    + G : float
+  }
+}
+
+package "跟随层" {
+  class PathFollower {
+    - path : Stack<AStarDetails>
+    - threshold : float
+    - pathRebuildDistance : float
+    - pathRebuildCooldown : float
+    - pathRebuildTimer : float
+    - hasValidPath : bool
+    + GetPosToGo(optPos, startPos, endPos : Vector3) : Vector3
+    + ArrivedPos() : void
+    + ResetPath() : void
+    + GetThreshold() : float
+    - FindWay(optPos, startPos, endPos : Vector3) : bool
+    - ReFindWay(optPos, startPos, endPos : Vector3) : void
+    - OnDrawGizmos() : void
+  }
+}
+
+package "调用方" {
+  class EnemyMovement
+  class NPCWander
+  class NPCPatrol
+}
+
+AStarNodeManager o-- AStarNode : 节点表
+AStarNode --> AStarNodeType : 通行类型
+AStarPathFinder o-- AStarNodeManager : 读节点表与格心
+AStarPathFinder *-- AStarOpenHeap : 开放列表
+AStarOpenHeap o-- Entry : 堆元素
+AStarPathFinder ..> AStarDetails : 构造节点并回溯路径
+AStarDetails --> AStarDetails : fatherNode 回溯父节点
+PathFollower --> AStarPathFinder : FindPath 请求路径
+PathFollower --> AStarNodeManager : 取格大小与格心
+EnemyMovement --> PathFollower : 每帧取路点
+NPCWander --> PathFollower : 每帧取路点
+NPCPatrol --> PathFollower : 每帧取路点
+
+
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员　# protected
+  
+  网格在 AStarNodeManager 初始化时按 Tilemap 与障碍层构建，格心经安全边距推离障碍物。
+  开放列表是二叉最小堆，Push 入待扩展格，Pop 弹出最小 F 项并按 G 丢弃过期项。
+  PathFollower 逐单位各持一份实例，路点保存在栈里：到点调 ArrivedPos 弹栈，换目标先调 ResetPath。
+  GetPosToGo 每帧返回当前路点的世界坐标，返回 Vector3.zero 表示无路可走。
+end legend
+@enduml

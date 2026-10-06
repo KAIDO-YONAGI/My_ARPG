@@ -1,0 +1,202 @@
+@startuml Quest_System
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 14
+skinparam ranksep 18
+
+title 任务系统
+caption v2_2026-10 · 状态机 / 进度字典
+
+left to right direction
+
+enum QuestState {
+  Idle
+  Accepted
+  Decline
+  IsToComplete
+  Completed
+}
+
+package "任务板与选项" {
+  class QuestBoardManager {
+    + questsOnBoard : List<QuestSO>
+    + openQuestEvent : VoidEventSO
+    + loadQuestEventSO : LoadQuestEventSO
+    + toggleQuestEvent : ToggleCanvasEventSO
+    - isInRange : bool
+    - OnToggleQuestCanvas(state : bool) : void
+    - CloseQuestBoardIfShowing() : void
+  }
+
+  class QuestOptionsButton {
+    + questStateToShift : QuestState
+    + questOptionsEventSO : QuestOptionsEventSO
+    + OnOptionButtonClicked() : void
+  }
+}
+
+package "任务核心" {
+  class QuestManager <<单例>> {
+    + questCanvaGroup : CanvasGroup
+    + acceptCanvaGroup / declineCanvaGroup / completeCanvaGroup : CanvasGroup
+    + promptCanvaGroup : CanvasGroup
+    + loadQuestEventSO : LoadQuestEventSO
+    + questOptionsEventSO : QuestOptionsEventSO
+    + ToggleCanvasEvent / toggleQuestEvent : ToggleCanvasEventSO
+    + SceneLoadedEvent : SceneLoadedEventSO
+    - questProgress : Dictionary<QuestSO, QuestProgressData>
+    - currentQuestState : QuestState
+    - currentBoardLoadQuests : List<QuestSO>
+    - currentQuest : QuestSO
+    - questLogSlots : QuestLogSlot[]
+    + CanvasIsActive : bool
+    + OpenQuest(quest : QuestSO) : void
+    + SetCurrentQuest(quest : QuestSO) : void
+    + CloseQuestBoard() : void
+    + IsDisplayingQuestBoard(quests : List<QuestSO>) : bool
+    + QuestStateChanged(quest : QuestSO, state : QuestState) : void
+    + UpdateObjectiveProgress(quest : QuestSO, obj : QuestObjective) : void
+    + RefreshObjectiveProgress(quest : QuestSO) : void
+    + GetProgressText(quest, obj) : string
+    + GetCurrentObjAmount(quest, obj) : int
+    + GetFirstIncompletedQuest() : QuestSO
+    + GetQuestStateFromProgress(quest) : QuestState
+    + SetQuestSlotToDoneState(quest : QuestSO) : void
+    - OnQuestOptionChose(state : QuestState) : void
+    - OnOpenQuestBoard() : void
+    - RaiseRewardEvent(quest : QuestSO) : void
+    - InitializeQuestProgress(quests) : void
+    - InitiateQuestSlots(quests) : void
+  }
+
+  class QuestProgressData <<私有嵌套>> {
+    + questState : QuestState
+    - questObjectives : Dictionary<QuestObjective, int>
+  }
+}
+
+package "任务面板" {
+  class QuestLogPanel {
+    + questNameText / questDescriptionText : TMP_Text
+    + objectiveSlots : QuestObjectiveSlot[]
+    + questRewardsSlot : QuestRewardsSlot[]
+    + openQuestEvent : VoidEventSO
+    - currentQuest : QuestSO
+    + ShowQuestOffer() : void
+    + HandleQuestClicked(quest : QuestSO) : void
+    + DisPlayObjectives() : void
+    - DisplayRewards() : void
+  }
+
+  class QuestLogSlot {
+    + questNameText / questLevelText : TMP_Text
+    + currentQuest : QuestSO
+    + questLogPanel : QuestLogPanel
+    + SlotCanvas : CanvasGroup
+    + SetQuest(quest : QuestSO) : void
+    + SetQuestActive(state : bool) : void
+    + ResetSlotState() : void
+    + OnSlotClicked() : void
+  }
+
+  class QuestObjectiveSlot {
+    + objectiveText / trackingText : TMP_Text
+    + RefreshObjectives(description, progress : string, isCompleted) : void
+  }
+
+  class QuestRewardsSlot {
+    + rewardImage : Image
+    + rewardQuantity : TMP_Text
+    + DisplayReward(sprite : Sprite, quantity : int) : void
+  }
+}
+
+package "资产与通道" {
+  class QuestSO <<配置资产>> {
+    + questName : string
+    + lv : int
+    + questDescription : string
+    + questObjectives : List<QuestObjective>
+    + rewards : List<Reward>
+  }
+
+  class QuestObjective <<可序列化>> {
+    + description : string
+    + targetItem : ItemSO
+    + targetCharacter : CharacterSO
+    + targetLocation : LocationSO
+    + requiredAmount : int
+  }
+
+  class Reward <<可序列化>> {
+    + rewardItem : ItemSO
+    + quantity : int
+  }
+
+  class LoadQuestEventSO <<事件通道>>
+  class VoidEventSO <<事件通道>>
+  class QuestOptionsEventSO <<事件通道>>
+  class ToggleCanvasEventSO <<事件通道>>
+  class SceneLoadedEventSO <<事件通道>>
+  class InventorySlotsStatsSO <<事件通道>>
+}
+
+package "进度来源与外部" {
+  class ItemHistoryManager <<单例>>
+  class ConversationHistoryManager <<单例>>
+  class InventoryManager <<单例>>
+  class UIManager <<单例>>
+  interface ICanvasManager
+}
+
+QuestManager ..|> ICanvasManager
+QuestManager *-- QuestProgressData : 按任务惰性注册
+QuestManager o-- QuestLogSlot : 6 个任务槽位
+QuestLogSlot --> QuestLogPanel : 点击转给面板
+QuestLogPanel o-- QuestObjectiveSlot : 目标条目
+QuestLogPanel o-- QuestRewardsSlot : 奖励条目
+
+"任务板与选项" ..> "任务核心" : 板面判定
+"任务核心" ..> "任务面板" : 刷新槽位
+"任务核心" ..> "资产与通道" : 资产与通道
+"任务核心" ..> "进度来源与外部" : 进度与上报
+QuestLogPanel -[hidden]- ItemHistoryManager
+QuestOptionsButton -[hidden]- QuestProgressData
+
+
+
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  QuestStateChanged 是唯一写入口：先关掉 accept、decline、complete 三组 CanvasGroup，
+  再写入 questProgress，然后按状态点亮按钮组并刷新目标文本。
+  Completed 分支调用 RaiseRewardEvent，逐条读 quest.rewards 并经 QuestRewardRequest 发事件，
+  奖励到背包，任务域与背包域之间没有直接引用。
+  目标进度只活在 questProgress 字典里，重算入口只有 QuestStateChanged；物品类目标取物品史数量，角色类目标对话过即记满。
+  任务板先装载清单再打开面板，任务面板按引用相等判定当前板，避免关掉别人的面板。
+  包间四条虚线都以任务核心为端点：任务板判定板面归属，任务核心刷新任务面板槽位，任务核心读写任务资产与四条通道，
+  任务核心取两类目标进度并上报画布状态。任务板装载清单与订阅开关、任务面板显示 QuestSO、奖励经 InventorySlotsStatsSO 入包这三条接线不再单独画线。
+  合并前的类级接线：QuestManager 订阅 ToggleCanvasEventSO 与 SceneLoadedEventSO、经 VoidEventSO 开面板、读 QuestSO、
+  Completed 分支发 InventorySlotsStatsSO、经 QuestOptionsEventSO 收状态迁移，ItemHistoryManager 与 ConversationHistoryManager
+  供两类目标进度，UIManager 收画布状态；QuestBoardManager 装载 LoadQuestEventSO、请求 VoidEventSO、订阅 ToggleCanvasEventSO，
+  QuestOptionsButton 广播 QuestOptionsEventSO；QuestLogSlot 显示 QuestSO。
+end legend
+@enduml

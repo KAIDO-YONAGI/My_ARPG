@@ -1,0 +1,145 @@
+@startuml Event_Channels
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+
+title 事件通道
+caption v2_2026-10 · 12 个通道资产
+
+left to right direction
+
+package "开关与场景通道" {
+  class VoidEventSO {
+      VoidEvent : event Action
+      OnEventRaised() : void
+  }
+
+  class ToggleCanvasEventSO {
+      toggleCanvasEvent : event Action<bool>
+      focusEvent : event Action
+      canvasToToggle : CanvasToToggle
+      RaiseToggleCanvasEvent(state : bool) : void
+      RaiseFocusEvent() : void
+  }
+
+  class SceneLoadEventSO {
+      LoadRequestEvent : event Action<List<GameSceneSO>, Vector3, bool>
+      RaiseLoadRequestEvent(scenes, position, isToFade) : void
+  }
+
+  class SceneLoadedEventSO {
+      SceneLoadedEvent : event Action<GameSceneSO>
+      RaiseSceneLoadedEvent(currentScene : GameSceneSO) : void
+  }
+
+  class DataSaveEventSO {
+      DataSaveEvent : event Action<SaveType>
+      RaiseDataSaveEvent(saveType : SaveType) : void
+  }
+
+  class InventorySlotsStatsSO {
+      InventoryUpdateRequestEvent : event Action<ItemSO, int, int>
+      RaiseInventoryUpdateRequest(item, price, amount) : void
+  }
+}
+
+package "域事件通道" {
+  class LootEventSO {
+      LootEvent : event Action<ItemSO, int, Loot>
+      OnEventRaised(item : ItemSO, quantity : int, loot : Loot) : void
+  }
+
+  class LoadQuestEventSO {
+      LoadQuestEvent : event Action<List<QuestSO>>
+      OnLoadQuestEventRaised(quests : List<QuestSO>) : void
+  }
+
+  class QuestOptionsEventSO {
+      questOptionsEvent : event Action<QuestState>
+      OnQuestOptionsEventRaised(questState : QuestState) : void
+  }
+
+  class ShopKeeperEventSO {
+      ShopKeeperEntered / ShopKeeperExited : event Action<ShopKeeper>
+      RaiseShopKeeperEntered(keeper) : void
+      RaiseShopKeeperExited(keeper) : void
+  }
+
+  class PlayerDamagedEventSO {
+      PlayerDamaged : event Action<int, Transform, float, float>
+      OnPlayerDamaged(damage, attacker, knockBackForce, stunTime) : void
+  }
+
+  class EnemyDefeatedEventSO {
+      EnemyDefeated : event Action<int, Transform>
+      OnEnemyDefeated(exp : int, enemy : Transform) : void
+  }
+}
+
+package "枚举" {
+  class CanvasToToggle {
+    ESC / GameOver / Stats / Skills / Dialog
+    Quest / Shop / Integrated / Backpack / SaveLoad
+    Default
+  }
+
+  class QuestState {
+    Idle / Accepted / Decline
+    IsToComplete / Completed
+  }
+
+  class SaveType {
+    SystemSave / PlayerSave
+  }
+}
+
+package "被引用的类型" {
+  class GameSceneSO <<配置资产>>
+  class ItemSO <<配置资产>>
+  class QuestSO <<配置资产>>
+  class Loot <<场景组件>>
+  class ShopKeeper <<场景组件>>
+}
+
+VoidEventSO -[hidden]- LootEventSO
+
+ToggleCanvasEventSO --> CanvasToToggle : 画布身份
+QuestOptionsEventSO --> QuestState : 任务状态
+DataSaveEventSO --> SaveType : 存档类型
+SceneLoadEventSO --> GameSceneSO : 场景组
+SceneLoadedEventSO --> GameSceneSO : 当前场景
+LoadQuestEventSO --> QuestSO : 任务清单
+InventorySlotsStatsSO --> ItemSO : 交易物品
+LootEventSO --> Loot : 掉落物实例
+ShopKeeperEventSO --> ShopKeeper : 店主实例
+
+
+
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  12 个通道类都直接继承 ScriptableObject；事件字段是 C# event 委托链，不落盘，资产文件里只有类引用与配置字段。
+  每个资产实例是一条独立广播线，同一个类建两个资产即为两条互不相干的广播。
+  订阅统一写在 OnEnable 与 OnDisable，成对使用  = 与 -=；发布方只调通道方法。
+  ToggleCanvasEventSO 的 canvasToToggle 是画布身份，10 个资产与 10 个互不重复的枚举值一一对应。
+end legend
+@enduml

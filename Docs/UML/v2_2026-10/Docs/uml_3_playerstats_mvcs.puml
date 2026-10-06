@@ -1,0 +1,204 @@
+@startuml PlayerStats_MVCS
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+
+title 玩家数值 MVCS 与经验线
+caption v2_2026-10 · Model / View / Controller / Service
+
+left to right direction
+
+package "Model 层" {
+  interface IPlayerStatsReadOnly {
+    + HealthChanged / StatsChanged : event Action
+    + ExpChanged : event Action
+    + LevelUp : event Action<int>
+    + 15 个只读属性
+  }
+
+  class PlayerStatsModel <<纯 C#>> {
+    - data : PlayerStatsData
+    + Damage / WeaponRange / KnockBackForce : 只读属性
+    + KnockBackTime / StunTime / CoolDown / Speed : 只读属性
+    + MaxHealth / CurrentHealth / SkillPoints : 只读属性
+    + Level / CurrentExp / ExpToUpgrade / MaxLevel : 只读属性
+    + ExpMultiplier : 只读属性
+    + MinExpToUpgrade / ExpStepLevels / ExpGrowthDivisor : const
+    + UpdateMaxHealth / UpdateHealth / SetCurrentHealth(…) : void
+    + UpdateSpeed / UpdateDamage / UpdateSkillPoints(…) : void
+    + AddExp(amount : int) : void
+    + LoadFrom(source : PlayerStatsData) : void
+    + ToData() : PlayerStatsData
+    - GrowExpToUpgrade() / RepairExpThreshold() : void
+  }
+
+  class PlayerStatsData <<存档传输格式>> {
+    + damage / maxHealth / currentHealth : int
+    + level / currentExp / expToUpgrade : int
+    + maxLevel / skillPoints : int
+    + weaponRange / knockBackForce : float
+    + knockBackTime / stunTime / coolDown : float
+    + speed / expMultiplier : float
+    + Clone() : PlayerStatsData
+  }
+}
+
+package "Service 层" {
+  class StatsService <<单例>> {
+    + statsConfig : PlayerStatsSO
+    - model : PlayerStatsModel
+    + Stats : IPlayerStatsReadOnly
+    + UpdateMaxHealth / UpdateHealth(amount : int) : void
+    + UpdateSpeed(amount : float) : void
+    + UpdateDamage / UpdateSkillPoints(amount : int) : void
+    + AddExperience(amount : int) : void
+    + Respawn() : void
+    + SaveData(data : SaveData) : void
+    + LoadData(data : SaveData) : void
+    - GetStats() : PlayerStatsData
+    - LoadStats(data : PlayerStatsData) : void
+  }
+
+  class SaveableService<T> <<抽象基类>> {
+    + OnSingletonInitialized() : void
+    + OnDestroy() : void
+    + GetDataID() : SaveDefinition
+    + SaveData(data : SaveData) : void
+    + LoadData(data : SaveData) : void
+  }
+
+  class SaveRegistry <<静态类>> {
+    + All : IReadOnlyList<ISaveable>
+    + Add(saveable : ISaveable) : void
+    + Remove(saveable : ISaveable) : void
+    + Clear() : void
+  }
+}
+
+package "Controller 层" {
+  class HealthController <<纯 C#>> {
+    + HealthController(view : HealthView)
+    + Refresh() / Dispose() : void
+  }
+
+  class StatsPanelController <<纯 C#>> {
+    + StatsPanelController(view : StatsPanelView)
+    + Refresh() / Dispose() : void
+  }
+
+  class ExperienceController <<纯 C#>> {
+    + ExperienceController(view : ExperiencePanelView, defeatedEvent : EnemyDefeatedEventSO)
+    + Refresh() / Dispose() : void
+    - GainExp(exp : int, defeatedEnemy : Transform) : void
+  }
+
+  class PlayerDamageController {
+    + playerRoot : GameObject
+    + playerDamagedEvent : PlayerDamagedEventSO
+    + retryEventSO : VoidEventSO
+    + movement : PlayerMovement
+    - OnDamaged(damage, attacker, knockBackForce, stunTime) : void
+    - OnRetryRequest() : void
+  }
+}
+
+package "View 层" {
+  class HealthView {
+    + healthText : TMP_Text
+    + healthTextAnimator : Animator
+    + SetHp(current : int, max : int) : void
+  }
+
+  class StatsPanelView {
+    + statTexts : TMP_Text[]
+    + statsCanvas : CanvasGroup
+    + toggleStatsEvent : ToggleCanvasEventSO
+    + SetStats(damage : int, speed : float) : void
+  }
+
+  class ExperiencePanelView {
+    + expSlider : Slider
+    + currentLevelText : TMP_Text
+    + defeatedEvent : EnemyDefeatedEventSO
+    + SetExp(currentExp, expToUpgrade, level : int) : void
+  }
+}
+
+package "配置与通道" {
+  class PlayerStatsSO <<配置资产>> {
+    - stats : PlayerStatsData
+    + Data : PlayerStatsData
+    + CreateInitialData() : PlayerStatsData
+  }
+
+  class EnemyDefeatedEventSO <<事件通道>>
+  class PlayerDamagedEventSO <<事件通道>>
+  class VoidEventSO <<事件通道>>
+}
+
+package "跨域写命令调用方" {
+  class SkillTreeManager
+  class InventoryManager
+  class UseItem
+  class SceneChanger <<单例>>
+  class SaveDataManager <<单例>>
+}
+
+PlayerStatsModel ..|> IPlayerStatsReadOnly
+StatsService *-- PlayerStatsModel : 私有持有 model
+PlayerStatsModel *-- PlayerStatsData
+StatsService --|> SaveableService
+StatsService --> PlayerStatsSO : 取初始值
+SaveableService ..> SaveRegistry : 注册与注销
+HealthView --> HealthController : 造并托管
+StatsPanelView --> StatsPanelController : 造并托管
+ExperiencePanelView --> ExperienceController : 造并托管
+PlayerDamageController --> SceneChanger : 重载场景组
+"View 层" ..> "Controller 层" : 造并托管
+"Controller 层" ..> "Service 层" : 订阅与写命令
+"配置与通道" ..> "Controller 层" : 订阅事件
+"Service 层" ..> "Model 层" : 转发读写
+"配置与通道" ..> "Service 层" : 初始值与事件
+"跨域写命令调用方" ..> "Service 层" : 跨域写命令
+
+
+
+
+legend bottom left
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  依赖方向是 View 到 Controller 到 Service 到 Model，Model 不反向引用上层。
+  写命令只经 StatsService，钳制、经验结算与事件广播都在 PlayerStatsModel 内完成。
+  AddExp 先广播 ExpChanged 再广播 LevelUp；LoadFrom 依次广播 HealthChanged、StatsChanged、
+  ExpChanged。
+  升级阈值与经验曲线由 GrowExpToUpgrade 计算，LoadFrom 与构造函数都经 RepairExpThreshold 兜底。
+  
+  为减少跨包长线，以下类级接线已改写为上面的包间连接（只改画法，事实不变）：
+  Controller 层到配置与通道：ExperienceController 订阅 EnemyDefeatedEventSO；
+  PlayerDamageController 订阅 PlayerDamagedEventSO 与 VoidEventSO。
+  Controller 层到 Service 层：HealthController 订阅 HealthChanged 并首刷；StatsPanelController
+  订阅 StatsChanged 并首刷；ExperienceController 订阅 ExpChanged 并 AddExperience；
+  PlayerDamageController 的 UpdateHealth 与 Respawn 写命令。
+  跨域写命令调用方到 Service 层：SkillTreeManager 订阅 LevelUp 并 UpdateSkillPoints；
+  InventoryManager 经验道具 AddExperience；UseItem 物品效果四条写命令；SaveDataManager 的
+  SaveData 与 LoadData，以及 SaveDataManager 遍历 SaveRegistry 向 SaveableService 分发。
+end legend
+@enduml

@@ -1,0 +1,203 @@
+@startuml Enemy_NPC_System
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+
+title 敌人、NPC 与店主
+
+caption v2_2026-10 · 敌人 / NPC / 店主
+
+enum EnemyState {
+  Idle
+  Chasing
+  Attacking
+  KnockBack
+}
+
+enum NPCState {
+  Idle
+  Wander
+  Patrol
+  Chat
+}
+
+package "敌人" {
+  class EnemyMovement {
+      speed : int
+      attackDetectRange : float
+      attackCoolDown : float
+      playerDetectRange : float
+      detectionPoint : Transform
+      playerMask : LayerMask
+      pathFollower : PathFollower
+    - rb : Rigidbody2D
+    - animator : Animator
+    - player : Transform
+    - enemyState : EnemyState
+    - detectInterval : float
+    - velocityCooldown : float
+      AnimatorSM(newState : EnemyState) : void
+    - CheckForPlayer() : void
+    - SetVelocity(direction : Vector2, speed : float) : void
+    - Flip() : void
+  }
+
+  class EnemyCombat {
+      damage : int
+      attackPoint : Transform
+      weaponRange : float
+      playerLayer : LayerMask
+      knockBackForce : float
+      stunTime : float
+      playerDamagedEvent : PlayerDamagedEventSO
+      Attack() : void
+  }
+
+  class EnemyHealth {
+      currentHealth : int
+      maxHealth : int
+      expReward : int
+      defeatedEvent : EnemyDefeatedEventSO
+    - knockBack : EnemyKnockBack
+      ChangeHealth(amount : int) : void
+      TakeDamage(damage : int, attacker : Transform) : void
+  }
+
+  class EnemyKnockBack {
+    - rb : Rigidbody2D
+    - enemyMovement : EnemyMovement
+      Knockback(forceTransform : Transform, knockBackForce : float, stunTime : float, knockBackTime : float) : void
+  }
+}
+
+package "NPC" {
+  class NPCStateController {
+      wanderScript : NPCWander
+      dialogTrigger : NPCDialogTrigger
+      patrolScript : NPCPatrol
+      DefaultState : NPCState
+    - currentState : NPCState
+      SwitchState(newState : NPCState) : void
+  }
+
+  class NPCWander {
+      animator : Animator
+      pathFollower : PathFollower
+      speed : float
+      waitTime : float
+      patrolRadius : int
+    - circleCenter : Vector3
+    - targetPosition : Vector3
+    - isWaiting : bool
+    - randomDirection() : Vector3
+  }
+
+  class NPCPatrol {
+      patrolSize : Vector2
+      clockwise : bool
+      speed : float
+      waitTime : float
+      animator : Animator
+      pathFollower : PathFollower
+    - cornerPositions : Vector3[]
+    - currentCornerIndex : int
+    - CalculateCornerPositions() : void
+    - GetNearestCornerIndex() : int
+  }
+
+  class NPCDialogTrigger {
+      chatAnimator : Animator
+      dialogSO : DialogSO
+      toggleDialogEvent : ToggleCanvasEventSO
+      advanceDialogAction : InputActionReference
+    - openDialogRequested : bool
+    - OnToggleDialogEvent(state : bool) : void
+  }
+}
+
+package "店主" {
+  class ShopKeeper {
+      logoAnimator : Animator
+      shopKeeperAnimator : Animator
+      shopKeeperEvent : ShopKeeperEventSO
+      shopItems : List<ShopItems>
+      shopWeapon : List<ShopItems>
+      shopArmor : List<ShopItems>
+      PortraitTarget : Transform
+  }
+}
+
+package "移动与契约" {
+  class PathFollower
+  interface IDamageable
+  class StatsService <<单例>>
+}
+
+package "通道与订阅方" {
+  class PlayerDamagedEventSO <<事件通道>>
+  class EnemyDefeatedEventSO <<事件通道>>
+  class ShopKeeperEventSO <<事件通道>>
+  class ToggleCanvasEventSO <<事件通道>>
+  class PlayerDamageController
+  class ExperienceController
+  class ShopManager <<单例>>
+  class ShopPortraitCamera
+  class DialogManager <<单例>>
+  class DialogSO <<配置资产>>
+}
+
+EnemyMovement --> EnemyState : 运行时状态
+EnemyMovement --> PathFollower : GetPosToGo 与 ArrivedPos
+EnemyMovement --> StatsService : 读玩家数值
+EnemyKnockBack --> EnemyMovement : 回写 KnockBack 状态
+EnemyHealth ..|> IDamageable
+EnemyHealth --> EnemyKnockBack : TakeDamage 继续击退
+EnemyHealth --> EnemyDefeatedEventSO : 血量归零广播
+EnemyHealth --> StatsService : 读击退力与硬直时长
+EnemyCombat --> PlayerDamagedEventSO : 命中玩家广播
+PlayerDamagedEventSO --> PlayerDamageController : 订阅并统一结算
+EnemyDefeatedEventSO --> ExperienceController : 订阅并加经验
+NPCStateController --> NPCState : 运行时状态
+NPCStateController o-- NPCWander : 互斥 enabled
+NPCStateController o-- NPCPatrol : 互斥 enabled
+NPCStateController o-- NPCDialogTrigger : 互斥 enabled
+NPCWander --> PathFollower : 随机游荡寻路
+NPCPatrol --> PathFollower : 四角巡逻寻路
+NPCDialogTrigger --> ToggleCanvasEventSO : 订阅开关请求
+NPCDialogTrigger --> DialogManager : StartDialog 与 AdvanceDialog
+NPCDialogTrigger --> DialogSO : 入口对话资产
+ShopKeeper --> ShopKeeperEventSO : 玩家进出范围广播
+ShopKeeperEventSO --> ShopManager : 记录当前店主
+ShopKeeperEventSO --> ShopPortraitCamera : 跟随与显隐头像相机
+ShopManager --> ShopKeeper : 读三份商品列表
+
+
+
+
+legend bottom left
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  敌人只在 enemyState 不是 KnockBack 时执行 Update，击退期间由 EnemyKnockBack 独占速度写入。
+  侦测每 0.2 秒做一次 Physics2D.OverlapCircle，命中玩家即缓存引用并按距离切 Chasing 或 Attacking。
+  NPCStateController 用组件 enabled 互斥三个行为组件，玩家进出触发区在 Chat 与 DefaultState 之间切换。
+  单位各自持有 PathFollower 实例，敌人用敌人自己的优化起点，两个 NPC 传 Vector3.zero。
+end legend
+@enduml

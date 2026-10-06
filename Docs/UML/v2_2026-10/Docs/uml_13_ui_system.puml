@@ -1,0 +1,220 @@
+@startuml UI_System
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 10
+skinparam ranksep 14
+
+title UI 系统与画布焦点栈
+caption v2_2026-10 · 焦点栈 / 画布管理
+
+left to right direction
+
+package "焦点与输入核心" {
+  class UIManager <<单例>> {
+    + loadEventSO : SceneLoadEventSO
+    - toggleCanvasEvents : List<ToggleCanvasEventSO>
+    - inputBindings : List<CanvasInputBinding>
+    - mutexCanvases : List<CanvasToToggle>
+    - focusStack : CanvasFocusStack
+    + FocusOrder : const int
+    + DefaultOrder : const int
+    + HandleFocus(canvas : CanvasToToggle) : void
+    + RequestCanvasToggle(canvas : CanvasToToggle) : void
+    + RequestCanvasClose(canvas : CanvasToToggle) : void
+    + {static} Report(canvas, state, closeOnEscape, blocked) : void
+    + IsCanvasFocused(canvas : CanvasToToggle) : bool
+    + GetCanvasOrder(canvas : CanvasToToggle, state : bool) : int
+    - CloseOtherMutexCanvases(opening : CanvasToToggle) : void
+    - FindToggleEvent(canvas : CanvasToToggle) : ToggleCanvasEventSO
+    - IsClosableCanvas(canvas : CanvasToToggle) : bool
+    - IsGlobalInputBlocked() : bool
+    - ToggleCanvas() : void
+    - CollectInputBindingRequests() : void
+    - HandleEscapeRequest() : bool
+    - HandleCanvasToggleRequest() : void
+    - RaiseCanvasEvent(target, state) : void
+    - RaiseFocusEvent(target : CanvasToToggle) : void
+    - ResetCanvases() : void
+  }
+
+  class CanvasFocusStack <<纯 C#>> {
+    + FocusOrder : const int
+    + DefaultOrder : const int
+    - canvasOpenOrder : LinkedList<CanvasToToggle>
+    - currentFocusCanvas : CanvasToToggle
+    - isAnyCanvasOpen : bool
+    + OnCanvasToggleRequested : Action<CanvasToToggle, bool>
+    + OnFocusRefreshRequested : Action<CanvasToToggle>
+    + IsAnyCanvasOpen : bool
+    + CurrentFocus : CanvasToToggle
+    + LastOpenCanvas : CanvasToToggle
+    + HandleFocus(canvas : CanvasToToggle) : void
+    + RequestClose(canvas : CanvasToToggle) : void
+    + HandleESCOrCloseTop() : void
+    + HandleESCOrOpen() : void
+    + ReportState(canvas : CanvasToToggle, state : bool) : void
+    + IsFocused(canvas : CanvasToToggle) : bool
+    + ApplyFocusChange(target : CanvasToToggle) : void
+    + GetCanvasOrder(canvas : CanvasToToggle, state : bool) : int
+    + GetOpenCanvases() : List<CanvasToToggle>
+    + Clear() : void
+  }
+
+  class CanvasInputBinding <<可序列化>> {
+    + canvas : CanvasToToggle
+    + action : InputActionReference
+  }
+}
+
+package "画布开关契约" {
+  interface ICanvasManager {
+    + ToggleCanvasEvent : ToggleCanvasEventSO
+    + SceneLoadedEvent : SceneLoadedEventSO
+    + CloseOnEscape : bool
+    + BlocksGlobalInput : bool
+    + ToggleCanvas(canvasGroup, canvas, canvasToToggle, state) : void
+    + SetCanvaInactive(canva, canvasToToggle) : void
+    + SetCanvaState(canva, canvasToToggle, state) : void
+    + RefreshCanvaOrder(canvas, canvasToToggle, state) : void
+  }
+
+  class ToggleCanvasEventSO <<事件通道>> {
+    + toggleCanvasEvent : event Action<bool>
+    + focusEvent : event Action
+    + canvasToToggle : CanvasToToggle
+  }
+
+  class SceneLoadedEventSO <<事件通道>>
+
+  enum CanvasToToggle {
+    ESC
+    GameOver
+    Stats
+    Skills
+    Dialog
+    Quest
+    Shop
+    Integrated
+    Backpack
+    SaveLoad
+    Default
+  }
+}
+
+package "画布管理器实现" {
+  class ESCMenuManager
+  class GameOverCanvasManager
+  class IntegratedUICanvasManager <<单例>>
+  class SkillTreeCanvasManager
+  class SaveLoadCanvasManager
+  class ShopManager <<单例>>
+  class DialogManager <<单例>>
+  class BackpackCanvasManager
+  class QuestManager <<单例>>
+  class StatsPanelView
+}
+
+package "窗口控件" {
+  class UIDrag {
+    + dragTarget : RectTransform
+    + dragCanvasType : CanvasToToggle
+    + OnDrag(eventData : PointerEventData) : void
+  }
+
+  class ESCButton {
+    + escButton : Button
+    - canvasToESC : CanvasToToggle
+    - OnESC() : void
+  }
+
+  class MenuSceneCanvasHider {
+    + canvasGroup : CanvasGroup
+    + sceneLoadedEvent : SceneLoadedEventSO
+    - OnSceneLoaded(currentScene : GameSceneSO) : void
+  }
+
+  class Joystick {
+    + Horizontal : float
+    + Vertical : float
+  }
+
+  class MobileAttackButton {
+    + playerMovement : PlayerMovement
+  }
+}
+
+package "外部类型" {
+  class PlayerMovement <<玩法层>>
+  class GameSceneSO <<配置资产>>
+  class InputActionReference <<Unity 输入>>
+}
+
+UIManager *-- CanvasFocusStack : focusStack 字段
+UIManager o-- CanvasInputBinding : 输入绑定表
+UIManager --> CanvasFocusStack : 接线两个回调
+ESCMenuManager ..|> ICanvasManager
+GameOverCanvasManager ..|> ICanvasManager
+IntegratedUICanvasManager ..|> ICanvasManager
+SkillTreeCanvasManager ..|> ICanvasManager
+SaveLoadCanvasManager ..|> ICanvasManager
+ShopManager ..|> ICanvasManager
+DialogManager ..|> ICanvasManager
+BackpackCanvasManager ..|> ICanvasManager
+QuestManager ..|> ICanvasManager
+StatsPanelView ..|> ICanvasManager
+ICanvasManager --> ToggleCanvasEventSO : 暴露订阅资产
+ICanvasManager --> SceneLoadedEventSO : 暴露订阅资产
+ICanvasManager --> CanvasToToggle : 画布身份
+ESCButton --> UIManager : 关闭指定画布
+UIDrag --> UIManager : 拖拽置顶
+MenuSceneCanvasHider --> SceneLoadedEventSO : 按场景显隐
+MenuSceneCanvasHider --> GameSceneSO : 读当前场景类型
+Joystick --> MobileAttackButton : 共用触屏输入层
+MobileAttackButton --> PlayerMovement : 触发攻击
+CanvasInputBinding --> InputActionReference : 绑定输入动作
+"窗口控件" ..> "焦点与输入核心" : 置顶与关闭请求
+"焦点与输入核心" ..> "画布开关契约" : 收开关与层级
+
+' 空洞压缩：类级隐藏链，把「画布管理器实现」与「焦点与输入核心」「窗口控件」锁进同一排
+' （包级隐藏链对这种无连线的包对无效，必须写成类级）
+QuestManager -[hidden]- UIManager
+MobileAttackButton -[hidden]- QuestManager
+
+
+
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  UIManager 是焦点与层级的协调者，负责输入绑定、互斥关闭、ESC 处理与开关广播；各管理器只管自己的画布显隐与焦点上报。
+  CanvasFocusStack 保存已开画布的顺序并计算 sortingOrder，全部外部动作经 OnCanvasToggleRequested 与
+  OnFocusRefreshRequested 两个回调驱动。
+  ICanvasManager 的四个方法都是接口默认实现，实现者共 10 个；默认实现里经 UIManager.Report 上报状态，
+  并从 UIManager.Instance 取层级。
+  Default 枚举不参与任何流程，也是 ESC 判断的基准；画布要被 UIManager 主动关闭，其开关资产必须登记进
+  toggleCanvasEvents 列表。
+  已并入包间线的连线（原 UIManager 指向画布开关契约包的三条虚线，语义不变）：UIManager 收发
+  ToggleCanvasEventSO 的开关与焦点事件；按 CanvasToToggle 决定焦点顺序与 ESC 判定；从
+  SceneLoadedEventSO 在切场景时复位全部画布。
+  已删除的三条冗余包间线：画布管理器实现 → 画布开关契约（实现接口默认方法，现由 10 条 ..|> 实现线表达）；
+  画布开关契约 → 焦点与输入核心（默认实现经 UIManager.Report 上报）；窗口控件 → 画布开关契约
+  （订阅画布与场景通道，现由 MenuSceneCanvasHider 指向 SceneLoadedEventSO 那条线表达）。
+end legend
+@enduml

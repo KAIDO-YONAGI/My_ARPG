@@ -1,0 +1,149 @@
+@startuml Skills_System
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+skinparam wrapWidth 155
+
+title 技能系统
+
+caption v2_2026-10 · 技能槽位 / 点数经济
+
+package "技能槽位" {
+  class SkillSlot {
+    + skillSO : SkillSO
+    + skillIcon : Image
+    + skillLevelText : TMP_Text
+    + skillButton : Button
+    + isUnlocked : bool
+    - preRiquriedForSkillUnlock_List : List<SkillSlot>
+    - currentLevel : int
+    + {static} OnAbilityPointSpent : event Action<SkillSlot>
+    + {static} OnMaxSkillLevel : event Action<SkillSlot>
+    + TryUpgradeSkill() : void
+    + Unlock() : void
+    + CanUnlockSkill() : bool
+    - UpdateUI() : void
+  }
+
+  class SkillSO <<配置资产>> {
+    + skillName : string
+    + maxLevel : int
+    + skillIcon : Sprite
+  }
+}
+
+package "技能管理器" {
+  class SkillTreeManager {
+    + skillSlots : SkillSlot[]
+    + pointsText : TMP_Text
+    - listeningToLevelUp : bool
+    + UpdateAbilityPoints(amount : int) : void
+    - TrySubscribeLevelUp() : void
+    - UnsubscribeLevelUp() : void
+    - HandleAbilityPointSpent(skillSlot : SkillSlot) : void
+    - HandleSkillMaxed(skillSlot : SkillSlot) : void
+  }
+
+  class SkillManager {
+    + combat : PlayerCombat
+    - HandleAbilityPointSpent(skillSlot : SkillSlot) : void
+  }
+
+  class SkillTreeCanvasManager {
+    + skillsCanvas : CanvasGroup
+    + toggleSkillEvent : ToggleCanvasEventSO
+    + sceneLoadedEvent : SceneLoadedEventSO
+    + ToggleCanvasEvent : ToggleCanvasEventSO
+    + SceneLoadedEvent : SceneLoadedEventSO
+    - OnToggleSkillEvent(state : bool) : void
+    - OnFocus() : void
+  }
+}
+
+package "数值与战斗依赖" {
+  class StatsService <<单例>> {
+    + Stats : IPlayerStatsReadOnly
+    + UpdateSkillPoints(amount : int) : void
+    + UpdateMaxHealth(amount : int) : void
+    + UpdateHealth(amount : int) : void
+  }
+
+  interface IPlayerStatsReadOnly {
+    + LevelUp : event Action<int>
+    + SkillPoints : int
+  }
+
+  class PlayerCombat {
+    + SetActive(active : bool) : void
+  }
+
+  class ShiftEquipment {
+    + combat : PlayerCombat
+    + bow : PlayerBow
+    + shiftEquipmentAction : InputActionReference
+    - shiftCooldown : float
+    - shiftTimer : float
+    - Update() : void
+  }
+}
+
+package "通道与契约" {
+  class ToggleCanvasEventSO <<事件通道>>
+  class SceneLoadedEventSO <<事件通道>>
+  interface ICanvasManager
+  class UIManager <<单例>>
+}
+
+SkillSlot --> SkillSO : 技能配置
+SkillSlot --> SkillSlot : 前置槽位列表
+SkillTreeManager o-- SkillSlot : 24 个槽位
+"技能管理器" ..> "技能槽位" : 加点与派发效果
+ShiftEquipment --> PlayerCombat : 独立切换武器模式
+SkillTreeCanvasManager ..|> ICanvasManager
+
+
+
+
+"技能管理器" ..> "数值与战斗依赖" : 读写点数
+"技能管理器" ..> "通道与契约" : 订阅开关
+
+legend bottom left
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  技能状态存在槽位实例上：等级按槽位独立计数，同一个 SkillSO 被多个槽位引用时各自从头累计。
+  解锁要求前置列表中每个槽位都已解锁且已满级；升级要求已解锁且等级低于 maxLevel。
+  升级成功广播 OnAbilityPointSpent，满级再广播 OnMaxSkillLevel，技能点的扣减由 SkillTreeManager 在事
+  件回调里完成。
+  技能点属于玩家数值域，存字段是 PlayerStatsModel.skillPoints，写命令 UpdateSkillPoints 经
+  StatsService 转发且不广播事件。
+  SkillManager 按 skillSO.skillName 字符串派发效果：MaxHealthBoost 加血量上限与当前血量，
+  SwordSlash 启用近战。
+  
+  为减少跨包长线，以下类级虚线已改为上面的包间连接（只改画法，事实不变）：
+  技能管理器到数值与战斗依赖：SkillTreeManager 到 StatsService 订阅 LevelUp 并扣加技能点，到
+  IPlayerStatsReadOnly 读 SkillPoints；SkillManager 到 PlayerCombat 在 SwordSlash 分支启用近战，
+  到 StatsService 在 MaxHealthBoost 分支写血量与上限。
+  技能管理器到通道与契约：SkillTreeCanvasManager 到 ToggleCanvasEventSO 订阅技能面板开关，到
+  SceneLoadedEventSO 订阅切场景复位，到 UIManager 上报画布状态。
+  技能管理器到技能槽位的三条虚线（按槽位加技能点、按 skillName 派发效果、槽位升级后广播两个静态事件回调）已经并为一条包间线，
+  聚合关系「24 个槽位」仍按类级绘制；槽位升级后回到 SkillTreeManager 的回调方向同样走这条包间线。
+end legend
+@enduml

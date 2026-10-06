@@ -1,0 +1,217 @@
+@startuml Inventory_Shop
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+
+title 背包与商店
+caption v2_2026-10 · 背包 / 商店
+
+left to right direction
+
+package "背包" {
+  class InventoryManager <<单例>> {
+    + hotbarParent / backpackParent : Transform
+    + useItem : UseItem
+    + goldAmountText : TMP_Text
+    + lootPrefab : Loot
+    + player : Transform
+    + ShoppingRequest / QuestRewardRequest : InventorySlotsStatsSO
+    + lootEvent : LootEventSO
+    + GoldAmount : int
+    - inventorySlotsList : List<InventorySlot>
+    - lootPool : ObjectPool<Loot>
+    - slotBeenClicked : InventorySlot
+    - goldAmount : int
+    + SetSlotBeenClicked(slot : InventorySlot) : void
+    + DropByClick(slot : InventorySlot) : void
+    + UseItem(slot : InventorySlot) : void
+    + UpdateGold(price : int) : void
+    - OnItemLootedHandler(item : ItemSO, quantity : int, lootObj : Loot) : void
+    - HandleShopping(item : ItemSO, price : int, amount : int) : void
+    - HandleQuestReward(item : ItemSO, price : int, amount : int) : void
+    - UpdateInventorySlots(item : ItemSO, quantity : int, lootObj : Loot) : void
+    - HasSpaceForItem(item : ItemSO) : bool
+    - DropLoot(item : ItemSO, quantity : int, existingLoot : Loot) : void
+  }
+
+  class InventorySlot {
+    + itemSO : ItemSO
+    + quantity : int
+    + itemImage : Image
+    + quantityText : TMP_Text
+    + ItemSO : ItemSO
+    + Quantity : int
+    + IsEmpty : bool
+    + OnPointerClick(eventData : PointerEventData) : void
+    + AddItem(item : ItemSO, amount : int) : int
+    + RemoveItem(amount : int) : int
+    + SpaceRemaining(item : ItemSO) : int
+    + UpdateUI() : void
+  }
+
+  class UseItem {
+    + ApplyItemEffects(item : ItemSO) : void
+    - EffectTimer(item : ItemSO, duration : float) : IEnumerator
+  }
+
+  class Loot <<场景组件>> {
+    + item : ItemSO
+    + quantity : int
+    + canBePick : bool
+    + hasBeenPicked : bool
+    + lootEvent : LootEventSO
+    + Initialize(item : ItemSO, quantity : int) : void
+    + MarkAsDisable() : void
+    + OnPoolGet() / OnPoolReturn() : void
+  }
+
+  class ObjectPool<T> <<对象池>> {
+    + Count : int
+    + Get() : T
+    + Return(obj : T) : void
+  }
+}
+
+package "商店" {
+  class ShopManager <<单例>> {
+    + shopSlots : ShopSlot[]
+    + shopCanvasGroup : CanvasGroup
+    + InventoryUpdateRequest : InventorySlotsStatsSO
+    + toggleShopCanvasEvent : ToggleCanvasEventSO
+    + shopKeeperEvent : ShopKeeperEventSO
+    + sceneLoadedEvent : SceneLoadedEventSO
+    + IsShopOpen : bool
+    + OpenShop(shopItems, shopWeapon, shopArmor : List<ShopItems>) : void
+    + CloseShop() : void
+    + TryBuyItem(item : ItemSO, price : int) : void
+    + SellItem(item : ItemSO) : void
+    + OpenItemShop() / OpenWeaponShop() / OpenArmorShop() : void
+    - OnKeeperEntered(keeper : ShopKeeper) : void
+    - OnKeeperExited(keeper : ShopKeeper) : void
+    - PopulateShopItems(shopItems : List<ShopItems>) : void
+  }
+
+  class ShopSlot {
+    - item : ItemSO
+    - price : int
+    + shopInfoPanel : ShopInfoPanel
+    + shopRef : Component
+    + Initialize(item : ItemSO, price : int) : void
+    + GetItemSO() : ItemSO
+    + GetPrice() : int
+    + OnBuyButtonClick() : void
+    + OnPointerEnter(eventData : PointerEventData) : void
+    + OnPointerMove(eventData : PointerEventData) : void
+  }
+
+  class ShopInfoPanel {
+    + infoPanel : CanvasGroup
+    + itemNameText / itemDescriptionText : TMP_Text
+    + itemStatsText : TMP_Text[]
+    + ShowItemInfo(item : ItemSO) : void
+    + HideItemInfo() : void
+    + FollowMouse() : void
+  }
+
+  class ShopCategoryToggles {
+    + itemButton / weaponButton / armorButton : Button
+    + shopRef : Component
+    + OpenItemShop() / OpenWeaponShop() / OpenArmorShop() : void
+  }
+
+  class ShopPortraitCamera {
+    + followOffset : Vector3
+    + hideWhenNoShopKeeper : bool
+    + shopKeeperEvent : ShopKeeperEventSO
+    - currentTarget : Transform
+    - LateUpdate() : void
+    - SetCameraState(state : bool) : void
+  }
+
+  class ShopItems <<可序列化>> {
+    + item : ItemSO
+    + price : int
+  }
+}
+
+package "通道与契约" {
+  class LootEventSO <<事件通道>>
+  class InventorySlotsStatsSO <<事件通道>>
+  class ShopKeeperEventSO <<事件通道>>
+  class ToggleCanvasEventSO <<事件通道>>
+  class SceneLoadedEventSO <<事件通道>>
+  interface IShopInteractable
+  interface ICanvasManager
+}
+
+package "共享配置与外部" {
+  class ItemSO <<配置资产>>
+  class ShopKeeper
+  class ItemHistoryManager <<单例>>
+  class StatsService <<单例>>
+  class UIManager <<单例>>
+}
+
+InventoryManager o-- InventorySlot : 快捷栏与背包槽位
+InventoryManager *-- ObjectPool : 掉落物池
+InventoryManager --> UseItem : 应用物品效果
+InventoryManager --> LootEventSO : 订阅拾取广播
+InventoryManager --> InventorySlotsStatsSO : 订阅买卖与任务奖励
+InventoryManager --> ItemHistoryManager : 记账四处写入
+InventoryManager --> StatsService : 经验道具与物品效果
+InventorySlot --> InventoryManager : 点击使用与丢弃
+InventorySlot --> ShopManager : 商店开着时卖出
+Loot --> LootEventSO : 拾取广播
+Loot --> ItemSO : 掉落物配置
+ShopManager ..|> ICanvasManager
+ShopManager ..|> IShopInteractable
+ShopManager o-- ShopSlot : 商品槽位
+ShopManager *-- ShopItems : 商品条目
+ShopManager --> InventorySlotsStatsSO : 发买卖请求
+ShopManager --> ShopKeeperEventSO : 记录当前店主
+ShopManager --> ShopKeeper : 读三份商品列表
+ShopManager --> UIManager : 上报画布状态
+ShopSlot --> IShopInteractable : OnBuyButtonClick
+ShopSlot --> ShopInfoPanel : 悬停信息
+ShopSlot --> ItemSO : 展示物品
+ShopCategoryToggles --> IShopInteractable : 切换分类页
+ShopPortraitCamera --> ShopKeeperEventSO : 显隐与跟随头像相机
+ShopKeeper --> ShopKeeperEventSO : 进出范围广播
+"背包" ..> "商店" : 商店开着时卖出
+"背包" ..> "通道与契约" : 拾取与买卖事件
+"商店" ..> "通道与契约" : 画布与店主事件
+"商店" ..> "共享配置与外部" : 商品配置与店主组件
+"背包" ..> "共享配置与外部" : 物品配置与数值写入
+
+
+
+
+legend bottom left
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  背包没有独立数据类，槽位就是场景里的 InventorySlot 组件，Start 里把 hotbarParent 与 backpackParent 的
+  子槽位拼成一个运行时列表，快捷栏在前。
+  堆叠上限取 ItemSO.stackableSize；空槽的 itemSO 保持 null。
+  结算集中在 HandleShopping：金币不足或背包无空间时直接返回；买入与卖出都先改金币再改槽位。
+  金币的写入点是 UpdateGold 与 UpdateInventorySlots 的 isGold 分支，两处都同步 goldAmountText。
+  背包内容与金币不入档，组件挂在常驻场景上，一次运行内跨游戏场景保留。
+end legend
+@enduml

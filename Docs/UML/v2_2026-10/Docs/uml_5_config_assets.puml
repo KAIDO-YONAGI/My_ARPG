@@ -1,0 +1,190 @@
+@startuml Config_Assets
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 30
+skinparam ranksep 40
+
+title 配置资产
+caption v2_2026-10 · ScriptableObject 与序列化结构
+
+left to right direction
+
+package "任务资产" {
+  class QuestSO {
+    + questName : string
+    + lv : int
+    + questDescription : string
+    + questObjectives : List<QuestObjective>
+    + rewards : List<Reward>
+  }
+
+  class QuestObjective <<可序列化>> {
+    + description : string
+    + targetItem : ItemSO
+    + targetCharacter : CharacterSO
+    + targetLocation : LocationSO
+    + requiredAmount / currentAmount : int
+  }
+
+  class Reward <<可序列化>> {
+    + rewardItem : ItemSO
+    + quantity : int
+  }
+}
+
+package "对话资产" {
+  class DialogSO {
+    + mainCharacter : CharacterSO
+    + dialogLines : DialogLine[]
+    + nextDialogOptions : DialogOption[]
+    + refuseDialogs : List<RefuseDialogSO>
+    + onlyTriggeredOnce : bool
+    + parentDialog : DialogSO
+  }
+
+  class RefuseDialogSO {
+    + isDefaultChat : bool
+    + requireCharacters : List<CharacterSO>
+    + requireItems : List<Item>
+  }
+
+  class DialogLine <<可序列化>> {
+    + speaker : CharacterSO
+    + text : string
+  }
+
+  class DialogOption <<可序列化>> {
+    + optionText : string
+    + nextDialogNode : DialogSO
+  }
+
+  class Item <<可序列化>> {
+    + itemSO : ItemSO
+    + quantity : int
+  }
+}
+
+package "角色、物品与技能" {
+  class CharacterSO {
+    + characterName : string
+    + characterPortrait : Sprite
+  }
+
+  class ItemSO {
+    + itemName / itemDescription : string
+    + icon : Sprite
+    + isGold / isEXP : bool
+    + stackableSize : int
+    + currentHealth / maxHealth : int
+    + speed / damage : int
+    + duration : float
+  }
+
+  class SkillSO {
+    + skillName : string
+    + maxLevel : int
+    + skillIcon : Sprite
+  }
+}
+
+package "场景与地点" {
+  class GameSceneSO {
+    + ID : string
+    + sceneAsset : SceneAsset
+    + sceneName : string
+    + sceneType : SceneType
+    + initialPosition : Vector3
+    + SaveKey : string
+  }
+
+  class LocationSO {
+    + locationID : string
+    + locationName : string
+  }
+}
+
+package "资产基类" {
+  class GuidSO {
+    - guid : string
+    + Guid : string
+    # OnValidate() : void
+  }
+}
+
+package "枚举" {
+  enum SceneType {
+    Location
+    Menu
+    Retry
+  }
+
+  enum PersistentType {
+    ReadWrite
+    DontPersist
+  }
+}
+
+package "数值资产" {
+  class PlayerStatsSO {
+    - stats : PlayerStatsData
+    + Data : PlayerStatsData
+    + CreateInitialData() : PlayerStatsData
+  }
+
+  class PlayerStatsData <<存档传输格式>> {
+    + damage / weaponRange : ...
+    + knockBackForce / knockBackTime / stunTime : ...
+    + coolDown / speed : ...
+    + maxHealth / currentHealth : int
+    + skillPoints / level / maxLevel : int
+    + currentExp / expToUpgrade : int
+    + expMultiplier : float
+    + Clone() : PlayerStatsData
+  }
+}
+
+QuestSO *-- QuestObjective : 目标
+QuestSO *-- Reward : 奖励
+QuestObjective --> ItemSO : 目标物品
+QuestObjective --> CharacterSO : 目标角色
+QuestObjective --> LocationSO : 目标地点
+Reward --> ItemSO : 奖励物品
+DialogSO *-- DialogLine : 台词
+DialogSO *-- DialogOption : 选项
+DialogSO --> RefuseDialogSO : 拒绝节点
+DialogOption --> DialogSO : nextDialogNode
+DialogSO --> DialogSO : parentDialog 回指
+RefuseDialogSO --|> DialogSO
+RefuseDialogSO --> Item : 需求物品
+Item --> ItemSO : 物品配置
+CharacterSO --|> GuidSO
+GameSceneSO --> SceneType : 场景类型
+PlayerStatsSO --> PlayerStatsData : 初始值模板
+DialogSO -[hidden]- PlayerStatsSO
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员　# protected
+
+  GuidSO 在 OnValidate 时补一个 GUID，CharacterSO 用它做历史记录与存档的稳定键。
+  配置资产的公有字段名就是 Newtonsoft 序列化出来的 JSON 键名，改名即改档。
+  PlayerStatsData 既是 PlayerStatsSO 的初始值模板，也是存档里的数值段。
+  SkillSO 由 SkillManager 按 skillName 字符串派发效果，名称是弱引用键。
+end legend
+@enduml

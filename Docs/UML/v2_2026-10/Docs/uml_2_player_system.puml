@@ -1,0 +1,201 @@
+@startuml Player_System
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 30
+skinparam ranksep 40
+
+title 玩家移动、战斗与装备系统
+caption v2_2026-10 · 移动 / 战斗 / 投射物
+
+left to right direction
+
+package "输入" {
+  class Joystick {
+    + handleRect : RectTransform
+    + canvasGroup : CanvasGroup
+    + joystickRoot : GameObject
+    + Horizontal : float
+    + Vertical : float
+  }
+
+  class MobileAttackButton {
+    + playerMovement : PlayerMovement
+    + pressVisual : RectTransform
+    + pressedScale : float
+  }
+}
+
+package "移动与状态" {
+  class PlayerMovement {
+    + rb : Rigidbody2D
+    + animator : Animator
+    + playerCombat : PlayerCombat
+    + playerBow : PlayerBow
+    + joystick : Joystick
+    + visualRoot : Transform
+    + slashAction / shootAction : InputActionReference
+    - moveAction : InputActionReference
+    - slashActionFinishedEvent : VoidEventSO
+    + shootActionFinishedEvent : VoidEventSO
+    - facingDirection : int
+    - canBeInterrupted : bool
+    - playerState : PlayerState
+    + {static} Main : PlayerMovement
+    + AnimateMachine(newState : PlayerState) : void
+    + TryAttack() : bool
+    + SetCanBeInterrupted(value : bool) : void
+    + ResetTimer() : void
+    + GetFacingDirection() : int
+    + KnockBack(enemy : Transform, force : float, stunTime : float) : void
+    + GetPlayerState() : PlayerState
+    - MovementSM() : void
+    - SetMovement(horizontal, vertical : float) : void
+    - Flip() : void
+  }
+
+  class PlayerLocator <<单例>> {
+    + playerTransform : Transform
+    + GetPosition() : Vector3
+  }
+
+  enum PlayerState {
+    Idle
+    Running
+    Attacking
+    Shooting
+    KnockBack
+  }
+}
+
+package "武器模式" {
+  class PlayerCombat {
+    + attackPoint : Transform
+    + enemyMask : LayerMask
+    + slashActionFinishedEvent : VoidEventSO
+    + IsActive : bool
+    + SetActive(active : bool) : void
+    + DealDamage() : void
+    + FinishCombat() : void
+  }
+
+  class PlayerBow {
+    + launchPoint : Transform
+    + arrowPrefab : Arrow
+    + arrowPrewarm : int
+    + arrowPoolMaxSize : int
+    + anim : Animator
+    + playerMovement : PlayerMovement
+    + moveAction : InputActionReference
+    + shootActionFinishedEvent : VoidEventSO
+    + IsActive : bool
+    - shootTimer : float
+    + SetActive(active : bool) : void
+    + HandleAiming() : void
+    + HandleShootingAiming() : void
+    + Shoot() : void
+    + ShootingDone() : void
+  }
+
+  class ShiftEquipment {
+    + combat : PlayerCombat
+    + bow : PlayerBow
+    + shiftEquipmentAction : InputActionReference
+    + slashActionFinishedEvent : VoidEventSO
+    + shootActionFinishedEvent : VoidEventSO
+    - shiftCooldown : float
+    - shiftTimer : float
+    - Update() : void
+  }
+
+  class PlayerAnimationEventRelay {
+    + combat : PlayerCombat
+    + bow : PlayerBow
+    + DealDamage() : void
+    + FinishCombat() : void
+    + HandleShootingAiming() : void
+    + Shoot() : void
+    + ShootingDone() : void
+  }
+}
+
+package "投射物" {
+  class Arrow <<对象池>> {
+    + rb : Rigidbody2D
+    + enemyLayer : LayerMask
+    + obstacleLayer : LayerMask
+    + spriteRenderer : SpriteRenderer
+    + buriedSprite : Sprite
+    + lifeSpan : float
+    + speed : float
+    + damage : int
+    - direction : Vector2
+    + Launch(direction : Vector2) : void
+    + OnPoolGet() : void
+    + OnPoolReturn() : void
+    - LifeTimer() : IEnumerator
+    - OnCollisionEnter2D(collision : Collision2D) : void
+    - AttachToTarget(target : Transform) : void
+  }
+
+  class ObjectPool<T> {
+    + Count : int
+    + TotalCreated : int
+    + Get() : T
+    + Return(obj : T) : void
+    + Clear() : void
+  }
+}
+
+package "外部依赖" {
+  class VoidEventSO <<事件通道>>
+  class StatsService <<单例>>
+  interface IDamageable
+}
+
+"输入" ..> "移动与状态" : 摇杆与攻击键
+PlayerMovement --> PlayerState : 运行时状态
+PlayerMovement o-- PlayerCombat : 启用与停用近战模式
+PlayerMovement o-- PlayerBow : 启用与停用远程模式
+ShiftEquipment --> PlayerCombat : 切换近战模式
+ShiftEquipment --> PlayerBow : 切换远程模式
+PlayerAnimationEventRelay --> PlayerCombat : 近战动画事件转发
+PlayerAnimationEventRelay --> PlayerBow : 射击动画事件转发
+PlayerBow --> ObjectPool : 箭矢池
+PlayerBow --> Arrow : Launch 发射
+
+"武器模式" ..> "外部依赖" : 读数值与广播
+ObjectPool -[hidden]- StatsService
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员　# protected
+
+  PlayerAnimationEventRelay 挂在 Player 根节点，按 PlayerCombat 与 PlayerBow 的 IsActive 把动画事件
+  转给当前武器模式。
+  近战命中走 Physics2D.OverlapCircleAll 取攻击范围内全部碰撞体，逐个 TryGetComponent 到 IDamageable
+  后调用 TakeDamage。
+  射击经对象池取箭矢，Shoot 里用 StatsService 的 CoolDown 重置射击计时器，ShootingDone 广播动作结束
+  事件。
+  PlayerLocator 供存档流程查询玩家坐标。
+  包间三条虚线：移动与状态读 StatsService 的 Speed 与 CoolDown；武器模式读 Damage、WeaponRange 与 CoolDown，
+  近战与射击动作结束时各广播一次 VoidEventSO 并由 ShiftEquipment 订阅同一事件；
+  命中判定统一走 IDamageable.TakeDamage，投射物从 StatsService 取伤害初值后同样走 TakeDamage。
+  输入到移动与状态这条包间线代表 Joystick 聚合持有 PlayerMovement 并每帧读轴值，MobileAttackButton 点击时调 TryAttack。
+end legend
+@enduml

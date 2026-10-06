@@ -1,0 +1,177 @@
+@startuml Dialog_System
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+
+title 对话系统
+caption v2_2026-10 · 会话推进 / 历史记录
+
+left to right direction
+
+package "触发链" {
+  class NPCStateController {
+    + dialogTrigger : NPCDialogTrigger
+    + DefaultState : NPCState
+    + SwitchState(newState : NPCState) : void
+  }
+
+  class NPCDialogTrigger {
+    + chatAnimator : Animator
+    + dialogSO : DialogSO
+    + toggleDialogEvent : ToggleCanvasEventSO
+    + advanceDialogAction : InputActionReference
+    - openDialogRequested : bool
+    - OnToggleDialogEvent(state : bool) : void
+  }
+}
+
+package "会话驱动" {
+  class DialogManager <<单例>> {
+    + dialogCanvasGroup : CanvasGroup
+    + speakerPortrait : Image
+    + dialogText / speakerNameText : TMP_Text
+    + optionButtons : Button[]
+    + optionTexts : TMP_Text[]
+    + isDialogActive : bool
+    + sceneLoadedEvent : SceneLoadedEventSO
+    - currentDialog : DialogSO
+    - currentLineIndex : int
+    + ToggleCanvasEvent : ToggleCanvasEventSO
+    + StartDialog(dialog : DialogSO) : void
+    + AdvanceDialog() : void
+    + EndDialog() : void
+    + ForeceEndDialog() : void
+    + InitializeButtons() / DisableButtons() : void
+    + SetDialogCanvas(state : bool) : void
+    - MatchConditionsToStartDialog(dialog : DialogSO) : bool
+    - HasRefuseConditions(refuse : RefuseDialogSO) : bool
+    - StartRefuseDialog(refuse : RefuseDialogSO) : void
+    - ShowDialog() / ShowChoices() : void
+    - OnOptionSelected(nextDialog : DialogSO) : void
+  }
+}
+
+package "历史记录" {
+  class ConversationHistoryManager <<单例>> {
+    - charactersHasChated : HashSet<CharacterSO>
+    - dialogsHasChated : HashSet<int>
+    + RecordCharacter(character : CharacterSO) : void
+    + HasChatedWith(character : CharacterSO) : bool
+    + RecordDialogHasChated(dialog : DialogSO) : void
+    + HasDialogChated(dialog : DialogSO) : bool
+  }
+
+  class ItemHistoryManager <<单例>> {
+    - itemHasPicked : Dictionary<ItemSO, int>
+    + RecordItem(item : ItemSO, quantity : int) : void
+    + HasPickedOverAmount(item : ItemSO, amount : int) : bool
+    + GetItemQuantity(item : ItemSO) : int
+  }
+
+  class VisitedHistoryManager <<单例>>
+}
+
+package "数据资产" {
+  class DialogSO <<配置资产>> {
+    + mainCharacter : CharacterSO
+    + dialogLines : DialogLine[]
+    + nextDialogOptions : DialogOption[]
+    + refuseDialogs : List<RefuseDialogSO>
+    + onlyTriggeredOnce : bool
+    + parentDialog : DialogSO
+  }
+
+  class RefuseDialogSO <<配置资产>> {
+    + isDefaultChat : bool
+    + requireCharacters : List<CharacterSO>
+    + requireItems : List<Item>
+  }
+
+  class CharacterSO <<配置资产>> {
+    + characterName : string
+    + characterPortrait : Sprite
+  }
+
+  class DialogLine <<可序列化>> {
+    + speaker : CharacterSO
+    + text : string
+  }
+
+  class DialogOption <<可序列化>> {
+    + optionText : string
+    + nextDialogNode : DialogSO
+  }
+
+  class Item <<可序列化>> {
+    + itemSO : ItemSO
+    + quantity : int
+  }
+}
+
+package "通道与外部" {
+  class ToggleCanvasEventSO <<事件通道>>
+  class SceneLoadedEventSO <<事件通道>>
+  interface ICanvasManager
+  class UIManager <<单例>>
+  class InventoryManager <<单例>>
+  class QuestManager <<单例>>
+  class ItemSO <<配置资产>>
+}
+
+NPCStateController --> NPCDialogTrigger : Chat 态启用该组件
+NPCDialogTrigger --> DialogManager : StartDialog 与 AdvanceDialog
+NPCDialogTrigger --> ToggleCanvasEventSO : 订阅开关请求
+DialogManager ..|> ICanvasManager
+DialogManager --> ConversationHistoryManager : 记录与查询对话史
+DialogManager --> ItemHistoryManager : 查询需求物品数量
+DialogManager --> SceneLoadedEventSO : 订阅切场景复位
+DialogManager --> UIManager : 上报对话画布状态
+DialogSO *-- DialogLine : 台词
+DialogSO *-- DialogOption : 选项
+DialogOption --> DialogSO : nextDialogNode 跳转
+DialogSO --> DialogSO : parentDialog 回指父节点
+DialogSO --> RefuseDialogSO : 拒绝节点
+RefuseDialogSO --|> DialogSO
+RefuseDialogSO --> CharacterSO : 需求角色
+RefuseDialogSO --> Item : 需求物品
+Item --> ItemSO : 物品配置
+InventoryManager --> ItemHistoryManager : 写入物品史
+QuestManager --> ItemHistoryManager : 读取物品进度
+"触发链" ..> "会话驱动" : 开关请求与逐句推进
+"会话驱动" ..> "历史记录" : 查对话史与物品史
+"会话驱动" ..> "数据资产" : 读台词与选项
+"历史记录" ..> "数据资产" : 按角色与对话资产记账
+"通道与外部" ..> "会话驱动" : 复位与画布上报
+
+
+
+
+legend bottom left
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+  
+  AdvanceDialog 是三段式推进：台词没播完就播下一句，台词播完且没有选项就结束对话，台词有内容且已到末尾就显示选项。
+  Refuse 判定按 refuseDialogs 的列表顺序取第一个命中的策略；isDefaultChat 为真时按父节点是否已对话判定，
+  否则按 requireCharacters 与 requireItems 的要求判定。
+  历史记录只在 EndDialog 写入；ForeceEndDialog 只关画布并清状态。
+  对话史的键是 dialog.GetInstanceID，只在单次进程生命内有效。
+  对话画布的开关请求由 NPCDialogTrigger 承接，DialogManager 的 ToggleCanvasEvent 返回 null。
+end legend
+@enduml

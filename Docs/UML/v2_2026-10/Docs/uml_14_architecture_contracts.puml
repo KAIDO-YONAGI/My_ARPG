@@ -1,0 +1,120 @@
+@startuml Architecture_Contracts
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 22
+skinparam ranksep 30
+
+title 分层、契约与初始化次序
+caption v2_2026-10 · 分层 / 契约 / 初始化次序
+
+package "Contracts 契约层 · 8 个文件" as Contracts {
+  abstract class YSingleton<T> {
+    + {static} Instance : T
+    # Awake() : void
+    # OnSingletonInitialized() : void
+    # OnDestroy() : void
+  }
+
+  abstract class SaveableService<T> {
+    # OnSingletonInitialized() : void
+    # OnDestroy() : void
+    + GetDataID() : SaveDefinition
+    + SaveData(data : SaveData) : void
+    + LoadData(data : SaveData) : void
+  }
+
+  class SaveRegistry <<静态类>> {
+    + All : IReadOnlyList<ISaveable>
+    + Add(saveable : ISaveable) : void
+    + Remove(saveable : ISaveable) : void
+    + Clear() : void
+    - ResetStatics() : void
+  }
+
+  interface ISaveable
+  interface ICanvasManager
+  interface IDamageable
+  interface IShopInteractable
+  class MyEnums <<枚举集合>>
+}
+
+package "Pipeline 管线层 · 57 个文件" as Pipeline {
+  package "场景与切场" as PipeScene {
+  }
+  package "寻路与对象池" as PipeAStar {
+  }
+  package "UI 基建" as PipeUI {
+  }
+  package "配置与事件通道资产" as PipeSO {
+  }
+}
+
+package "Gameplay 玩法层 · 59 个文件" as Gameplay {
+  package "Player" as GPlayer {
+  }
+  package "Quest" as GQuest {
+  }
+  package "Dialog" as GDialog {
+  }
+  package "Inventory" as GInventory {
+  }
+  package "Shop" as GShop {
+  }
+  package "Skills" as GSkills {
+  }
+  package "Units" as GUnits {
+  }
+  package "Save" as GSave {
+  }
+  package "Grid" as GGrid {
+  }
+}
+
+SaveableService --|> YSingleton
+SaveableService ..|> ISaveable
+SaveableService ..> SaveRegistry : 注册与注销
+Pipeline ..> Contracts : 两层共用契约
+Gameplay ..> Pipeline : 互引命名空间
+
+
+
+
+
+legend bottom left
+  + 公开成员与 Inspector 序列化字段　- 私有成员　# protected
+  
+  **初始化次序**
+  一、场景 Awake 注册 YSingleton 实例，随后回调 OnSingletonInitialized；契约层 1 处、管线层 4 处、
+  玩法层 2 处重写该钩子。
+  二、跨单例订阅在 OnEnable 与 Start 各调一次，先判 Instance 是否为空，兜住初始化先后之差。
+  三、跨单例协作的另一种兜底是窗口标志位：SceneChanger.isLoading 与 SaveSystem.IsLoadingSaveRequest
+  。
+  四、每局进播放前清空静态表：SaveRegistry.ResetStatics 与 PersistentSceneRegistry.Reset。
+  五、CameraPixelSnap 取 DefaultExecutionOrder 10000，在渲染收尾阶段执行。
+  **三层按变化原因切分**
+  Contracts 放跨域共享的接口、基类与枚举，Pipeline 放与具体玩法无关的引擎级基建，Gameplay 按玩法域平铺九个目录。
+  依赖方向单向：契约层反向引用管线层或玩法层为 0 处，管线层与玩法层之间只有 PlayerStatsSO 引用 PlayerStatsData 这一条反
+  向 using。
+  产品代码 124 个文件里 13 个带 namespace，其余落在全局命名空间，全工程没有 asmdef，产品代码同在一个程序集里。
+  玩家数值线是九个玩法域里唯一的 MVCS 四层结构，其余域是整体 Manager 形态。
+  管线层与玩法层之间只有一条反向 using（Pipeline 声明的个别类型引用玩法层的配置资产），方向不单独画线。
+  管线层与玩法层都通过 YSingleton 与跨域接口使用契约层，包间只画一条「两层共用契约」。
+end legend
+@enduml

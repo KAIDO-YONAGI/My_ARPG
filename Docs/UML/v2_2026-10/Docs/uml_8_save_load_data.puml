@@ -1,0 +1,250 @@
+@startuml SaveLoad_Data
+scale 2
+!theme plain
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam defaultFontName "Microsoft YaHei"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam Class {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassAttribute {
+  FontName "Microsoft YaHei"
+}
+skinparam ClassStereotype {
+  FontName "Microsoft YaHei"
+  FontColor Black
+}
+skinparam nodesep 16
+skinparam ranksep 22
+
+title 存档与读档
+caption v2_2026-10 · 存档身份 / 落盘结构
+
+left to right direction
+
+package "存档参与者" {
+  class Loot <<场景组件>> {
+    + item : ItemSO
+    + quantity : int
+    + canBePick : bool
+    + hasBeenPicked : bool
+    + Initialize(item : ItemSO, quantity : int) : void
+    + GetDataID() : SaveDefinition
+    + SaveData(data : SaveData) : void
+    + LoadData(data : SaveData) : void
+      RegisterSelf() : void
+      AssignNewIdentity() : void
+  }
+
+  class StatsService <<单例>> {
+    + SaveData(data : SaveData) : void
+    + LoadData(data : SaveData) : void
+  }
+}
+
+package "存档契约" {
+  interface ISaveable {
+    + GetDataID() : SaveDefinition
+    + RegisterSaveable() : void
+    + UnRegisterSaveable() : void
+    + SaveData(data : SaveData) : void
+    + LoadData(data : SaveData) : void
+  }
+
+  class SaveableService<T> <<抽象基类>> {
+    + GetDataID() : SaveDefinition
+    + SaveData(data : SaveData) : void
+    + LoadData(data : SaveData) : void
+  }
+
+  class SaveDefinition <<场景组件>> {
+    + persistentType : PersistentType
+    + ID : string
+      OnValidate() : void
+  }
+
+  enum PersistentType {
+    ReadWrite
+    DontPersist
+  }
+
+  class SaveRegistry <<静态类>> {
+    + All : IReadOnlyList<ISaveable>
+    + Add(saveable : ISaveable) : void
+    + Remove(saveable : ISaveable) : void
+    + Clear() : void
+      ResetStatics() : void
+  }
+}
+
+package "保存面板" {
+  class SaveLoadCanvasManager {
+    + toggleSaveLoadCanvasEvent : ToggleCanvasEventSO
+    + saveLoadButtonGroups : List<SaveLoadButtonGroup>
+      saveType : SaveType
+      isPanelOpen : bool
+    + OnClickSave(group : SaveLoadButtonGroup) : void
+    + OnClickLoad(group : SaveLoadButtonGroup) : void
+    + OpenPanel() : void
+    + ClosePanel() : void
+      LoadInfoToSaveList() : void
+  }
+
+  class SaveLoadButtonGroup <<可序列化>> {
+    + saveInfo : SaveInfo
+    + saveInfoText : TMP_Text
+    + saveButton : Button
+    + loadButton : Button
+  }
+
+  class SaveInfo <<可序列化>> {
+    + savePath : string
+    + saveType : SaveType
+  }
+}
+
+package "读写编排" {
+  together {
+  class SaveSystem <<单例>> {
+    + IsLoadingSaveRequest : bool
+    + dataSavedEvent : DataSaveEventSO
+    + OnSaveEvent(saveType : SaveType) : void
+    + WriteSave(saveType : SaveType) : string
+    + DeleteSave(savePath : string) : bool
+    + LoadSave(saveType : SaveType, savePath : string) : bool
+    + GetLatestLoadableSavePath(saveType : SaveType) : string
+    + GetSavesPath(saveType : SaveType) : string[]
+      IsLoadableSaveFile(saveFile : string) : bool
+      GetScene(data : SaveData) : GameSceneSO
+  }
+
+  class SaveDataManager <<单例>> {
+    + GetData : SaveData
+    + dataSavedEvent : DataSaveEventSO
+    + sceneLoadEventSO : SceneLoadEventSO
+    + sceneLoadedEvent : SceneLoadedEventSO
+      dataToSave : SaveData
+      lastSceneType : SceneType
+    + PrepareManualSaveData() : bool
+    + LoadFromData(data : SaveData) : void
+    + RemoveLootRegistration(lootId : string) : void
+      OnAutoSave(scenesToLoadSO : List<GameSceneSO>, pos, isToFade) : void
+      OnAutoLoad() : void
+  }
+
+  class DynamicDataHandler <<静态类>> {
+    + PrepareForNewGameLoad(data : SaveData) : void
+    + ClearDynamicData(data : SaveData) : void
+  }
+
+  class DataSaveEventSO <<事件通道>>
+  class SceneLoadEventSO <<事件通道>>
+  class SceneLoadedEventSO <<事件通道>>
+  }
+}
+
+package "存档数据" {
+  class SaveFile {
+    + saveInfo : SaveMetaData
+    + data : SaveData
+  }
+
+  class SaveMetaData {
+    + saveID : string
+    + saveType : SaveType
+  }
+
+  class SaveData {
+    + lootsStatsDic : Dictionary<string, LootStatus>
+    + sceneIDAndPlayerPos : SceneAndPosition
+    + playerStatsData : PlayerStatsData
+  }
+
+  class LootStatus <<可序列化>> {
+    + position : SerializableVector3
+    + hasBeenPicked : bool
+    + moved : bool
+  }
+
+  class SceneAndPosition <<可序列化>> {
+    + sceneID : string
+    + position : SerializableVector3
+  }
+
+  class SerializableVector3 <<可序列化>> {
+    + x : float
+    + y : float
+    + z : float
+    + ToVector3() : Vector3
+  }
+
+  enum SaveType {
+    SystemSave
+    PlayerSave
+  }
+
+  class PlayerStatsData <<存档传输格式>>
+}
+
+package "场景反查" {
+  class SceneDataForSave <<单例>> {
+    + gameScenes : List<GameSceneSO>
+  }
+
+  class GameSceneSO <<配置资产>> {
+    + SaveKey : string
+  }
+
+  class SceneChanger <<单例>>
+}
+
+"存档参与者" -[hidden]- "保存面板"
+"存档契约" -[hidden]- "读写编排"
+"存档数据" -[hidden]- "场景反查"
+
+Loot ..|> ISaveable
+StatsService --|> SaveableService
+SaveableService ..|> ISaveable
+SaveDefinition ..> PersistentType : 持久化模式
+"存档参与者" ..> "存档契约" : 注册与取组件
+SaveableService ..> SaveRegistry : 注册与注销
+"读写编排" ..> "存档契约" : 遍历注册表
+SaveDataManager ..> DataSaveEventSO : 广播系统存档
+SaveDataManager ..> SceneLoadEventSO : 订阅自动存档
+SaveDataManager ..> SceneLoadedEventSO : 订阅自动回灌
+SaveDataManager ..> DynamicDataHandler : 新局与切场时调用
+SaveDataManager *-- SaveData : dataToSave
+SaveSystem ..> DataSaveEventSO : 订阅保存确认
+SaveSystem ..> SaveDataManager : LoadFromData 全量分发
+SaveSystem *-- SaveFile : 落盘结构
+"读写编排" ..> "场景反查" : 反查与切场
+"保存面板" ..> "读写编排" : 手动存读
+SaveLoadCanvasManager o-- SaveLoadButtonGroup : 26 个槽位
+SaveLoadButtonGroup *-- SaveInfo : 槽位路径
+SaveFile *-- SaveMetaData
+SaveFile *-- SaveData
+SaveMetaData ..> SaveType : 存档类别
+SaveData *-- LootStatus : 掉落物条目
+SaveData *-- SceneAndPosition : 场景与坐标
+SaveData ..> PlayerStatsData : 数值段
+LootStatus *-- SerializableVector3 : 位置
+SceneAndPosition *-- SerializableVector3 : 位置
+SceneDataForSave o-- GameSceneSO : 反查表
+"读写编排" ..> "存档数据" : 清理与回灌
+
+legend right
+  + 公开成员与 Inspector 序列化字段　- 私有成员
+
+  落盘目录是 Application.persistentDataPath，文件名是 {saveType}_{saveID}.json，saveID 取时间戳
+  yyyyMMdd_HHmmss_fff。
+  序列化用 Newtonsoft 的 JsonConvert，JSON 键名等于公有字段名；加字段安全，缺字段取默认值。
+  系统档由自动存档写出，手动档只由保存面板写出，两者互不覆盖，Continue 只认系统档。
+  读档顺序固定为 LoadFromData 分发、GetScene 反查、置 IsLoadingSaveRequest、RequestSceneLoad、
+  复位标志位。
+  坏档回退按文件名升序取最新的可加载档，可加载要求数值段与场景反查都成立。
+end legend
+@enduml
