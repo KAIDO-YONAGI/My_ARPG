@@ -29,6 +29,7 @@ A 2D top-down ARPG prototype built with Unity 2022.3.62f3c1 — a complete, even
 - [Project Structure](#project-structure)
 - [Core System Architecture](#core-system-architecture)
 - [Layered Architecture](#layered-architecture)
+- [Multi-Agent Workflow](#multi-agent-workflow)
 - [Build Guide](#build-guide)
 - [ScriptableObject Usage Tips](#scriptableobject-usage-tips)
 - [Known Limitations](#known-limitations)
@@ -144,6 +145,10 @@ The project uses a lightweight MVCS split: a Model holds one data aggregate's st
 This project's migration status, confirmed defects, unimplemented designs, and per-system conventions live in [`Y_MultipleAgentWorkflow/`](Y_MultipleAgentWorkflow/Router.md): the root Router is the entry point, layering boundaries are in `Architecture/Layering/Layering_Guide.md`, composition and initialization order in `Architecture/Composition/Composition_Guide.md`, and every gameplay, scene, asset, save, and build domain has its own Router and Guide. The historical baseline docs (the refactor checklists formerly indexed under `Docs/`) are no longer the current authority.
 
 > **Project status: the layered refactor is frozen.** The player stats line is organized in four layers; quests, dialogue, inventory and shops, save and scene orchestration, and movement, combat, and pathfinding keep their original Manager form. The skill domain is the retained verification point: skill points belong to the stats aggregate while spending happens in the skill aggregate, so it is the only place in this project where the rule that a single write atomically changes two data aggregates can be verified.
+
+## Multi-Agent Workflow
+
+The multi-agent collaboration workflow used in this project is the **author's own** workflow, kept in a standalone repository: [KAIDO-YONAGI/Y_MultipleAgentWorkflow](https://github.com/KAIDO-YONAGI/Y_MultipleAgentWorkflow) — reusable multi-agent workflow configuration, concurrency leases, and multi-client skill distribution. The [`Y_MultipleAgentWorkflow/`](Y_MultipleAgentWorkflow/Router.md) directory here is this project's instance of it and is versioned with the project; the configuration method is documented in [`Workflow_Configuration_Guide.md`](Y_MultipleAgentWorkflow/Workflow_Configuration_Guide.md).
 
 ## Build Guide
 

@@ -29,6 +29,7 @@
 - [项目结构](#项目结构)
 - [核心系统架构](#核心系统架构)
 - [分层架构与重构现状](#分层架构与重构现状)
+- [多 Agent 工作流](#多-agent-工作流)
 - [构建指南](#构建指南)
 - [ScriptableObject 使用建议](#scriptableobject-使用建议)
 - [已知限制](#已知限制)
@@ -144,6 +145,10 @@
 本工程的迁移现状、已确认缺陷、未实施设计与各系统约定收在 [`Y_MultipleAgentWorkflow/`](Y_MultipleAgentWorkflow/Router.md)：入口是根 Router，分层边界见 `Architecture/Layering/Layering_Guide.md`，组合与初始化时序见 `Architecture/Composition/Composition_Guide.md`，各玩法域与场景、资源、存档、构建各有自己的 Router 与 Guide。历史基线文档（`.codegraph`、原 `Docs/` 索引所述的重构清单）已不再作为现行权威。
 
 > **项目状态：分层重构已冻结。** 玩家数值线按四层组织；任务、对话、背包与商店、存档与场景编排、移动战斗寻路保留原有的 Manager 形态。技能域是保留的验证点：技能点属于数值聚合，消耗发生在技能聚合，「一次写要原子地改动两个数据聚合」这条准则在本工程只有它能验证。
+
+## 多 Agent 工作流
+
+本工程使用的多 Agent 协作工作流为**作者自研**，独立仓库：[KAIDO-YONAGI/Y_MultipleAgentWorkflow](https://github.com/KAIDO-YONAGI/Y_MultipleAgentWorkflow)——可复用的多 Agent 工作流配置、并发租约与多客户端 Skill 分发。工程内的 [`Y_MultipleAgentWorkflow/`](Y_MultipleAgentWorkflow/Router.md) 是它在本工程的实例，与工程一起版本管理；配置方法见 [`Workflow_Configuration_Guide.md`](Y_MultipleAgentWorkflow/Workflow_Configuration_Guide.md)。
 
 ## 构建指南
 
