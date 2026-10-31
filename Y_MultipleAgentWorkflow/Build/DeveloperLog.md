@@ -3,6 +3,21 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-05 单元测试目录约定
+
+**写入的文件**
+
+- `TestBaseline_Guide.md`（`BUILD-TESTBASELINE-GUIDE`，Active）：§3.1 增加「新增单元测试统一放在 `Assets\Tests\Editor\`，命名空间用 `Gameplay.Tests`」，§1 线索表加入 `新增单元测试` / `测试放哪`，指向 §3.1。
+
+**依据的证据路径**
+
+- `Assets\Tests\Editor\` 下的 5 个测试文件；执行侧入口 `..\Workflow\Project_Validation_Guide.md` §3 C12。
+
+**已核验**
+
+- 测试目录下 5 个文件、0 个 asmdef，命名空间均为 `Gameplay.Tests`，与 §2.1 一致。
+- 删除旧包后 `Builds\Android\` 只剩 `My_ARPG-release.apk`。
+
 ## 2026-10-05 建立 Build 域权威文档
 
 **写入的文件**
@@ -29,18 +44,3 @@ maintenance count changes here.
 - 全仓检索 `-buildTarget` / `-executeMethod` / `BuildPipeline.` / `BuildPlayerOptions` 均无命中；唯一命中为 `-runTests -testPlatform EditMode`。
 
 **维护计数**：`0/5` → 本轮为首次建立，未触发维护周期变更。
-
-## 2026-10-05 单元测试目录约定
-
-**写入的文件**
-
-- `TestBaseline_Guide.md`（`BUILD-TESTBASELINE-GUIDE`，Active）：§3.1 增加「新增单元测试统一放在 `Assets\Tests\Editor\`，命名空间用 `Gameplay.Tests`」，§1 线索表加入 `新增单元测试` / `测试放哪`，指向 §3.1。
-
-**依据的证据路径**
-
-- `Assets\Tests\Editor\` 下的 5 个测试文件；执行侧入口 `..\Workflow\Project_Validation_Guide.md` §3 C12。
-
-**已核验**
-
-- 测试目录下 5 个文件、0 个 asmdef，命名空间均为 `Gameplay.Tests`，与 §2.1 一致。
-- 删除旧包后 `Builds\Android\` 只剩 `My_ARPG-release.apk`。

@@ -3,6 +3,12 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-31 属性面板预制体与闲置缓存
+
+新增 Pipeline.UI.Runtime 的 CachedUIView / UIViewCache；UIManager 组合预制体注册与闲置 LRU，复用既有输入和焦点栈。更新组合契约与分层统计。
+
+Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `2/5`。
+
 ## 2026-10-05 建立 Architecture 域中文 Router 与两个子域权威文档
 
 - 任务：为 Architecture 域重写中文模板 Router，并建立 `Composition` 与 `AssemblyPlan` 两个子域的权威文档与子 Router；`Composition` 状态 Active，`AssemblyPlan` 状态 Proposal。
@@ -18,10 +24,3 @@ maintenance count changes here.
   - 程序集与热更：事件通道 SO 类型族；`SkillManager` 的 `skillName` 分派、`UseItem` 的 `ApplyItemEffects` 分派、`PlayerMovement` 的 `playerState` 分派。
 - 本轮核对的静态事实：具体单例 19 个加抽象基类 1 个；`DefaultExecutionOrder` 全工程 1 处，工程设置中没有脚本执行顺序配置；`RuntimeInitializeOnLoadMethod` 2 处；`ICanvasManager` 实现者 10 个；`OnSingletonInitialized` 重写点 6 个；全工程 asmdef 数为 0；无 xLua 与 Lua 资产，`LuaManager` 类型未定义；事件类 11 个、通道 12 条、事件资产 28 个。
 - 维护计数：`0/5 -> 1/5`
-
-
-## 2026-10-31 属性面板预制体与闲置缓存
-
-新增 Pipeline.UI.Runtime 的 CachedUIView / UIViewCache；UIManager 组合预制体注册与闲置 LRU，复用既有输入和焦点栈。更新组合契约与分层统计。
-
-Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `2/5`。

@@ -67,9 +67,9 @@
 
 ### 2.6 订阅惯例与画布
 
-- 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`：`InventoryManager` 订 3 条，`ShopManager` 订 4 条，`BackpackCanvasManager` 订 3 条；场景加载事件统一用来复位画布。
-- 面板显隐走 `ICanvasManager` 的默认实现，并把状态上报 `UIManager`。`ShopManager` 与 `BackpackCanvasManager` 都实现该接口，并把 `ToggleCanvasEvent`、`SceneLoadedEvent` 暴露出去供 `UIManager` 注册。
-- 面板内部控件取父级商店的方式是 `[SerializeField] Component shopRef` 加 `as IShopInteractable`，因为接口无法序列化；引用为空时打 `Debug.LogError`。`ShopSlot` 与 `ShopCategoryToggles` 都走这条路。
+- 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`；场景加载事件统一用来复位画布。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 统一订阅。
+- 面板显隐分两条路：`BackpackCanvasManager` 仍实现 `ICanvasManager`，把 `ToggleCanvasEvent`、`SceneLoadedEvent` 暴露给 `UIManager`；商店界面由 `ShopCanvasView`（继承 `CachedCanvasView`，预制体 `ShopCanvas.prefab`）承担，登记在 `UICacheManager.views`，打开前用 `CanOpenFromView` 判断有无店主。
+- 面板内部控件由 `ShopCanvasView` 注入数据：`ShopSlot` 与 `ShopCategoryToggles` 不持 `shopRef`，也不做 `IShopInteractable` 转换；管理器对外暴露 `State` 与买卖命令。
 - `InventorySlot` 直接走 `ShopManager.Instance`。
 - 商店头像相机订阅同一 `ShopKeeperEventSO`，无 keeper 时按 `hideWhenNoShopKeeper` 关闭 Camera，`LateUpdate` 跟目标偏移。
 - 悬停信息面板只读 `ItemSO` 的展示字段与五个数值字段，负数与零不显示。

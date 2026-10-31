@@ -18,6 +18,14 @@
 
 第 2 项与本目录文档冲突时，以当前工作区的代码与资源为准，并立即修正文档。
 
+## 必须先读的规则
+
+**`RULES.md`（文档 ID `RULES`）是本工程的协作规则，位于本文件同目录。** 开始任何分析、
+写作或改代码之前先读它，并在全过程遵守。它约束 `Y_MultipleAgentWorkflow/` 下全部 Guide、
+Router、DeveloperLog，以及项目根的 `AGENTS.md` 与 `CLAUDE.md`。
+
+本文件与各业务 Router 只负责"知识在哪"，规则内容一律引用 `RULES.md`，本文件不复制。
+
 ## 业务路由
 
 | 业务根 | Router |
@@ -32,12 +40,13 @@
 
 ## 必读起点
 
-1. 先经本文件路由。
-2. 读 `Workflow\Concurrency_Guide.md`。
-3. 用 `Workflow\Scripts\WorkingAgent.ps1` 取得精确租约。
-4. 租约状态显示重叠任务、且客户端支持原生 Agent 通信时，编辑前先通知该任务。
-5. 只读被路由到的 Guide/Design、Router 和必要证据。
-6. 成功、失败或取消都要释放租约；客户端支持原生通信时，释放后再通知等待中的任务。
+1. 先读 `RULES.md`，全程遵守本工程的协作规则。
+2. 经本文件路由到对应业务根。
+3. 读 `Workflow\Concurrency_Guide.md`。
+4. 用 `Workflow\Scripts\WorkingAgent.ps1` 取得精确租约。
+5. 租约状态显示重叠任务、且客户端支持原生 Agent 通信时，编辑前先通知该任务。
+6. 只读被路由到的 Guide/Design、Router 和必要证据。
+7. 成功、失败或取消都要释放租约；客户端支持原生通信时，释放后再通知等待中的任务。
 
 ## 项目验证
 
@@ -76,6 +85,7 @@
 | 文档 ID | 路径 | 状态 |
 |---|---|---|
 | `ROOT-ROUTER` | `Router.md` | Active |
+| `RULES` | `RULES.md` | Active |
 | `ENTRY-AGENTS` | `..\AGENTS.md` | Active |
 | `ENTRY-CLAUDE` | `..\CLAUDE.md` | Active |
 | `WF-CONFIG-METHOD` | `Workflow_Configuration_Guide.md` | Active |

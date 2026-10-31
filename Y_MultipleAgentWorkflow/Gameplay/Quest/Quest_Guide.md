@@ -20,11 +20,11 @@
 
 ### 2.1 状态机与面板（`QuestManager`）
 
-`QuestManager : YSingleton<QuestManager>, ICanvasManager` 是任务域唯一管理者，同时持有 UI 引用、事件资产与进度数据。
+`QuestManager : YSingleton<QuestManager>` 是任务域唯一管理者，只持进度数据与事件资产、不持 UI 引用；任务板界面在 `QuestCanvasView`（预制体 `QuestCanvas.prefab`），由 `UICacheManager` 按需创建。对外暴露 `CanOpenBoard`、`CurrentBoardQuests`、`CurrentQuest`、`CurrentQuestState` 与 `State`，视图按脏标记拉取。
 
 状态枚举 `QuestState { Idle, Accepted, Decline, IsToComplete, Completed }` 依次取值 0 到 4，管理器的状态字段初值为 `Idle`。
 
-写入口是 `QuestStateChanged(QuestSO, QuestState)`，流程固定为：未注册的任务直接返回；先关闭 accept、decline、complete 三个 CanvasGroup；写入 `questProgress[quest].questState`；按状态点亮按钮组；调用 `RefreshObjectiveProgress(quest)` 与 `questLogPanel.DisPlayObjectives()`。
+写入口是 `QuestStateChanged(QuestSO, QuestState)`，流程固定为：未注册的任务直接返回；写入 `questProgress[quest].questState`，当前任务同步 `currentQuestState`；由非完成态首次转 `Completed` 时发奖 `RaiseRewardEvent`；调用 `RefreshObjectiveProgress(quest)` 重算目标；最后 `MarkDirty()` 把 `State` 的各项标记为脏，按钮组与槽位由视图刷新。
 
 各状态点亮的 CanvasGroup：
 
@@ -46,7 +46,7 @@
 
 `Decline`、`IsToComplete`、`Completed` 的具体取值由常驻场景里的三个 `QuestOptionsButton` 实例决定，`questStateToShift` 分别覆盖为 1、2、4；`QuestOptionsButton` 预制体的默认值是 0。没有任何按钮写入 0 或 3。
 
-面板开关与焦点：`ToggleCanvasEvent` 取 `toggleQuestEvent`，`SceneLoadedEvent` 取 `sceneLoadedEvent`；`OnToggleQuest` 忽略开启态，开启只认任务板的 `openQuestEventSO`，关闭态调用 `CloseQuestBoard()`；`OnFocus` 在面板已开时刷新排序；切场景调用 `CloseQuestBoard()`；`ToggleCanvas` 走 `ICanvasManager` 默认实现。私有方法 `SetCanvaState` 只改 CanvasGroup 的显隐、可交互与射线拦截三项，用于 accept、decline、complete、details、prompt 这些子面板，不上报 UIManager。
+面板开关与焦点：`QuestCanvasView.CanOpen()` 用 `CanOpenBoard` 拒绝无任务可展示时的打开；打开时调 `OnCachedViewOpened()`、关闭时调 `OnCachedViewClosed()`；`QuestManager` 自己仍订阅 `openQuestEventSO` 与 `sceneLoadedEvent`，切场景调用 `CloseQuestBoard()`。ESC、互斥与排序由 `UIManager` 的焦点栈统一处理。
 
 `CloseQuestBoard()` 会把 `currentBoardLoadQuests` 与 `currentQuest` 置空；任务板用 `IsDisplayingQuestBoard(quests)` 做引用相等判定，避免关掉别人的面板。
 
@@ -54,7 +54,7 @@
 
 进度存在 `QuestManager` 的内存字典里。`QuestProgressData` 是 `QuestManager` 的私有嵌套类，成员为 `questState` 与 `Dictionary<QuestObjective,int> questObjectives`，构造函数按目标列表把每个目标初值置 0。所有实例存在 `Dictionary<QuestSO, QuestProgressData> questProgress` 中，惰性注册且不覆盖已有进度。
 
-`QuestSO.QuestObjective.currentAmount` 字段仍序列化在资产上，全工程无代码读写，`QuestSO` 的注释把它标为遗留字段；代码只读写 `questProgress`。
+进度只存在 `questProgress` 中。
 
 进度重算只有 `UpdateObjectiveProgress` 一处实现，按目标类型取值：`targetItem` 非空时取 `ItemHistoryManager.Instance.GetItemQuantity(targetItem)`；否则当 `targetCharacter` 非空且 `ConversationHistoryManager.Instance.HasChatedWith(targetCharacter)` 为真时直接记满 `requiredAmount`。`targetLocation` 没有分支，位置类目标进度恒为 0。`RefreshObjectiveProgress` 在任务已 `Completed` 时整体跳过，否则逐目标调用；它只被 `QuestStateChanged` 调用，物品拾取与对话结束都不驱动它。
 
@@ -86,13 +86,13 @@
 - `HandleQuestClicked(quest)`：记 `currentQuest`、调 `QuestManager.OpenQuest(quest)`、写标题与描述、调 `DisplayRewards()`。
 - `DisPlayObjectives()` 逐槽取 `GetCurrentObjAmount` 与 `GetProgressText`，超出数量的槽位 `SetActive(false)`；`DisplayRewards()` 用 `reward.rewardItem.icon` 与数量。
 
-`QuestManager` 的 `questLogPanel`、`questLogSlots`、accept 与 decline 与 complete 三组 CanvasGroup、主画布都接在常驻场景的同一组件上，其中 `questLogSlots` 为 6 个槽位。
+`QuestCanvasView` 在 `Awake` 里用 `GetComponentInChildren` / `GetComponentsInChildren` 抓取 `questLogPanel`、全部 `QuestLogSlot` 与五个 `CanvasGroup`（按名字 `Accept`、`Decline`、`Complete`、`QuestDetails`、`NoQuestsText` 匹配），接线全在预制体内部。
 
 ### 2.5 槽位视图
 
-`QuestLogSlot : MonoBehaviour`：`Awake` 缓存 `CanvasGroup` 并复位，`SlotCanvas` 对外暴露；`SetQuest` 写名字与等级文本，复位后激活；`SetQuestActive(false)` 会清 `currentQuest`；`ResetSlotState` 把 alpha、interactable、blocksRaycasts 全置真；点击转给面板的 `HandleQuestClicked`。`QuestManager.InitiateQuestSlots` 先全量 `SetQuestActive(false)`，再按数量 `SetQuest`，最后给已完成任务套 `SetQuestSlotToDoneState`。`OnValidate` 在编辑器里执行 `SetActive(false)`。
+`QuestLogSlot : MonoBehaviour`：`Awake` 缓存 `CanvasGroup` 并复位，`SlotCanvas` 对外暴露；`SetQuest` 写名字与等级文本，复位后激活；`SetQuestActive(false)` 会清 `currentQuest`；`ResetSlotState` 把 alpha、interactable、blocksRaycasts 全置真。槽位填充搬到视图：`QuestCanvasView.RefreshIfDirty` 先全量 `SetQuestActive(false)`，再按数量 `SetQuest`，已完成的任务调 `SetCompletedState()`。`OnValidate` 在编辑器里执行 `SetActive(false)`。
 
-`SetQuestSlotToDoneState` 把 `currentQuest` 等于该任务的槽位置为 alpha 0.2、interactable 假、blocksRaycasts 假，这是当前唯一的已完成不可再点保护。
+`QuestLogSlot.SetCompletedState()` 把槽位置为 alpha 0.2、interactable 假、blocksRaycasts 假，这是当前唯一的已完成不可再点保护。
 
 `QuestObjectiveSlot.RefreshObjectives` 写说明与进度文本，完成时整体转灰；`QuestRewardsSlot.DisplayReward` 写图标与数量。
 

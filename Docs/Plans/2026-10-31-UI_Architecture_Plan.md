@@ -16,7 +16,7 @@
 
 LRU 用字典配合双向链表实现：字典定位实例，链表维护使用顺序。正在显示的界面不参与淘汰；常驻 HUD 单独保留。首版按闲置实例数量限制缓存，资源加载先使用 Prefab 直接引用。
 
-**已落地：** `UIManager.cachedViewPrefabs` 登记预制体，`UIViewCache` 按事件资产的 `CanvasToToggle` 创建和复用实例。属性面板已提取为 `Assets/Prefabs/UI/Runtime/StatsPanel.prefab`；常驻场景通过 `RuntimeViews` 承载实例。`maxIdleViews` 默认 3，设为 0 则关闭即销毁；切场景时清空缓存。直接引用的 Prefab 及其贴图等资源仍然保留，淘汰仅销毁界面实例。
+**已落地：** `UIManager.cachedViewPrefabs` 登记预制体，`UIViewCache` 按事件资产的 `CanvasToToggle` 创建和复用实例。属性面板已提取为 `Assets/Prefabs/UI/Runtime/StatsCanvas.prefab`；常驻场景通过 `RuntimeViews` 承载实例。`maxIdleViews` 默认 3，设为 0 则关闭即销毁；切场景时清空缓存。直接引用的 Prefab 及其贴图等资源仍然保留，淘汰仅销毁界面实例。
 
 项目现有 `ObjectPool<T>` 适合重复借还同一种对象；界面缓存还要处理界面身份、显示状态和淘汰顺序，因此单独实现。关闭后的 View 停止刷新，任务进度、背包内容等业务数据继续由业务层持有。
 
@@ -47,7 +47,7 @@ LRU 用字典配合双向链表实现：字典定位实例，链表维护使用�
 
 ## 4. 界面内部分工
 
-MVC 把模型、显示、控制分开；MVP 进一步由 Presenter 协调数据和 View；MVVM 则通过属性与命令绑定驱动显示。本项目已有 `PlayerStatsModel → StatsPanelController → StatsPanelView`，继续沿用这套方式即可。
+MVC 把模型、显示、控制分开；MVP 进一步由 Presenter 协调数据和 View；MVVM 则通过属性与命令绑定驱动显示。本项目已有 `PlayerStatsModel → StatsCanvasController → StatsCanvasView`，继续沿用这套方式即可。
 
 | 层 | 负责什么 | 项目中的例子 |
 |---|---|---|
@@ -63,7 +63,7 @@ MVC 把模型、显示、控制分开；MVP 进一步由 Presenter 协调数据�
 
 | 顺序 | 改动 | 做完应看到什么 |
 |---|---|---|
-| 1. 属性面板 | 提取 Stats Prefab，增加注册与缓存；调整 StatsPanelView/Controller 的绑定生命周期 | 关闭再开复用实例；淘汰后重建仍显示当前属性 |
+| 1. 属性面板 | 提取 Stats Prefab，增加注册与缓存；调整 StatsCanvasView/Controller 的绑定生命周期 | 关闭再开复用实例；淘汰后重建仍显示当前属性 |
 | 2. 确认弹窗 | 增加 ModalRoot、实例栈和通用确认框，接入 UIManager 的输入与切场流程 | 两个弹窗可以嵌套，只有栈顶可操作，关闭后恢复下层 |
 | 3. 循环容器 | 实现共用的可见区计算与 cell 池，再提供列表和网格入口 | 1,000 条数据也只创建视口附近的节点，滚动不串数据 |
 | 4. 任务列表 | 用 Controller 适配任务数据，替换固定 QuestLogSlot 数组的显示流程 | 超出原槽位数量仍可浏览；完成态随复用正确恢复 |

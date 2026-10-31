@@ -3,6 +3,19 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-31 面板迁出后复核单例与画布契约
+
+- §2.6：`ICanvasManager` 实现者 9 → 6，`DialogManager`、`QuestManager`、`ShopManager` 与 `SkillTreeManager` 已迁出。
+- §2.7 重写：缓存改由 `UICacheManager` 持有（`prefab + anchor` 注册、闲置超时 120 秒），`UIManager` 只转发。
+- §2.3.1：`OnSingletonInitialized` 重写点 6 → 5。
+- §3.6：缓存界面登记位置改为 `UICacheManager.views`。
+
+## 2026-10-31 属性面板预制体与闲置缓存
+
+记录 UIManager 的双注册入口、CachedUIView 打开/关闭生命周期、闲置 LRU 与切场清理；Stats 为首个预制体样例，无新增单例。
+
+Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `1/5`。
+
 ## 2026-10-05 建立 组合与初始化时序 权威文档
 
 - 任务：为 Architecture.Composition 建立权威 Guide，覆盖单例清单与预算、初始化时序三套手写解法、唯一执行序属性、`SaveRegistry` 登记处契约、UI 画布焦点栈契约。
@@ -22,10 +35,3 @@ maintenance count changes here.
   - `OnSingletonInitialized` 重写点 6 处；18 个单例派生类均未重写 `Awake`。
   - `ICanvasManager` 实现者 10 个；全工程 asmdef 数量为 0。
 - 维护计数：`0/5 -> 1/5`
-
-
-## 2026-10-31 属性面板预制体与闲置缓存
-
-记录 UIManager 的双注册入口、CachedUIView 打开/关闭生命周期、闲置 LRU 与切场清理；Stats 为首个预制体样例，无新增单例。
-
-Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `1/5`。

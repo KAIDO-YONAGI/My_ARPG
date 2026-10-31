@@ -3,6 +3,12 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-31 技能界面迁入缓存预制体
+
+- `SkillTreeManager` 不再持 `skillSlots` 与 `pointsText`，改为 `SkillState` 存取 + `State` 脏标记；界面被淘汰前由 `SkillsCanvasView` 触发保存。
+- 槽位规模更正：24 个 `SkillSlot`（23 个 `MaxHealthBoost`、1 个 `CombatUnlock`）现在位于 `SkillsCanvas.prefab`，由视图 `GetComponentsInChildren` 抓取。
+- `SkillSlot` 自己在 `OnEnable` 绑定 `TryUpgradeSkill`，不再依赖管理器挂回调。
+
 ## 2026-10-05 建立 技能树 权威文档
 
 - 任务：为 `Gameplay.Skills` 建立当前实现的事实性权威文档，并按项目中文模板重写 Router。

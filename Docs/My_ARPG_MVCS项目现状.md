@@ -20,11 +20,11 @@
 | `Gameplay/Player/Services/StatsService.cs` | Service | 私有持有 `PlayerStatsModel`；对外暴露 `IPlayerStatsReadOnly Stats` 与薄写转发，负责 `Respawn()`、存档注册/注销和读写生命周期 |
 | `Gameplay/Player/Controllers/ExperienceController.cs` | Controller | 纯 C#；经构造注入订阅 `EnemyDefeated` 通道与 `ExpChanged`，推经验条数据；由 `ExperiencePanelView` 托管 |
 | `Gameplay/Player/Controllers/HealthController.cs` | Controller | 纯 C#；订阅 `HealthChanged`，推血量文本；由 `HealthView` 托管 |
-| `Gameplay/Player/Controllers/StatsPanelController.cs` | Controller | 纯 C#；订阅 `StatsChanged`，推属性面板；由 `StatsPanelView` 托管 |
+| `Gameplay/Player/Controllers/StatsCanvasController.cs` | Controller | 纯 C#；订阅 `StatsChanged`，推属性面板；由 `StatsCanvasView` 托管 |
 | `Gameplay/Player/Controllers/PlayerDamageController.cs` | Controller | 输入侧；订阅 `PlayerDamaged` 广播，扣血、击退、死亡编排 |
 | `Gameplay/Player/Views/ExperiencePanelView.cs` | View | 经验条与等级文本的场景组件，持击杀通道的序列化引用，托管 `ExperienceController` |
 | `Gameplay/Player/Views/HealthView.cs` | View | 血量文本的场景组件，托管 `HealthController` |
-| `Gameplay/Player/Views/StatsPanelView.cs` | View | 属性面板的场景组件，托管 `StatsPanelController`；兼管画布开关/焦点/层级（`ICanvasManager` 是全 UI 共用基建） |
+| `Gameplay/Player/Views/StatsCanvasView.cs` | View | 属性面板的场景组件，托管 `StatsCanvasController`；兼管画布开关/焦点/层级（`ICanvasManager` 是全 UI 共用基建） |
 | `Gameplay/Player/PlayerLocator.cs` | 定位器 | 给存档系统提供玩家坐标 |
 | `Pipeline/SO/PlayerStatsSO.cs` | 配置 | 初始值模板，`CreateInitialData()` 导出拷贝 |
 | `Pipeline/SO/Events/PlayerDamagedEventSO.cs` | 事件通道 | 玩家受击广播：伤害值、攻击者、击退力、眩晕时长 |
@@ -90,7 +90,7 @@ expToUpgrade += ((expToUpgrade / 10) * 10 * expMultiplier) / 4
 | 事件 | 触发时机 | 订阅者 |
 | --- | --- | --- |
 | `HealthChanged` | 血量或上限变化、读档 | `HealthController`（推给 `HealthView`） |
-| `StatsChanged` | 速度、伤害变化、读档 | `StatsPanelController`（推给 `StatsPanelView`） |
+| `StatsChanged` | 速度、伤害变化、读档 | `StatsCanvasController`（推给 `StatsCanvasView`） |
 | `LevelUp` | 结算里产生升级 | `SkillTreeManager` |
 | `ExpChanged` | 加经验结算后、读档后 | `ExperienceController`（推给 `ExperiencePanelView`） |
 | `PlayerDamaged`（SO 事件通道） | 伤害源广播 | `PlayerDamageController` |
@@ -155,7 +155,7 @@ SkillSystemModel（纯C#）：per-skill 等级/解锁、前置依赖图、规则
 **步骤**（按九步流程映射）：
 
 1. `SkillSystemModel`：`Dictionary<skillId, level>` + 解锁集合 + 前置图；规则校验与事件都在写方法里发出。技能点不复制进本模型——它是升级域的货币，`SkillService` 通过 `StatsService.Instance.Stats.SkillPoints` 查询，并通过 `StatsService.UpdateSkillPoints` 写入。
-2. `SkillSO` 继承 `GuidSO` 拿稳定 id（为将来存档铺路；`GuidSO` 在 `Pipeline/SO/`，`CharacterSO` 是现有使用者）；前置依赖图从槽位的场景接线（`preRiquriedForSkillUnlock_List`）挪进 `SkillSO` 资产——依赖关系是配置数据，不是场景接线。
+2. `SkillSO` 继承 `GuidSO` 拿稳定 id（为将来存档铺路；`GuidSO` 在 `Contracts/`，`CharacterSO` 是现有使用者）；前置依赖图从槽位的场景接线（`preRiquriedForSkillUnlock_List`）挪进 `SkillSO` 资产——依赖关系是配置数据，不是场景接线。
 3. `SkillService : YSingleton`（域数据入口，符合单例预算），持 Model，暴露 `TryUpgrade/CanUnlock`。
 4. `SkillSlot` 瘦成纯显示 + 点击转发；`SkillTreeManager` 拆成 View（面板基建+点数文本）+ 纯 C# Controller（订阅模型事件推显示）；`SkillManager` 解体，效果分发进 `SkillEffectApplier`（修 D2）。
 5. `TryUpgrade` 原子完成"校验点数 + 扣减 + 升级"（修 D3）。

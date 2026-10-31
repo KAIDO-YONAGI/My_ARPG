@@ -81,7 +81,7 @@ headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：
 
 ### 2.7 无 PlayMode 测试
 
-52 个用例全为 `[Test]`，见 §2.2；`[UnityTest]` 为 0，仓库中不存在显式的 PlayMode 测试。“进场景 / 场景切换 / 存档往返”这类路径目前靠手工验证，真机冒烟见 `AndroidBuild_Guide.md` §2.7。
+52 个用例全为 `[Test]`，见 §2.2；`[UnityTest]` 为 0，仓库中不存在显式的 PlayMode 测试。“进场景 / 场景切换 / 存档往返”这类路径靠手工验证，真机冒烟见 `AndroidBuild_Guide.md` §2.7。
 
 ## 3. 约定与硬边界
 

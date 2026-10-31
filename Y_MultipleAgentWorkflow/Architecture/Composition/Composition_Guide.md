@@ -18,7 +18,7 @@
 | `执行顺序`、`DefaultExecutionOrder`、`10000` | 本文 §2.4 |
 | `SaveRegistry`、`注册表`、`Domain Reload`、`局间复位` | 本文 §2.5 |
 | `ICanvasManager`、`焦点栈`、`sortingOrder`、`UIManager.Instance` | 本文 §2.6 |
-| `UI 缓存`、`预制体注册`、`UIViewCache`、`LRU` | 本文 §2.7 |
+| `UI 缓存`、`预制体注册`、`UIViewCache`、`UICacheManager`、`Anchor`、`LRU` | 本文 §2.7 |
 | `重试`、`RetryRequestEvent`、`Respawn`、`重载当前场景组` | 本文 §2.3.4 |
 
 ## 2. 当前实现
@@ -63,7 +63,7 @@
 
 #### 2.3.1 统一钩子：`OnSingletonInitialized`
 
-实例注册成功后的初始化统一写在 `OnSingletonInitialized` 钩子里，各类都省去自写 `Awake`。重写点共 6 个：`StatsService` 建模型并调 `base` 注册，`SceneChanger` 设初始位置，`UIManager` 枚举建 `inputState` 并接线焦点栈回调，另有 `IntegratedUICanvasManager`、`AStarNodeManager`、`DialogManager`。
+实例注册成功后的初始化统一写在 `OnSingletonInitialized` 钩子里，各类都省去自写 `Awake`。重写点共 5 个：`StatsService` 建模型并调 `base` 注册，`SceneChanger` 设初始位置，`UIManager` 枚举建 `inputState` 并接线焦点栈回调，另有 `IntegratedUICanvasManager`、`AStarNodeManager`。
 
 #### 2.3.2 可重试订阅：`SkillTreeManager` 式
 
@@ -101,7 +101,7 @@
 
 ### 2.6 UI 画布焦点栈契约
 
-`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 9 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SkillTreeCanvasManager`、`SaveLoadCanvasManager`、`ShopManager`、`DialogManager`、`BackpackCanvasManager`、`QuestManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。`StatsPanelView` 已改由 §2.7 的缓存托管。
+`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 6 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SkillTreeCanvasManager`、`SaveLoadCanvasManager`、`BackpackCanvasManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。`StatsCanvasView` 与对话、任务、商店、技能四个面板由 §2.7 的缓存托管；`DialogManager`、`QuestManager`、`ShopManager`、`SkillTreeManager` 是这些界面的数据侧，不实现该接口。
 
 反向依赖有两处，都在默认实现里直读单例：`SetCanvaState` 末行调静态入口 `UIManager.Report(...)`，该入口集中判空，未注册时静默跳过；`RefreshCanvaOrder` 直读 `UIManager.Instance`，`Instance` 为 null 时静默退化为 `UIManager.DefaultOrder`。`UIManager` 为此保留常量转发与 `GetCanvasOrder` 转发，接口引用保持不变。
 
@@ -109,13 +109,15 @@
 
 ### 2.7 预制体注册与闲置缓存
 
-`UIManager` 组合普通 C# 类 `UIViewCache`，没有新增单例。`cachedViewPrefabs` 直接引用继承 `CachedUIView` 的 Prefab，以其 `ToggleEvent.canvasToToggle` 为唯一 ID；启动只登记，首次打开才实例化。场景中的旧界面继续使用 `toggleCanvasEvents`。事件查找优先取预制体注册表，再取旧列表。
+缓存归 `UICacheManager` 这个独立 MonoBehaviour 单例所有，`UIManager` 只持一个引用并转发开关请求。它是全工程唯一不经 `YSingleton` 的手写单例（`static Instance` 自管），因此不计入 §2.1 的 19 个具体单例。
 
-缓存持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。View 在 `OnOpen` 绑定数据并首刷，在 `OnClose` 退订；关闭后停用整个对象。派生类若重写 `OnDisable`，必须调用基类实现，保证外部停用也能收尾。
+注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasView` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。首次打开才实例化。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
 
-字典定位实例，双向链表按关闭顺序保存闲置实例。重新打开时移出链表，关闭时放到末尾，超出 `maxIdleViews` 就销毁队首；打开中的界面不入链表。默认上限 3，0 表示关闭即销毁。`UIManager.ClearIdleViews()` 仅清理闲置实例；切场请求先关闭全部界面，再清空闲置缓存；管理器销毁时退订并释放缓存。当前直接引用 Prefab，销毁实例不会卸载其引用的资源资产。
+缓存持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。View 在 `OnOpen` 绑定数据并首刷，在 `OnClose` 退订，界面被淘汰前还会调 `OnCacheDestroy` 供派生类保存易失状态（技能树靠它保存等级与解锁）。关闭后停用整个对象；派生类若重写 `OnDisable`，必须调基类实现。
 
-首个接入者是 `StatsPanelView`，注册在常驻场景，实例父节点为 `GamePlayCanvases/RuntimeViews`。热键、ESC、互斥和排序仍走原有 `CanvasFocusStack`。常驻 HUD 未接入缓存。
+淘汰有两条规则：字典定位实例，双向链表按关闭顺序保存闲置实例，超出 `maxIdleViews` 销毁队首；另有 `idleTimeoutSeconds`（默认 120 秒）按关闭时刻清超时实例。打开中的界面不入链表。`UIManager` 打开画布并确认状态后广播 `CanvasOpenedEventSO`，`UICacheManager` 订阅它刷新最近使用序号。切场时先关闭全部界面再清空闲置；管理器销毁时退订并释放缓存。预制体以直接引用方式持有，销毁实例时其引用的资源资产保留在内存中。
+
+常驻场景登记了 6 块界面：`StatsCanvas`、`SkillsCanvas`、`ShopCanvas`、`DialogCanvas`、`QuestCanvas`、`BackpackCanvas`，预制体都在 `Assets/Prefabs/UI/Runtime/`。热键、ESC、互斥和排序仍走原有 `CanvasFocusStack`。常驻 HUD（快捷栏）不接入缓存，由 `HotbarCanvasView` 常驻。
 
 ## 3. 约定与硬边界
 
@@ -141,7 +143,7 @@
 
 ### 3.6 画布要能被 UIManager 主动关闭，必须登记开关事件或缓存预制体
 
-场景画布登记在 `UIManager.toggleCanvasEvents`；缓存界面登记在 `cachedViewPrefabs`，由预制体提供事件。同一个 ID 只保留一个显示实例与一方开关订阅者，迁移后应移除旧场景实例。两处都未登记时，`IsClosableCanvas` 返回 false，ESC 与互斥关闭不会作用于它。
+场景画布登记在 `UIManager.toggleCanvasEvents`；缓存界面登记在 `UICacheManager.views`（`prefab` + `anchor`），由预制体自己提供开关事件。同一个 ID 只保留一个显示实例与一方开关订阅者，迁移后应移除旧场景实例。两处都未登记时，`IsClosableCanvas` 返回 false，ESC 与互斥关闭不会作用于它。
 
 ### 3.7 `EditorSettings` 的 Domain Reload 状态与静态状态必须成对
 

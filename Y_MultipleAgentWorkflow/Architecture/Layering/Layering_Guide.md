@@ -29,38 +29,40 @@
 
 | 目录 | 文件数 | 含义 | 判定标准：新文件落到哪 |
 |---|---|---|---|
-| `Contracts` | 8 | 跨域共享的接口、基类与枚举 | 类型被两个以上域直接引用，且其中不含具体业务规则 |
+| `Contracts` | 12 | 跨域共享的接口、基类与枚举 | 类型被两个以上域直接引用，且其中不含具体业务规则 |
 | `Pipeline` | 59 | 引擎级基建：场景切换、寻路、对象池、UI 系统基建、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
-| `Gameplay` | 59 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
+| `Gameplay` | 65 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
 
-`Contracts` 的 8 个文件全部声明 `namespace Contracts`。原 `MyEnums` 类已拆开：`PlayerState` `EnemyState` `SceneType` `PersistentType` `AStarNodeType` `NPCState` `QuestState` `CanvasToToggle` `SaveType` `SaveLoadPanelType` 现在是 `Contracts` 下的 10 个顶层枚举，文件仍叫 `MyEnums.cs`。引用它们写 `using Contracts;` 后直接用枚举名，不再有 `MyEnums.` 前缀。
+`Contracts` 的 12 个文件全部声明 `namespace Contracts`。`MyEnums.cs` 提供 `PlayerState` `EnemyState` `SceneType` `PersistentType` `AStarNodeType` `NPCState` `QuestState` `CanvasToToggle` `SaveType` `SaveLoadPanelType` 十个顶层枚举，引用时写 `using Contracts;` 后直接用枚举名。缓存界面的基类 `CachedUIView`、`CachedCanvasView`，管理器与视图共享的 `DirtyValue<T>`，以及资产基类 `GuidSO` 都在这一层。
 
 ### 2.2 跨层依赖方向
 
 按 `using` 指令统计：
 
-- `Contracts` → `Gameplay`：**2 处**，`ISaveable` 与 `SaveableService` 各引一次 `Gameplay.Save`；`Contracts` → `Pipeline`：**3 处**，`ICanvasManager` 引 `Pipeline.SO.Events` 与 `Pipeline.UI.SystemCanvasManagers`，`IShopInteractable` 引 `Pipeline.SO`。
-- `Gameplay` → `Contracts`：**29 处**；`Gameplay` → `Pipeline`：**64 处**。
-- `Pipeline` → `Contracts`：**24 处**；`Pipeline` → `Gameplay`：**6 处**，分别是 `ContinueButton`、`LootEventSO`、`MobileAttackButton`、`PlayerStatsSO`、`SceneChanger`、`ShopKeeperEventSO` 各 1 处。
+- `Contracts` → `Gameplay`：**2 处**，`ISaveable` 与 `SaveableService` 各引一次 `Gameplay.Save`；`Contracts` → `Pipeline`：**7 处**，`CachedUIView` 引 `Pipeline.SO.Events`、`Pipeline.UI.Runtime` 与 `Pipeline.UI.SystemCanvasManagers`，`CachedCanvasView` 与 `ICanvasManager` 引 `Pipeline.SO.Events`，`IShopInteractable` 引 `Pipeline.SO`。
+- `Gameplay` → `Contracts`：**34 处**；`Gameplay` → `Pipeline`：**71 处**。
+- `Pipeline` → `Contracts`：**26 处**；`Pipeline` → `Gameplay`：**6 处**，分别是 `ContinueButton`、`LootEventSO`、`MobileAttackButton`、`PlayerStatsSO`、`SceneChanger`、`ShopKeeperEventSO` 各 1 处。
 
-方向口径：`Contracts` 被所有域引用是设计意图，所以 `Contracts → Gameplay/Pipeline` 的 5 处算反向依赖，`Pipeline → Gameplay` 的 6 处同样算反向依赖。
+方向口径：`Contracts` 被所有域引用是设计意图，`Contracts → Gameplay/Pipeline` 的 9 处算反向依赖；`Pipeline → Gameplay` 的 6 处同样算反向依赖。
 
-这组数字比 2026-10-05 记录的（`Contracts →` 0 处、`Gameplay → Pipeline` 0 处、`Pipeline → Gameplay` 1 处）大了一个量级。差别不来自这轮重构新增了耦合，而来自引用的书写方式：类型原先在全局命名空间，`using` 一行都不用写，依赖是隐式的、统计不到；收进命名空间之后每条跨命名空间依赖都必须显式 `using`，编译器第一次把真实依赖图完整写了出来。旧数字是全局命名空间造成的度量假象，新数字才是实际耦合。
+统计口径是显式 `using` 指令。类型进入命名空间后，跨命名空间引用必须写 `using`，这些数字等于实际引用数。
 
-管线层与玩法域的主要接触点仍是配置资产要用的数值传输类型（`PlayerStatsSO` → `Gameplay.Player.Models`），其余 5 处是管线侧的按钮、事件通道与场景切换器直接引用了玩法侧的单例或资产类型。
+管线层与玩法域的接触点：`PlayerStatsSO` 引用 `Gameplay.Player.Models` 的数值传输类型；另有 5 处由管线侧的按钮、事件通道与场景切换器直接引用玩法侧的单例或资产类型。
 
 ### 2.3 玩家数值线的 MVCS 四层
 
-九个玩法域里只有 `Gameplay` 的 `Player` 数值线拆成四层，其余域是整体 Manager 形态，一个类叠数据、规则与 UI 刷新：
+`Gameplay` 的 `Player` 数值线拆成 MVCS 四层；对话、任务、商店、背包、技能五个域同样拆成两段：管理器只留数据与规则，界面放在继承 `Contracts.CachedCanvasView` 的视图里，管理器不持有控件引用。`CachedUIView` 与 `CachedCanvasView` 这两个作为继承目标的基类住在 `Contracts`；`CachedUIView` 引用开关事件与 `UIManager.DefaultOrder`，构成契约层的反向依赖，见 §3.4：
 
 | 层 | 类型 | 命名空间 | 形态与实例化方式 |
 |---|---|---|---|
 | Model | `PlayerStatsModel` `IPlayerStatsReadOnly` `PlayerStatsData` | `Gameplay.Player.Models` | 纯 C#，`new PlayerStatsModel(PlayerStatsData)` |
 | Service | `StatsService` | `Gameplay.Player.Services` | `SaveableService<StatsService>` 单例 |
-| Controller | `ExperienceController` `HealthController` `StatsPanelController` `PlayerDamageController` | `Gameplay.Player.Controllers` | 前三个纯 C#，由 View 托管 `new`；`PlayerDamageController` 挂场景 |
-| View | `ExperiencePanelView` `HealthView` `StatsPanelView` | `Gameplay.Player.Views` | MonoBehaviour，不挂单例；属性面板继承管线层的 `CachedUIView` |
+| Controller | `ExperienceController` `HealthController` `StatsCanvasController` `PlayerDamageController` | `Gameplay.Player.Controllers` | 前三个纯 C#，由 View 托管 `new`；`PlayerDamageController` 挂场景 |
+| View | `ExperiencePanelView` `HealthView` `StatsCanvasView` | `Gameplay.Player.Views` | MonoBehaviour，不挂单例；属性面板继承契约层的 `CachedUIView` |
 
-`Player` 相关产品代码文件 18 个，全部带命名空间，按层分布为 `Gameplay.Player` 7 个、`Gameplay.Player.Controllers` 4 个、`Gameplay.Player.Models` 3 个、`Gameplay.Player.Views` 3 个、`Gameplay.Player.Services` 1 个。`Arrow` `PlayerAnimationEventRelay` `PlayerBow` `PlayerCombat` `PlayerMovement` `ShiftEquipment` 这 6 个类型现在也在 `Gameplay.Player` 里，移动、战斗、弓箭这条线仍是整体 Manager 形态。12 个带命名空间的类型中含 `PlayerLocator`，命名空间为 `Gameplay.Player`，是存档域专用的坐标查询单例，不归属上述四层。
+另外五个域的"数据 / 界面"配对：`DialogManager` → `DialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`（常驻快捷栏另由 `HotbarCanvasView` 承担）、`SkillTreeManager` → `SkillsCanvasView`。视图统一继承 `Contracts.CachedCanvasView`，由 `UICacheManager` 按预制体懒创建；管理器向视图暴露 `State` 与状态查询，视图自行拉取刷新，二者之间没有控件级引用。
+
+`Player` 相关产品代码文件 18 个，全部带命名空间，按层分布为 `Gameplay.Player` 7 个、`Gameplay.Player.Controllers` 4 个、`Gameplay.Player.Models` 3 个、`Gameplay.Player.Views` 3 个、`Gameplay.Player.Services` 1 个。`Arrow` `PlayerAnimationEventRelay` `PlayerBow` `PlayerCombat` `PlayerMovement` `ShiftEquipment` 这 6 个类型同样在 `Gameplay.Player` 里，移动、战斗、弓箭这条线是整体 Manager 形态。12 个带命名空间的类型中含 `PlayerLocator`，命名空间为 `Gameplay.Player`，是存档域专用的坐标查询单例，不归属上述四层。
 
 ### 2.4 唯一写入口与只读接口的约定
 
@@ -75,42 +77,42 @@
 
 ### 2.5 命名空间分布
 
-**命名空间一律跟随目录**：命名空间就是文件相对 `Assets\Scripts\` 的目录路径，点号代替反斜杠，目录名原样保留大小写。`Contracts\MyEnums.cs` 是 `Contracts`，`Gameplay\Units\Enemy\EnemyCombat.cs` 是 `Gameplay.Units.Enemy`，`Pipeline\SO\Events\VoidEventSO.cs` 是 `Pipeline.SO.Events`。没有例外，也不再有意外的命名空间名。
+**命名空间一律跟随目录**：命名空间就是文件相对 `Assets\Scripts\` 的目录路径，点号代替反斜杠，目录名原样保留大小写。`Contracts\MyEnums.cs` 是 `Contracts`，`Gameplay\Units\Enemy\EnemyCombat.cs` 是 `Gameplay.Units.Enemy`，`Pipeline\SO\Events\VoidEventSO.cs` 是 `Pipeline.SO.Events`。全部 26 个命名空间都遵循这条对应关系。
 
-26 个命名空间覆盖全部 126 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
+26 个命名空间覆盖全部 136 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
 
 | 层 | 命名空间 | 文件数 |
 |---|---|---|
-| `Contracts` | `Contracts` | 8 |
+| `Contracts` | `Contracts` | 12 |
 | `Pipeline` | `Pipeline` | 3 |
 | | `Pipeline.Pathfinding` | 7 |
 | | `Pipeline.Scene` | 7 |
-| | `Pipeline.SO` | 10 |
-| | `Pipeline.SO.Events` | 12 |
+| | `Pipeline.SO` | 9 |
+| | `Pipeline.SO.Events` | 13 |
 | | `Pipeline.UI` | 6 |
 | | `Pipeline.UI.Buttons` | 6 |
 | | `Pipeline.UI.SystemCanvasManagers` | 6 |
 | | `Pipeline.UI.Runtime` | 2 |
-| `Gameplay` | `Gameplay.Dialog` | 1 |
+| `Gameplay` | `Gameplay.Dialog` | 2 |
 | | `Gameplay.Dialog.HistoryManager` | 3 |
 | | `Gameplay.Grid` | 2 |
-| | `Gameplay.Inventory` | 5 |
+| | `Gameplay.Inventory` | 7 |
 | | `Gameplay.Player` | 7 |
 | | `Gameplay.Player.Controllers` | 4 |
 | | `Gameplay.Player.Models` | 3 |
 | | `Gameplay.Player.Services` | 1 |
 | | `Gameplay.Player.Views` | 3 |
-| | `Gameplay.Quest` | 6 |
+| | `Gameplay.Quest` | 7 |
 | | `Gameplay.Save` | 6 |
-| | `Gameplay.Shop` | 5 |
-| | `Gameplay.Skills` | 4 |
+| | `Gameplay.Shop` | 6 |
+| | `Gameplay.Skills` | 5 |
 | | `Gameplay.Units.Enemy` | 4 |
 | | `Gameplay.Units.NPC` | 4 |
 | | `Gameplay.Units.ShopKeeper` | 1 |
 
-- 合计 126 个产品代码文件；测试侧 5 个文件同样是 `namespace Gameplay.Tests`。
-- 全局命名空间只剩 1 个编辑器脚本 `Assets\Editor\InputActionReferenceRebuilder.cs`，它不在 `Assets\Scripts` 下，不受"跟随目录"规则约束。产品代码、测试与编辑器脚本合计 132 个源文件。
-- 跨命名空间调用一律靠 `using`；同一命名空间内的类型直接可见。原先"全局类型不用 using"的便利已不存在。
+- 合计 136 个产品代码文件；测试侧 5 个文件同样是 `namespace Gameplay.Tests`。
+- 全局命名空间只剩 1 个编辑器脚本 `Assets\Editor\InputActionReferenceRebuilder.cs`，它不在 `Assets\Scripts` 下，不受"跟随目录"规则约束。产品代码、测试与编辑器脚本合计 142 个源文件。
+- 跨命名空间调用一律靠 `using`；同一命名空间内的类型直接可见。
 
 ### 2.6 单例基类与写入口
 
@@ -138,11 +140,11 @@
 
 改动任何源码都触发整个 `Assembly-CSharp` 重编；分层只靠命名约定与纪律，编译器不拦截跨层引用。
 
-### 3.2 命名空间按目录分配，重名不再跨域互撞
+### 3.2 命名空间按目录分配，重名只在同一命名空间内冲突
 
-产品代码已全部进命名空间，标识符分属 25 个命名空间；同名类型只要不在同一命名空间就不会冲突，编译失败点也会落回该命名空间对应的目录。剩下的全局池只有 1 个编辑器脚本。
+产品代码全部在命名空间内，标识符分属 26 个命名空间。同名类型分处两个命名空间即不冲突，编译失败点落在该命名空间对应的目录。全局池只有 1 个编辑器脚本。
 
-代价是引用变啰嗦：任何跨目录引用都要 `using`，漏写就是 `CS0246`。新增文件时命名空间必须与所在目录一致，否则该类型既不被同目录代码看见，也会在将来挪动时制造一次无谓的改名。
+代价是引用变长：跨目录引用都要写 `using`，漏写报 `CS0246`。新增文件的命名空间与所在目录一致，否则该类型在其目录内不可见，挪动目录时还会多出一次改名。
 
 ### 3.3 `SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`
 
@@ -150,13 +152,15 @@
 
 ### 3.4 `Contracts` 不得反向 using `Gameplay` 或 `Pipeline`
 
-契约层被所有域引用，反向依赖会形成环。**这条现在是被违反的，共 5 处**，是命名空间改造的直接后果：
+契约层被所有域引用，反向依赖会形成环。**当前违反 9 处**，分布在 5 个文件：
 
-- `ISaveable`、`SaveableService` → `using Gameplay.Save;`：两者签名里直接用到 `SaveData` 与 `SaveDefinition`，而这两个类型住在 `Gameplay\Save\`。
+- `ISaveable`、`SaveableService` → `using Gameplay.Save;`：签名用到 `SaveData` 与 `SaveDefinition`，这两个类型住在 `Gameplay\Save\`。
+- `CachedUIView` → `using Pipeline.SO.Events;`、`using Pipeline.UI.Runtime;`、`using Pipeline.UI.SystemCanvasManagers;`：抽象属性返回 `ToggleCanvasEventSO`，排序默认值取自 `UIManager.DefaultOrder`，`Closed` 事件与 `UIViewCache` 的托管协议对接。
+- `CachedCanvasView` → `using Pipeline.SO.Events;`：属性返回 `ToggleCanvasEventSO`。
 - `ICanvasManager` → `using Pipeline.SO.Events;` 与 `using Pipeline.UI.SystemCanvasManagers;`：接口属性返回 `ToggleCanvasEventSO`、`SceneLoadedEventSO`，默认实现调 `UIManager`。
 - `IShopInteractable` → `using Pipeline.SO;`：方法签名接受 `ItemSO`。
 
-改造前这几处不写 `using` 也能编译，因为类型都在全局命名空间；搬进命名空间后依赖被迫显式化，环就暴露出来了。**在收口之前，本条是待偿债务，不是已满足的约束**。收口方向有两条：把契约层实际依赖的类型下沉进 `Contracts`，或让契约层改用不依赖具体类型的抽象（事件基类、`ISaveData` 之类的接口）。
+命名空间让依赖显式化，环因此可见。本条按待偿债务对待，收口方向有两条：把契约层实际依赖的类型下沉进 `Contracts`，或让契约层改用不依赖具体类型的抽象（事件基类、`ISaveData` 之类的接口）。
 
 ### 3.5 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法
 

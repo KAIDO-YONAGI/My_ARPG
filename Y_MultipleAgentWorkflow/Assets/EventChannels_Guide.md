@@ -23,9 +23,9 @@
 
 ## 2. 当前实现
 
-### 2.1 清单：12 个通道类，28 个通道资产
+### 2.1 清单：13 个通道类，29 个通道资产
 
-12 个通道类集中在 Pipeline 层的 SO 事件目录：
+13 个通道类集中在 Pipeline 层的 SO 事件目录：
 
 | # | 类 | 对外事件 | 发布方法 | 资产数 |
 |---|---|---|---|---|
@@ -41,13 +41,14 @@
 | 10 | `ShopKeeperEventSO` | `Action<ShopKeeper> ShopKeeperEntered / Exited` | `RaiseShopKeeperEntered/Exited(...)` | 1 |
 | 11 | `PlayerDamagedEventSO` | `Action<int,Transform,float,float> PlayerDamaged` | `OnPlayerDamaged(...)` | 1 |
 | 12 | `EnemyDefeatedEventSO` | `Action<int,Transform> EnemyDefeated` | `OnEnemyDefeated(...)` | 1 |
-| | **合计** | | | **28** |
+| 13 | `CanvasOpenedEventSO` | `Action<CanvasToToggle> CanvasOpened` | `RaiseCanvasOpened(...)` | 1 |
+| | **合计** | | | **29** |
 
-12 个类里有 3 个是多实例：`ToggleCanvasEventSO` 占 10 个资产、`VoidEventSO` 占 6 个、`InventorySlotsStatsSO` 占 3 个，其余 9 个类各 1 个。
+13 个类里有 3 个是多实例：`ToggleCanvasEventSO` 占 10 个资产、`VoidEventSO` 占 6 个、`InventorySlotsStatsSO` 占 3 个，其余 10 个类各 1 个。
 
 ### 2.2 类型契约
 
-**12 个类每一个都直接继承 `ScriptableObject`，没有公共基类、没有公共接口**，`VoidEventSO`、`SceneLoadedEventSO`、`ShopKeeperEventSO`、`PlayerDamagedEventSO` 都写作 `: ScriptableObject`；`GuidSO` 是另一条无关的继承线，事件通道不使用它。
+**13 个类每一个都直接继承 `ScriptableObject`，没有公共基类、没有公共接口**，`VoidEventSO`、`SceneLoadedEventSO`、`ShopKeeperEventSO`、`PlayerDamagedEventSO` 都写作 `: ScriptableObject`；`GuidSO` 是另一条无关的继承线，事件通道不使用它。
 
 - 事件字段一律是 `public event Action<...>`，未标注 `[SerializeField]`，因此委托链不序列化，资产文件里只有 `m_Script` 与类内配置字段，看不到任何订阅者。
 - 泛型参数只引用 `ItemSO`、`QuestSO`、`GameSceneSO`、`Loot`、`ShopKeeper` 与 `Contracts` 里的枚举（`SaveType`、`QuestState`、`CanvasToToggle`）；通道类不引用任何 Manager、Controller 或 View。
@@ -63,7 +64,7 @@
 
 ### 2.4 订阅与发布惯例
 
-**订阅必须成对。** 场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订；纯 C# Controller 在构造与 `Dispose` 中成对处理。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 承接，并随 `UIManager` 启停；View 停用不会切断重新打开的入口。`StatsPanelView` 仅在 `OnOpen/OnClose` 中订阅和退订场景完成事件。
+**订阅必须成对。** 场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订；纯 C# Controller 在构造与 `Dispose` 中成对处理。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 承接，并随 `UICacheManager` 启停；View 停用不会切断重新打开的入口。属性面板与五个玩法面板只在 `OnOpen/OnClose` 中订阅和退订各自的场景完成事件。
 
 代表写法，取字段、`+=` 与同名 `-=` 一次可见：
 
@@ -93,7 +94,7 @@ private void OnDisable() { sceneLoadEventSO.LoadRequestEvent -= OnAutoSave; ... 
 
 ### 2.5 ToggleCanvasEventSO 的内部契约
 
-`ToggleCanvasEventSO` 是 12 个类里唯一带配置字段的，字段是 `public CanvasToToggle canvasToToggle`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
+`ToggleCanvasEventSO` 是 13 个类里唯一带配置字段的，字段是 `public CanvasToToggle canvasToToggle`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
 
 消费侧靠枚举匹配配对：
 
@@ -108,7 +109,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 }
 ```
 
-`UIManager.cachedViewPrefabs` 与 `toggleCanvasEvents` 共同提供枚举到事件的登记。缓存预制体优先，旧列表随后；`IsClosableCanvas` 也使用这一查找。`Stats` 现在通过缓存预制体登记，原场景实例和旧列表中的 Stats 项已移除；其余界面保持旧接线。
+`UICacheManager.views` 与 `UIManager.toggleCanvasEvents` 共同提供枚举到事件的登记。缓存注册表优先，`toggleCanvasEvents` 随后；`IsClosableCanvas` 使用同一查找。属性面板与技能、商店、对话、任务、背包六块界面登记在 `views`；其余画布登记在 `toggleCanvasEvents`。
 
 10 个 toggle 资产映射到 **10 个互不重复**的 `CanvasToToggle` 值。`CanvasToToggle` 共 11 个成员，唯一无资产的是 `Default`。
 
@@ -130,7 +131,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 1. 新建类时把它放在事件通道目录，`[CreateAssetMenu(menuName = "Events/<类名>")]`，包一层 `public event Action<...>` 加一个发布方法，照抄同族命名风格，见 §2.2。
 2. 在 Events 目录或多实例子目录右键 `Create > Events > ...` 建资产，随即改名；默认文件名是类名，`VoidEventSO` 必须补语义前缀。
 3. 发布方用 `[SerializeField]` 拖该资产；订阅方在 `OnEnable` 与 `OnDisable` 成对 `+=` 与 `-=`；两侧都拖到同一个资产，见 §3.3。
-4. 画布开关通道要给资产设 `canvasToToggle`。场景画布将事件登记进 `UIManager.toggleCanvasEvents`；缓存界面将使用该事件的 `CachedUIView` 预制体登记进 `cachedViewPrefabs`。
+4. 画布开关通道要给资产设 `canvasToToggle`。场景画布将事件登记进 `UIManager.toggleCanvasEvents`；缓存界面把带该事件的 `Contracts.CachedCanvasView` 预制体登记进 `UICacheManager.views`。
 
 ## 3. 约定与硬边界
 

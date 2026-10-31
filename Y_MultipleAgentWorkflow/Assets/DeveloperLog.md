@@ -3,6 +3,17 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-31 事件通道新增开面板事件
+
+- `Pipeline/SO/Events` 从 12 个通道类增至 13 个，新增 `CanvasOpenedEventSO`（`Action<CanvasToToggle> CanvasOpened`）与对应资产，通道资产总数 28 → 29。
+- 登记方式更正：缓存界面的开关事件仍登记在 `UIManager.toggleCanvasEvents` 供按键查找，预制体则登记在 `UICacheManager.views` 供缓存实例化与订阅。
+
+## 2026-10-31 属性面板预制体与闲置缓存
+
+提取 Assets/Prefabs/UI/Runtime/StatsCanvas.prefab 并保留内部控件与事件引用。PersistentScene 删除旧 StatsCanvas，将 Prefab 注册到 UIManager，实例父节点为 GamePlayCanvases/RuntimeViews；Stats 不再重复登记于旧事件列表。
+
+Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `2/5`。
+
 ## 2026-10-05 建立 Assets 域权威文档
 
 **写入的文件**
@@ -31,10 +42,3 @@ maintenance count changes here.
 **维护计数**
 
 `BUS-ASSETS` 维护计数保持 `0/5`；本轮为建立，非维护轮次。
-
-
-## 2026-10-31 属性面板预制体与闲置缓存
-
-提取 Assets/Prefabs/UI/Runtime/StatsPanel.prefab 并保留内部控件与事件引用。PersistentScene 删除旧 StatsCanvas，将 Prefab 注册到 UIManager，实例父节点为 GamePlayCanvases/RuntimeViews；Stats 不再重复登记于旧事件列表。
-
-Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `2/5`。

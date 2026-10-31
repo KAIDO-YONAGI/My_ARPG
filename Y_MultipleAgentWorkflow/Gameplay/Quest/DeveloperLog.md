@@ -3,6 +3,12 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-31 任务面板迁入缓存预制体
+
+- `QuestManager` 不再实现 `ICanvasManager`，去掉 `questLogPanel`、`questLogSlots` 与三组 `CanvasGroup` 引用；`QuestStateChanged` 只写状态、发奖、重算并 `MarkDirty()`。
+- 新增 `QuestCanvasView`：`CanOpen` 用 `CanOpenBoard` 拒绝空任务板，`RefreshIfDirty` 负责槽位填充、五个 `CanvasGroup` 显隐与 `QuestLogPanel` 刷新。
+- `SetQuestSlotToDoneState` 收敛为 `QuestLogSlot.SetCompletedState()`。
+
 ## 2026-10-05 建立 Gameplay.Quest 权威文档
 
 **写入的文件**

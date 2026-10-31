@@ -164,7 +164,7 @@ void SetCount(RedDotKey key, int count)
 
 **拦路点（已核实，不能绕过）**：`UpdateSkillPoints` 目前**故意不广播任何事件**——`PlayerStatsModel.cs:128` 注释写明「技能点变化不触发事件，界面由 SkillTreeManager 刷新」，且 `PlayerStatsModelTests.cs:145` 的 `UpdateSkillPoints_AccumulatesWithoutEvents` 明确断言 `statsChangedCount == 0`。
 
-因此**不能**给 `StatsChanged` 补广播：`StatsChanged` 的语义是「攻/防/速面板数值变化」，订阅方是 `StatsPanelController`（`:19`），复用会让语义失真，并且打红既有测试。
+因此**不能**给 `StatsChanged` 补广播：`StatsChanged` 的语义是「攻/防/速面板数值变化」，订阅方是 `StatsCanvasController`（`:19`），复用会让语义失真，并且打红既有测试。
 
 **正确做法**：新增**专有事件**。
 

@@ -218,7 +218,7 @@ Bootstrap.unity（新，Build Settings #0）
 | **AOT 集** | `Contracts`、`Pipeline`、**全部 `ScriptableObject` 类**、**全部 `MonoBehaviour`**、第三方 | SO 与 MonoBehaviour 会被场景/预制体/bundle 按脚本 GUID 引用，必须在包体内可解析。放进热更集会直接 `MissingScript` |
 | **热更集** | 纯 C# 玩法逻辑：Model / Service / Controller、数值规则、任务判定、邮件逻辑 | 不参与资产序列化引用，才允许整体换 dll |
 
-工程已有一条纯 C# 逻辑线（`PlayerStatsModel`、`IPlayerStatsReadOnly`、`ExperienceController` / `HealthController` / `StatsPanelController`、`CanvasFocusStack`），**这批就是热更集的第一批内容**，划分成本比想象中低。
+工程已有一条纯 C# 逻辑线（`PlayerStatsModel`、`IPlayerStatsReadOnly`、`ExperienceController` / `HealthController` / `StatsCanvasController`、`CanvasFocusStack`），**这批就是热更集的第一批内容**，划分成本比想象中低。
 
 **必须先拆的一处反向依赖**：`Pipeline` 引用 `Gameplay` 全工程只有 1 处——`Assets/Scripts/Pipeline/SO/PlayerStatsSO.cs:2` 的 `using Gameplay.Player.Models;`。不拆掉它，AOT 集就反向依赖热更集，形成循环。
 

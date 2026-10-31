@@ -3,6 +3,12 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-31 对话界面迁入缓存预制体
+
+- `DialogManager` 不再实现 `ICanvasManager`、不持控件引用，只留对话状态与推进；新增 `DialogCanvasView`（继承 `CachedCanvasView`）承接立绘、正文与选项。
+- `ShowDialog` / `ShowChoices` 改为纯状态推进并 `MarkDirty()`，渲染交给视图。
+- 界面实体在 `DialogCanvas.prefab`，接线全在预制体内部。
+
 ## 2026-10-05 建立 Gameplay.Dialog 权威文档
 
 **写入的文件**

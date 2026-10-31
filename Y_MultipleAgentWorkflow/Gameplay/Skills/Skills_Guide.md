@@ -26,23 +26,23 @@
 - 解锁条件：`CanUnlockSkill` 要求前置列表中每个槽位都 `isUnlocked`，并且 `currentLevel` 达到该槽位 `skillSO` 的 `maxLevel`；前置列表为空时结果为 true。解锁动作只有 `Unlock()` 一个入口。
 - 升级规则：`TryUpgradeSkill` 要求 `isUnlocked` 为真且 `currentLevel` 小于 `skillSO` 的 `maxLevel`，随后 `currentLevel` 自增、广播 `OnAbilityPointSpent`，满级再广播 `OnMaxSkillLevel`，最后 `UpdateUI`。技能点的扣减由订阅方完成，见 §2.2。
 - 两个 static 事件是唯一的状态广播通道。`UpdateUI` 按解锁态切换按钮可交互、文本与图标颜色：未解锁显示 `Locked`，已解锁显示当前等级与上限。
-- 场景实例规模：常驻场景里 `SkillTreeManager.skillSlots` 接了 24 个 `SkillSlot`，其中 23 个指向 `MaxHealthBoost`，1 个指向 `CombatUnlock`；前置依赖数组长度为 1 到 3。
-- 初始解锁态：技能按钮预制体的 `isUnlocked` 默认为 0，前置列表为空，`skillSO` 为空引用；场景里有 3 个实例把它改为 1，分别是 `MaxHealthBoost` 两个与 `CombatUnlock` 一个。技能树从预先解锁的根往外生长。
+- 槽位规模：技能面板预制体 `SkillsCanvas.prefab` 里有 24 个 `SkillSlot`，其中 23 个指向 `MaxHealthBoost`、1 个指向 `CombatUnlock`；前置依赖数组长度为 1 到 3。`SkillTreeManager` 已不持槽位引用，`SkillsCanvasView` 用 `GetComponentsInChildren` 抓取。
+- 初始解锁态：技能按钮预制体的 `isUnlocked` 默认为 0，前置列表为空，`skillSO` 为空引用；场景里有 3 个实例把 `isUnlocked` 设为 1，分别是 `MaxHealthBoost` 两个与 `CombatUnlock` 一个。技能树从预先解锁的根往外生长。
 - 技能等级与解锁状态不入档：`SaveData` 顶层字段里没有技能相关字段，技能点数随 `PlayerStatsData.skillPoints` 入档。
 
 ### 2.2 技能点来源与收支
 
 - 技能点属于玩家数值域：字段是 `PlayerStatsModel.skillPoints`，写命令 `UpdateSkillPoints` 不广播事件，经 `StatsService.UpdateSkillPoints` 转发。
 - 来源是升级：`PlayerStatsModel.AddExp` 结算完升级后广播 `LevelUp(levelsGained)`。
-- 发放：`SkillTreeManager.UpdateAbilityPoints(amount)` 调 `StatsService.UpdateSkillPoints(amount)` 后刷新 `pointsText`；一次升多级就发多点，读档不补发。
-- 支出：点击槽位触发 `SkillTreeManager.Start` 注册的 onClick 闭包，闭包先查技能点大于 0 才调 `slot.TryUpgradeSkill()`；升级成功广播 `OnAbilityPointSpent`，`SkillTreeManager.HandleAbilityPointSpent` 再查一次余额并 `UpdateAbilityPoints(-1)`。
+- 发放：`SkillTreeManager.UpdateAbilityPoints(amount)` 调 `StatsService.UpdateSkillPoints(amount)`；技能点文本由 `SkillsCanvasView` 按 `State` 刷新，管理器不碰控件。一次升多级就发多点，读档不补发。
+- 支出：点击槽位由 `SkillSlot` 自己在 `OnEnable` 绑定 `TryUpgradeSkill`；升级成功广播 `OnAbilityPointSpent`，`SkillTreeManager.HandleAbilityPointSpent` 再查一次余额并 `UpdateAbilityPoints(-1)`。
 - 界面刷新点有三处：`Start` 结束时调 `UpdateAbilityPoints(0)`、升级事件、扣点回调。技能点变化本身不发事件，跳过 `UpdateAbilityPoints` 直接写 `StatsService` 会让点数文本变旧。
 
 ### 2.3 SkillTreeManager 与 SkillManager 的分工
 
 | 类 | 订阅 | 职责 |
 |---|---|---|
-| `SkillTreeManager` | `SkillSlot.OnAbilityPointSpent`、`SkillSlot.OnMaxSkillLevel`、`PlayerStatsModel.LevelUp` | 点数收支、文本刷新、满级后按前置条件批量解锁、给每个槽位挂升级按钮回调 |
+| `SkillTreeManager` | `SkillSlot.OnAbilityPointSpent`、`SkillSlot.OnMaxSkillLevel`、`PlayerStatsModel.LevelUp` | 点数收支、满级后按前置条件批量解锁、按 `SkillState` 保存等级与解锁状态供界面重建还原；文本与按钮由 `SkillsCanvasView` 负责 |
 | `SkillManager` | `SkillSlot.OnAbilityPointSpent` | 按 `skillSO.skillName` 分发技能效果，技能点收支归 `SkillTreeManager` |
 
 两个类只共享同一个 static 事件，订阅都在 `OnEnable`，退订都在 `OnDisable`。

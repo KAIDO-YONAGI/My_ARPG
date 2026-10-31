@@ -17,7 +17,7 @@
 | `PlayerStatsSO` `初始值` `模板` | §2.6、§3.3 |
 | `playerStatsData` `读档` `存档数值` `坏档` | §2.7、§3.8 |
 | `26 个测试` `EditMode` `回归网` | §2.8 |
-| `属性面板缓存` `StatsPanelView` `StatsPanelController` | §2.10 |
+| `属性面板缓存` `StatsCanvasView` `StatsCanvasController` | §2.10 |
 
 ## 2. 当前实现
 
@@ -31,8 +31,8 @@
 | 契约 | interface | `IPlayerStatsReadOnly` | 4 个事件 + 15 个只读属性 |
 | DTO | `[Serializable]` 普通类 | `PlayerStatsData` | 15 个 public 字段 + `Clone()` |
 | Service | `SaveableService<StatsService>` | `StatsService` | 私有持有 model，唯一写入口 |
-| Controller | 3 个纯 C# + 1 个 MonoBehaviour | `HealthController`、`ExperienceController`、`StatsPanelController`、`PlayerDamageController` | 只读经 `IPlayerStatsReadOnly` |
-| View | MonoBehaviour | `HealthView`、`ExperiencePanelView`、`StatsPanelView` | 血量、经验在 `Start` 建 Controller；属性面板在每次打开时创建并首刷 |
+| Controller | 3 个纯 C# + 1 个 MonoBehaviour | `HealthController`、`ExperienceController`、`StatsCanvasController`、`PlayerDamageController` | 只读经 `IPlayerStatsReadOnly` |
+| View | MonoBehaviour | `HealthView`、`ExperiencePanelView`、`StatsCanvasView` | 血量、经验在 `Start` 建 Controller；属性面板在每次打开时创建并首刷 |
 | 配置 | `ScriptableObject` | `PlayerStatsSO` | 命名空间 `Pipeline.SO`，不在 `Gameplay.Player.*` |
 
 `StatsService` 的 `model` 字段是 private，对外只给 `public IPlayerStatsReadOnly Stats => model;`。`GetStats()` 与 `LoadStats()` 是 private，仅存档流程使用。
@@ -139,13 +139,13 @@ expToUpgrade = Mathf.Max(1, expToUpgrade + step)  // 下限仍受 MinExpToUpgrad
 | `SkillTreeManager.UpdateAbilityPoints` | `UpdateSkillPoints(amount)` |
 | `SkillManager` 的 `MaxHealthBoost` 分支 | `UpdateMaxHealth(1)` 加 `UpdateHealth(1)` |
 
-只读消费方直接读 `Stats`，不经过服务方法：`PlayerCombat` 读 WeaponRange 与 Damage；`PlayerBow` 读 CoolDown；`PlayerMovement` 读 CoolDown 与 Speed；`Arrow` 读 Damage；`EnemyHealth` 读 KnockBackForce / StunTime / KnockBackTime；`HealthController`、`ExperienceController`、`StatsPanelController`、`SkillTreeManager` 读各自需要的字段。
+只读消费方直接读 `Stats`，不经过服务方法：`PlayerCombat` 读 WeaponRange 与 Damage；`PlayerBow` 读 CoolDown；`PlayerMovement` 读 CoolDown 与 Speed；`Arrow` 读 Damage；`EnemyHealth` 读 KnockBackForce / StunTime / KnockBackTime；`HealthController`、`ExperienceController`、`StatsCanvasController`、`SkillTreeManager` 读各自需要的字段。
 
 ### 2.10 属性面板的预制体与缓存
 
-`StatsPanelView` 继承 `CachedUIView`，预制体是 `Assets/Prefabs/UI/Runtime/StatsPanel.prefab`。常驻场景只在 `UIManager.cachedViewPrefabs` 中登记，不预放面板实例。首次打开创建，关闭后退订模型与场景完成事件、恢复拖动位置并停用对象；重开时重新创建 Controller，读取当前数值。
+`StatsCanvasView` 继承 `Contracts.CachedUIView`，预制体是 `Assets/Prefabs/UI/Runtime/StatsCanvas.prefab`。常驻场景只在 `UICacheManager.views` 里以 `prefab + anchor` 登记，不预放面板实例。首次打开创建，关闭后退订模型与场景完成事件、恢复拖动位置并停用对象；重开时重新创建 Controller，读取当前数值。
 
-`StatsPanelController` 保留构造时实际订阅的 `IPlayerStatsReadOnly`，`Dispose` 对同一对象退订。缓存淘汰只销毁 View，数值继续由 `StatsService` 持有。场景加载期间临时打开的面板仍会在加载完成时通过 `RequestCanvasClose(Stats)` 关闭。
+`StatsCanvasController` 保留构造时实际订阅的 `IPlayerStatsReadOnly`，`Dispose` 对同一对象退订。缓存淘汰只销毁 View，数值继续由 `StatsService` 持有。场景加载期间临时打开的面板仍会在加载完成时通过 `RequestCanvasClose(Stats)` 关闭。
 
 ## 3. 约定与硬边界
 

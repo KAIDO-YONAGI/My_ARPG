@@ -21,16 +21,16 @@
 
 ### 2.1 会话流程（`DialogManager`）
 
-`DialogManager : YSingleton<DialogManager>, ICanvasManager` 是唯一的会话驱动者，持有全部 UI 引用。它的画布开关事件返回 null，开与关的请求由 NPC 触发器承接，见 §2.5。
+`DialogManager : YSingleton<DialogManager>` 是唯一的会话驱动者，只持对话状态、不持 UI 引用；立绘、正文与选项按钮在 `DialogCanvasView`（预制体 `DialogCanvas.prefab`）。它对外暴露 `CurrentDialog`、`CurrentLineIndex`、`IsShowingChoices` 与 `State`，视图按脏标记拉取。开与关的请求仍由 NPC 触发器承接，见 §2.5。
 
-- `StartDialog(DialogSO)`：先做空引用与条件判定，再开画布、`DisableButtons()`、记录 `currentDialog` 与 `currentLineIndex = 0`、调用 `ShowDialog()`。
+- `StartDialog(DialogSO)`：先做空引用与条件判定，再 `SetDialogCanvas(true)`、`DisableButtons()`、记录 `currentDialog` 与 `currentLineIndex = 0`、调用 `ShowDialog()`。
 - `AdvanceDialog()`：三段式推进。台词未播完时 `ShowDialog()` 播下一句；台词播完且 `nextDialogOptions` 为空时 `EndDialog()`；台词有内容且 `currentLineIndex` 已到台词数末尾时 `ShowChoices()`。
 - `ShowDialog()`：逐句写立绘、名字与文本，末尾自增 `currentLineIndex`。
 - `ShowChoices()`：先 `InitializeButtons()` 控制按钮显隐并写选项文本，再逐个 `AddListener` 绑定 `nextDialogNode`。
 - `OnOptionSelected(DialogSO)`：目标非空时 `StartDialog(nextDialog)` 并 `DisableButtons()`，为空时 `EndDialog()`。
-- `EndDialog()`：关画布、`DisableButtons()`、写历史，最后清空 `currentDialog` 与 `currentLineIndex`。
-- `ForeceEndDialog()`：只关画布并清状态，历史记录留给 `EndDialog()` 写。
-- 生命周期：`OnSingletonInitialized` 初始关闭画布；`OnEnable` 与 `OnDisable` 订阅同一 `sceneLoadedEvent`；切场景时调用 `ForeceEndDialog()`。
+- `EndDialog()`：`SetDialogCanvas(false)`、`DisableButtons()`、写历史，最后清空 `currentDialog` 与 `currentLineIndex`。
+- `ForeceEndDialog()`：只清状态并关闭画布标记，历史记录留给 `EndDialog()` 写。
+- 生命周期：`OnEnable` 与 `OnDisable` 订阅同一 `sceneLoadedEvent`；切场景时调用 `ForeceEndDialog()`；视图打开时 `OnCachedViewOpened()`、关闭时 `OnCachedViewClosed()`。
 
 ### 2.2 数据模型（对话树）
 
@@ -83,7 +83,7 @@
 
 `NPCDialogTrigger` 承接 UIManager 的对话开关请求：订阅 `toggleDialogEvent`，收到开启只置 `openDialogRequested`，收到关闭直接 `ForeceEndDialog()`。`Update()` 中，存在开启请求且对话未激活时才 `StartDialog(dialogSO)`；对话进行中且 `advanceDialogAction.WasPressedThisFrame()` 时 `AdvanceDialog()`。`OnDisable` 同样 `ForeceEndDialog()`。
 
-资产与接线：`ToggleDialogEvent` 事件资产的 `canvasToToggle` 为 4，对应 `CanvasToToggle` 里 Dialog 的取值；该资产登记在常驻场景 UIManager 的 `toggleCanvasEvents` 列表里，并有 canvas 4 的输入绑定。`DialogManager` 组件挂在常驻场景中，配了 4 个选项按钮与 4 个选项文本。场景内 `NPCDialogTrigger` 的入口对话引用：Scene1 的两个触发器分别用 `PurpleBobPickMushroom` 与 `PurpleBobs Greeting`，Scene2 的一个触发器用 `PurpleBobs Greeting`。
+资产与接线：`ToggleDialogEvent` 事件资产的 `canvasToToggle` 为 4，对应 `CanvasToToggle` 里 Dialog 的取值；该资产登记在常驻场景 UIManager 的 `toggleCanvasEvents` 列表里，并有 canvas 4 的输入绑定。界面实体在 `Assets/Prefabs/UI/Runtime/DialogCanvas.prefab`，配了 4 个选项按钮与 4 个选项文本，作为缓存界面登记在 `UICacheManager.views`；`DialogManager` 组件只挂状态与事件。场景内 `NPCDialogTrigger` 的入口对话引用：Scene1 的两个触发器分别用 `PurpleBobPickMushroom` 与 `PurpleBobs Greeting`，Scene2 的一个触发器用 `PurpleBobs Greeting`。
 
 ## 3. 约定与硬边界
 

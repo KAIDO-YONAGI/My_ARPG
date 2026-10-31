@@ -3,6 +3,12 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-10-31 商店与背包界面迁入缓存预制体
+
+- `ShopManager` 不再实现 `ICanvasManager`，改由 `ShopCanvasView`（`CanOpenFromView` 判店主）承接界面；`BackpackCanvasManager` 仍保留 `ICanvasManager` 用于背包画布。
+- `ShopSlot` 与 `ShopCategoryToggles` 去掉 `shopRef` 与 `IShopInteractable` 转换，数据由 `ShopCanvasView` 注入。
+- `InventoryManager` 暴露 `State`、`TryGetSlotState`、`InitializeHotbarState`；`BackpackCanvasView` 承载背包，常驻快捷栏拆出 `HotbarCanvasView`。
+
 ## 2026-10-05 建立 背包与商店 权威文档
 
 - 任务：为 `Gameplay.InventoryShop` 建立当前实现的事实性权威文档，并按项目中文模板重写 Router。
