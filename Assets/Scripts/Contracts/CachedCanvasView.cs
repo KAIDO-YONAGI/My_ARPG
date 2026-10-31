@@ -1,5 +1,6 @@
 using Pipeline.SO.Events;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Contracts
 {
@@ -27,8 +28,9 @@ namespace Contracts
         [Tooltip("控制显隐、交互和射线阻挡的 CanvasGroup，通常就在预制体根节点。")]
         [SerializeField] private CanvasGroup viewGroup;
 
-        [Tooltip("是否响应开关事件；由外部代码直接控制的画布可关闭。")]
-        [SerializeField] private bool listenForToggleEvent = true;
+        [Tooltip("是否由开关事件直接打开。对话、任务先由业务管理器准备数据再打开；关闭请求始终响应。")]
+        [FormerlySerializedAs("listenForToggleEvent")]
+        [SerializeField] private bool openOnToggleEvent = true;
 
         [Tooltip("按 ESC 时是否允许关闭本画布。")]
         [SerializeField] private bool closeOnEscape = true;
@@ -38,7 +40,7 @@ namespace Contracts
 
         public override ToggleCanvasEventSO ToggleEvent => toggleEvent;
         public override CanvasToToggle CanvasId => canvasId;
-        public override bool ListenForToggleEvent => listenForToggleEvent;
+        public override bool OpenOnToggleEvent => openOnToggleEvent;
         public override bool CloseOnEscape => closeOnEscape;
         public override bool BlocksGlobalInput => blocksGlobalInput;
         protected override Canvas ViewCanvas => viewCanvas;

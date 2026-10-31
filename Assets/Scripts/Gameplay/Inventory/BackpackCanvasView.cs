@@ -31,13 +31,15 @@ namespace Gameplay.Inventory
                 var quantities = new int[slots.Length];
                 for (int i = 0; i < slots.Length; i++)
                 {
+                    // 每个新实例都要登记槽位地址，点击才能定位管理器中的背包数据。
+                    slots[i].ConfigureSlot(true, i);
                     items[i] = slots[i].InitialItem;
                     quantities[i] = slots[i].InitialQuantity;
                 }
                 manager.InitializeBackpackState(items, quantities);
             }
 
-            manager?.MarkDirty();
+            manager?.CurrentState.Backpack.MarkDirty();
             RefreshIfDirty();
         }
 

@@ -70,23 +70,40 @@ namespace Gameplay.Quest
 
             var quests = state.BoardQuests.Value;
             int questCount = quests != null ? quests.Count : 0;
-            int slotCount = questLogSlots != null ? questLogSlots.Length : 0;
-            for (int i = 0; i < slotCount; i++)
+            // 列表或任务完成态变化时才填充条目，切换选择只刷新右侧详情。
+            if (state.BoardQuests.IsDirty)
             {
-                bool hasQuest = i < questCount && quests[i] != null;
-                questLogSlots[i].SetQuestActive(false);
-                if (!hasQuest) continue;
+                int slotCount = questLogSlots != null ? questLogSlots.Length : 0;
+                for (int i = 0; i < slotCount; i++)
+                {
+                    bool hasQuest = i < questCount && quests[i] != null;
+                    if (!hasQuest)
+                    {
+                        questLogSlots[i].SetQuestActive(false);
+                        continue;
+                    }
 
-                QuestSO quest = quests[i];
-                questLogSlots[i].SetQuest(quest);
-                if (manager.GetQuestStateFromProgress(quest) == QuestState.Completed)
-                    questLogSlots[i].SetCompletedState();
+                    QuestSO quest = quests[i];
+                    questLogSlots[i].SetQuest(quest);
+                    if (manager.GetQuestStateFromProgress(quest) == QuestState.Completed)
+                        questLogSlots[i].SetCompletedState();
+                }
+
+                bool showNoQuests = questCount == 0 || manager.IsAllQuestsCompleted(quests);
+                SetCanvasState(detailsCanvasGroup, !showNoQuests);
+                SetCanvasState(promptCanvasGroup, showNoQuests);
             }
 
-            bool showNoQuests = questCount == 0 || manager.IsAllQuestsCompleted(quests);
-            SetCanvasState(detailsCanvasGroup, !showNoQuests);
-            SetCanvasState(promptCanvasGroup, showNoQuests);
+            if (state.BoardQuests.IsDirty || state.CurrentQuest.IsDirty || state.CurrentQuestState.IsDirty)
+                RefreshDetails(manager);
 
+            state.ClearDirty();
+        }
+
+        /// <summary>刷新选中任务的详情和操作按钮；同一任务只重绘目标进度。</summary>
+        private void RefreshDetails(QuestManager manager)
+        {
+            var state = manager.CurrentState;
             var selectedQuest = state.CurrentQuest.Value;
             questLogPanel?.RefreshFromManager(selectedQuest);
             QuestState questState = state.CurrentQuestState.Value;
@@ -105,8 +122,6 @@ namespace Gameplay.Quest
             SetCanvasState(completeCanvasGroup,
                 selectedQuest != null &&
                 (questState == QuestState.Accepted || questState == QuestState.IsToComplete));
-
-            state.ClearDirty();
         }
 
         /// <summary>统一设置 CanvasGroup 的透明度、射线阻挡和交互状态。</summary>

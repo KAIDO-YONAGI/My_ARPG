@@ -144,7 +144,9 @@ namespace Gameplay.Save
             // 兜底防御，避免其他读取入口把空数据直接塞进运行态。
             if (data == null)
             {
-                Debug.LogWarning("Skip load because save data is null.");
+#if UNITY_EDITOR
+                Debug.LogWarning("存档数据为空，已跳过读取。");
+#endif
                 return;
             }
             dataToSave = data;

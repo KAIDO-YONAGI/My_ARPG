@@ -28,7 +28,9 @@ namespace Pipeline
                 string sceneName = sceneReference.sceneName;
                 if (string.IsNullOrWhiteSpace(sceneName))
                 {
-                    Debug.LogError($"InitialLoad cannot load '{sceneReference.name}' because it has no scene assigned.");
+#if UNITY_EDITOR
+                    Debug.LogError($"[InitialLoad] 场景资源“{sceneReference.name}”未指定场景，无法加载。");
+#endif
                     continue;
                 }
 
@@ -38,7 +40,9 @@ namespace Pipeline
 
                 if (!Application.CanStreamedLevelBeLoaded(sceneName))
                 {
-                    Debug.LogError($"InitialLoad cannot load scene '{sceneName}'. Assign a scene in its GameSceneSO first.");
+#if UNITY_EDITOR
+                    Debug.LogError($"[InitialLoad] 无法加载场景“{sceneName}”，请先在对应的 GameSceneSO 中指定场景。");
+#endif
                     continue;
                 }
 

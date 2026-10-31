@@ -50,7 +50,9 @@ namespace Gameplay.Units.NPC
         {
             if(pathFollower==null)
             {
-                Debug.LogError("NPCPatrol: Missing PathFollower reference.");
+#if UNITY_EDITOR
+                Debug.LogError("巡逻单位缺少路径跟随组件引用。");
+#endif
                 enabled = false;
                 return;
             }

@@ -16,9 +16,6 @@ namespace Gameplay.Dialog.HistoryManager
                 itemHasPicked[item] += quantity;
             }
             else itemHasPicked.Add(item, quantity);
-            // Debug.Log(item.itemName);
-            // Debug.Log(itemHasPicked.Count);
-            // Debug.Log(itemHasPicked[item]);
 
         }
 

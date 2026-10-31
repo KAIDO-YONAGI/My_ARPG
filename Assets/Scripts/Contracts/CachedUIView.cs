@@ -25,8 +25,8 @@ namespace Contracts
         public virtual CanvasToToggle CanvasId =>
             ToggleEvent != null ? ToggleEvent.canvasToToggle : CanvasToToggle.Default;
 
-        /// <summary>是否响应开关事件。常驻 HUD 等由外部直接控制的界面可设为 false。</summary>
-        public virtual bool ListenForToggleEvent => true;
+        /// <summary>是否由开关事件直接打开；需要先准备业务数据的界面交给管理器打开，关闭请求始终响应。</summary>
+        public virtual bool OpenOnToggleEvent => true;
 
         /// <summary>显示排序使用的 Canvas。</summary>
         protected abstract Canvas ViewCanvas { get; }
@@ -86,7 +86,9 @@ namespace Contracts
             }
             catch (Exception exception)
             {
+#if UNITY_EDITOR
                 Debug.LogException(exception, this);
+#endif
             }
             finally
             {
@@ -112,7 +114,9 @@ namespace Contracts
             }
             catch (Exception exception)
             {
+#if UNITY_EDITOR
                 Debug.LogException(exception, this);
+#endif
             }
         }
 

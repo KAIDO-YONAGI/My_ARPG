@@ -136,7 +136,9 @@ namespace Gameplay.Player.Models
         {
             if (amount <= 0)
             {
+#if UNITY_EDITOR
                 if (amount < 0) Debug.LogWarning($"[PlayerStatsModel] 忽略非正数经验：{amount}");
+#endif
                 return;
             }
 

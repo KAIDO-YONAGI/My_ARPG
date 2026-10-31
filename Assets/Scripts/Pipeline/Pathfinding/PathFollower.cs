@@ -64,7 +64,7 @@ namespace Pipeline.Pathfinding
             if (AStarNodeManager.Instance == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning("AStarNodeManager.Instance is NULL!");
+                Debug.LogWarning("寻路节点管理器实例为空！");
 #endif
 
                 return 0f;

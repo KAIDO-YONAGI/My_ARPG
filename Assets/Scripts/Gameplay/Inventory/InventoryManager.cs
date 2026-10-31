@@ -252,7 +252,9 @@ namespace Gameplay.Inventory
             {
                 if (!hasSelectedSlot)
                 {
-                    Debug.Log("No slot been Marked");
+#if UNITY_EDITOR
+                    Debug.Log("未标记任何槽位。");
+#endif
                     return;
                 }
 

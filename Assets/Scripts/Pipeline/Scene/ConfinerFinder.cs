@@ -40,7 +40,7 @@ namespace Pipeline.Scene
             {
 #if UNITY_EDITOR
 
-                Debug.LogWarning("Can't find Confiner");
+                Debug.LogWarning("找不到标记为 Confiner 的边界对象。");
 #endif
 
                 yield break;
@@ -50,13 +50,15 @@ namespace Pipeline.Scene
 
             if (col == null)
             {
-                Debug.LogWarning("No Confiner Collider2D");
+#if UNITY_EDITOR
+                Debug.LogWarning("边界对象上没有二维碰撞体。");
+#endif
                 yield break;
             }
 
             confiner.m_BoundingShape2D = col;
 
-            // ⭐ 必须刷新
+            // 必须刷新
             confiner.InvalidateCache();
         }
     }

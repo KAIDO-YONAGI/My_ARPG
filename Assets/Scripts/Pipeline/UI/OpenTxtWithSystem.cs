@@ -16,7 +16,9 @@ namespace Pipeline.UI
             }
             else
             {
+#if UNITY_EDITOR
                 UnityEngine.Debug.LogError("找不到游戏指南文件：" + path);
+#endif
             }
         }
     }

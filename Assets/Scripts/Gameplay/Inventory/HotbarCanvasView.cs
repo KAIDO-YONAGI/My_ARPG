@@ -50,8 +50,8 @@ namespace Gameplay.Inventory
         }
 
         /// <summary>
-        /// 按管理器脏标记刷新快捷栏和金币。
-        /// <paramref name="force"/> 用于首次进入时强制刷新一次，避免初始版本恰好是 -1。
+        /// 分别按脏标记刷新快捷栏和金币，避免金币变化时遍历槽位。
+        /// <paramref name="force"/> 用于视图首次进入时完整绘制一次。
         /// </summary>
         private void RefreshIfDirty(bool force)
         {
@@ -59,22 +59,25 @@ namespace Gameplay.Inventory
             if (manager == null) return;
 
             var state = manager.CurrentState;
-            if (!force && !state.Hotbar.IsDirty && !state.Gold.IsDirty) return;
-
-            int slotCount = hotbarSlots != null ? hotbarSlots.Length : 0;
-            for (int i = 0; i < slotCount; i++)
+            if (force || state.Hotbar.IsDirty)
             {
-                if (manager.TryGetSlotState(false, i, out var item, out int quantity))
-                    hotbarSlots[i].RestoreState(item, quantity);
-                else
-                    hotbarSlots[i].RestoreState(null, 0);
+                int slotCount = hotbarSlots != null ? hotbarSlots.Length : 0;
+                for (int i = 0; i < slotCount; i++)
+                {
+                    if (manager.TryGetSlotState(false, i, out var item, out int quantity))
+                        hotbarSlots[i].RestoreState(item, quantity);
+                    else
+                        hotbarSlots[i].RestoreState(null, 0);
+                }
+                state.Hotbar.ClearMark();
             }
 
-            if (goldAmountText != null)
-                goldAmountText.text = manager.GoldAmount.ToString();
-
-            state.Hotbar.ClearMark();
-            state.Gold.ClearMark();
+            if (force || state.Gold.IsDirty)
+            {
+                if (goldAmountText != null)
+                    goldAmountText.text = manager.GoldAmount.ToString();
+                state.Gold.ClearMark();
+            }
         }
     }
 }

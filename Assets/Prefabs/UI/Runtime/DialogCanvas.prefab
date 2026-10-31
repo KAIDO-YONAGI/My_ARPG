@@ -1535,7 +1535,7 @@ MonoBehaviour:
   toggleEvent: {fileID: 11400000, guid: 955f6dbe397714a4ebb6c61eb71272a4, type: 2}
   viewCanvas: {fileID: 6488684876146596961}
   viewGroup: {fileID: 3759123316824621624}
-  listenForToggleEvent: 1
+  openOnToggleEvent: 0
   closeOnEscape: 1
   blocksGlobalInput: 0
   speakerPortrait: {fileID: 6869753883484933926}

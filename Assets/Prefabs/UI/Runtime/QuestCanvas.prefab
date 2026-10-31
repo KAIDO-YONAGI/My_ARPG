@@ -513,7 +513,6 @@ MonoBehaviour:
   - {fileID: 8313470221424160791}
   - {fileID: 5925403567099557623}
   - {fileID: 7180767871561368689}
-  openQuestEvent: {fileID: 11400000, guid: 1f4dc831c8a864d44a39c1e76db3d595, type: 2}
 --- !u!114 &3577935950709056116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,7 +529,7 @@ MonoBehaviour:
   toggleEvent: {fileID: 11400000, guid: 981c401ba718ed348ac5d29d44888098, type: 2}
   viewCanvas: {fileID: 4035007961084433283}
   viewGroup: {fileID: 4204033136621114581}
-  listenForToggleEvent: 1
+  openOnToggleEvent: 0
   closeOnEscape: 1
   blocksGlobalInput: 0
   questLogPanel: {fileID: 7722953177741845804}

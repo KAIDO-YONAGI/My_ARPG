@@ -62,7 +62,9 @@ namespace Gameplay.Save
             string path=Application.persistentDataPath + $"/{saveType}_{saveID}.json";
             File.WriteAllText(path, json);
 
-            Debug.Log("SaveRoute: " + path);
+#if UNITY_EDITOR
+            Debug.Log("存档路径：" + path);
+#endif
 
             return path;
 
@@ -71,7 +73,9 @@ namespace Gameplay.Save
         {
             if (string.IsNullOrEmpty(savePath))
             {
-                Debug.LogWarning("Save path is empty for delete.");
+#if UNITY_EDITOR
+                Debug.LogWarning("删除存档失败：路径为空。");
+#endif
                 return false;
             }
 
@@ -79,25 +83,33 @@ namespace Gameplay.Save
             string fullPersistentPath = Path.GetFullPath(Application.persistentDataPath);
             if (!fullSavePath.StartsWith(fullPersistentPath, StringComparison.OrdinalIgnoreCase))
             {
-                Debug.LogWarning($"Save file is outside persistentDataPath: {savePath}");
+#if UNITY_EDITOR
+                Debug.LogWarning($"存档文件不在持久化目录内：{savePath}");
+#endif
                 return false;
             }
 
             if (!File.Exists(fullSavePath))
             {
-                Debug.LogWarning($"Save file not found: {savePath}");
+#if UNITY_EDITOR
+                Debug.LogWarning($"未找到存档文件：{savePath}");
+#endif
                 return false;
             }
 
             try
             {
                 File.Delete(fullSavePath);
-                Debug.Log("DeleteRoute: " + fullSavePath);
+#if UNITY_EDITOR
+                Debug.Log("删除路径：" + fullSavePath);
+#endif
                 return true;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to delete save file {savePath}: {e.Message}");
+#if UNITY_EDITOR
+                Debug.LogError($"删除存档失败：{savePath}（{e.Message}）");
+#endif
                 return false;
             }
         }
@@ -107,19 +119,25 @@ namespace Gameplay.Save
         {
             if (string.IsNullOrEmpty(savePath))
             {
-                Debug.LogWarning($"Save path is empty for {saveType}.");
+#if UNITY_EDITOR
+                Debug.LogWarning($"读取存档失败：{saveType} 的路径为空。");
+#endif
                 return false;
             }
 
             if (!File.Exists(savePath))
             {
-                Debug.LogWarning($"Save file not found: {savePath}");
+#if UNITY_EDITOR
+                Debug.LogWarning($"未找到存档文件：{savePath}");
+#endif
                 return false;
             }
 
             if (!IsLoadableSaveFile(savePath))
             {
-                Debug.LogWarning($"Save file is not loadable: {savePath}");
+#if UNITY_EDITOR
+                Debug.LogWarning($"存档文件不可加载：{savePath}");
+#endif
                 return false;
             }
 
@@ -145,16 +163,22 @@ namespace Gameplay.Save
                 }
                 else
                 {
-                    Debug.Log("Failed Load SceneID");
+#if UNITY_EDITOR
+                    Debug.Log("存档中的场景标识无效，无法加载。");
+#endif
                     return false;
                 }
 
-                Debug.Log("LoadRoute: " + savePath);
+#if UNITY_EDITOR
+                Debug.Log("读取路径：" + savePath);
+#endif
                 return true;
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Failed to load save file {savePath}: {e.Message}");
+#if UNITY_EDITOR
+                Debug.LogError($"读取存档失败：{savePath}（{e.Message}）");
+#endif
             }
 
 
@@ -165,7 +189,9 @@ namespace Gameplay.Save
             string[] files = GetSavesPath(saveType);
             if (files.Length == 0)
             {
-                Debug.LogWarning("No save files found.");
+#if UNITY_EDITOR
+                Debug.LogWarning("未找到存档文件。");
+#endif
                 return null;
             }
 
@@ -175,7 +201,9 @@ namespace Gameplay.Save
             string latestFile = files.LastOrDefault(IsLoadableSaveFile);
             if (string.IsNullOrEmpty(latestFile))
             {
-                Debug.LogWarning($"No valid {saveType} save files found.");
+#if UNITY_EDITOR
+                Debug.LogWarning($"未找到可用的 {saveType} 存档。");
+#endif
                 return null;
             }
 
@@ -198,7 +226,9 @@ namespace Gameplay.Save
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"Skip invalid save file {saveFile}: {e.Message}");
+#if UNITY_EDITOR
+                Debug.LogWarning($"跳过无效存档：{saveFile}（{e.Message}）");
+#endif
                 return false;
             }
         }

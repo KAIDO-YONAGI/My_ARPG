@@ -15,18 +15,18 @@ namespace Pipeline.Pathfinding
     public class ObjectsMapManager : YSingleton<ObjectsMapManager>
     {
         /// <summary>
-        /// Tag,PositionInfo
+        /// 键为 Tag，值为该物体登记的位置信息
         /// </summary>
         Dictionary<string, PositionInfo> objects = new();
 
-        // Start is called before the first frame update
+        // 第一帧执行前调用
         void Start()
         {
             PositionInfo positionInfo = new();
             positionInfo.pos = Vector3.zero;
         }
 
-        // Update is called once per frame
+        // 每帧调用
         void Update()
         {
         }

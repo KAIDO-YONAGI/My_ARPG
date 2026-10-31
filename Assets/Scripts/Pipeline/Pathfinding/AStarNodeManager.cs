@@ -112,7 +112,9 @@ namespace Pipeline.Pathfinding
         {
             if (tilemaps == null || tilemaps.Length == 0)
             {
+#if UNITY_EDITOR
                 Debug.LogError("Tilemaps 未赋值！");
+#endif
                 return;
             }
 

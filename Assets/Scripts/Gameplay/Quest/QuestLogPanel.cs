@@ -1,5 +1,4 @@
 using Pipeline.SO;
-using Pipeline.SO.Events;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -28,38 +27,13 @@ namespace Gameplay.Quest
         [FormerlySerializedAs("questRewardsSlot")]
         [SerializeField] private QuestRewardsSlot[] questRewardsSlots;
 
-        [Header("事件")]
-        [Tooltip("请求显示第一个未完成任务。")]
-        [SerializeField] private VoidEventSO openQuestEvent;
-
+        // 只记录已经绘制的任务，默认选择由 QuestManager 在界面打开时决定。
         private QuestSO currentQuest;
 
-        private void OnEnable()
-        {
-            if (openQuestEvent != null)
-                openQuestEvent.VoidEvent += ShowQuestOffer;
-        }
-
-        private void OnDisable()
-        {
-            if (openQuestEvent != null)
-                openQuestEvent.VoidEvent -= ShowQuestOffer;
-        }
-
-        /// <summary>从管理器取第一个未完成任务并显示它的详情。</summary>
-        public void ShowQuestOffer()
-        {
-            var manager = QuestManager.Instance;
-            QuestSO incomingQuestSO = manager != null ? manager.GetFirstIncompletedQuest() : null;
-
-            if (incomingQuestSO != null)
-                HandleQuestClicked(incomingQuestSO);
-        }
-
-        /// <summary>任务条目被点击：记录当前任务并通知管理器切换选中项。</summary>
+        /// <summary>任务条目被点击：向管理器提交选择，由视图读取脏标记后刷新详情。</summary>
         public void HandleQuestClicked(QuestSO quest)
         {
-            currentQuest = quest;
+            // currentQuest 记录已经绘制的任务；提前修改会让刷新误判为同一任务。
             QuestManager.Instance?.OpenQuest(quest);
         }
 

@@ -157,14 +157,18 @@ namespace Pipeline.Scene
         {
             if (scenes == null || scenes.Count == 0)
             {
+#if UNITY_EDITOR
                 Debug.LogWarning("[SceneChanger] 收到空场景组加载请求，已忽略。");
+#endif
                 return;
             }
 
             // 加载窗口内拒绝新请求，避免同一时间启动多条卸载/加载协程。
             if (isLoading)
             {
+#if UNITY_EDITOR
                 Debug.LogWarning($"[SceneChanger] 加载进行中，忽略新的加载请求: {scenes[0].name}");
+#endif
                 return;
             }
 
@@ -216,8 +220,10 @@ namespace Pipeline.Scene
                 if (PersistentSceneRegistry.IsPersistent(scene.Asset) ||
                     PersistentSceneRegistry.IsPersistent(loaded.name))
                 {
+#if UNITY_EDITOR
                     Debug.LogWarning(
-                        $"[SceneChanger] Skipped unload of registered persistent scene '{loaded.name}'.");
+                        $"[SceneChanger] 已跳过卸载注册的常驻场景“{loaded.name}”。");
+#endif
                     currentScenes.RemoveAt(i);
                     continue;
                 }
@@ -227,7 +233,9 @@ namespace Pipeline.Scene
 
                 if (loaded.IsValid() && loaded.isLoaded)
                 {
-                    Debug.LogError($"[SceneChanger] Scene '{loaded.name}' is still loaded. Scene switch aborted.");
+#if UNITY_EDITOR
+                    Debug.LogError($"[SceneChanger] 场景“{loaded.name}”仍未卸载，已中止场景切换。");
+#endif
                     if (targetFade && !isInitialScene)
                         PlayLoadingAnimation("FadeOut");
                     AllowInput();
@@ -259,9 +267,11 @@ namespace Pipeline.Scene
 
                 if (!Application.CanStreamedLevelBeLoaded(scene.sceneName))
                 {
+#if UNITY_EDITOR
                     Debug.LogError(
-                        $"[SceneChanger] Scene '{scene.sceneName}' ({scene.name}) is not in Build Settings; " +
-                        "add it via File > Build Settings before loading. Skipped.");
+                        $"[SceneChanger] 场景“{scene.sceneName}”（{scene.name}）不在构建设置中，" +
+                        "已跳过；请先在“文件 > 构建设置”中添加。");
+#endif
                     continue;
                 }
 
@@ -294,7 +304,9 @@ namespace Pipeline.Scene
 
                 if (!loaded.IsValid() || !loaded.isLoaded)
                 {
-                    Debug.LogError($"[SceneChanger] Scene '{scene.sceneName}' did not finish loading.");
+#if UNITY_EDITOR
+                    Debug.LogError($"[SceneChanger] 场景“{scene.sceneName}”未能完成加载。");
+#endif
                     continue;
                 }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Contracts;
 using Pipeline.Scene;
 using Pipeline.SO;
@@ -158,7 +158,9 @@ namespace Gameplay.Save
             }
             if (SaveDataManager.Instance == null || !SaveDataManager.Instance.PrepareManualSaveData())
             {
-                Debug.LogWarning("Manual save data is not ready.");
+#if UNITY_EDITOR
+                Debug.LogWarning("手动存档数据未就绪。");
+#endif
                 return;
             }
             string path = SaveSystem.Instance.WriteSave(group.saveInfo.saveType);

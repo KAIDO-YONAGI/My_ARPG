@@ -300,7 +300,7 @@ MonoBehaviour:
   toggleEvent: {fileID: 11400000, guid: 31b9cc770eb5b0a4284d1ca1b9c114b7, type: 2}
   viewCanvas: {fileID: 2477475730167730523}
   viewGroup: {fileID: 7885678762525265330}
-  listenForToggleEvent: 1
+  openOnToggleEvent: 1
   closeOnEscape: 1
   blocksGlobalInput: 0
   slots:

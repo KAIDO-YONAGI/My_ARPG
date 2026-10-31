@@ -24,7 +24,7 @@ namespace Gameplay.Quest
             /// <summary>任务板是否处于打开状态。</summary>
             public DirtyValue<bool> CanvasIsActive;
 
-            /// <summary>当前任务板里的任务列表。</summary>
+            /// <summary>当前任务板列表；任务完成态变化时也标脏，以便更新条目与提示。</summary>
             public DirtyValue<List<QuestSO>> BoardQuests;
 
             /// <summary>当前选中的任务。</summary>
@@ -139,7 +139,9 @@ namespace Gameplay.Quest
             if (state.CurrentQuest.Value == null) return;
             if (nextState == QuestState.Completed && !IsQuestObjDone(state.CurrentQuest.Value))
             {
-                Debug.Log("Quest Not Done");
+#if UNITY_EDITOR
+                Debug.Log("任务目标未完成。");
+#endif
                 return;
             }
 
@@ -157,10 +159,8 @@ namespace Gameplay.Quest
         public void CloseQuestBoard()
         {
             UICacheManager.Instance?.CloseCanvas(CanvasToToggle.Quest);
-            state.CanvasIsActive.Value = false;
-            state.BoardQuests.Value = null;
-            state.CurrentQuest.Value = null;
-            MarkDirty();
+            // 没有已打开的视图时也要清理已装载的数据；关闭回调已清理时会直接返回。
+            OnCachedViewClosed();
         }
 
         /// <summary>判断当前任务板是否就是传入的这批任务，用于避免重复加载。</summary>
@@ -174,7 +174,8 @@ namespace Gameplay.Quest
         {
             if (quest == null) return;
             state.CurrentQuest.Value = quest;
-            QuestStateChanged(quest, GetQuestStateFromProgress(quest));
+            state.CurrentQuestState.Value = GetQuestStateFromProgress(quest);
+            RefreshObjectiveProgress(quest);
         }
 
         /// <summary>缓存界面打开后回调：登记激活状态、补全进度并选中第一个未完成任务。</summary>
@@ -198,10 +199,14 @@ namespace Gameplay.Quest
         /// <summary>缓存界面关闭后回调：清空任务板引用，避免继续操作已经关闭的界面。</summary>
         public void OnCachedViewClosed()
         {
+            if (!state.CanvasIsActive.Value && state.BoardQuests.Value == null &&
+                state.CurrentQuest.Value == null)
+                return;
+
             state.CanvasIsActive.Value = false;
             state.BoardQuests.Value = null;
             state.CurrentQuest.Value = null;
-            MarkDirty();
+            state.CurrentQuestState.Value = QuestState.Idle;
         }
 
         /// <summary>
@@ -221,7 +226,6 @@ namespace Gameplay.Quest
                         QuestStateChanged(quest, QuestState.IsToComplete);
                 }
             }
-            MarkDirty();
         }
 
         /// <summary>向背包系统发放任务奖励；奖励内容由任务配置决定。</summary>
@@ -278,6 +282,7 @@ namespace Gameplay.Quest
             if (quest == null || !questProgress.TryGetValue(quest, out var progress)) return;
 
             bool isCurrentQuest = state.CurrentQuest.Value == quest;
+            bool stateChanged = progress.questState != nextState;
             bool isCompletingNow = nextState == QuestState.Completed &&
                                    progress.questState != QuestState.Completed;
             progress.questState = nextState;
@@ -288,7 +293,9 @@ namespace Gameplay.Quest
                 RaiseRewardEvent(quest);
 
             RefreshObjectiveProgress(quest);
-            MarkDirty();
+            // 选择任务只影响详情；状态实际变化才需要刷新列表中的完成态。
+            if (stateChanged)
+                state.BoardQuests.MarkDirty();
         }
 
         /// <summary>

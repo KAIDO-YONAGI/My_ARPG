@@ -26,7 +26,9 @@ namespace Pipeline.UI.Buttons
             }
             else
             {
+#if UNITY_EDITOR
                 Debug.LogWarning("[ButtonSceneToggler] sceneToLoad 未配置。重试按钮请改用 RetryButton 组件。", this);
+#endif
             }
         }
     }

@@ -96,21 +96,27 @@ namespace Pipeline.UI.Runtime
                     prefab.CanvasId == CanvasToToggle.Default || prefab.ToggleEvent == null ||
                     prefab.ToggleEvent.canvasToToggle != prefab.CanvasId)
                 {
+#if UNITY_EDITOR
                     Debug.LogError("UI 缓存注册失败：Prefab、Anchor 或匹配的开关事件缺失，或使用了 Default ID.", prefab);
+#endif
                     continue;
                 }
 
                 // 缓存只接受预制体资产，不接受场景里已经摆好的实例，否则会重复创建或改坏场景对象。
                 if (prefab.gameObject.scene.IsValid() || !prefab.enabled)
                 {
+#if UNITY_EDITOR
                     Debug.LogError("UI 缓存只接受启用了 View 组件的预制体资产。", prefab);
+#endif
                     continue;
                 }
 
                 var id = prefab.CanvasId;
                 if (entries.ContainsKey(id))
                 {
+#if UNITY_EDITOR
                     Debug.LogError($"UI 缓存重复注册：{id}。", prefab);
+#endif
                     continue;
                 }
 
@@ -121,7 +127,12 @@ namespace Pipeline.UI.Runtime
                     Anchor = binding.anchor,
                     ToggleEvent = prefab.ToggleEvent
                 };
-                entry.Toggle = state => SetOpen(entry, state);
+                // 对话和任务由业务入口准备数据后打开；ESC、互斥和切场仍统一走关闭事件。
+                entry.Toggle = state =>
+                {
+                    if (!state || entry.Prefab.OpenOnToggleEvent)
+                        SetOpen(entry, state);
+                };
                 entry.Focus = () => RefreshOrder(entry);
                 entry.Closed = () => OnClosed(entry);
                 entries.Add(id, entry);
@@ -147,8 +158,7 @@ namespace Pipeline.UI.Runtime
             connected = true;
             foreach (var entry in entries.Values)
             {
-                if (entry.Prefab.ListenForToggleEvent)
-                    entry.ToggleEvent.toggleCanvasEvent += entry.Toggle;
+                entry.ToggleEvent.toggleCanvasEvent += entry.Toggle;
                 entry.ToggleEvent.focusEvent += entry.Focus;
             }
         }
@@ -160,8 +170,7 @@ namespace Pipeline.UI.Runtime
             connected = false;
             foreach (var entry in entries.Values)
             {
-                if (entry.Prefab.ListenForToggleEvent)
-                    entry.ToggleEvent.toggleCanvasEvent -= entry.Toggle;
+                entry.ToggleEvent.toggleCanvasEvent -= entry.Toggle;
                 entry.ToggleEvent.focusEvent -= entry.Focus;
             }
         }
@@ -201,8 +210,8 @@ namespace Pipeline.UI.Runtime
         }
 
         /// <summary>
-        /// 每帧检查闲置超时。链表按关闭时间先后排列，遇到第一个未超时的节点即可停止。
-        /// 注意：销毁会修改链表，所以循环里先保存下一个节点。
+        /// 每帧按关闭时刻检查闲置超时。链表按最近使用顺序排列，需要逐项检查。
+        /// 销毁会修改链表，所以循环里先保存下一个节点。
         /// </summary>
         public void Update(float now)
         {
@@ -261,7 +270,9 @@ namespace Pipeline.UI.Runtime
             {
                 DestroyInstance(entry);
                 reportState(entry.Id, false, true, false);
+#if UNITY_EDITOR
                 Debug.LogException(exception);
+#endif
                 return false;
             }
         }
