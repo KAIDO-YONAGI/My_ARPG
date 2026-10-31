@@ -29,17 +29,48 @@ namespace Gameplay.Skills
             }
         }
 
-        private readonly Dictionary<string, SkillState> skillState = new();
-        private bool listeningToLevelUp;
-        private int dirtyVersion;
+        /// <summary>技能树运行状态：可变化的数值与各自的脏标记放在同一个结构体字段里。</summary>
+        public sealed class State
+        {
+            /// <summary>按稳定路径保存的技能状态。</summary>
+            public DirtyValue<Dictionary<string, SkillState>> Skills;
 
-        /// <summary>状态版本号，界面每帧对比它决定是否需要重绘。</summary>
-        public int DirtyVersion => dirtyVersion;
+            /// <summary>当前可用技能点。</summary>
+            public DirtyValue<int> AbilityPoints;
+
+            public State()
+            {
+                Skills = new DirtyValue<Dictionary<string, SkillState>>(
+                    new Dictionary<string, SkillState>(), true);
+                AbilityPoints = new DirtyValue<int>(0, true);
+            }
+
+            /// <summary>任一字段有变化时为 true。</summary>
+            public bool AnyDirty => Skills.IsDirty || AbilityPoints.IsDirty;
+
+            /// <summary>把全部字段标记为待刷新。</summary>
+            public void MarkAllDirty()
+            {
+                Skills.MarkDirty();
+                AbilityPoints.MarkDirty();
+            }
+
+            /// <summary>视图读完后清除全部标记。</summary>
+            public void ClearDirty()
+            {
+                Skills.ClearMark();
+                AbilityPoints.ClearMark();
+            }
+        }
+
+        private readonly State state = new();
+        private bool listeningToLevelUp;
+
+        /// <summary>技能树运行状态，供视图读取。</summary>
+        public State CurrentState => state;
 
         /// <summary>当前可用技能点；数值服务尚未就绪时返回 0。</summary>
-        public int AbilityPoints => StatsService.Instance != null
-            ? StatsService.Instance.Stats.SkillPoints
-            : 0;
+        public int AbilityPoints => state.AbilityPoints.Value;
 
         private void OnEnable()
         {
@@ -57,7 +88,7 @@ namespace Gameplay.Skills
         {
             // OnEnable 可能早于 StatsService 的 Awake，Start 再补一次订阅。
             TrySubscribeLevelUp();
-            MarkDirty();
+            RefreshAbilityPoints();
         }
 
         /// <summary>订阅玩家升级事件；已经订阅或数值服务未就绪时直接返回。</summary>
@@ -91,7 +122,8 @@ namespace Gameplay.Skills
         /// </summary>
         public SkillState GetSkillState(string key, int initialLevel, bool initiallyUnlocked)
         {
-            if (!string.IsNullOrEmpty(key) && skillState.TryGetValue(key, out var saved))
+            Dictionary<string, SkillState> skills = state.Skills.Value;
+            if (!string.IsNullOrEmpty(key) && skills.TryGetValue(key, out var saved))
                 return saved;
 
             return new SkillState(initialLevel, initiallyUnlocked);
@@ -102,8 +134,9 @@ namespace Gameplay.Skills
         {
             if (string.IsNullOrEmpty(key)) return;
 
-            skillState[key] = new SkillState(level, unlocked);
-            MarkDirty();
+            Dictionary<string, SkillState> skills = state.Skills.Value;
+            skills[key] = new SkillState(level, unlocked);
+            state.Skills.MarkDirty();
         }
 
         /// <summary>调整技能点并刷新界面；数值服务未就绪时忽略。</summary>
@@ -111,13 +144,21 @@ namespace Gameplay.Skills
         {
             if (StatsService.Instance == null) return;
             StatsService.Instance.UpdateSkillPoints(amount);
-            MarkDirty();
+            RefreshAbilityPoints();
         }
 
-        /// <summary>递增状态版本，通知界面下一帧重绘。</summary>
-        private void MarkDirty()
+        /// <summary>从数值服务读取当前技能点并写入状态。</summary>
+        private void RefreshAbilityPoints()
         {
-            dirtyVersion++;
+            int points = StatsService.Instance != null ? StatsService.Instance.Stats.SkillPoints : 0;
+            state.AbilityPoints.Value = points;
+        }
+
+        /// <summary>从数值服务刷新技能点，并把全部状态标记为待刷新。</summary>
+        public void MarkDirty()
+        {
+            RefreshAbilityPoints();
+            state.MarkAllDirty();
         }
     }
 }

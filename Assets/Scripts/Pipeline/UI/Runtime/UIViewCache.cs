@@ -18,7 +18,7 @@ namespace Pipeline.UI.Runtime
     /// </para>
     /// <para>
     /// 缓存只负责实例生命周期，不持有业务数据。界面关闭后业务状态仍由各 Manager 保存，
-    /// 重新打开时由 View 通过 <c>DirtyVersion</c> 拉取最新状态。
+    /// 重新打开时由 View 通过管理器的 <c>State</c> 拉取最新状态。
     /// </para>
     /// </remarks>
     public sealed class UIViewCache : IDisposable
@@ -42,7 +42,6 @@ namespace Pipeline.UI.Runtime
         private readonly Dictionary<CanvasToToggle, Entry> entries = new();
         private readonly LinkedList<Entry> idle = new();
         private readonly Transform owner;
-        private readonly GameObject stagingRoot;
         private readonly int maxIdleViews;
         private readonly float idleTimeoutSeconds;
         private readonly Action<CanvasToToggle, bool, bool, bool> reportState;
@@ -70,7 +69,7 @@ namespace Pipeline.UI.Runtime
         /// 且开关事件上的枚举必须与预制体的 <see cref="CachedUIView.CanvasId"/> 一致。
         /// </summary>
         /// <param name="bindings">界面注册表：预制体 + 场景挂载点。</param>
-        /// <param name="owner">缓存根节点，闲置实例暂时停放其下。</param>
+        /// <param name="owner">缓存根节点，用于判断界面当前是否可以打开。</param>
         /// <param name="maxIdleViews">最多保留的闲置实例数，0 表示关闭即销毁。</param>
         /// <param name="idleTimeoutSeconds">闲置超时秒数，0 表示关闭后下一帧淘汰。</param>
         /// <param name="reportState">向 UIManager 上报显隐、ESC 与输入阻断状态。</param>
@@ -88,11 +87,6 @@ namespace Pipeline.UI.Runtime
             this.idleTimeoutSeconds = Mathf.Max(0f, idleTimeoutSeconds);
             this.reportState = reportState;
             this.getOrder = getOrder;
-
-            // 闲置实例统一停在一个未激活的父节点下，避免它们继续执行 Update 或参与布局。
-            stagingRoot = new GameObject("InactiveUIStaging");
-            stagingRoot.SetActive(false);
-            stagingRoot.transform.SetParent(owner, false);
 
             if (bindings == null) return;
             foreach (var binding in bindings)
@@ -243,10 +237,9 @@ namespace Pipeline.UI.Runtime
             {
                 if (entry.View == null)
                 {
-                    // 先挂到停用的暂存节点，完成父级切换后再交给 Anchor，避免实例化瞬间闪现。
-                    entry.View = Object.Instantiate(entry.Prefab, stagingRoot.transform, false);
+                    // 直接建在挂载点下并立即停用，等 Open 时再激活，避免半初始化的界面参与布局。
+                    entry.View = Object.Instantiate(entry.Prefab, entry.Anchor.transform, false);
                     entry.View.gameObject.SetActive(false);
-                    entry.View.transform.SetParent(entry.Anchor.transform, false);
                     entry.View.Closed += entry.Closed;
                 }
 
@@ -335,13 +328,12 @@ namespace Pipeline.UI.Runtime
                 DestroyInstance(idle.First.Value);
         }
 
-        /// <summary>释放缓存：退订事件、关闭界面、销毁闲置实例和暂存节点。</summary>
+        /// <summary>释放缓存：退订事件、关闭界面、销毁闲置实例。</summary>
         public void Dispose()
         {
             Disconnect();
             CloseAll();
             ClearIdle();
-            if (stagingRoot != null) Object.Destroy(stagingRoot);
         }
     }
 }

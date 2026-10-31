@@ -17,7 +17,7 @@ namespace Gameplay.Skills
     /// <remarks>
     /// 槽位是 SkillsCanvas 预制体里的嵌套预制体。状态键以画布根为基准生成，
     /// 根节点由 <see cref="SkillsCanvasView"/> 在打开时通过 <see cref="BindStateRoot"/> 注入，
-    /// 不再用 <c>GetComponentInParent</c> 反查视图。
+    /// 状态路径以画布根为基准。
     /// </remarks>
     public class SkillSlot : MonoBehaviour
     {

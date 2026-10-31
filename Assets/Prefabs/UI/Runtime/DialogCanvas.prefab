@@ -1533,9 +1533,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasId: 4
   toggleEvent: {fileID: 11400000, guid: 955f6dbe397714a4ebb6c61eb71272a4, type: 2}
+  viewCanvas: {fileID: 6488684876146596961}
+  viewGroup: {fileID: 3759123316824621624}
   listenForToggleEvent: 1
   closeOnEscape: 1
   blocksGlobalInput: 0
+  speakerPortrait: {fileID: 6869753883484933926}
+  dialogText: {fileID: 1538332912359972278}
+  speakerNameText: {fileID: 6371137508629883780}
+  optionButtons:
+  - {fileID: 536906606252997941}
+  - {fileID: 5804280678853414032}
+  - {fileID: 6524730226123738554}
+  - {fileID: 734050099272200000}
+  optionTexts:
+  - {fileID: 2436894573083390046}
+  - {fileID: 3639368910540890891}
+  - {fileID: 147594271854603930}
+  - {fileID: 7575028699040587494}
 --- !u!1 &8226794290520445998
 GameObject:
   m_ObjectHideFlags: 0
@@ -1973,3 +1988,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5878640716484297849, guid: d3f06836b2efa7a418dde7b8928afd37, type: 3}
   m_PrefabInstance: {fileID: 8416646114747126551}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6869753883484933926 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3142294066857139249, guid: d3f06836b2efa7a418dde7b8928afd37, type: 3}
+  m_PrefabInstance: {fileID: 8416646114747126551}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

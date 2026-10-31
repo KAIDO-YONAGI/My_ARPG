@@ -1,5 +1,5 @@
+using Contracts;
 using Pipeline.SO;
-using Pipeline.UI.Runtime;
 using UnityEngine;
 
 namespace Gameplay.Inventory
@@ -10,16 +10,13 @@ namespace Gameplay.Inventory
     /// </summary>
     /// <remarks>
     /// 背包数据由管理器按“快捷栏在前、背包在后”的顺序保存，视图只负责把状态画到槽位上。
-    /// 首次打开时把预制体里配置的初始物品交给管理器，之后管理器不再回头读预制体。
+    /// 首次打开时把预制体里配置的初始物品交给管理器，此后管理器以内存中的槽位状态为准，预制体只提供初始值。
     /// </remarks>
     public sealed class BackpackCanvasView : CachedCanvasView
     {
         [Header("背包槽位")]
         [Tooltip("背包网格里的槽位，顺序即管理器中的背包槽位顺序。")]
         [SerializeField] private InventorySlot[] slots;
-
-        /// <summary>上次刷新时的管理器脏版本。</summary>
-        private int observedDirtyVersion = -1;
 
         /// <summary>
         /// 打开时先登记预制体上的初始物品，再刷新显示。
@@ -40,7 +37,7 @@ namespace Gameplay.Inventory
                 manager.InitializeBackpackState(items, quantities);
             }
 
-            observedDirtyVersion = -1;
+            manager?.MarkDirty();
             RefreshIfDirty();
         }
 
@@ -49,11 +46,14 @@ namespace Gameplay.Inventory
             RefreshIfDirty();
         }
 
-        /// <summary>按管理器脏版本刷新背包槽位；槽位数量不足时多余的槽位清空。</summary>
+        /// <summary>按管理器脏标记刷新背包槽位；槽位数量不足时多余的槽位清空。</summary>
         private void RefreshIfDirty()
         {
             var manager = InventoryManager.Instance;
-            if (!IsOpen || manager == null || observedDirtyVersion == manager.DirtyVersion) return;
+            if (!IsOpen || manager == null) return;
+
+            var state = manager.CurrentState;
+            if (!state.Backpack.IsDirty) return;
 
             int slotCount = slots != null ? slots.Length : 0;
             for (int i = 0; i < slotCount; i++)
@@ -64,7 +64,7 @@ namespace Gameplay.Inventory
                     slots[i].RestoreState(null, 0);
             }
 
-            observedDirtyVersion = manager.DirtyVersion;
+            state.Backpack.ClearMark();
         }
     }
 }

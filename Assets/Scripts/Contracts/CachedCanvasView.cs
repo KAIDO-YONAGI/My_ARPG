@@ -1,8 +1,7 @@
-using Contracts;
 using Pipeline.SO.Events;
 using UnityEngine;
 
-namespace Pipeline.UI.Runtime
+namespace Contracts
 {
     /// <summary>
     /// 缓存画布的通用实现：界面身份、开关事件、Canvas 与 CanvasGroup 全部由预制体序列化接线，

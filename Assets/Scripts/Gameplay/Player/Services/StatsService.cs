@@ -52,7 +52,7 @@ namespace Gameplay.Player.Services
 
         public void AddExperience(int amount) => model.AddExp(amount);
 
-        /// <summary>取当前状态的一份快照，供存档使用。返回拷贝，不是运行时状态本身。</summary>
+        /// <summary>取当前状态的一份快照，供存档使用。返回拷贝，与运行时状态相互独立。</summary>
         private PlayerStatsData GetStats() => model.ToData();
 
         /// <summary>读档：用存档数据整体替换运行时状态。</summary>

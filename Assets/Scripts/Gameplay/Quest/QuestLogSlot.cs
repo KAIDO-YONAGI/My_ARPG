@@ -10,7 +10,7 @@ namespace Gameplay.Quest
     /// </summary>
     /// <remarks>
     /// 条目本身是 QuestSlot 预制体，CanvasGroup 直接在预制体上拖引用，
-    /// 不再在 <c>Awake</c> 或每个方法里用 <c>GetComponent</c> 现取。
+    /// 控件引用在预制体上拖好，<c>Awake</c> 与各方法直接使用。
     /// </remarks>
     public class QuestLogSlot : MonoBehaviour
     {

@@ -1,10 +1,10 @@
 using System;
-using Contracts;
 using Pipeline.SO.Events;
+using Pipeline.UI.Runtime;
 using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 
-namespace Pipeline.UI.Runtime
+namespace Contracts
 {
     /// <summary>
     /// 可被 <see cref="UIViewCache"/> 缓存的普通界面基类。

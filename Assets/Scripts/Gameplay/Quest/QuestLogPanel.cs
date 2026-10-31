@@ -12,7 +12,7 @@ namespace Gameplay.Quest
     /// </summary>
     /// <remarks>
     /// 任务数据来自 <see cref="QuestManager"/>，本组件只负责把数据写到文本和槽位。
-    /// 所有控件引用都在预制体上拖好，运行时不再查找子物体。
+    /// 所有控件引用都在预制体上拖好，运行时不查找子物体。
     /// </remarks>
     public class QuestLogPanel : MonoBehaviour
     {

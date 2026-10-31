@@ -17,7 +17,7 @@ namespace Gameplay.Player.Models
     {
         /// <summary>生命值或上限变化时触发。HealthController 订阅后推给 HealthView。</summary>
         public event Action HealthChanged;
-        /// <summary>速度、伤害等属性变化时触发。StatsPanelController 订阅后推给 StatsPanelView。</summary>
+        /// <summary>速度、伤害等属性变化时触发。StatsCanvasController 订阅后推给 StatsCanvasView。</summary>
         public event Action StatsChanged;
         /// <summary>升级时触发一次，参数是本次升的级数。SkillTreeManager 订阅它发放技能点。</summary>
         public event Action<int> LevelUp;

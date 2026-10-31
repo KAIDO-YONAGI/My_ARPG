@@ -809,9 +809,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasId: 3
   toggleEvent: {fileID: 11400000, guid: bb5ccf70ac2b9954ba49cbcd636f01e1, type: 2}
+  viewCanvas: {fileID: 8839419452847094076}
+  viewGroup: {fileID: 3471111612392140427}
   listenForToggleEvent: 1
   closeOnEscape: 1
   blocksGlobalInput: 0
+  slots:
+  - {fileID: 2886400113059537132}
+  - {fileID: 4210779328965746262}
+  - {fileID: 7190313952422890053}
+  - {fileID: 1686768829167711396}
+  - {fileID: 6279970535885719695}
+  - {fileID: 7023998788864158801}
+  - {fileID: 2613438655915831754}
+  - {fileID: 1630247948253753880}
+  - {fileID: 6062903105859283470}
+  - {fileID: 3007138913612931092}
+  - {fileID: 6279273613662097924}
+  - {fileID: 2117207570392981320}
+  - {fileID: 7210933318568829296}
+  - {fileID: 3958901228048220313}
+  - {fileID: 3223709990225131712}
+  - {fileID: 520881463202223161}
+  - {fileID: 6780052976192496153}
+  - {fileID: 7642190768582122438}
+  - {fileID: 4369852722886221408}
+  - {fileID: 8583887233336564189}
+  - {fileID: 4674765793164687803}
+  - {fileID: 3975262032689985833}
+  - {fileID: 5663331224489562134}
+  - {fileID: 1448122291992482423}
+  pointsText: {fileID: 147379324721189488}
 --- !u!1 &3201192192992959414
 GameObject:
   m_ObjectHideFlags: 0
@@ -1564,6 +1592,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 6780052976192496153}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -1708,6 +1744,22 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 2117207570392981320}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[1]
+      value: 
+      objectReference: {fileID: 6279273613662097924}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[2]
+      value: 
+      objectReference: {fileID: 3007138913612931092}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 3
@@ -2015,6 +2067,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 7190313952422890053}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -2160,6 +2220,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 3223709990225131712}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -2300,6 +2368,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 4210779328965746262}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -2442,6 +2518,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 1630247948253753880}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -2582,6 +2666,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 7023998788864158801}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -2728,6 +2820,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 3958901228048220313}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -2872,6 +2972,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 7642190768582122438}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -3018,6 +3126,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 8583887233336564189}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -3162,6 +3278,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 4369852722886221408}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -3308,6 +3432,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 3975262032689985833}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -3452,6 +3584,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 520881463202223161}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -3751,6 +3891,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 1686768829167711396}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -3896,6 +4044,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 5663331224489562134}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -4036,6 +4192,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 2613438655915831754}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -4465,6 +4629,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 2886400113059537132}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -4605,6 +4777,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 6279970535885719695}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -4751,6 +4931,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 4674765793164687803}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -4768,6 +4956,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7953370996453584490, guid: ad6c571997aade34da41c92faf999008, type: 3}
   m_PrefabInstance: {fileID: 7195409567819403058}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1448122291992482423 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+  m_PrefabInstance: {fileID: 7195409567819403058}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7b53c1ab62442c49a29604d0ff471df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7683752829895393805
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4880,6 +5079,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 6062903105859283470}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1
@@ -5025,6 +5232,14 @@ PrefabInstance:
       propertyPath: skillSO
       value: 
       objectReference: {fileID: 11400000, guid: 13c041cc51c267445bdd925edcccc8a0, type: 2}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
+      propertyPath: prerequisiteSlots.Array.data[0]
+      value: 
+      objectReference: {fileID: 7210933318568829296}
     - target: {fileID: 8630015554613927237, guid: ad6c571997aade34da41c92faf999008, type: 3}
       propertyPath: preRiquriedForSkillUnlock_List.Array.size
       value: 1

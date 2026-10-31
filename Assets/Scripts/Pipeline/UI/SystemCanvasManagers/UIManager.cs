@@ -24,7 +24,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         public const int FocusOrder = CanvasFocusStack.FocusOrder;
         public const int DefaultOrder = CanvasFocusStack.DefaultOrder;
 
-        [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
+        [Header("事件")] [SerializeField] private SceneLoadEventSO loadEventSO;
 
         [Tooltip(
             "场景中已有画布的开关事件。按需创建的界面在 Prefab Cache 中登记；两种登记均支持热键、ESC、切场复位和互斥关闭。")]
@@ -39,7 +39,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
         private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
 
-        [Header("Canvas Runtime")]
+        [Header("画布运行时")]
         [SerializeField] private UICacheManager cacheManager;
         [SerializeField] private CanvasOpenedEventSO canvasOpenedEvent;
 
@@ -401,10 +401,14 @@ namespace Pipeline.UI.SystemCanvasManagers
         }
     }
 
+    /// <summary>按键与画布的绑定：按下输入动作时请求切换对应画布。</summary>
     [Serializable]
     public class CanvasInputBinding
     {
+        [Tooltip("要切换的画布。")]
         public CanvasToToggle canvas;
+
+        [Tooltip("触发切换的输入动作。")]
         public InputActionReference action;
     }
 }

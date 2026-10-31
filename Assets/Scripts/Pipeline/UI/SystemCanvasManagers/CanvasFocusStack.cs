@@ -19,7 +19,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         //用来合并外部（代码调用）输入
         private readonly LinkedList<CanvasToToggle> canvasOpenOrder = new();
 
-        //用来存已打开画布的链表，顺序访问，但是可以依赖枚举任意删除节点
+        //用来存已打开画布的链表，顺序访问，并可经枚举定位后任意删除节点
         private CanvasToToggle currentFocusCanvas = CanvasToToggle.Default;
 
         private bool isAnyCanvasOpen;

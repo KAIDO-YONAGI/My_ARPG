@@ -1,5 +1,5 @@
 using System;
-using Pipeline.UI.Runtime;
+using Contracts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -37,9 +37,6 @@ namespace Gameplay.Dialog
         /// <summary>注册到按钮上的监听，销毁时按同一委托移除。</summary>
         private UnityAction[] optionListeners = Array.Empty<UnityAction>();
 
-        /// <summary>上次刷新时的管理器脏版本。</summary>
-        private int observedDirtyVersion = -1;
-
         private void Awake()
         {
             optionButtons ??= Array.Empty<Button>();
@@ -66,7 +63,6 @@ namespace Gameplay.Dialog
         protected override void OnOpen()
         {
             DialogManager.Instance?.OnCachedViewOpened();
-            observedDirtyVersion = -1;
             RefreshIfDirty();
         }
 
@@ -76,23 +72,26 @@ namespace Gameplay.Dialog
         }
 
         /// <summary>
-        /// 按脏版本刷新当前对话。管理器在显示一行前会把行号加一，
+        /// 按脏标记刷新当前对话。管理器在显示一行前会把行号加一，
         /// 所以这里取 <c>CurrentLineIndex - 1</c> 并夹到合法范围。
         /// </summary>
         private void RefreshIfDirty()
         {
             var manager = DialogManager.Instance;
-            if (!IsOpen || manager == null || observedDirtyVersion == manager.DirtyVersion) return;
+            if (!IsOpen || manager == null) return;
 
-            var dialog = manager.CurrentDialog;
+            var state = manager.CurrentState;
+            if (!state.AnyDirty) return;
+
+            var dialog = state.CurrentDialog.Value;
             if (dialog == null || dialog.dialogLines == null || dialog.dialogLines.Length == 0)
             {
                 SetChoicesVisible(false);
-                observedDirtyVersion = manager.DirtyVersion;
+                state.ClearDirty();
                 return;
             }
 
-            int lineIndex = Mathf.Clamp(manager.CurrentLineIndex - 1, 0, dialog.dialogLines.Length - 1);
+            int lineIndex = Mathf.Clamp(state.CurrentLineIndex.Value - 1, 0, dialog.dialogLines.Length - 1);
             var line = dialog.dialogLines[lineIndex];
             if (speakerPortrait != null && line.speaker != null)
                 speakerPortrait.sprite = line.speaker.characterPortrait;
@@ -101,7 +100,7 @@ namespace Gameplay.Dialog
             if (dialogText != null)
                 dialogText.text = line.text;
 
-            bool showChoices = manager.IsShowingChoices;
+            bool showChoices = state.ShowingChoices.Value;
             for (int i = 0; i < optionButtons.Length; i++)
             {
                 bool hasOption = showChoices && i < dialog.nextDialogOptions.Length;
@@ -111,7 +110,7 @@ namespace Gameplay.Dialog
                     optionTexts[i].text = dialog.nextDialogOptions[i].optionText;
             }
 
-            observedDirtyVersion = manager.DirtyVersion;
+            state.ClearDirty();
         }
 
         /// <summary>统一隐藏或显示所有选项按钮。</summary>

@@ -1,4 +1,4 @@
-using Pipeline.UI.Runtime;
+using Contracts;
 using UnityEngine;
 
 namespace Gameplay.Shop
@@ -17,9 +17,6 @@ namespace Gameplay.Shop
         [Tooltip("商店里的商品槽位，顺序与当前分类的商品列表一致。")]
         [SerializeField] private ShopSlot[] slots;
 
-        /// <summary>上次刷新时的管理器脏版本。</summary>
-        private int observedDirtyVersion = -1;
-
         /// <summary>附近没有店主时不允许打开商店。</summary>
         protected override bool CanOpen()
         {
@@ -33,7 +30,6 @@ namespace Gameplay.Shop
             if (manager == null) return;
 
             manager.OnCachedViewOpened();
-            observedDirtyVersion = -1;
             RefreshIfDirty();
         }
 
@@ -43,15 +39,18 @@ namespace Gameplay.Shop
         }
 
         /// <summary>
-        /// 按脏版本刷新商品槽位。没有商品的槽位直接隐藏，
+        /// 按脏标记刷新商品槽位。没有商品的槽位直接隐藏，
         /// 避免切换分类后残留上一页的商品和点击目标。
         /// </summary>
         private void RefreshIfDirty()
         {
             var manager = ShopManager.Instance;
-            if (!IsOpen || manager == null || observedDirtyVersion == manager.DirtyVersion) return;
+            if (!IsOpen || manager == null) return;
 
-            var items = manager.CurrentShopItems;
+            var state = manager.CurrentState;
+            if (!state.AnyDirty) return;
+
+            var items = state.CurrentItems.Value;
             int slotCount = slots != null ? slots.Length : 0;
             for (int i = 0; i < slotCount; i++)
             {
@@ -61,7 +60,7 @@ namespace Gameplay.Shop
                     slots[i].Initialize(items[i].item, items[i].price);
             }
 
-            observedDirtyVersion = manager.DirtyVersion;
+            state.ClearDirty();
         }
 
         /// <summary>关闭时通知管理器退出商店状态。</summary>

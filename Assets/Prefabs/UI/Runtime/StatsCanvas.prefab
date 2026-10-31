@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8987585251263161933}
   - component: {fileID: 6381262706852678088}
   m_Layer: 5
-  m_Name: StatsPanel
+  m_Name: StatsCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

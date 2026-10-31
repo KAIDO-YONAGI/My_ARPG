@@ -1,7 +1,11 @@
 using UnityEngine;
 
-namespace Pipeline.SO
+namespace Contracts
 {
+    /// <summary>
+    /// 带稳定 GUID 的 ScriptableObject 基类。首次在 Inspector 校验时生成 GUID，
+    /// 之后保持不变，供需要跨版本引用配置资产的系统使用。
+    /// </summary>
     public class GuidSO : ScriptableObject
     {
         [SerializeField] private string guid;

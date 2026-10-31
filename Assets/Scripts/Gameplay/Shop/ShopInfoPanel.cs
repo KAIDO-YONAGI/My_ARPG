@@ -12,7 +12,7 @@ namespace Gameplay.Shop
     /// </summary>
     /// <remarks>
     /// 浮窗的 RectTransform 和 CanvasGroup 都在 ShopCanvas 预制体上拖引用，
-    /// 运行时不再用 <c>GetComponent</c> 获取自身组件。
+    /// 自身组件引用在预制体上拖好，运行时不调 <c>GetComponent</c>。
     /// </remarks>
     public class ShopInfoPanel : MonoBehaviour
     {
