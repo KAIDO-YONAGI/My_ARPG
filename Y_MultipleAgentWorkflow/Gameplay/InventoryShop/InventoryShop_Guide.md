@@ -2,7 +2,7 @@
 
 文档 ID：`GP-INVENTORYSHOP-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-11-01`
 权威范围：本域负责背包槽位数据与堆叠、拾取与丢弃、物品使用、金币与商店买卖这条链路；玩家数值域的内部规则归 `Gameplay.PlayerStats`，掉落物存档格式的内部规则归存档域，任务与对话如何发起奖励归各自域。
 
 ## 1. 触发线索
@@ -23,17 +23,17 @@
 
 ### 2.1 背包数据结构与堆叠规则
 
-- 背包没有独立的数据类。槽位就是场景里的 `InventorySlot` 组件，`InventoryManager.Start` 用两次 `GetComponentsInChildren` 把 `hotbarParent` 与 `backpackParent` 的子槽位拼成一个运行时 `List<InventorySlot>`。这份列表的顺序决定优先级：快捷栏在前、背包在后，填充总是从快捷栏开始。
-- 槽位私有状态只有 `itemSO` 与 `quantity` 两个字段，对外只读暴露 `ItemSO`、`Quantity`、`IsEmpty`。
-- 堆叠上限来自 `ItemSO.stackableSize`。`AddItem` 在同类物品上取上限减去现有数量，在空槽上取 `stackableSize`，返回实际放入数量；`SpaceRemaining` 用同一套上限，购买前的容量检查走 `HasSpaceForItem`。
-- `RemoveItem` 在数量归零时把 `quantity` 归 0 并清空 `itemSO`，维持空槽 `itemSO` 为 null 的不变量；`UpdateUI` 在 `quantity <= 0` 时同样清空 `itemSO`。
+- `InventoryManager.State` 保存金币与快捷栏、背包两组 `InventorySlotState` 列表，每组各带脏标记。入包先遍历快捷栏再遍历背包，各组顺序由视图的序列化槽位数组决定。
+- `InventorySlot` 保存物品与数量的显示副本，并以 `IsBackpackSlot`、`SlotIndex` 标记槽位地址。快捷栏在首次初始化时配置地址，背包每次打开时为当前实例配置地址。
+- 堆叠上限来自 `ItemSO.stackableSize`，`AddToSlots` 按顺序填充空槽或同类物品槽位，返回剩余数量；`HasSpaceForItem` 检查两组列表的剩余空间。
+- `RemoveFromSlot` 在数量归零时清空物品引用并标记对应列表。视图读取状态后通过 `RestoreState` 更新控件；首次初始化接收视图初始配置，缓存重建沿用管理器中的数据。
 - 背包内容与金币都不入档：`SaveData` 顶层只有 `lootsStatsDic`、`sceneIDAndPlayerPos`、`playerStatsData` 三个字段，`InventoryManager` 未实现 `ISaveable`。组件挂在常驻场景上，因此一次运行内跨游戏场景保留，读档后回到本局的运行值。
 
 ### 2.2 拾取、丢弃、使用三条入口
 
 - 拾取：`Loot.OnTriggerEnter2D` 判定 `Player` 标签与 `canBePick`，播 `Pickup` 动画并广播 `lootEvent.OnEventRaised(item, quantity, this)`，由 `InventoryManager.OnItemLootedHandler` 接手并调 `UpdateInventorySlots`。
-- 丢弃：右键槽位触发 `InventoryManager.DropByClick`，先 `DropLoot(ItemSO, 1)` 再 `slot.RemoveItem(1)`。`DropLoot` 走 `ObjectPool<Loot>`，池取不到对象时一次性实例化兜底并手工补一次 `OnPoolGet`。掉落物经 `SceneManager.MoveGameObjectToScene` 挂到当前场景根，`Loot.OnPoolGet` 先把父级置空。
-- 使用：左键槽位且商店未打开时调 `InventoryManager.UseItem`，随后执行 `useItem.ApplyItemEffects`、`slot.RemoveItem(1)`，并写物品史 `-1`。
+- 丢弃：右键槽位触发 `InventoryManager.DropByClick`，管理器按槽位地址取物品，先 `DropLoot` 再 `RemoveFromSlot` 扣减。掉落物通过 `ObjectPool<Loot>` 取得，池耗尽时实例化兜底，随后移到当前场景。
+- 使用：左键槽位且商店未打开时调 `InventoryManager.UseItem`，按槽位地址取物品，执行效果后扣减状态并更新物品史。
 - 拾取余量：`UpdateInventorySlots` 放完所有槽位后仍有 `quantity > 0` 时，用 `DropLoot` 把余量掉在玩家脚下；来源是同一个 `Loot` 对象时走原地重掉分支，位移到玩家位置、`Initialize`、重新激活并延时恢复可拾取。
 
 ### 2.3 物品使用对数值域的写命令
@@ -57,18 +57,18 @@
 
 - 商品数据由 `ShopKeeper` 持有，分 `shopItems`、`shopWeapon`、`shopArmor` 三类列表，元素是 `ShopItems{item, price}`。
 - 玩家进出范围经 `ShopKeeperEventSO` 到 `ShopManager.OnKeeperEntered` 与 `OnKeeperExited`，记录 `activeShopKeeper`；离开时商店若开着就 `CloseShop`。
-- 开关经 `toggleShopCanvasEvent.toggleCanvasEvent` 到 `OnShopToggle`；打开时用 `activeShopKeeper` 的三份列表调 `OpenShop`，再由 `PopulateShopItems` 逐槽 `Initialize(item, price)`，多余槽位 `SetActive(false)`。
-- 买入：`ShopSlot.OnBuyButtonClick` 调 `IShopInteractable.TryBuyItem`，后者发 `InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, price, 1)`。
-- 卖出：左键背包槽位且 `ShopManager.Instance.IsShopOpen` 为真时，先 `SetSlotBeenClicked(this)` 再 `ShopManager.Instance.SellItem(itemSO)`。`SellItem` 在当前 `shopSlots` 里找同名 `ItemSO`，命中后以负价格、负数量发事件。
+- 缓存接收商店开关事件，`ShopCanvasView.CanOpen` 检查店主。打开后管理器装载商品状态并标脏，视图逐槽显示当前分类的商品，多余槽位隐藏。
+- 买入：`ShopSlot.OnBuyButtonClick` 调 `ShopManager.TryBuyItem`，后者发布正价格与正数量请求。
+- 卖出：左键物品槽位且商店打开时，先 `SetSlotBeenClicked` 保存地址，再 `ShopManager.SellItem` 按当前分类的物品引用匹配报价，发布负价格与负数量请求。
 - 结算集中在 `InventoryManager.HandleShopping`：`goldAmount` 小于 `price` 时直接返回；买入在 `HasSpaceForItem` 通过后先 `UpdateGold(price)` 再 `UpdateInventorySlots(item, amount)`；卖出先 `UpdateGold(price)` 再 `UpdateInventorySlots(item, amount)`。
-- 金币的写入点是 `UpdateGold` 与 `UpdateInventorySlots` 的 `isGold` 分支：`UpdateGold` 做 `goldAmount -= price` 并刷新 `goldAmountText`，`isGold` 分支做 `goldAmount += quantity` 并刷新同一文本。两处都必须同步文本，文本是硬引用。
+- 金币的写入点是 `UpdateGold` 与 `UpdateInventorySlots` 的 `isGold` 分支，两处只修改 `State.Gold` 并置脏；`HotbarCanvasView` 拉取并刷新金币文本，快捷栏槽位按自己的脏标记刷新。
 - 货币来源：`goldAmount` 初值为 0，增加路径是拾取或奖励 `isGold` 物品时的 `goldAmount += quantity`，以及出售时经 `UpdateGold` 以负价格反向增加；金币没有其它增加入口。
 - 商店不消耗库存：`TryBuyItem` 只发事件，商店侧没有数量扣减与售罄处理。
 
 ### 2.6 订阅惯例与画布
 
 - 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`；场景加载事件统一用来复位画布。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 统一订阅。
-- 面板显隐分两条路：`BackpackCanvasManager` 仍实现 `ICanvasManager`，把 `ToggleCanvasEvent`、`SceneLoadedEvent` 暴露给 `UIManager`；商店界面由 `ShopCanvasView`（继承 `CachedCanvasView`，预制体 `ShopCanvas.prefab`）承担，登记在 `UICacheManager.views`，打开前用 `CanOpenFromView` 判断有无店主。
+- 背包与商店分别由 `BackpackCanvasView`、`ShopCanvasView` 承担，预制体登记在 `UICacheManager.views`。缓存统一管理实例、开关和焦点，业务管理器持有运行状态。
 - 面板内部控件由 `ShopCanvasView` 注入数据：`ShopSlot` 与 `ShopCategoryToggles` 不持 `shopRef`，也不做 `IShopInteractable` 转换；管理器对外暴露 `State` 与买卖命令。
 - `InventorySlot` 直接走 `ShopManager.Instance`。
 - 商店头像相机订阅同一 `ShopKeeperEventSO`，无 keeper 时按 `hideWhenNoShopKeeper` 关闭 Camera，`LateUpdate` 跟目标偏移。
@@ -103,9 +103,9 @@
 
 `UpdateInventorySlots` 的负数分支只认这个字段，未设置时只打一条 `Debug.Log("No slot been Marked")`，随后保留物品。
 
-### 3.4 金币的写入点是 `UpdateGold` 与 `isGold` 分支，两处都必须同步 `goldAmountText`
+### 3.4 金币与槽位分别标脏
 
-文本是硬引用，为空即抛 `NullReferenceException`。
+管理器写 `State.Gold` 后由常驻 `HotbarCanvasView` 更新文本；金币变化只触发金币显示，快捷栏与背包按对应列表的脏标记刷新。
 
 ### 3.5 `isGold` 与 `isEXP` 分支先于数量正负判断
 
@@ -121,4 +121,4 @@
 
 ### 3.8 槽位顺序即优先级
 
-`Start` 里 hotbar 先于 backpack 拼接，改动层级会改变入包顺序与背包满时的表现。
+管理器先填快捷栏再填背包；各组内的优先级由视图序列化槽位数组的顺序决定。

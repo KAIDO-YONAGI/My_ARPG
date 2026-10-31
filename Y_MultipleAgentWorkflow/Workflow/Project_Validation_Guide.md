@@ -111,7 +111,7 @@
 
 ### C12 EditMode 测试
 
-- 用途：跑现有 52 个 EditMode 用例。
+- 用途：跑现有 60 个 EditMode 用例。
 - 命令：
   ```powershell
   & "D:\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe" `

@@ -2,7 +2,7 @@
 
 文档 ID：`GP-DIALOG-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-11-01`
 权威范围：对话域当前代码与资产的实际行为，含对话树结构与推进、Refuse 前置条件判定、角色与物品历史记录的写入与读取、NPC 触发链、对话画布的开关归属。任务域的状态机与发奖、背包内部堆叠规则、UIManager 的焦点栈实现细节分别归任务域、背包域与架构域文档。
 
 ## 1. 触发线索
@@ -105,7 +105,7 @@
 
 ### 3.5 对话画布的开关请求由 NPC 触发器承接
 
-触发器订阅 `ToggleDialogEvent`，`DialogManager` 的 `ToggleCanvasEvent` 返回 null。按键开对话与关对话的改点在触发器。
+触发器订阅 `ToggleDialogEvent`，收到打开请求后在 `Update` 调用 `DialogManager.StartDialog`。管理器先准备对话状态，再请求缓存打开；预制体的 `OpenOnToggleEvent` 关闭直接打开路径。缓存始终接收关闭事件，NPC 触发器同时结束对话状态，ESC 与互斥沿用统一关闭路径。
 
 ### 3.6 `ForeceEndDialog()` 只清状态与画布
 

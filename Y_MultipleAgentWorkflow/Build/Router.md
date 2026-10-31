@@ -2,8 +2,8 @@
 
 文档 ID：`BUS-BUILD`
 状态：`Active`
-维护计数：`1/5`
-最后更新：`2026-10-31`
+维护计数：`2/5`
+最后更新：`2026-11-01`
 
 ## 任务线索
 
@@ -35,5 +35,5 @@
 
 - `AndroidBuild_Guide.md`：Android 构建环境自检顺序；两类已知故障的根因与幂等修复，即代理未继承与非 ASCII 的 StreamingAssets 名；产物位置与签名现状。
 - `ProjectConfig_Guide.md`：重现阶段一份可构建工程所需的最小事实，含 Editor 版本、包依赖、场景列表与顺序、Player/Build 配置原值、程序集结构、Addressables 状态。
-- `TestBaseline_Guide.md`：测试位置与框架、52 个用例的分布、覆盖与零覆盖域、纯 C# 选型及其边界、asmdef 约束。
+- `TestBaseline_Guide.md`：测试位置与框架、用例分布、覆盖与零覆盖域、纯 C# 选型及其边界、asmdef 约束。
 - 只读检查命令见 `..\Workflow\Project_Validation_Guide.md`，涵盖代理状态查询、产物与签名检查。

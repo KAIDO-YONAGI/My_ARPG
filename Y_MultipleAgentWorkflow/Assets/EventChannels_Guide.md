@@ -2,7 +2,7 @@
 
 文档 ID：`ASSETS-EVENTCHANNELS-GUIDE`
 状态：`Active`
-最后更新：`2026-10-31`
+最后更新：`2026-11-01`
 权威范围：本文件只对事件通道这一资产的清单、类型契约、订阅与发布惯例、命名与接线检查清单负责。事件总线机制与 MVC 及服务层的边界属 Architecture 域，场景、存档、任务等业务语义属各自 Gameplay 域。
 
 ## 1. 触发线索
@@ -64,7 +64,7 @@
 
 ### 2.4 订阅与发布惯例
 
-**订阅必须成对。** 场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订；纯 C# Controller 在构造与 `Dispose` 中成对处理。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 承接，并随 `UICacheManager` 启停；View 停用不会切断重新打开的入口。属性面板与五个玩法面板只在 `OnOpen/OnClose` 中订阅和退订各自的场景完成事件。
+**订阅必须成对。** 场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订；纯 C# Controller 在构造与 `Dispose` 中成对处理。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 承接，并随 `UICacheManager` 启停；View 停用时开关入口仍然有效。`OpenOnToggleEvent` 控制是否直接响应打开，对话与任务先由业务入口准备数据再打开；缓存始终接收关闭请求。
 
 代表写法，取字段、`+=` 与同名 `-=` 一次可见：
 
@@ -139,7 +139,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 
 `ScriptableObject` 资产的生命周期比场景对象长。只订阅不退订会保留已销毁实例，重复订阅会让一次广播触发多次回调。场景组件使用 `OnEnable/OnDisable`，Controller 使用构造与 `Dispose`，缓存 View 使用 `OnOpen/OnClose`，缓存服务使用 `Connect/Disconnect`。
 
-另一套机制是静态事件：`SkillSlot` 用的是 `public static event`，`SkillManager` 也成对订阅，静态事件跨场景存活。新增 SO 通道订阅时照抄 SO 通道的成对写法。
+另一套机制是静态事件：`SkillSlot` 用的是 `public static event`，由 `SkillTreeManager` 成对订阅，静态事件跨场景存活。新增 SO 通道订阅时照抄 SO 通道的成对写法。
 
 ### 3.2 canvasToToggle 是隐式身份，必须唯一
 

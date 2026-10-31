@@ -31,7 +31,7 @@
 |---|---|---|---|
 | `Contracts` | 12 | 跨域共享的接口、基类与枚举 | 类型被两个以上域直接引用，且其中不含具体业务规则 |
 | `Pipeline` | 59 | 引擎级基建：场景切换、寻路、对象池、UI 系统基建、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
-| `Gameplay` | 65 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
+| `Gameplay` | 62 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
 
 `Contracts` 的 12 个文件全部声明 `namespace Contracts`。`MyEnums.cs` 提供 `PlayerState` `EnemyState` `SceneType` `PersistentType` `AStarNodeType` `NPCState` `QuestState` `CanvasToToggle` `SaveType` `SaveLoadPanelType` 十个顶层枚举，引用时写 `using Contracts;` 后直接用枚举名。缓存界面的基类 `CachedUIView`、`CachedCanvasView`，管理器与视图共享的 `DirtyValue<T>`，以及资产基类 `GuidSO` 都在这一层。
 
@@ -40,7 +40,7 @@
 按 `using` 指令统计：
 
 - `Contracts` → `Gameplay`：**2 处**，`ISaveable` 与 `SaveableService` 各引一次 `Gameplay.Save`；`Contracts` → `Pipeline`：**7 处**，`CachedUIView` 引 `Pipeline.SO.Events`、`Pipeline.UI.Runtime` 与 `Pipeline.UI.SystemCanvasManagers`，`CachedCanvasView` 与 `ICanvasManager` 引 `Pipeline.SO.Events`，`IShopInteractable` 引 `Pipeline.SO`。
-- `Gameplay` → `Contracts`：**34 处**；`Gameplay` → `Pipeline`：**71 处**。
+- `Gameplay` → `Contracts`：**32 处**；`Gameplay` → `Pipeline`：**66 处**。
 - `Pipeline` → `Contracts`：**26 处**；`Pipeline` → `Gameplay`：**6 处**，分别是 `ContinueButton`、`LootEventSO`、`MobileAttackButton`、`PlayerStatsSO`、`SceneChanger`、`ShopKeeperEventSO` 各 1 处。
 
 方向口径：`Contracts` 被所有域引用是设计意图，`Contracts → Gameplay/Pipeline` 的 9 处算反向依赖；`Pipeline → Gameplay` 的 6 处同样算反向依赖。
@@ -79,7 +79,7 @@
 
 **命名空间一律跟随目录**：命名空间就是文件相对 `Assets\Scripts\` 的目录路径，点号代替反斜杠，目录名原样保留大小写。`Contracts\MyEnums.cs` 是 `Contracts`，`Gameplay\Units\Enemy\EnemyCombat.cs` 是 `Gameplay.Units.Enemy`，`Pipeline\SO\Events\VoidEventSO.cs` 是 `Pipeline.SO.Events`。全部 26 个命名空间都遵循这条对应关系。
 
-26 个命名空间覆盖全部 136 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
+26 个命名空间覆盖全部 133 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
 
 | 层 | 命名空间 | 文件数 |
 |---|---|---|
@@ -96,7 +96,7 @@
 | `Gameplay` | `Gameplay.Dialog` | 2 |
 | | `Gameplay.Dialog.HistoryManager` | 3 |
 | | `Gameplay.Grid` | 2 |
-| | `Gameplay.Inventory` | 7 |
+| | `Gameplay.Inventory` | 6 |
 | | `Gameplay.Player` | 7 |
 | | `Gameplay.Player.Controllers` | 4 |
 | | `Gameplay.Player.Models` | 3 |
@@ -105,24 +105,24 @@
 | | `Gameplay.Quest` | 7 |
 | | `Gameplay.Save` | 6 |
 | | `Gameplay.Shop` | 6 |
-| | `Gameplay.Skills` | 5 |
+| | `Gameplay.Skills` | 3 |
 | | `Gameplay.Units.Enemy` | 4 |
 | | `Gameplay.Units.NPC` | 4 |
 | | `Gameplay.Units.ShopKeeper` | 1 |
 
-- 合计 136 个产品代码文件；测试侧 5 个文件同样是 `namespace Gameplay.Tests`。
-- 全局命名空间只剩 1 个编辑器脚本 `Assets\Editor\InputActionReferenceRebuilder.cs`，它不在 `Assets\Scripts` 下，不受"跟随目录"规则约束。产品代码、测试与编辑器脚本合计 142 个源文件。
+- 合计 133 个产品代码文件；测试侧 6 个文件同样是 `namespace Gameplay.Tests`。
+- 全局命名空间只剩 1 个编辑器脚本 `Assets\Editor\InputActionReferenceRebuilder.cs`，它不在 `Assets\Scripts` 下，不受"跟随目录"规则约束。产品代码、测试与编辑器脚本合计 140 个源文件。
 - 跨命名空间调用一律靠 `using`；同一命名空间内的类型直接可见。
 
 ### 2.6 单例基类与写入口
 
-`YSingleton<T>` 提供 `Instance` 只读访问、重复实例自毁、`OnDestroy` 复位。工程里 18 个具体类直接继承它，加一个抽象中间层 `SaveableService<TSelf>`。
+`YSingleton<T>` 提供 `Instance` 只读访问、重复实例自毁、`OnDestroy` 复位。工程里 19 个具体类直接继承它，加一个抽象中间层 `SaveableService<TSelf>`。
 
 `SaveableService` 是单例与存档身份的合并基类：继承即自动注册进 `SaveRegistry`、销毁自动注销、`GetDataID()` 固定返回 `null` 表示走固定槽位存档。`StatsService` 是它当前唯一的子类，也是唯一写入口这条约定的落地处。
 
 ### 2.7 边界测试
 
-编辑器侧测试共 5 个文件、合计 52 个 `[Test]`：
+编辑器侧测试共 6 个文件、合计 60 项用例：
 
 | 文件 | 用例数 | 守的边界 |
 |---|---|---|
@@ -131,8 +131,9 @@
 | `AStarOpenHeapTests` | 6 | 寻路的开放列表堆 |
 | `ObjectPoolTests` | 5 | 对象池 |
 | `PlayerStatsSOTests` | 2 | 配置资产的拷贝语义 |
+| `UICacheRegressionTests` | 8 | 缓存事件路由、任务选择与关闭、背包槽位地址、快捷栏局部刷新 |
 
-这 5 个文件位于编辑器侧测试目录、无 asmdef，编译进默认程序集，与产品代码同程序集，可直接 `new` 内部类型并反射 `StatsService`。
+这 6 个文件位于编辑器侧测试目录、无 asmdef，编译进默认程序集，与产品代码同程序集，可直接 `new` 内部类型并反射 `StatsService`。
 
 ## 3. 约定与硬边界
 

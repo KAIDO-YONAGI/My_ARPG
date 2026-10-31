@@ -2,7 +2,7 @@
 
 文档 ID：`ARCH-COMPOSITION-GUIDE`
 状态：`Active`
-最后更新：`2026-10-31`
+最后更新：`2026-11-01`
 权威范围：场景实例如何被组合成全局服务图，以及这些服务在 Unity 生命周期里的初始化先后与竞态兜底方式。各业务域自身的数据流归 Gameplay 域与 SceneFlow 域，程序集拆分规划归 AssemblyPlan 域。
 
 ## 1. 触发线索
@@ -101,7 +101,7 @@
 
 ### 2.6 UI 画布焦点栈契约
 
-`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 6 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SkillTreeCanvasManager`、`SaveLoadCanvasManager`、`BackpackCanvasManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。`StatsCanvasView` 与对话、任务、商店、技能四个面板由 §2.7 的缓存托管；`DialogManager`、`QuestManager`、`ShopManager`、`SkillTreeManager` 是这些界面的数据侧，不实现该接口。
+`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 4 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SaveLoadCanvasManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。属性、对话、任务、商店、技能、背包六个面板由 §2.7 的缓存托管；各业务管理器保存数据，预制体视图持有控件引用并按脏标记拉取状态。
 
 反向依赖有两处，都在默认实现里直读单例：`SetCanvaState` 末行调静态入口 `UIManager.Report(...)`，该入口集中判空，未注册时静默跳过；`RefreshCanvaOrder` 直读 `UIManager.Instance`，`Instance` 为 null 时静默退化为 `UIManager.DefaultOrder`。`UIManager` 为此保留常量转发与 `GetCanvasOrder` 转发，接口引用保持不变。
 
@@ -113,9 +113,11 @@
 
 注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasView` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。首次打开才实例化。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
 
-缓存持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。View 在 `OnOpen` 绑定数据并首刷，在 `OnClose` 退订，界面被淘汰前还会调 `OnCacheDestroy` 供派生类保存易失状态（技能树靠它保存等级与解锁）。关闭后停用整个对象；派生类若重写 `OnDisable`，必须调基类实现。
+缓存持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。`OpenOnToggleEvent` 决定打开请求是否直接交给缓存；对话与任务由业务入口先准备数据，再调用 `OpenCanvas`。关闭请求始终由缓存处理，ESC 与互斥沿用同一路径。
 
-淘汰有两条规则：字典定位实例，双向链表按关闭顺序保存闲置实例，超出 `maxIdleViews` 销毁队首；另有 `idleTimeoutSeconds`（默认 120 秒）按关闭时刻清超时实例。打开中的界面不入链表。`UIManager` 打开画布并确认状态后广播 `CanvasOpenedEventSO`，`UICacheManager` 订阅它刷新最近使用序号。切场时先关闭全部界面再清空闲置；管理器销毁时退订并释放缓存。预制体以直接引用方式持有，销毁实例时其引用的资源资产保留在内存中。
+View 在 `OnOpen` 读取管理器状态并首刷，在 `OnClose` 释放打开期间的订阅，界面被淘汰前调 `OnCacheDestroy`。背包与技能运行状态由持久管理器保存。关闭后停用整个对象；派生类若重写 `OnDisable`，必须调基类实现。
+
+淘汰有两条规则：字典定位实例，双向链表按最近使用序号保存闲置实例，超出 `maxIdleViews` 销毁队首；`idleTimeoutSeconds` 按关闭时刻逐项检查超时。策略参数在 `UICacheManager` 的 Inspector 中配置。打开中的界面不入链表。`UIManager` 打开画布并确认状态后广播 `CanvasOpenedEventSO`，`UICacheManager` 订阅它刷新最近使用序号。切场时先关闭全部界面再清空闲置；管理器销毁时退订并释放缓存。预制体以直接引用方式持有，销毁实例时其引用的资源资产保留在内存中。
 
 常驻场景登记了 6 块界面：`StatsCanvas`、`SkillsCanvas`、`ShopCanvas`、`DialogCanvas`、`QuestCanvas`、`BackpackCanvas`，预制体都在 `Assets/Prefabs/UI/Runtime/`。热键、ESC、互斥和排序仍走原有 `CanvasFocusStack`。常驻 HUD（快捷栏）不接入缓存，由 `HotbarCanvasView` 常驻。
 

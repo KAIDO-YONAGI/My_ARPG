@@ -50,7 +50,7 @@
 ### 2.3 程序集结构：0 个 asmdef
 
 - 工程内无 asmdef —— 产品代码全部落在预定义程序集里。
-- 编辑器程序集名为 `Assembly-CSharp-Editor`，`Compile Include` 收录 5 个测试文件与编辑器侧的 `InputActionReferenceRebuilder`，并 `ProjectReference` 到 `Assembly-CSharp`；两者都引用 `nunit.framework`，由扩展 NUnit 包提供。
+- 编辑器程序集名为 `Assembly-CSharp-Editor`，`Compile Include` 收录 6 个测试文件与编辑器侧的 `InputActionReferenceRebuilder`，并 `ProjectReference` 到 `Assembly-CSharp`；两者都引用 `nunit.framework`，由扩展 NUnit 包提供。
 - 相关约定见 §3.3 与 `TestBaseline_Guide.md`。
 
 ### 2.4 构建场景列表与顺序
@@ -128,7 +128,7 @@
 
 ### 3.3 不要给测试加 asmdef 而不改引用
 
-当前 0 asmdef，现有 52 个用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
+当前 0 asmdef，现有 60 项用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
 
 ### 3.4 不要依赖仓库外依赖能解析
 

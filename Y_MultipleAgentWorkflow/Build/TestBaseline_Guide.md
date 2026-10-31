@@ -2,7 +2,7 @@
 
 文档 ID：`BUILD-TESTBASELINE-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-11-01`
 权威范围：只负责本工程自动化测试的现状事实——位置、框架、用例分布、覆盖与零覆盖域。逐条用例的断言内容归各业务域 Guide；测试执行命令见 `..\Workflow\Project_Validation_Guide.md`。本域只描述已落地的测试，不列测试计划。
 
 ## 1. 触发线索
@@ -23,29 +23,30 @@
 
 ### 2.1 位置与框架
 
-- 测试集中在 `Tests/Editor` 目录下，共 **5 个文件**，命名空间统一为 `Gameplay.Tests`，与产品代码的 25 个命名空间互不重合。
+- 测试集中在 `Assets/Tests/Editor` 目录下，共 6 个文件，命名空间统一为 `Gameplay.Tests`。
 - 框架为 Unity Test Framework **1.4.6**；断言用 NUnit，`nunit.framework` 由扩展 NUnit 包提供。
 - **0 个 asmdef**。测试与编辑器侧的 `InputActionReferenceRebuilder` 一起被编译进预定义编辑器程序集 `Assembly-CSharp-Editor`，该程序集引用 `Assembly-CSharp`。
 
 ### 2.2 用例分布
 
-5 个文件、52 个 `[Test]`：
+6 个文件，共 60 项用例：
 
-| 文件 | `[Test]` 数 | 被测对象 |
+| 文件 | 用例数 | 被测对象 |
 |---|---|---|
 | `PlayerStatsModelTests` | 24 | `PlayerStatsModel` / `StatsService`：钳制、事件广播、经验曲线、等级上限、拷贝语义 |
 | `CanvasFocusStackTests` | 15 | `CanvasFocusStack`：开闭顺序、order 计算、ESC 行为 |
 | `AStarOpenHeapTests` | 6 | `AStarOpenHeap`：堆序、平局规则、重复入堆、随机输入排序 |
 | `ObjectPoolTests` | 5 | `ObjectPool<T>`：预热、Get/Return 回调、池内对象销毁后的选取 |
 | `PlayerStatsSOTests` | 2 | `PlayerStatsSO.CreateInitialData()`：模板拷贝语义 |
-| **合计** | **52** | |
+| `UICacheRegressionTests` | 8 | 任务选择与关闭、背包槽位地址、金币局部刷新、对话与任务的开关路由 |
+| **合计** | **60** | |
 
-- 特性统计：`[Test]` 52，`[TestCase]` 0，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
-- `[SetUp]` 与 `[TearDown]` 分布在 `ObjectPoolTests`、`PlayerStatsSOTests`、`PlayerStatsModelTests`，`CanvasFocusStackTests` 亦有 `SetUp`。
+- 特性统计：`[Test]` 58，`[TestCase]` 2，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
+- `[SetUp]` 与 `[TearDown]` 分布在 `ObjectPoolTests`、`PlayerStatsSOTests`、`PlayerStatsModelTests`、`UICacheRegressionTests`，`CanvasFocusStackTests` 亦有 `SetUp`。
 
 ### 2.3 用例计数的口径
 
-- 本指南的口径：5 个文件、52 个 `[Test]`，与 §2.2 的表格一致。
+- 每个 `[Test]` 计一项，每个 `[TestCase]` 参数实例计一项；用例数按此口径汇总。
 
 ### 2.4 选型：测试落在不依赖 UnityEngine 的纯 C# 逻辑上
 
@@ -62,14 +63,15 @@
 | `PlayerStatsModelTests` | 是 | 24 个用例中 1 个用引擎 API：`LogAssert.Expect(LogType.Warning, ...)` |
 | `ObjectPoolTests` | 是 | 5 个用例构造 `GameObject` 与 `MonoBehaviour`，依赖 EditMode 下的 `Object.DestroyImmediate` |
 | `PlayerStatsSOTests` | 是 | 2 个用例用 `ScriptableObject.CreateInstance` 与 `Object.DestroyImmediate` |
+| `UICacheRegressionTests` | 是 | 临时组件与 SO 验证业务状态；读取实际预制体验证打开策略和关闭路由 |
 
 这套测试整体需要 Unity 才能运行。
 
 ### 2.5 覆盖与零覆盖
 
-有覆盖的只有 4 个被测类型加 1 个 SO：`PlayerStatsModel` / `StatsService`、`CanvasFocusStack`、`AStarOpenHeap`、`ObjectPool<T>`、`PlayerStatsSO`。
+有覆盖的对象包括 `PlayerStatsModel` / `StatsService`、`CanvasFocusStack`、`AStarOpenHeap`、`ObjectPool<T>`、`PlayerStatsSO`，以及任务视图、背包槽位、快捷栏与缓存事件路由。
 
-**零覆盖域**：对话、任务、商店与背包、存档、场景编排与加载、技能、单位与 NPC；测试目录下对这些域无任何引用，其中场景编排与加载指 `SceneChanger` 与 `InitialLoad`。
+缓存回归覆盖对话与任务预制体的开关策略、任务选择与关闭、背包槽位地址、快捷栏局部刷新。商店交易、完整对话流程、存档、场景编排与加载、技能、单位与 NPC 的业务路径依靠手工验证。
 
 改 `PlayerStatsModel`、`StatsService`、`ExperienceController` 之前先跑绿 `PlayerStatsModelTests`。
 
@@ -81,7 +83,7 @@ headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：
 
 ### 2.7 无 PlayMode 测试
 
-52 个用例全为 `[Test]`，见 §2.2；`[UnityTest]` 为 0，仓库中不存在显式的 PlayMode 测试。“进场景 / 场景切换 / 存档往返”这类路径靠手工验证，真机冒烟见 `AndroidBuild_Guide.md` §2.7。
+用例使用 NUnit 的 `[Test]` 与 `[TestCase]` 在 EditMode 执行。“进场景 / 场景切换 / 存档往返”这类路径靠手工验证，真机冒烟见 `AndroidBuild_Guide.md` §2.7。
 
 ## 3. 约定与硬边界
 
@@ -93,7 +95,7 @@ headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：
 
 ### 3.2 新增 asmdef 会排除现有测试
 
-当前 0 asmdef 是“测试能自动被 Test Runner 看到”的前提。引入 asmdef 后这 5 个文件改由新程序集编译，必须显式引用 `UnityEngine.TestRunner`、`UnityEditor.TestRunner`、test-framework 与产品程序集，否则编译不通过或测试无法被枚举。
+当前测试由预定义编辑器程序集编译；引入 asmdef 后必须显式引用 `UnityEngine.TestRunner`、`UnityEditor.TestRunner`、test-framework 与产品程序集。
 
 ### 3.3 不要用 IDE 用的 MSBuild 目标文件判断测试是否被排除
 
@@ -105,7 +107,7 @@ headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：
 
 ### 3.5 测试数量
 
-5 个文件、52 个 `[Test]`，见 §2.2。
+用例分布与计数口径见 §2.2、§2.3。
 
 ### 3.6 同一工程不能同时开两个 Editor 实例
 

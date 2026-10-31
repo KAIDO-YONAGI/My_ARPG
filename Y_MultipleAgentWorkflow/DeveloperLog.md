@@ -17,7 +17,7 @@
 - 触发：技能、商店、对话、任务、背包四类面板与属性面板统一改为按需创建的缓存界面。
 - 代码：新增 `UICacheManager`（持 `UIViewCache`，按 `prefab + anchor` 注册，闲置容量 3、闲置超时 120 秒）与 `CanvasOpenedEventSO`；`CachedUIView` 增加 `CanvasId`、`ListenForToggleEvent`、`CanOpen`、`OnCacheDestroy`，`Open` 返回 bool；新增通用基类 `CachedCanvasView`。
 - 业务侧：`DialogManager`、`QuestManager`、`ShopManager`、`SkillTreeManager` 去掉 `ICanvasManager` 与控件引用，改暴露 `State` 与 `DirtyValue` 字段；新增 `DialogCanvasView`、`QuestCanvasView`、`ShopCanvasView`、`SkillsCanvasView`、`BackpackCanvasView`，常驻快捷栏拆出 `HotbarCanvasView`。
-- 资产：6 块界面移入 `Assets/Prefabs/UI/Runtime/`，常驻场景只留 Anchor，行数从 36928 降到 14966。
+- 资产：6 块界面移入 `Assets/Prefabs/UI/Runtime/`，常驻场景只留 Anchor。
 - 文档：本次复核了 `Architecture/Layering`、`Architecture/Composition`、`Assets/EventChannels`、`Gameplay/Dialog`、`Gameplay/Quest`、`Gameplay/InventoryShop`、`Gameplay/Skills`、`Gameplay/PlayerStats` 的 Guide，并各自维护计数 +1。
 - 验证：Roslyn `csc` 配 Unity 2022.3.62f3c1 的 286 条程序集引用编译 141 个源文件，0 error 0 warning；各提交批次分别验证可编译。
 

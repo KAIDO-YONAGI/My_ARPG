@@ -137,7 +137,7 @@ expToUpgrade = Mathf.Max(1, expToUpgrade + step)  // 下限仍受 MinExpToUpgrad
 | `UseItem.ApplyItemEffects` | `UpdateMaxHealth` / `UpdateHealth` / `UpdateSpeed` / `UpdateDamage` |
 | `UseItem.EffectTimer` 到期回滚 | 上述四个命令的反向调用 |
 | `SkillTreeManager.UpdateAbilityPoints` | `UpdateSkillPoints(amount)` |
-| `SkillManager` 的 `MaxHealthBoost` 分支 | `UpdateMaxHealth(1)` 加 `UpdateHealth(1)` |
+| `SkillTreeManager.UpdateAbilityPoints` | `UpdateSkillPoints(amount)` |
 
 只读消费方直接读 `Stats`，不经过服务方法：`PlayerCombat` 读 WeaponRange 与 Damage；`PlayerBow` 读 CoolDown；`PlayerMovement` 读 CoolDown 与 Speed；`Arrow` 读 Damage；`EnemyHealth` 读 KnockBackForce / StunTime / KnockBackTime；`HealthController`、`ExperienceController`、`StatsCanvasController`、`SkillTreeManager` 读各自需要的字段。
 
