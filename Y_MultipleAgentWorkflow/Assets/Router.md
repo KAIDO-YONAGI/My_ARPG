@@ -2,7 +2,7 @@
 
 文档 ID：`BUS-ASSETS`
 状态：`Active`
-维护计数：`1/5`
+维护计数：`2/5`
 最后更新：`2026-10-31`
 
 ## 任务线索
@@ -17,7 +17,7 @@
 | `事件通道` / `事件SO` / `EventSO` / `VoidEventSO` / `ToggleCanvasEventSO` | `EventChannels_Guide.md §2.1`、`EventChannels_Guide.md §2.2`、`EventChannels_Guide.md §2.5` |
 | `订阅` / `OnEnable +=` / `OnDisable -=` / `Raise` / `发布` | `EventChannels_Guide.md §2.4`、`EventChannels_Guide.md §3.1` |
 | `事件不生效` / `接线断了` / `Inspector 没拖` / `改名事件资产` | `EventChannels_Guide.md §3.3` 检查清单 |
-| `canvasToToggle` / `toggleCanvasEvents` | `EventChannels_Guide.md §2.5`、`EventChannels_Guide.md §3.2` |
+| `canvasToToggle` / `toggleCanvasEvents` / `cachedViewPrefabs` | `EventChannels_Guide.md §2.5`、`EventChannels_Guide.md §3.2` |
 | `InventorySlotsStatsSO` | `EventChannels_Guide.md §2.1`、`EventChannels_Guide.md §2.3` |
 
 ## 下级导航

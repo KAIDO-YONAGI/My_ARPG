@@ -2,7 +2,7 @@
 
 文档 ID：`ARCH-COMPOSITION-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-10-31`
 权威范围：场景实例如何被组合成全局服务图，以及这些服务在 Unity 生命周期里的初始化先后与竞态兜底方式。各业务域自身的数据流归 Gameplay 域与 SceneFlow 域，程序集拆分规划归 AssemblyPlan 域。
 
 ## 1. 触发线索
@@ -18,6 +18,7 @@
 | `执行顺序`、`DefaultExecutionOrder`、`10000` | 本文 §2.4 |
 | `SaveRegistry`、`注册表`、`Domain Reload`、`局间复位` | 本文 §2.5 |
 | `ICanvasManager`、`焦点栈`、`sortingOrder`、`UIManager.Instance` | 本文 §2.6 |
+| `UI 缓存`、`预制体注册`、`UIViewCache`、`LRU` | 本文 §2.7 |
 | `重试`、`RetryRequestEvent`、`Respawn`、`重载当前场景组` | 本文 §2.3.4 |
 
 ## 2. 当前实现
@@ -100,11 +101,21 @@
 
 ### 2.6 UI 画布焦点栈契约
 
-`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 10 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SkillTreeCanvasManager`、`SaveLoadCanvasManager`、`ShopManager`、`DialogManager`、`BackpackCanvasManager`、`QuestManager`、`StatsPanelView`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。
+`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 9 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SkillTreeCanvasManager`、`SaveLoadCanvasManager`、`ShopManager`、`DialogManager`、`BackpackCanvasManager`、`QuestManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。`StatsPanelView` 已改由 §2.7 的缓存托管。
 
 反向依赖有两处，都在默认实现里直读单例：`SetCanvaState` 末行调静态入口 `UIManager.Report(...)`，该入口集中判空，未注册时静默跳过；`RefreshCanvaOrder` 直读 `UIManager.Instance`，`Instance` 为 null 时静默退化为 `UIManager.DefaultOrder`。`UIManager` 为此保留常量转发与 `GetCanvasOrder` 转发，接口引用保持不变。
 
 `CanvasFocusStack` 是把上述状态机从 `UIManager` 拆出的纯 C# 类，与 `MonoBehaviour` 生命周期解耦，也独立于 `ToggleCanvasEventSO`，全部外部动作经两个回调委托 `OnCanvasToggleRequested` 与 `OnFocusRefreshRequested`，宿主在 `OnSingletonInitialized` 里接线。`CanvasFocusStackTests` 因此在 EditMode 里可以直接 `new` 出实例断言，覆盖开闭顺序、order 计算、ESC 行为与互斥快照。
+
+### 2.7 预制体注册与闲置缓存
+
+`UIManager` 组合普通 C# 类 `UIViewCache`，没有新增单例。`cachedViewPrefabs` 直接引用继承 `CachedUIView` 的 Prefab，以其 `ToggleEvent.canvasToToggle` 为唯一 ID；启动只登记，首次打开才实例化。场景中的旧界面继续使用 `toggleCanvasEvents`。事件查找优先取预制体注册表，再取旧列表。
+
+缓存持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。View 在 `OnOpen` 绑定数据并首刷，在 `OnClose` 退订；关闭后停用整个对象。派生类若重写 `OnDisable`，必须调用基类实现，保证外部停用也能收尾。
+
+字典定位实例，双向链表按关闭顺序保存闲置实例。重新打开时移出链表，关闭时放到末尾，超出 `maxIdleViews` 就销毁队首；打开中的界面不入链表。默认上限 3，0 表示关闭即销毁。`UIManager.ClearIdleViews()` 仅清理闲置实例；切场请求先关闭全部界面，再清空闲置缓存；管理器销毁时退订并释放缓存。当前直接引用 Prefab，销毁实例不会卸载其引用的资源资产。
+
+首个接入者是 `StatsPanelView`，注册在常驻场景，实例父节点为 `GamePlayCanvases/RuntimeViews`。热键、ESC、互斥和排序仍走原有 `CanvasFocusStack`。常驻 HUD 未接入缓存。
 
 ## 3. 约定与硬边界
 
@@ -128,9 +139,9 @@
 
 它无索引，语义为默认界面，同时是 ESC 判断依据；`UIManager.ReportCanvasState` 与 `CanvasFocusStack.ReportState` 都直接 return。新枚举成员必须加在 `Default` 之前，加在后面会静默丢失画布能力。
 
-### 3.6 画布要能被 UIManager 主动关闭，其 `ToggleCanvasEventSO` 必须登记进 `UIManager.toggleCanvasEvents`
+### 3.6 画布要能被 UIManager 主动关闭，必须登记开关事件或缓存预制体
 
-未登记的画布只能上报状态与刷新层级，`IsClosableCanvas` 返回 false，ESC 与互斥关闭都不会作用于它；此时若向它发关闭请求，焦点栈与真实显隐会错位。
+场景画布登记在 `UIManager.toggleCanvasEvents`；缓存界面登记在 `cachedViewPrefabs`，由预制体提供事件。同一个 ID 只保留一个显示实例与一方开关订阅者，迁移后应移除旧场景实例。两处都未登记时，`IsClosableCanvas` 返回 false，ESC 与互斥关闭不会作用于它。
 
 ### 3.7 `EditorSettings` 的 Domain Reload 状态与静态状态必须成对
 

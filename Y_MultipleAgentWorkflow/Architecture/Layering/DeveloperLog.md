@@ -61,3 +61,10 @@ maintenance count changes here.
 - §3.4 从"已满足的约束"改记为"违反 5 处的待偿债务"，因为契约层现在 `using` 了 `Gameplay.Save`、`Pipeline.SO.Events`、`Pipeline.UI.SystemCanvasManagers`、`Pipeline.SO`。
 
 **维护计数**：`0/5` → `1/5`。
+
+
+## 2026-10-31 属性面板预制体与闲置缓存
+
+新增 Pipeline.UI.Runtime，实测产品代码 126 个、命名空间 26 个；Gameplay → Pipeline 为 64 处，Pipeline → Contracts 为 24 处。
+
+Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `2/5`。

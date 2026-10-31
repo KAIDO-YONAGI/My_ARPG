@@ -22,3 +22,10 @@ maintenance count changes here.
   - `OnSingletonInitialized` 重写点 6 处；18 个单例派生类均未重写 `Awake`。
   - `ICanvasManager` 实现者 10 个；全工程 asmdef 数量为 0。
 - 维护计数：`0/5 -> 1/5`
+
+
+## 2026-10-31 属性面板预制体与闲置缓存
+
+记录 UIManager 的双注册入口、CachedUIView 打开/关闭生命周期、闲置 LRU 与切场清理；Stats 为首个预制体样例，无新增单例。
+
+Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `1/5`。

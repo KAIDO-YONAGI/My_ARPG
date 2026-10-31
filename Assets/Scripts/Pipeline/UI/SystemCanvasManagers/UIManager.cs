@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Contracts;
 using Pipeline.SO;
 using Pipeline.SO.Events;
+using Pipeline.UI.Runtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,7 +18,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         [Header("Events")] [SerializeField] private SceneLoadEventSO loadEventSO;
 
         [Tooltip(
-            "可由 UIManager 主动控制的画布开关事件资产。列表中的画布可通过对应按键切换、由 ESC 关闭、在场景切换时复位，并参与互斥面板的自动关闭；未注册的画布只能上报状态和刷新层级，不会被 UIManager 主动关闭。")]
+            "场景中已有画布的开关事件。按需创建的界面在 Prefab Cache 中登记；两种登记均支持热键、ESC、切场复位和互斥关闭。")]
         [SerializeField]
         private List<ToggleCanvasEventSO> toggleCanvasEvents;
 
@@ -28,6 +29,17 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
         private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
+
+        [Header("Prefab Cache")]
+        [Tooltip("按需创建的界面预制体；以各自 ToggleEvent 的 CanvasToToggle 作为唯一 ID。")]
+        [SerializeField] private List<CachedUIView> cachedViewPrefabs = new();
+        [SerializeField] private Transform cachedViewRoot;
+        [Tooltip("最多保留多少个已关闭的界面实例；0 表示关闭即销毁，打开的界面不计入。")]
+        [Min(0)] [SerializeField] private int maxIdleViews = 3;
+
+        private UIViewCache viewCache;
+        public int CachedViewCount => viewCache?.InstanceCount ?? 0;
+        public int IdleViewCount => viewCache?.IdleCount ?? 0;
 
         // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
         private readonly CanvasFocusStack focusStack = new();
@@ -50,10 +62,14 @@ namespace Pipeline.UI.SystemCanvasManagers
             // 接线：纯逻辑栈通过回调驱动 SO 事件，保持自身不依赖 ToggleCanvasEventSO。
             focusStack.OnCanvasToggleRequested = RaiseCanvasEvent;
             focusStack.OnFocusRefreshRequested = RaiseFocusEvent;
+            viewCache = new UIViewCache(cachedViewPrefabs,
+                cachedViewRoot != null ? cachedViewRoot : transform,
+                maxIdleViews, ReportCanvasState, GetCanvasOrder);
         }
 
         private void OnEnable()
         {
+            viewCache?.Connect();
             loadEventSO.LoadRequestEvent += OnLoadScene;
 
             foreach (var binding in inputBindings)
@@ -64,6 +80,8 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         private void OnDisable()
         {
+            viewCache?.CloseAll();
+            viewCache?.Disconnect();
             loadEventSO.LoadRequestEvent -= OnLoadScene;
 
             foreach (var binding in inputBindings)
@@ -72,12 +90,26 @@ namespace Pipeline.UI.SystemCanvasManagers
             }
         }
 
+        protected override void OnDestroy()
+        {
+            viewCache?.Dispose();
+            viewCache = null;
+            base.OnDestroy();
+        }
+
+        [ContextMenu("UI Cache/Clear Idle Views")]
+        public void ClearIdleViews()
+        {
+            viewCache?.ClearIdle();
+        }
+
         private void OnLoadScene(List<GameSceneSO> arg0, Vector3 arg1, bool arg2)
             //UIManager作为跨场景持久单例，不会随场景卸载而disable，因此需要订阅场景加载事件来主动重置画布状态。
             //本处理器在 SceneChanger.RequestSceneLoad 的广播段内同步执行，先于其切换流程，
             //面板因此在过渡动画和旧场景卸载前被关闭。
         {
             ResetCanvases();
+            ClearIdleViews();
         }
 
         private void Update()
@@ -184,10 +216,12 @@ namespace Pipeline.UI.SystemCanvasManagers
             return mutexCanvases != null && mutexCanvases.Contains(canvas);
         }
 
-        // 在 toggleCanvasEvents 中查找某画布对应的事件资产；未登记返回 null。
-        // 可关闭判定、开关广播、focus 广播三处共用同一套匹配规则：取列表中第一个匹配项。
+        // 优先查预制体注册表，再查场景画布列表；开关、焦点与可关闭判定共用此入口。
         private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas)
         {
+            var cachedEvent = viewCache?.GetToggleEvent(canvas);
+            if (cachedEvent != null) return cachedEvent;
+
             foreach (var eventSO in toggleCanvasEvents)
             {
                 if (eventSO != null && eventSO.canvasToToggle == canvas)
@@ -197,8 +231,7 @@ namespace Pipeline.UI.SystemCanvasManagers
             return null;
         }
 
-        // 是否为可关闭面板：开关事件在 toggleCanvasEvents 列表中，可被按键唤起、ESC 关闭、切场景复位和互斥关闭。
-        // 不在列表中的面板即使上报状态（仅上报层级），UIManager 也不主动关闭它，显隐由其自身逻辑决定。
+        // 任一注册表中有对应开关事件，即可由 UIManager 主动控制。
         private bool IsClosableCanvas(CanvasToToggle canvas)
         {
             return FindToggleEvent(canvas) != null;
@@ -369,6 +402,8 @@ namespace Pipeline.UI.SystemCanvasManagers
             {
                 eventSO.RaiseToggleCanvasEvent(false);
             }
+
+            viewCache?.CloseAll();
 
             ResetInputState();
         }

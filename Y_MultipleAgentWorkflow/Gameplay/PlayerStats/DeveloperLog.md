@@ -36,3 +36,10 @@ maintenance count changes here.
 **维护计数**
 
 - `BUS-GAMEPLAY-PLAYERSTATS` 维持 `0/5`；首次建档，未发生 5 次触发的维护轮次。
+
+
+## 2026-10-31 属性面板预制体与闲置缓存
+
+StatsPanelView 改继承 CachedUIView；每次打开创建并刷新 Controller，关闭退订、恢复位置并停用。Controller 对实际订阅的只读模型退订，缓存重建不会重建数值模型。
+
+Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `2/5`。

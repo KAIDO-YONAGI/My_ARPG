@@ -2,7 +2,7 @@
 
 文档 ID：`GP-PLAYERSTATS-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-10-31`
 
 ## 1. 触发线索
 
@@ -17,6 +17,7 @@
 | `PlayerStatsSO` `初始值` `模板` | §2.6、§3.3 |
 | `playerStatsData` `读档` `存档数值` `坏档` | §2.7、§3.8 |
 | `26 个测试` `EditMode` `回归网` | §2.8 |
+| `属性面板缓存` `StatsPanelView` `StatsPanelController` | §2.10 |
 
 ## 2. 当前实现
 
@@ -31,7 +32,7 @@
 | DTO | `[Serializable]` 普通类 | `PlayerStatsData` | 15 个 public 字段 + `Clone()` |
 | Service | `SaveableService<StatsService>` | `StatsService` | 私有持有 model，唯一写入口 |
 | Controller | 3 个纯 C# + 1 个 MonoBehaviour | `HealthController`、`ExperienceController`、`StatsPanelController`、`PlayerDamageController` | 只读经 `IPlayerStatsReadOnly` |
-| View | MonoBehaviour | `HealthView`、`ExperiencePanelView`、`StatsPanelView` | 只碰控件，在 `Start` 里造 Controller 并首刷 |
+| View | MonoBehaviour | `HealthView`、`ExperiencePanelView`、`StatsPanelView` | 血量、经验在 `Start` 建 Controller；属性面板在每次打开时创建并首刷 |
 | 配置 | `ScriptableObject` | `PlayerStatsSO` | 命名空间 `Pipeline.SO`，不在 `Gameplay.Player.*` |
 
 `StatsService` 的 `model` 字段是 private，对外只给 `public IPlayerStatsReadOnly Stats => model;`。`GetStats()` 与 `LoadStats()` 是 private，仅存档流程使用。
@@ -140,6 +141,12 @@ expToUpgrade = Mathf.Max(1, expToUpgrade + step)  // 下限仍受 MinExpToUpgrad
 
 只读消费方直接读 `Stats`，不经过服务方法：`PlayerCombat` 读 WeaponRange 与 Damage；`PlayerBow` 读 CoolDown；`PlayerMovement` 读 CoolDown 与 Speed；`Arrow` 读 Damage；`EnemyHealth` 读 KnockBackForce / StunTime / KnockBackTime；`HealthController`、`ExperienceController`、`StatsPanelController`、`SkillTreeManager` 读各自需要的字段。
 
+### 2.10 属性面板的预制体与缓存
+
+`StatsPanelView` 继承 `CachedUIView`，预制体是 `Assets/Prefabs/UI/Runtime/StatsPanel.prefab`。常驻场景只在 `UIManager.cachedViewPrefabs` 中登记，不预放面板实例。首次打开创建，关闭后退订模型与场景完成事件、恢复拖动位置并停用对象；重开时重新创建 Controller，读取当前数值。
+
+`StatsPanelController` 保留构造时实际订阅的 `IPlayerStatsReadOnly`，`Dispose` 对同一对象退订。缓存淘汰只销毁 View，数值继续由 `StatsService` 持有。场景加载期间临时打开的面板仍会在加载完成时通过 `RequestCanvasClose(Stats)` 关闭。
+
 ## 3. 约定与硬边界
 
 ### 3.1 升序迭代是收敛的，阈值为 1 时按级数消耗
@@ -160,7 +167,7 @@ Newtonsoft 按字段名序列化；类名可以改。
 
 ### 3.5 `Stats` 在 `StatsService.Awake` 完成前是 null
 
-`model` 在 `OnSingletonInitialized` 里创建，该钩子由 `YSingleton.Awake` 调用。三个 View 都在 `Start` 建 Controller，`SkillTreeManager` 额外做了可重试订阅。
+`model` 在 `OnSingletonInitialized` 里创建，该钩子由 `YSingleton.Awake` 调用。血量与经验 View 在 `Start` 建 Controller；属性面板由 UI 输入请求按需打开后建 Controller，不在 UIManager 的初始化钩子中取数。`SkillTreeManager` 额外做了可重试订阅。
 
 ### 3.6 `IPlayerStatsReadOnly` 是唯一的对外读类型
 

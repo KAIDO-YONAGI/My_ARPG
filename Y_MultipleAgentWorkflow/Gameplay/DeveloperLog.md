@@ -18,3 +18,10 @@ maintenance count changes here.
 **已核验**
 - 6 行下级导航结构与既有 Router 文件一一对应（`PlayerStats`、`Units`、`Dialog`、`Quest`、`InventoryShop`、`Skills` 六个目录均存在 Router.md）。
 - Gameplay/Router 只做分派与导航，未写任何实现细节；实现事实全部落在子域 Guide。
+
+
+## 2026-10-31 属性面板预制体与闲置缓存
+
+属性面板从常驻场景实例迁移为按需创建的 StatsPanel.prefab；数值模型仍由 StatsService 持有。细节见 PlayerStats/PlayerStats_Guide.md §2.10。
+
+Unity 重编译及预制体引用检查完成；未运行测试或进入 Play 模式，复用与多界面淘汰仍待运行时验证。维护计数更新为 `2/5`。

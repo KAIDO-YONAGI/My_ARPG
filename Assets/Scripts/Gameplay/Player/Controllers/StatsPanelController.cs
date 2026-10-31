@@ -7,27 +7,27 @@ namespace Gameplay.Player.Controllers
     /// <summary>
     /// 属性面板的控制器，纯 C# 类，由 StatsPanelView 创建并托管。
     /// 订阅 PlayerStatsModel.StatsChanged，把当前 damage/speed 推给 StatsPanelView.SetStats。
-    /// 画布开关、焦点与层级由 View 自理。数值规则在 PlayerStatsModel，View 只负责显示。
+    /// 只在界面打开期间存活；保留实际订阅的模型，关闭时对同一对象退订。
     /// </summary>
     public class StatsPanelController
     {
         private readonly StatsPanelView view;
+        private readonly IPlayerStatsReadOnly stats;
 
         public StatsPanelController(StatsPanelView view)
         {
             this.view = view;
-            StatsService.Instance.Stats.StatsChanged += Refresh;
+            stats = StatsService.Instance.Stats;
+            stats.StatsChanged += Refresh;
         }
 
         public void Dispose()
         {
-            if (StatsService.Instance != null)
-                StatsService.Instance.Stats.StatsChanged -= Refresh;
+            stats.StatsChanged -= Refresh;
         }
 
         public void Refresh()
         {
-            IPlayerStatsReadOnly stats = StatsService.Instance.Stats;
             view.SetStats(stats.Damage, stats.Speed);
         }
     }

@@ -2,7 +2,7 @@
 
 文档 ID：`ASSETS-EVENTCHANNELS-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-10-31`
 权威范围：本文件只对事件通道这一资产的清单、类型契约、订阅与发布惯例、命名与接线检查清单负责。事件总线机制与 MVC 及服务层的边界属 Architecture 域，场景、存档、任务等业务语义属各自 Gameplay 域。
 
 ## 1. 触发线索
@@ -63,7 +63,7 @@
 
 ### 2.4 订阅与发布惯例
 
-**统一订阅惯例：`OnEnable` 里 `+=`，`OnDisable` 里 `-=`。** 全量统计：订阅表达式 **49** 处，分布在 **22** 个文件中；发布调用点 **23** 处，分布在 **15** 个文件中。订阅点最密集的是 `QuestManager`，共 6 处。其余订阅方包括 `ShopManager`、`StatsPanelView`、`SaveLoadCanvasManager`、`IntegratedUICanvasManager`、`BackpackCanvasManager`、`SkillTreeCanvasManager`、`ESCMenuManager`、`GameOverCanvasManager`、`InventoryManager`、`QuestBoardManager`、`PlayerDamageController`、`PlayerMovement`、`ShopPortraitCamera`、`QuestLogPanel`、`DialogManager`、`SaveDataManager`、`SaveSystem`、`MenuSceneCanvasHider`、`NPCDialogTrigger`、`UIManager`、`ExperienceController`。`ExperienceController` 在构造函数 `+=`、在 `Dispose` `-=`。
+**订阅必须成对。** 场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订；纯 C# Controller 在构造与 `Dispose` 中成对处理。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 承接，并随 `UIManager` 启停；View 停用不会切断重新打开的入口。`StatsPanelView` 仅在 `OnOpen/OnClose` 中订阅和退订场景完成事件。
 
 代表写法，取字段、`+=` 与同名 `-=` 一次可见：
 
@@ -100,13 +100,15 @@ private void OnDisable() { sceneLoadEventSO.LoadRequestEvent -= OnAutoSave; ... 
 ```csharp
 // UIManager 的枚举匹配查找
 private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
+    var cachedEvent = viewCache?.GetToggleEvent(canvas);
+    if (cachedEvent != null) return cachedEvent;
     foreach (var eventSO in toggleCanvasEvents)
         if (eventSO != null && eventSO.canvasToToggle == canvas) return eventSO;   // 取第一个匹配
     return null;
 }
 ```
 
-`UIManager.toggleCanvasEvents` 是枚举到资产的登记表；`IsClosableCanvas` 用它判定面板能否被关，未登记的 `CanvasToToggle` 不会被 UIManager 主动关闭。
+`UIManager.cachedViewPrefabs` 与 `toggleCanvasEvents` 共同提供枚举到事件的登记。缓存预制体优先，旧列表随后；`IsClosableCanvas` 也使用这一查找。`Stats` 现在通过缓存预制体登记，原场景实例和旧列表中的 Stats 项已移除；其余界面保持旧接线。
 
 10 个 toggle 资产映射到 **10 个互不重复**的 `CanvasToToggle` 值。`CanvasToToggle` 共 11 个成员，唯一无资产的是 `Default`。
 
@@ -128,19 +130,19 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 1. 新建类时把它放在事件通道目录，`[CreateAssetMenu(menuName = "Events/<类名>")]`，包一层 `public event Action<...>` 加一个发布方法，照抄同族命名风格，见 §2.2。
 2. 在 Events 目录或多实例子目录右键 `Create > Events > ...` 建资产，随即改名；默认文件名是类名，`VoidEventSO` 必须补语义前缀。
 3. 发布方用 `[SerializeField]` 拖该资产；订阅方在 `OnEnable` 与 `OnDisable` 成对 `+=` 与 `-=`；两侧都拖到同一个资产，见 §3.3。
-4. 画布开关通道要给资产设 `canvasToToggle`，并把资产加进常驻场景中 `UIManager` 的 `toggleCanvasEvents` 列表。
+4. 画布开关通道要给资产设 `canvasToToggle`。场景画布将事件登记进 `UIManager.toggleCanvasEvents`；缓存界面将使用该事件的 `CachedUIView` 预制体登记进 `cachedViewPrefabs`。
 
 ## 3. 约定与硬边界
 
-### 3.1 订阅必须成对，且必须在 OnEnable 与 OnDisable
+### 3.1 订阅必须随对象或打开状态成对管理
 
-`ScriptableObject` 资产的生命周期比场景对象长。只 `+=` 不 `-=` 时，对象销毁后委托仍指向已销毁实例，下次广播会抛 `MissingReferenceException`；重复 `OnEnable` 会累积多次订阅，一次广播触发多次回调。现有 22 个订阅方全部成对，`ExperienceController` 在构造函数订阅、在 `Dispose` 注销，同样成对。
+`ScriptableObject` 资产的生命周期比场景对象长。只订阅不退订会保留已销毁实例，重复订阅会让一次广播触发多次回调。场景组件使用 `OnEnable/OnDisable`，Controller 使用构造与 `Dispose`，缓存 View 使用 `OnOpen/OnClose`，缓存服务使用 `Connect/Disconnect`。
 
 另一套机制是静态事件：`SkillSlot` 用的是 `public static event`，`SkillManager` 也成对订阅，静态事件跨场景存活。新增 SO 通道订阅时照抄 SO 通道的成对写法。
 
 ### 3.2 canvasToToggle 是隐式身份，必须唯一
 
-`FindToggleEvent` 取列表中第一个匹配项。两个 toggle 资产填了同一个 `CanvasToToggle` 时，后者永远查不到，该面板的焦点与开关广播静默丢失。当前 10 个资产值互不重复。新增画布时先加枚举成员，`CanvasToToggle` 的注释要求在 `Default` 之前插入；再建资产填值，最后登记进 `toggleCanvasEvents`。
+同一个 ID 只对应一份事件资产和显示实例。旧列表取第一个匹配项，缓存注册表拒绝重复 ID；两处同时出现时缓存定义优先。当前 10 个资产值互不重复。新增画布先在 `Default` 之前增加枚举成员，再创建事件资产，最后登记到事件列表或预制体列表。
 
 ### 3.3 新增与改名事件通道的检查清单
 
@@ -150,9 +152,9 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 |---|---|---|
 | 1 | 通道类本身：事件名、发布方法签名 | 通道类源码 |
 | 2 | 发布方：`[SerializeField]` 拖了该资产 | 按该资产 GUID 检索场景、预制体与资产 |
-| 3 | 订阅方：`OnEnable +=` 与 `OnDisable -=` | §2.4 列出的 22 个订阅方各自核对成对改动 |
+| 3 | 订阅与退订成对 | 按 §2.4 核对组件、Controller、缓存 View 和服务的生命周期 |
 | 4 | 场景与预制体里的资产引用 | 按 GUID 计数，改名后引用数不应为 0 |
-| 5 | toggle 通道：`canvasToToggle` 值唯一，且已登记进 `UIManager.toggleCanvasEvents` | `CanvasToToggle` 与 `UIManager` |
+| 5 | toggle 通道：`canvasToToggle` 值唯一，且已登记事件或缓存预制体 | `CanvasToToggle` 与 `UIManager` |
 | 6 | 常驻场景内管理器持有的通道 | 确认它是常驻场景 `PersistentScene` 里的对象 |
 | 7 | 改完后按 GUID 复算引用数，确认与改前一致 | 对全部场景、预制体与资产做 GUID 匹配计数 |
 

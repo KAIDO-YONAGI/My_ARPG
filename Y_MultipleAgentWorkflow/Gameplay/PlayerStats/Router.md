@@ -2,7 +2,7 @@
 
 文档 ID：`BUS-GAMEPLAY-PLAYERSTATS`
 状态：`Active`
-维护计数：`1/5`
+维护计数：`2/5`
 最后更新：`2026-10-31`
 
 ## 任务线索
@@ -18,6 +18,7 @@
 | `playerStatsData` `读档` `坏档` `存档数值` | `PlayerStats_Guide.md` §2.7 §3.8 |
 | `PlayerDamaged` `EnemyDefeated` `AddExperience` | `PlayerStats_Guide.md` §2.2 §2.9 |
 | `PlayerCombat` `DealDamage` `Arrow` `攻击命中` | `PlayerStats_Guide.md` §2.9 |
+| `属性面板缓存` `StatsPanelView` `StatsPanelController` | `PlayerStats_Guide.md` §2.10 |
 
 ## 下级导航
 

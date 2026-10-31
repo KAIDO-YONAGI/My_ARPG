@@ -2,8 +2,8 @@
 
 文档 ID：`BUS-ARCHITECTURE-COMPOSITION`
 状态：`Active`
-维护计数：`0/5`
-最后更新：`2026-10-05`
+维护计数：`1/5`
+最后更新：`2026-10-31`
 
 ## 任务线索
 
@@ -15,6 +15,7 @@
 | `执行顺序`、`DefaultExecutionOrder`、`CameraPixelSnap` | `Composition_Guide.md` §2.4 |
 | `SaveRegistry`、`注册表`、`Domain Reload`、`局间复位`、`ISaveable` | `Composition_Guide.md` §2.5 |
 | `ICanvasManager`、`焦点栈`、`CanvasFocusStack`、`sortingOrder` | `Composition_Guide.md` §2.6 |
+| `界面缓存`、`预制体注册`、`UIViewCache`、`LRU` | `Composition_Guide.md` §2.7 |
 | `新增单例吗`、`能不能加个 Manager`、`接线约定` | `Composition_Guide.md` §3 |
 
 ## 下级导航
