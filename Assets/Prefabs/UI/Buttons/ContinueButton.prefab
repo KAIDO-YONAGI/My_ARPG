@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2123171645065277886}
   - component: {fileID: 8672685043917836365}
   m_Layer: 5
-  m_Name: Continue
+  m_Name: ContinueButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
