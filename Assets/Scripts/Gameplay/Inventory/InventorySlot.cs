@@ -7,114 +7,137 @@ using UnityEngine.UI;
 
 namespace Gameplay.Inventory
 {
+    /// <summary>
+    /// 单个物品槽位的显示与点击入口。快捷栏和背包共用本组件，
+    /// 通过 <see cref="ConfigureSlot"/> 区分自己属于哪一组、排第几位。
+    /// </summary>
+    /// <remarks>
+    /// 物品与数量是管理器状态的显示副本，运行期只由管理器通过
+    /// <see cref="RestoreState"/> 写入；槽位本身不决定堆叠、使用或出售规则。
+    /// 预制体上的初始物品只在第一次初始化管理器状态时读取。
+    /// </remarks>
     public class InventorySlot : MonoBehaviour, IPointerClickHandler
     {
+        [Header("初始配置")]
+        [Tooltip("预制体上的初始物品；只在首次初始化管理器状态时读取。")]
         [SerializeField] private ItemSO itemSO;
+
+        [Tooltip("预制体上的初始数量；只在首次初始化管理器状态时读取。")]
         [SerializeField] private int quantity;
+
+        [Header("控件")]
         [SerializeField] private Image itemImage;
         [SerializeField] private TMP_Text quantityText;
 
-        // 只读访问器：外部可读不可写
+        private int slotIndex = -1;
+        private bool isBackpackSlot;
+        private ItemSO initialItem;
+        private int initialQuantity;
+
+        /// <summary>当前显示的物品；空槽位为 null。</summary>
         public ItemSO ItemSO => itemSO;
+
+        /// <summary>当前显示的数量。</summary>
         public int Quantity => quantity;
+
         public bool IsEmpty => itemSO == null;
 
-        private void OnEnable() {
+        /// <summary>预制体上配置的初始物品；必须在第一次 <see cref="RestoreState"/> 前读取。</summary>
+        public ItemSO InitialItem => initialItem;
+
+        /// <summary>预制体上配置的初始数量。</summary>
+        public int InitialQuantity => initialQuantity;
+
+        /// <summary>槽位在所属列表中的下标；<c>-1</c> 表示尚未配置。</summary>
+        public int SlotIndex => slotIndex;
+
+        /// <summary>是否属于背包列表；false 表示快捷栏。</summary>
+        public bool IsBackpackSlot => isBackpackSlot;
+
+        private void Awake()
+        {
+            // 先保存预制体上的初始值，后面的 RestoreState 会覆盖 itemSO/quantity。
+            initialItem = itemSO;
+            initialQuantity = quantity;
+        }
+
+        private void OnEnable()
+        {
             UpdateUI();
         }
-        private void OnValidate() {
+
+        private void OnValidate()
+        {
             UpdateUI();
         }
+
+        /// <summary>
+        /// 点击槽位：左键在商店打开时出售，否则使用；右键丢弃。
+        /// 只处理有物品的槽位，空槽位不响应。
+        /// </summary>
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (quantity > 0)
-            {
-                if (eventData.button == PointerEventData.InputButton.Left)
-                {
-                    if (ShopManager.Instance.IsShopOpen)//如果检测到商店活跃，那就出售物品
-                    {
-                        InventoryManager.Instance.SetSlotBeenClicked(this);
-                        ShopManager.Instance.SellItem(itemSO);
-                    }
-                    else
-                    {
-                        InventoryManager.Instance.UseItem(this);
-                    }
+            if (slotIndex < 0 || quantity <= 0) return;
 
-                }
-                else if (eventData.button == PointerEventData.InputButton.Right)
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                if (ShopManager.Instance != null && ShopManager.Instance.IsShopOpen)
                 {
-                    InventoryManager.Instance.DropByClick(this);
+                    // 商店打开时左键表示出售：先记录槽位，商店再按物品报价扣减。
+                    InventoryManager.Instance.SetSlotBeenClicked(this);
+                    ShopManager.Instance.SellItem(itemSO);
                 }
+                else
+                {
+                    InventoryManager.Instance.UseItem(this);
+                }
+            }
+            else if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                InventoryManager.Instance.DropByClick(this);
             }
         }
 
-        /// <summary>
-        /// 往槽位添加物品。统一处理 itemSO 赋值、数量累加、UI 刷新。
-        /// </summary>
-        /// <returns>实际放入的数量（受堆叠上限约束）</returns>
-        public int AddItem(ItemSO item, int amount)
+        /// <summary>配置槽位归属与下标；由快捷栏/背包视图在初始化时调用。</summary>
+        public void ConfigureSlot(bool backpack, int index)
         {
-            if (item == null || amount <= 0) return 0;
+            isBackpackSlot = backpack;
+            slotIndex = index;
+        }
 
-            // 可堆叠则不超过 stackableSize；新物品则按 amount 放入
-            int maxForThisSlot = itemSO == item ? item.stackableSize - quantity : item.stackableSize;
-            int actual = Mathf.Min(maxForThisSlot, amount);
-            if (actual <= 0) return 0;
-
-            itemSO = item;
-            quantity += actual;
+        /// <summary>用管理器状态覆盖显示；数量为 0 时清空槽位。</summary>
+        public void RestoreState(ItemSO item, int amount)
+        {
+            itemSO = amount > 0 ? item : null;
+            quantity = itemSO != null ? amount : 0;
             UpdateUI();
-            return actual;
         }
 
-        /// <summary>
-        /// 从槽位移除物品。数量归零时自动清空 itemSO，保持"空槽 itemSO 必为 null"不变量。
-        /// </summary>
-        /// <returns>实际移除的数量</returns>
-        public int RemoveItem(int amount)
-        {
-            if (itemSO == null || amount <= 0) return 0;
-
-            int actual = Mathf.Min(amount, quantity);
-            quantity -= actual;
-            if (quantity <= 0)
-            {
-                quantity = 0;
-                itemSO = null;
-            }
-            UpdateUI();
-            return actual;
-        }
-
-        /// <summary>
-        /// 返回本槽位还能放入多少该物品（同物品受堆叠上限约束；空槽则上限为 stackableSize）。
-        /// </summary>
-        public int SpaceRemaining(ItemSO item)
-        {
-            if (itemSO == null) return item != null ? item.stackableSize : 0;
-            if (itemSO != item) return 0;
-            return item.stackableSize - quantity;
-        }
-
+        /// <summary>把当前物品与数量画到图标和文本上；数量为 0 时清空物品引用。</summary>
         public void UpdateUI()
         {
-            if (quantity <= 0)//把脚本化对象置空，让槽位被清空的逻辑正常运行
+            if (quantity <= 0)
             {
+                // 把物品引用置空，让槽位重新参与“空槽位”判定。
                 itemSO = null;
             }
 
             if (itemSO != null)
             {
-                itemImage.sprite = itemSO.icon;
-                itemImage.gameObject.SetActive(true);
-                quantityText.text = quantity.ToString();
+                if (itemImage != null)
+                {
+                    itemImage.sprite = itemSO.icon;
+                    itemImage.gameObject.SetActive(true);
+                }
+                if (quantityText != null)
+                    quantityText.text = quantity.ToString();
             }
             else
             {
-                itemImage.gameObject.SetActive(false);
-                quantityText.text = "";
-
+                if (itemImage != null)
+                    itemImage.gameObject.SetActive(false);
+                if (quantityText != null)
+                    quantityText.text = "";
             }
         }
     }

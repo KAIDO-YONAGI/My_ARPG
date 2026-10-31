@@ -2,64 +2,118 @@ using Pipeline.SO;
 using Pipeline.SO.Events;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Gameplay.Quest
 {
-    public class QuestLogPanel : MonoBehaviour //UI更新有关逻辑
+    /// <summary>
+    /// 任务详情面板：显示当前任务的名称、描述、目标进度和奖励。
+    /// 它是 QuestCanvas 预制体内部的子视图，由 <see cref="QuestCanvasView"/> 驱动刷新。
+    /// </summary>
+    /// <remarks>
+    /// 任务数据来自 <see cref="QuestManager"/>，本组件只负责把数据写到文本和槽位。
+    /// 所有控件引用都在预制体上拖好，运行时不再查找子物体。
+    /// </remarks>
+    public class QuestLogPanel : MonoBehaviour
     {
+        [Header("任务信息")]
         [SerializeField] private TMP_Text questNameText;
         [SerializeField] private TMP_Text questDescriptionText;
-        [SerializeField] private QuestObjectiveSlot[] objectiveSlots; //任务条目槽位
-        [SerializeField] private QuestRewardsSlot[] questRewardsSlot; //任务奖励槽位
 
+        [Header("任务条目槽位")]
+        [Tooltip("任务目标槽位，按任务目标顺序显示。")]
+        [SerializeField] private QuestObjectiveSlot[] objectiveSlots;
+
+        [Tooltip("任务奖励槽位，按奖励配置顺序显示。")]
+        [FormerlySerializedAs("questRewardsSlot")]
+        [SerializeField] private QuestRewardsSlot[] questRewardsSlots;
+
+        [Header("事件")]
+        [Tooltip("请求显示第一个未完成任务。")]
         [SerializeField] private VoidEventSO openQuestEvent;
 
         private QuestSO currentQuest;
 
         private void OnEnable()
         {
-            openQuestEvent.VoidEvent += ShowQuestOffer;
+            if (openQuestEvent != null)
+                openQuestEvent.VoidEvent += ShowQuestOffer;
         }
 
         private void OnDisable()
         {
-            openQuestEvent.VoidEvent -= ShowQuestOffer;
+            if (openQuestEvent != null)
+                openQuestEvent.VoidEvent -= ShowQuestOffer;
         }
 
+        /// <summary>从管理器取第一个未完成任务并显示它的详情。</summary>
         public void ShowQuestOffer()
         {
-            QuestSO incomingQuestSO = QuestManager.Instance.GetFirstIncompletedQuest();
+            var manager = QuestManager.Instance;
+            QuestSO incomingQuestSO = manager != null ? manager.GetFirstIncompletedQuest() : null;
 
             if (incomingQuestSO != null)
                 HandleQuestClicked(incomingQuestSO);
         }
 
-        public void HandleQuestClicked(QuestSO quest) //绑定了按钮事件
+        /// <summary>任务条目被点击：记录当前任务并通知管理器切换选中项。</summary>
+        public void HandleQuestClicked(QuestSO quest)
         {
             currentQuest = quest;
-            QuestManager.Instance.OpenQuest(quest);
-
-            questNameText.text = currentQuest.questName;
-            questDescriptionText.text = currentQuest.questDescription;
-            DisplayRewards();
+            QuestManager.Instance?.OpenQuest(quest);
         }
 
-        public void DisPlayObjectives()
+        /// <summary>
+        /// 显示任务详情。传入 null 时清空文本并隐藏所有目标、奖励槽位，
+        /// 用于“没有任务”或任务板关闭后的收尾。
+        /// </summary>
+        public void DisplayQuest(QuestSO quest)
         {
+            currentQuest = quest;
+            if (currentQuest == null)
+            {
+                if (questNameText != null) questNameText.text = string.Empty;
+                if (questDescriptionText != null) questDescriptionText.text = string.Empty;
+                SetSlotsActive(objectiveSlots, false);
+                SetSlotsActive(questRewardsSlots, false);
+                return;
+            }
+
+            if (questNameText != null) questNameText.text = currentQuest.questName;
+            if (questDescriptionText != null) questDescriptionText.text = currentQuest.questDescription;
+            DisplayRewards();
+            DisplayObjectives();
+        }
+
+        /// <summary>
+        /// 管理器状态变化后刷新。任务切换时整页重绘，仍显示同一任务时只刷新目标进度，
+        /// 避免每次进度变化都重写名称和描述。
+        /// </summary>
+        public void RefreshFromManager(QuestSO quest)
+        {
+            if (currentQuest != quest)
+                DisplayQuest(quest);
+            else if (currentQuest != null)
+                DisplayObjectives();
+        }
+
+        /// <summary>按管理器中的当前进度刷新所有目标槽位；多余槽位隐藏。</summary>
+        public void DisplayObjectives()
+        {
+            var manager = QuestManager.Instance;
+            if (currentQuest == null || manager == null || objectiveSlots == null) return;
+
             for (int i = 0; i < objectiveSlots.Length; i++)
             {
                 if (i < currentQuest.questObjectives.Count)
                 {
-                    var obj = currentQuest.questObjectives[i];
-                    int currentAmount =
-                        QuestManager.Instance.GetCurrentObjAmount(currentQuest, obj);
-                    string progress =
-                        QuestManager.Instance.GetProgressText(currentQuest, obj);
-                    bool isCompleted = currentAmount >= obj.requiredAmount;
+                    var objective = currentQuest.questObjectives[i];
+                    int currentAmount = manager.GetCurrentObjAmount(currentQuest, objective);
+                    string progress = manager.GetProgressText(currentQuest, objective);
+                    bool isCompleted = currentAmount >= objective.requiredAmount;
 
                     objectiveSlots[i].gameObject.SetActive(true);
-
-                    objectiveSlots[i].RefreshObjectives(obj.description, progress, isCompleted);
+                    objectiveSlots[i].RefreshObjectives(objective.description, progress, isCompleted);
                 }
                 else
                 {
@@ -68,21 +122,34 @@ namespace Gameplay.Quest
             }
         }
 
+        /// <summary>按任务奖励配置刷新奖励槽位；多余槽位隐藏。</summary>
         private void DisplayRewards()
         {
-            for (int i = 0; i < questRewardsSlot.Length; i++)
+            if (currentQuest == null || questRewardsSlots == null) return;
+
+            for (int i = 0; i < questRewardsSlots.Length; i++)
             {
                 if (i < currentQuest.rewards.Count)
                 {
                     var reward = currentQuest.rewards[i];
-                    questRewardsSlot[i].DisplayReward(reward.rewardItem.icon, reward.quantity);
-
-                    questRewardsSlot[i].gameObject.SetActive(true);
+                    questRewardsSlots[i].DisplayReward(reward.rewardItem.icon, reward.quantity);
+                    questRewardsSlots[i].gameObject.SetActive(true);
                 }
                 else
                 {
-                    questRewardsSlot[i].gameObject.SetActive(false);
+                    questRewardsSlots[i].gameObject.SetActive(false);
                 }
+            }
+        }
+
+        /// <summary>批量显示或隐藏一组任务槽位。</summary>
+        private static void SetSlotsActive(Component[] slots, bool state)
+        {
+            if (slots == null) return;
+            foreach (var slot in slots)
+            {
+                if (slot != null)
+                    slot.gameObject.SetActive(state);
             }
         }
     }
