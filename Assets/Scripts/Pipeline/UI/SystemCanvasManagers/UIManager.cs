@@ -9,6 +9,15 @@ using UnityEngine.InputSystem;
 
 namespace Pipeline.UI.SystemCanvasManagers
 {
+    /// <summary>
+    /// 全局 UI 输入与画布状态协调器。统一收集按键和外部切换请求，
+    /// 维护画布焦点栈、互斥关系、ESC 关闭顺序和排序层级。
+    /// </summary>
+    /// <remarks>
+    /// 画布本身只负责显隐，真正的“谁在前、谁能被关闭、谁阻断输入”都由这里决定。
+    /// 按需创建的界面通过 <see cref="UICacheManager"/> 注册，常驻场景画布通过
+    /// <c>toggleCanvasEvents</c> 注册，两种来源在查找开关事件时统一处理。
+    /// </remarks>
     public class UIManager : YSingleton<UIManager>
     {
         // 常量保留转发，避免破坏 ICanvasManager.RefreshCanvaOrder 对 UIManager.DefaultOrder 的引用。
@@ -30,16 +39,9 @@ namespace Pipeline.UI.SystemCanvasManagers
         [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
         private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
 
-        [Header("Prefab Cache")]
-        [Tooltip("按需创建的界面预制体；以各自 ToggleEvent 的 CanvasToToggle 作为唯一 ID。")]
-        [SerializeField] private List<CachedUIView> cachedViewPrefabs = new();
-        [SerializeField] private Transform cachedViewRoot;
-        [Tooltip("最多保留多少个已关闭的界面实例；0 表示关闭即销毁，打开的界面不计入。")]
-        [Min(0)] [SerializeField] private int maxIdleViews = 3;
-
-        private UIViewCache viewCache;
-        public int CachedViewCount => viewCache?.InstanceCount ?? 0;
-        public int IdleViewCount => viewCache?.IdleCount ?? 0;
+        [Header("Canvas Runtime")]
+        [SerializeField] private UICacheManager cacheManager;
+        [SerializeField] private CanvasOpenedEventSO canvasOpenedEvent;
 
         // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
         private readonly CanvasFocusStack focusStack = new();
@@ -59,17 +61,13 @@ namespace Pipeline.UI.SystemCanvasManagers
                 inputState[canvas] = false;
             }
 
-            // 接线：纯逻辑栈通过回调驱动 SO 事件，保持自身不依赖 ToggleCanvasEventSO。
+            // 纯逻辑栈通过回调驱动画布事件，不直接依赖具体画布实现。
             focusStack.OnCanvasToggleRequested = RaiseCanvasEvent;
             focusStack.OnFocusRefreshRequested = RaiseFocusEvent;
-            viewCache = new UIViewCache(cachedViewPrefabs,
-                cachedViewRoot != null ? cachedViewRoot : transform,
-                maxIdleViews, ReportCanvasState, GetCanvasOrder);
         }
 
         private void OnEnable()
         {
-            viewCache?.Connect();
             loadEventSO.LoadRequestEvent += OnLoadScene;
 
             foreach (var binding in inputBindings)
@@ -80,8 +78,6 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         private void OnDisable()
         {
-            viewCache?.CloseAll();
-            viewCache?.Disconnect();
             loadEventSO.LoadRequestEvent -= OnLoadScene;
 
             foreach (var binding in inputBindings)
@@ -90,17 +86,10 @@ namespace Pipeline.UI.SystemCanvasManagers
             }
         }
 
-        protected override void OnDestroy()
-        {
-            viewCache?.Dispose();
-            viewCache = null;
-            base.OnDestroy();
-        }
-
         [ContextMenu("UI Cache/Clear Idle Views")]
         public void ClearIdleViews()
         {
-            viewCache?.ClearIdle();
+            cacheManager?.ClearIdle();
         }
 
         private void OnLoadScene(List<GameSceneSO> arg0, Vector3 arg1, bool arg2)
@@ -117,7 +106,8 @@ namespace Pipeline.UI.SystemCanvasManagers
             ToggleCanvas();
         }
 
-        public void HandleFocus(CanvasToToggle canvas) //拖拽脚本的输入，用于完成focus调整
+        /// <summary>拖拽类控件把焦点请求转给焦点栈，由焦点栈统一重排层级。</summary>
+        public void HandleFocus(CanvasToToggle canvas)
         {
             focusStack.HandleFocus(canvas);
         }
@@ -184,6 +174,8 @@ namespace Pipeline.UI.SystemCanvasManagers
             }
 
             focusStack.ReportState(canvas, state);
+            if (state)
+                canvasOpenedEvent?.RaiseCanvasOpened(canvas);
         }
 
         public bool IsCanvasFocused(CanvasToToggle canvas)
@@ -219,7 +211,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         // 优先查预制体注册表，再查场景画布列表；开关、焦点与可关闭判定共用此入口。
         private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas)
         {
-            var cachedEvent = viewCache?.GetToggleEvent(canvas);
+            var cachedEvent = cacheManager != null ? cacheManager.GetToggleEvent(canvas) : null;
             if (cachedEvent != null) return cachedEvent;
 
             foreach (var eventSO in toggleCanvasEvents)
@@ -398,12 +390,12 @@ namespace Pipeline.UI.SystemCanvasManagers
         {
             focusStack.Clear();
 
-            foreach (var eventSO in toggleCanvasEvents)
+            foreach (CanvasToToggle canvas in Enum.GetValues(typeof(CanvasToToggle)))
             {
-                eventSO.RaiseToggleCanvasEvent(false);
+                FindToggleEvent(canvas)?.RaiseToggleCanvasEvent(false);
             }
 
-            viewCache?.CloseAll();
+            cacheManager?.CloseAll();
 
             ResetInputState();
         }
