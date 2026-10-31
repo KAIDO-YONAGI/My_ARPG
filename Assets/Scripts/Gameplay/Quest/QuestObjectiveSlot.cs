@@ -1,17 +1,20 @@
 using TMPro;
 using UnityEngine;
 
-public class QuestObjectiveSlot : MonoBehaviour
+namespace Gameplay.Quest
 {
-    [SerializeField] private TMP_Text objectiveText;
-    [SerializeField] private TMP_Text trackingText;
-    public void RefreshObjectives(string description, string progress, bool isCompleted)
+    public class QuestObjectiveSlot : MonoBehaviour
     {
-        objectiveText.text = description;
-        trackingText.text = progress;
+        [SerializeField] private TMP_Text objectiveText;
+        [SerializeField] private TMP_Text trackingText;
+        public void RefreshObjectives(string description, string progress, bool isCompleted)
+        {
+            objectiveText.text = description;
+            trackingText.text = progress;
 
-        Color color = isCompleted ? Color.gray : Color.white;
-        objectiveText.color = color;
-        trackingText.color = color;
+            Color color = isCompleted ? Color.gray : Color.white;
+            objectiveText.color = color;
+            trackingText.color = color;
+        }
     }
 }

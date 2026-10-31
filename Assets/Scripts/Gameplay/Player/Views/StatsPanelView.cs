@@ -1,6 +1,9 @@
+using Contracts;
 using TMPro;
 using UnityEngine;
 using Gameplay.Player.Controllers;
+using Pipeline.SO;
+using Pipeline.SO.Events;
 
 namespace Gameplay.Player.Views
 {
@@ -58,19 +61,19 @@ namespace Gameplay.Player.Views
 
         private void OnSceneLoaded(GameSceneSO _)
         {
-            ((ICanvasManager)this).SetCanvaInactive(statsCanvas, MyEnums.CanvasToToggle.Stats);
+            ((ICanvasManager)this).SetCanvaInactive(statsCanvas, CanvasToToggle.Stats);
         }
 
         private void OnToggleStatsEvent(bool state)
         {
             // 数据由 Controller 事件驱动持续刷新，面板打开时即为最新值
-            ((ICanvasManager)this).ToggleCanvas(statsCanvas, canvas, MyEnums.CanvasToToggle.Stats, state);
+            ((ICanvasManager)this).ToggleCanvas(statsCanvas, canvas, CanvasToToggle.Stats, state);
         }
 
         private void OnFocus()
         {
             if (!canvasIsActive()) return;
-            ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Stats, true);
+            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasToToggle.Stats, true);
         }
 
         private bool canvasIsActive()

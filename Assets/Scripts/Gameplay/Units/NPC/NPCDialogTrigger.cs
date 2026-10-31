@@ -1,107 +1,113 @@
+using Gameplay.Dialog;
+using Pipeline.SO;
+using Pipeline.SO.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class NPCDialogTrigger : MonoBehaviour
+namespace Gameplay.Units.NPC
 {
-    private Rigidbody2D rb;
-    [SerializeField] private Animator chatAnimator;
-    [SerializeField] private DialogSO dialogSO;
-    [SerializeField] private ToggleCanvasEventSO toggleDialogEvent;
-
-    [Header("Input Actions")]
-    [SerializeField] private InputActionReference advanceDialogAction;
-
-    private bool openDialogRequested;
-
-    private void Awake()
+    public class NPCDialogTrigger : MonoBehaviour
     {
-        rb = GetComponent<Rigidbody2D>();
+        private Rigidbody2D rb;
+        [SerializeField] private Animator chatAnimator;
+        [SerializeField] private DialogSO dialogSO;
+        [SerializeField] private ToggleCanvasEventSO toggleDialogEvent;
 
-        if (DialogManager.Instance != null)
+        [Header("Input Actions")]
+        [SerializeField] private InputActionReference advanceDialogAction;
+
+        private bool openDialogRequested;
+
+        private void Awake()
         {
-            DialogManager.Instance.DisableButtons();
-        }
-    }
+            rb = GetComponent<Rigidbody2D>();
 
-    private void OnEnable()
-    {
-        openDialogRequested = false;
-
-        toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
-
-        if (rb != null)
-        {
-            rb.velocity = Vector2.zero;
-            rb.isKinematic = true;
-        }
-
-        if (chatAnimator != null)
-        {
-            chatAnimator.Play("Chat");
-        }
-
-        advanceDialogAction.action.Enable();
-    }
-
-    private void OnDisable()
-    {
-        openDialogRequested = false;
-
-        toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
-
-        advanceDialogAction.action.Disable();
-
-        if (rb != null)
-        {
-            rb.isKinematic = false;
-        }
-
-        if (chatAnimator != null)
-        {
-            chatAnimator.Play("Idle");
-        }
-
-        if (DialogManager.Instance != null)
-        {
-            DialogManager.Instance.ForeceEndDialog();
-        }
-    }
-    private void OnToggleDialogEvent(bool state)
-    {
-        if (DialogManager.Instance == null)
-        {
-            return;
-        }
-
-        if (!state)
-        {
-            openDialogRequested = false;
-            DialogManager.Instance.ForeceEndDialog();
-            return;
-        }
-
-        openDialogRequested = true;
-    }
-    private void Update()
-    {
-        if (DialogManager.Instance == null)
-        {
-            return;
-        }
-
-        if (openDialogRequested)
-        {
-            openDialogRequested = false;
-
-            if (dialogSO != null && !DialogManager.Instance.isDialogActive)
+            if (DialogManager.Instance != null)
             {
-                DialogManager.Instance.StartDialog(dialogSO);
+                DialogManager.Instance.DisableButtons();
             }
         }
 
-        if (DialogManager.Instance.isDialogActive && advanceDialogAction.action.WasPressedThisFrame())
+        private void OnEnable()
         {
-            DialogManager.Instance.AdvanceDialog();
+            openDialogRequested = false;
+
+            toggleDialogEvent.toggleCanvasEvent += OnToggleDialogEvent;
+
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero;
+                rb.isKinematic = true;
+            }
+
+            if (chatAnimator != null)
+            {
+                chatAnimator.Play("Chat");
+            }
+
+            advanceDialogAction.action.Enable();
+        }
+
+        private void OnDisable()
+        {
+            openDialogRequested = false;
+
+            toggleDialogEvent.toggleCanvasEvent -= OnToggleDialogEvent;
+
+            advanceDialogAction.action.Disable();
+
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+            }
+
+            if (chatAnimator != null)
+            {
+                chatAnimator.Play("Idle");
+            }
+
+            if (DialogManager.Instance != null)
+            {
+                DialogManager.Instance.ForeceEndDialog();
+            }
+        }
+        private void OnToggleDialogEvent(bool state)
+        {
+            if (DialogManager.Instance == null)
+            {
+                return;
+            }
+
+            if (!state)
+            {
+                openDialogRequested = false;
+                DialogManager.Instance.ForeceEndDialog();
+                return;
+            }
+
+            openDialogRequested = true;
+        }
+        private void Update()
+        {
+            if (DialogManager.Instance == null)
+            {
+                return;
+            }
+
+            if (openDialogRequested)
+            {
+                openDialogRequested = false;
+
+                if (dialogSO != null && !DialogManager.Instance.isDialogActive)
+                {
+                    DialogManager.Instance.StartDialog(dialogSO);
+                }
+            }
+
+            if (DialogManager.Instance.isDialogActive && advanceDialogAction.action.WasPressedThisFrame())
+            {
+                DialogManager.Instance.AdvanceDialog();
+            }
         }
     }
 }

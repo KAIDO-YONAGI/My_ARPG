@@ -1,13 +1,17 @@
+using Contracts;
+using Pipeline.SO.Events;
 using UnityEngine;
-using UnityEngine.Events;
 
-public class QuestOptionsButton : MonoBehaviour
+namespace Pipeline.UI.Buttons
 {
-    [SerializeField]private MyEnums.QuestState questStateToShift;
-    [SerializeField] private QuestOptionsEventSO questOptionsEventSO;
-
-    public void OnOptionButtonClicked()//unity中绑定
+    public class QuestOptionsButton : MonoBehaviour
     {
-        questOptionsEventSO.OnQuestOptionsEventRaised(questStateToShift);
+        [SerializeField]private QuestState questStateToShift;
+        [SerializeField] private QuestOptionsEventSO questOptionsEventSO;
+
+        public void OnOptionButtonClicked()//unity中绑定
+        {
+            questOptionsEventSO.OnQuestOptionsEventRaised(questStateToShift);
+        }
     }
 }

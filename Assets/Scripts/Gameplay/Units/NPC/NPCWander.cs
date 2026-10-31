@@ -1,124 +1,125 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using Pipeline.Pathfinding;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
-public class NPCWander : MonoBehaviour
+namespace Gameplay.Units.NPC
 {
-    private static readonly int IsWalking = Animator.StringToHash("isWalking");
-
-    [Header("Component References")]
-    [SerializeField] private Animator animator;
-    [FormerlySerializedAs("aStarController")]
-    [SerializeField] private PathFollower pathFollower;
-
-    [Header("Movement Settings")]
-    [SerializeField] private float speed = 2f;
-    [SerializeField] private float waitTime = 1f;
-    [SerializeField] private int patrolRadius = 5;
-
-    private int facingDirec = 1; // 1表示朝右，-1表示朝左
-    private Vector3 circleCenter;
-    private Vector3 targetPosition;
-    private Vector3 posToGo;
-    private Rigidbody2D rb;
-    private bool isWaiting = false;
-    private float threshold = 0;
-    private void Awake()
+    public class NPCWander : MonoBehaviour
     {
-        rb = GetComponent<Rigidbody2D>(); //这里要早点获取组件，因为Start可能在OnEnable之后被调用，而OnEnable里需要用到rb，避免空引用错误
-    }
-    private void OnEnable()
-    {
-        rb.isKinematic = false;
-    }
-    private void Start()
-    {
-        circleCenter = transform.position;
-        targetPosition = circleCenter + randomDirection();
-        pathFollower.ResetPath();
-        posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        threshold = pathFollower.GetThreshold() * .2f;
-    }
+        private static readonly int IsWalking = Animator.StringToHash("isWalking");
 
-    private void OnDisable()
-    {
-        animator.SetBool(IsWalking, false);
-    }
-    private void Update()
-    {
-        if (isWaiting)
-            return;
+        [Header("Component References")]
+        [SerializeField] private Animator animator;
+        [FormerlySerializedAs("aStarController")]
+        [SerializeField] private PathFollower pathFollower;
 
-        // 计算朝向目标的方向
-        Vector2 direction = (posToGo - transform.position).normalized;
-        if (direction.x * facingDirec < 0)
+        [Header("Movement Settings")]
+        [SerializeField] private float speed = 2f;
+        [SerializeField] private float waitTime = 1f;
+        [SerializeField] private int patrolRadius = 5;
+
+        private int facingDirec = 1; // 1表示朝右，-1表示朝左
+        private Vector3 circleCenter;
+        private Vector3 targetPosition;
+        private Vector3 posToGo;
+        private Rigidbody2D rb;
+        private bool isWaiting = false;
+        private float threshold = 0;
+        private void Awake()
         {
-            Flip();
+            rb = GetComponent<Rigidbody2D>(); //这里要早点获取组件，因为Start可能在OnEnable之后被调用，而OnEnable里需要用到rb，避免空引用错误
         }
-        if (posToGo != Vector3.zero)
-            rb.velocity = direction * speed;
-        else rb.velocity = Vector2.zero;
-
-        float thresholdSqr = threshold * threshold;
-
-        if ((transform.position - posToGo).sqrMagnitude < thresholdSqr)//到寻路节点则告知controller
+        private void OnEnable()
         {
-            pathFollower.ArrivedPos();
-            posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+            rb.isKinematic = false;
         }
-        else
+        private void Start()
         {
-            animator.SetBool(IsWalking, true);
-        }
-
-        if ((transform.position - targetPosition).sqrMagnitude < thresholdSqr || posToGo == Vector3.zero)//到终点则重新获取巡逻点
-        {
-            StartCoroutine(WaitAndContinue());
-        }
-    }
-    private void Flip()
-    {
-        facingDirec *= -1;
-        transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
-        //这个向量应该乘-1而不是facingDirec，因为facingDirec仅记录当前的状态（朝向），可以为1
-    }
-    IEnumerator WaitAndContinue()
-    {
-        isWaiting = true;
-        animator.SetBool(IsWalking, false);
-        rb.velocity = Vector2.zero;
-        yield return new WaitForSeconds(waitTime);
-
-        //如果没有路径了，说明被堵住了，换点找到有为止
-        do
-        {
+            circleCenter = transform.position;
             targetPosition = circleCenter + randomDirection();
-            //如果随机点太近了就重新随机，避免被卡住
-            if ((targetPosition - transform.position).sqrMagnitude < threshold * threshold)
-            {
-                targetPosition = circleCenter + (transform.position - circleCenter).normalized * patrolRadius;
-            }
             pathFollower.ResetPath();
             posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
-        } while (posToGo == Vector3.zero);
-        isWaiting = false;
-    }
+            threshold = pathFollower.GetThreshold() * .2f;
+        }
 
-    private Vector3 randomDirection()
-    {
-        Vector2 dir = Random.insideUnitCircle; // 均匀分布在圆内
-        return new Vector3(dir.x, dir.y, 0) * patrolRadius;
-    }
-    private void OnDrawGizmos()
-    {
-        if (!enabled)//非运行时不着色
-            return;
-        if (patrolRadius == 0)
-            return;
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(Application.isPlaying ? circleCenter : transform.position, patrolRadius);//运行时着色取初始点
+        private void OnDisable()
+        {
+            animator.SetBool(IsWalking, false);
+        }
+        private void Update()
+        {
+            if (isWaiting)
+                return;
+
+            // 计算朝向目标的方向
+            Vector2 direction = (posToGo - transform.position).normalized;
+            if (direction.x * facingDirec < 0)
+            {
+                Flip();
+            }
+            if (posToGo != Vector3.zero)
+                rb.velocity = direction * speed;
+            else rb.velocity = Vector2.zero;
+
+            float thresholdSqr = threshold * threshold;
+
+            if ((transform.position - posToGo).sqrMagnitude < thresholdSqr)//到寻路节点则告知controller
+            {
+                pathFollower.ArrivedPos();
+                posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+            }
+            else
+            {
+                animator.SetBool(IsWalking, true);
+            }
+
+            if ((transform.position - targetPosition).sqrMagnitude < thresholdSqr || posToGo == Vector3.zero)//到终点则重新获取巡逻点
+            {
+                StartCoroutine(WaitAndContinue());
+            }
+        }
+        private void Flip()
+        {
+            facingDirec *= -1;
+            transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            //这个向量应该乘-1而不是facingDirec，因为facingDirec仅记录当前的状态（朝向），可以为1
+        }
+        IEnumerator WaitAndContinue()
+        {
+            isWaiting = true;
+            animator.SetBool(IsWalking, false);
+            rb.velocity = Vector2.zero;
+            yield return new WaitForSeconds(waitTime);
+
+            //如果没有路径了，说明被堵住了，换点找到有为止
+            do
+            {
+                targetPosition = circleCenter + randomDirection();
+                //如果随机点太近了就重新随机，避免被卡住
+                if ((targetPosition - transform.position).sqrMagnitude < threshold * threshold)
+                {
+                    targetPosition = circleCenter + (transform.position - circleCenter).normalized * patrolRadius;
+                }
+                pathFollower.ResetPath();
+                posToGo = pathFollower.GetPosToGo(Vector3.zero, transform.position, targetPosition);
+            } while (posToGo == Vector3.zero);
+            isWaiting = false;
+        }
+
+        private Vector3 randomDirection()
+        {
+            Vector2 dir = Random.insideUnitCircle; // 均匀分布在圆内
+            return new Vector3(dir.x, dir.y, 0) * patrolRadius;
+        }
+        private void OnDrawGizmos()
+        {
+            if (!enabled)//非运行时不着色
+                return;
+            if (patrolRadius == 0)
+                return;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(Application.isPlaying ? circleCenter : transform.position, patrolRadius);//运行时着色取初始点
+        }
     }
 }

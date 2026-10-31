@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu(fileName = "LoadQuestEventSO", menuName = "Events/LoadQuestEventSO", order = 0)]
 
-public class LoadQuestEventSO : ScriptableObject
+namespace Pipeline.SO.Events
 {
-    public event Action<List<QuestSO>> LoadQuestEvent;
-    public void OnLoadQuestEventRaised(List<QuestSO> quests)
+    [CreateAssetMenu(fileName = "LoadQuestEventSO", menuName = "Events/LoadQuestEventSO", order = 0)]
+
+    public class LoadQuestEventSO : ScriptableObject
     {
-        LoadQuestEvent?.Invoke(quests);
+        public event Action<List<QuestSO>> LoadQuestEvent;
+        public void OnLoadQuestEventRaised(List<QuestSO> quests)
+        {
+            LoadQuestEvent?.Invoke(quests);
+        }
     }
 }

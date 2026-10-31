@@ -1,38 +1,43 @@
+using Contracts;
+using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIDrag : MonoBehaviour, IDragHandler, IPointerDownHandler
+namespace Pipeline.UI
 {
-    [SerializeField] private RectTransform dragTarget;
-    [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private MyEnums.CanvasToToggle dragCanvasType;
-    private Vector2 offset;
-    private Vector2 originPosition;
-    private bool wasVisible;
-
-    private void Start()
+    public class UIDrag : MonoBehaviour, IDragHandler, IPointerDownHandler
     {
-        originPosition = dragTarget.anchoredPosition;
-        wasVisible = canvasGroup != null && canvasGroup.alpha > 0.01f;
-    }
+        [SerializeField] private RectTransform dragTarget;
+        [SerializeField] private CanvasGroup canvasGroup;
+        [SerializeField] private CanvasToToggle dragCanvasType;
+        private Vector2 offset;
+        private Vector2 originPosition;
+        private bool wasVisible;
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        offset = dragTarget.anchoredPosition - eventData.position;
-    }
+        private void Start()
+        {
+            originPosition = dragTarget.anchoredPosition;
+            wasVisible = canvasGroup != null && canvasGroup.alpha > 0.01f;
+        }
 
-    public void OnDrag(PointerEventData eventData)
-    {
-        dragTarget.anchoredPosition = eventData.position + offset;
-        UIManager.Instance.HandleFocus(dragCanvasType);
-    }
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            offset = dragTarget.anchoredPosition - eventData.position;
+        }
 
-    private void LateUpdate()
-    {
-        if (canvasGroup == null) return;
-        bool isVisible = canvasGroup.alpha > 0.01f;
-        if (wasVisible && !isVisible)
-            dragTarget.anchoredPosition = originPosition;
-        wasVisible = isVisible;
+        public void OnDrag(PointerEventData eventData)
+        {
+            dragTarget.anchoredPosition = eventData.position + offset;
+            UIManager.Instance.HandleFocus(dragCanvasType);
+        }
+
+        private void LateUpdate()
+        {
+            if (canvasGroup == null) return;
+            bool isVisible = canvasGroup.alpha > 0.01f;
+            if (wasVisible && !isVisible)
+                dragTarget.anchoredPosition = originPosition;
+            wasVisible = isVisible;
+        }
     }
 }

@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Gameplay.Player.Controllers;
+using Pipeline.SO.Events;
 
 namespace Gameplay.Player.Views
 {

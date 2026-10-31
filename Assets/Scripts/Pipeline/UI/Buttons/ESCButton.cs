@@ -1,30 +1,31 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using Contracts;
+using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ESCButton : MonoBehaviour
+namespace Pipeline.UI.Buttons
 {
-    [SerializeField] private Button escButton;
-    [SerializeField] private MyEnums.CanvasToToggle canvasToESC;
-    private void OnEnable() {
-        escButton.onClick.AddListener(OnESC);
-    }
-    private void OnDisable()
+    public class ESCButton : MonoBehaviour
     {
-        escButton.onClick.RemoveAllListeners();
-    }
-    private void OnESC()
-    {
-        if (UIManager.Instance == null)
+        [SerializeField] private Button escButton;
+        [SerializeField] private CanvasToToggle canvasToESC;
+        private void OnEnable() {
+            escButton.onClick.AddListener(OnESC);
+        }
+        private void OnDisable()
         {
-            return;
+            escButton.onClick.RemoveAllListeners();
+        }
+        private void OnESC()
+        {
+            if (UIManager.Instance == null)
+            {
+                return;
+            }
+
+            UIManager.Instance.RequestCanvasClose(canvasToESC);
         }
 
-        UIManager.Instance.RequestCanvasClose(canvasToESC);
+
     }
-
-
 }

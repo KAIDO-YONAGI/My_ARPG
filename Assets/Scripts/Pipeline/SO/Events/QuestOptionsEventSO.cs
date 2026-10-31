@@ -1,17 +1,20 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using Contracts;
 using UnityEngine;
-[CreateAssetMenu(fileName = "QuestOptionsEventSO", menuName = "Events/QuestOptionsEventSO", order = 0)]
 
-public class QuestOptionsEventSO : ScriptableObject
+namespace Pipeline.SO.Events
 {
-    public event Action<MyEnums.QuestState> questOptionsEvent;
+    [CreateAssetMenu(fileName = "QuestOptionsEventSO", menuName = "Events/QuestOptionsEventSO", order = 0)]
 
-    public void OnQuestOptionsEventRaised(MyEnums.QuestState questState)
+    public class QuestOptionsEventSO : ScriptableObject
     {
-        questOptionsEvent?.Invoke(questState);
-    }
+        public event Action<QuestState> questOptionsEvent;
 
+        public void OnQuestOptionsEventRaised(QuestState questState)
+        {
+            questOptionsEvent?.Invoke(questState);
+        }
+
+    }
 }
 

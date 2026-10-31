@@ -1,60 +1,65 @@
+using Gameplay.Units.ShopKeeper;
+using Pipeline.SO.Events;
 using UnityEngine;
 
-[DisallowMultipleComponent]
-public class ShopPortraitCamera : MonoBehaviour
+namespace Gameplay.Shop
 {
-    [SerializeField] private Vector3 followOffset = new(0f, 0f, -2f);
-    [SerializeField] private bool hideWhenNoShopKeeper = true;
-    [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
-
-    private Camera cachedCamera;
-    private Transform currentTarget;
-
-    private void Awake()
+    [DisallowMultipleComponent]
+    public class ShopPortraitCamera : MonoBehaviour
     {
-        cachedCamera = GetComponent<Camera>();
-        SetCameraState(false);
-    }
+        [SerializeField] private Vector3 followOffset = new(0f, 0f, -2f);
+        [SerializeField] private bool hideWhenNoShopKeeper = true;
+        [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
 
-    private void OnEnable()
-    {
-        shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
-        shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
-        SetCameraState(false);
-    }
+        private Camera cachedCamera;
+        private Transform currentTarget;
 
-    private void OnDisable()
-    {
-        shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
-        shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
-        currentTarget = null;
-        SetCameraState(false);
-    }
-
-    private void OnKeeperEntered(ShopKeeper keeper)
-    {
-        currentTarget = keeper != null ? keeper.PortraitTarget : null;
-        SetCameraState(currentTarget != null);
-    }
-
-    private void OnKeeperExited(ShopKeeper keeper)
-    {
-        currentTarget = null;
-        SetCameraState(false);
-    }
-
-    private void LateUpdate()
-    {
-        if (currentTarget != null)
+        private void Awake()
         {
-            transform.position = currentTarget.position + followOffset;
+            cachedCamera = GetComponent<Camera>();
+            SetCameraState(false);
         }
-    }
 
-    private void SetCameraState(bool state)
-    {
-        if (cachedCamera == null || !hideWhenNoShopKeeper) return;
+        private void OnEnable()
+        {
+            shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
+            SetCameraState(false);
+        }
 
-        cachedCamera.enabled = state;
+        private void OnDisable()
+        {
+            shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
+            currentTarget = null;
+            SetCameraState(false);
+        }
+
+        private void OnKeeperEntered(ShopKeeper keeper)
+        {
+            currentTarget = keeper != null ? keeper.PortraitTarget : null;
+            SetCameraState(currentTarget != null);
+        }
+
+        private void OnKeeperExited(ShopKeeper keeper)
+        {
+            currentTarget = null;
+            SetCameraState(false);
+        }
+
+        private void LateUpdate()
+        {
+            if (currentTarget != null)
+            {
+                transform.position = currentTarget.position + followOffset;
+            }
+        }
+
+        private void SetCameraState(bool state)
+        {
+            if (cachedCamera == null || !hideWhenNoShopKeeper) return;
+
+            cachedCamera.enabled = state;
+        }
     }
 }

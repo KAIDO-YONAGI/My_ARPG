@@ -1,171 +1,178 @@
-using System;
 using System.Collections.Generic;
+using Contracts;
+using Gameplay.Units.ShopKeeper;
+using Pipeline.SO;
+using Pipeline.SO.Events;
 using UnityEngine;
-public class ShopManager : YSingleton<ShopManager>, ICanvasManager, IShopInteractable
+
+namespace Gameplay.Shop
 {
-    [SerializeField] private ShopSlot[] shopSlots;
-    [SerializeField] private CanvasGroup shopCanvasGroup;
-    [SerializeField] private Canvas canvas;
-
-    [Header("Events To Trigger")]
-    [SerializeField] private InventorySlotsStatsSO InventoryUpdateRequest;
-    [Header("Events To Receive")]
-    [SerializeField] private ToggleCanvasEventSO toggleShopCanvasEvent;
-    public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
-    [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
-    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
-    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
-
-
-    private List<ShopItems> shopItems;
-    private List<ShopItems> shopWeapon;
-    private List<ShopItems> shopArmor;
-    private ShopKeeper activeShopKeeper;
-
-    public Transform CurrentPortraitTarget
+    public class ShopManager : YSingleton<ShopManager>, ICanvasManager, IShopInteractable
     {
-        get
+        [SerializeField] private ShopSlot[] shopSlots;
+        [SerializeField] private CanvasGroup shopCanvasGroup;
+        [SerializeField] private Canvas canvas;
+
+        [Header("Events To Trigger")]
+        [SerializeField] private InventorySlotsStatsSO InventoryUpdateRequest;
+        [Header("Events To Receive")]
+        [SerializeField] private ToggleCanvasEventSO toggleShopCanvasEvent;
+        public ToggleCanvasEventSO ToggleCanvasEvent => toggleShopCanvasEvent;
+        [SerializeField] private ShopKeeperEventSO shopKeeperEvent;
+        [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
+        public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
+
+
+        private List<ShopItems> shopItems;
+        private List<ShopItems> shopWeapon;
+        private List<ShopItems> shopArmor;
+        private ShopKeeper activeShopKeeper;
+
+        public Transform CurrentPortraitTarget
         {
-            if (activeShopKeeper != null)
-                return activeShopKeeper.PortraitTarget;
-            return null;
-        }
-    }
-    private bool isShopOpen = false;
-    public bool IsShopOpen => isShopOpen;
-
-    private void OnEnable()
-    {
-        toggleShopCanvasEvent.toggleCanvasEvent += OnShopToggle;
-        toggleShopCanvasEvent.focusEvent += OnFocus;
-        shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
-        shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
-        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
-    }
-
-    private void OnDisable()
-    {
-        toggleShopCanvasEvent.toggleCanvasEvent -= OnShopToggle;
-        toggleShopCanvasEvent.focusEvent -= OnFocus;
-        shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
-        shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
-        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
-    }
-
-    private void OnSceneLoaded(GameSceneSO _)
-    {
-        CloseShop();
-    }
-
-    private void OnKeeperEntered(ShopKeeper keeper)
-    {
-        activeShopKeeper = keeper;
-    }
-
-    private void OnKeeperExited(ShopKeeper keeper)
-    {
-        if (activeShopKeeper != keeper) return;
-        activeShopKeeper = null;
-        if (isShopOpen)
-            CloseShop();
-    }
-
-    private void OnShopToggle(bool state)
-    {
-        if (state)
-        {
-            if (!isShopOpen && activeShopKeeper != null)
+            get
             {
-                OpenShop(
-                    activeShopKeeper.ShopItems,
-                    activeShopKeeper.ShopWeapon,
-                    activeShopKeeper.ShopArmor);
+                if (activeShopKeeper != null)
+                    return activeShopKeeper.PortraitTarget;
+                return null;
             }
         }
-        else
+        private bool isShopOpen = false;
+        public bool IsShopOpen => isShopOpen;
+
+        private void OnEnable()
+        {
+            toggleShopCanvasEvent.toggleCanvasEvent += OnShopToggle;
+            toggleShopCanvasEvent.focusEvent += OnFocus;
+            shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            toggleShopCanvasEvent.toggleCanvasEvent -= OnShopToggle;
+            toggleShopCanvasEvent.focusEvent -= OnFocus;
+            shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(GameSceneSO _)
         {
             CloseShop();
         }
-    }
 
-    private void OnFocus()
-    {
-        if (!isShopOpen) return;
-        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Shop, true);
-    }
-
-    public void OpenShop(
-        List<ShopItems> items,
-        List<ShopItems> weapon,
-        List<ShopItems> armor)
-    {
-        shopItems = items;
-        shopWeapon = weapon;
-        shopArmor = armor;
-        OpenItemShop();
-        isShopOpen = true;
-        ((ICanvasManager)this).ToggleCanvas(shopCanvasGroup, canvas, MyEnums.CanvasToToggle.Shop, true);
-    }
-
-    public void CloseShop()
-    {
-        isShopOpen = false;
-        ((ICanvasManager)this).ToggleCanvas(shopCanvasGroup, canvas, MyEnums.CanvasToToggle.Shop, false);
-    }
-
-    private void PopulateShopItems(List<ShopItems> shopItems)
-    {
-        if (shopItems == null) return;
-        for (int i = 0; i < shopItems.Count && i < shopSlots.Length; i++)
+        private void OnKeeperEntered(ShopKeeper keeper)
         {
-            ShopItems shopItem = shopItems[i];
-
-            shopSlots[i].Initialize(shopItem.item, shopItem.price);
-            shopSlots[i].gameObject.SetActive(true);
+            activeShopKeeper = keeper;
         }
-        for (int i = shopItems.Count; i < shopSlots.Length; i++)// 清除多余的商店槽位。
-        {
-            shopSlots[i].gameObject.SetActive(false);
 
+        private void OnKeeperExited(ShopKeeper keeper)
+        {
+            if (activeShopKeeper != keeper) return;
+            activeShopKeeper = null;
+            if (isShopOpen)
+                CloseShop();
         }
-    }
 
-    public void TryBuyItem(ItemSO item, int price)
-    {
-        InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, price, 1);
-    }
-    public void SellItem(ItemSO item)
-    {
-        if (item == null) return;
-        foreach (var slot in shopSlots)// 查找玩家想要出售的物品。
+        private void OnShopToggle(bool state)
         {
-            if (slot.GetItemSO() == item)
+            if (state)
             {
-                // 使用负数价格和数量表示出售。
-                InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, -slot.GetPrice(), -1);
-                return;
+                if (!isShopOpen && activeShopKeeper != null)
+                {
+                    OpenShop(
+                        activeShopKeeper.ShopItems,
+                        activeShopKeeper.ShopWeapon,
+                        activeShopKeeper.ShopArmor);
+                }
+            }
+            else
+            {
+                CloseShop();
             }
         }
-    }
 
-    public void OpenItemShop()
-    {
-        PopulateShopItems(shopItems);
-    }
+        private void OnFocus()
+        {
+            if (!isShopOpen) return;
+            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasToToggle.Shop, true);
+        }
 
-    public void OpenWeaponShop()
-    {
-        PopulateShopItems(shopWeapon);
-    }
+        public void OpenShop(
+            List<ShopItems> items,
+            List<ShopItems> weapon,
+            List<ShopItems> armor)
+        {
+            shopItems = items;
+            shopWeapon = weapon;
+            shopArmor = armor;
+            OpenItemShop();
+            isShopOpen = true;
+            ((ICanvasManager)this).ToggleCanvas(shopCanvasGroup, canvas, CanvasToToggle.Shop, true);
+        }
 
-    public void OpenArmorShop()
-    {
-        PopulateShopItems(shopArmor);
+        public void CloseShop()
+        {
+            isShopOpen = false;
+            ((ICanvasManager)this).ToggleCanvas(shopCanvasGroup, canvas, CanvasToToggle.Shop, false);
+        }
+
+        private void PopulateShopItems(List<ShopItems> shopItems)
+        {
+            if (shopItems == null) return;
+            for (int i = 0; i < shopItems.Count && i < shopSlots.Length; i++)
+            {
+                ShopItems shopItem = shopItems[i];
+
+                shopSlots[i].Initialize(shopItem.item, shopItem.price);
+                shopSlots[i].gameObject.SetActive(true);
+            }
+            for (int i = shopItems.Count; i < shopSlots.Length; i++)// 清除多余的商店槽位。
+            {
+                shopSlots[i].gameObject.SetActive(false);
+
+            }
+        }
+
+        public void TryBuyItem(ItemSO item, int price)
+        {
+            InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, price, 1);
+        }
+        public void SellItem(ItemSO item)
+        {
+            if (item == null) return;
+            foreach (var slot in shopSlots)// 查找玩家想要出售的物品。
+            {
+                if (slot.GetItemSO() == item)
+                {
+                    // 使用负数价格和数量表示出售。
+                    InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, -slot.GetPrice(), -1);
+                    return;
+                }
+            }
+        }
+
+        public void OpenItemShop()
+        {
+            PopulateShopItems(shopItems);
+        }
+
+        public void OpenWeaponShop()
+        {
+            PopulateShopItems(shopWeapon);
+        }
+
+        public void OpenArmorShop()
+        {
+            PopulateShopItems(shopArmor);
+        }
     }
-}
-[System.Serializable]
-public class ShopItems
-{
-    public ItemSO item;
-    public int price;
+    [System.Serializable]
+    public class ShopItems
+    {
+        public ItemSO item;
+        public int price;
+    }
 }

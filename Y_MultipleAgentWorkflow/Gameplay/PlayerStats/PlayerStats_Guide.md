@@ -32,7 +32,7 @@
 | Service | `SaveableService<StatsService>` | `StatsService` | 私有持有 model，唯一写入口 |
 | Controller | 3 个纯 C# + 1 个 MonoBehaviour | `HealthController`、`ExperienceController`、`StatsPanelController`、`PlayerDamageController` | 只读经 `IPlayerStatsReadOnly` |
 | View | MonoBehaviour | `HealthView`、`ExperiencePanelView`、`StatsPanelView` | 只碰控件，在 `Start` 里造 Controller 并首刷 |
-| 配置 | `ScriptableObject` | `PlayerStatsSO` | 落在全局命名空间，不在 `Gameplay.Player.*` |
+| 配置 | `ScriptableObject` | `PlayerStatsSO` | 命名空间 `Pipeline.SO`，不在 `Gameplay.Player.*` |
 
 `StatsService` 的 `model` 字段是 private，对外只给 `public IPlayerStatsReadOnly Stats => model;`。`GetStats()` 与 `LoadStats()` 是 private，仅存档流程使用。
 

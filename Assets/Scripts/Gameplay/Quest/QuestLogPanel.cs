@@ -1,86 +1,88 @@
-using System.Collections;
-using System.Collections.Generic;
+using Pipeline.SO;
+using Pipeline.SO.Events;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class QuestLogPanel : MonoBehaviour //UI更新有关逻辑
+namespace Gameplay.Quest
 {
-    [SerializeField] private TMP_Text questNameText;
-    [SerializeField] private TMP_Text questDescriptionText;
-    [SerializeField] private QuestObjectiveSlot[] objectiveSlots; //任务条目槽位
-    [SerializeField] private QuestRewardsSlot[] questRewardsSlot; //任务奖励槽位
-
-    [SerializeField] private VoidEventSO openQuestEvent;
-
-    private QuestSO currentQuest;
-
-    private void OnEnable()
+    public class QuestLogPanel : MonoBehaviour //UI更新有关逻辑
     {
-        openQuestEvent.VoidEvent += ShowQuestOffer;
-    }
+        [SerializeField] private TMP_Text questNameText;
+        [SerializeField] private TMP_Text questDescriptionText;
+        [SerializeField] private QuestObjectiveSlot[] objectiveSlots; //任务条目槽位
+        [SerializeField] private QuestRewardsSlot[] questRewardsSlot; //任务奖励槽位
 
-    private void OnDisable()
-    {
-        openQuestEvent.VoidEvent -= ShowQuestOffer;
-    }
+        [SerializeField] private VoidEventSO openQuestEvent;
 
-    public void ShowQuestOffer()
-    {
-        QuestSO incomingQuestSO = QuestManager.Instance.GetFirstIncompletedQuest();
+        private QuestSO currentQuest;
 
-        if (incomingQuestSO != null)
-            HandleQuestClicked(incomingQuestSO);
-    }
-
-    public void HandleQuestClicked(QuestSO quest) //绑定了按钮事件
-    {
-        currentQuest = quest;
-        QuestManager.Instance.OpenQuest(quest);
-
-        questNameText.text = currentQuest.questName;
-        questDescriptionText.text = currentQuest.questDescription;
-        DisplayRewards();
-    }
-
-    public void DisPlayObjectives()
-    {
-        for (int i = 0; i < objectiveSlots.Length; i++)
+        private void OnEnable()
         {
-            if (i < currentQuest.questObjectives.Count)
-            {
-                var obj = currentQuest.questObjectives[i];
-                int currentAmount =
-                    QuestManager.Instance.GetCurrentObjAmount(currentQuest, obj);
-                string progress =
-                    QuestManager.Instance.GetProgressText(currentQuest, obj);
-                bool isCompleted = currentAmount >= obj.requiredAmount;
+            openQuestEvent.VoidEvent += ShowQuestOffer;
+        }
 
-                objectiveSlots[i].gameObject.SetActive(true);
+        private void OnDisable()
+        {
+            openQuestEvent.VoidEvent -= ShowQuestOffer;
+        }
 
-                objectiveSlots[i].RefreshObjectives(obj.description, progress, isCompleted);
-            }
-            else
+        public void ShowQuestOffer()
+        {
+            QuestSO incomingQuestSO = QuestManager.Instance.GetFirstIncompletedQuest();
+
+            if (incomingQuestSO != null)
+                HandleQuestClicked(incomingQuestSO);
+        }
+
+        public void HandleQuestClicked(QuestSO quest) //绑定了按钮事件
+        {
+            currentQuest = quest;
+            QuestManager.Instance.OpenQuest(quest);
+
+            questNameText.text = currentQuest.questName;
+            questDescriptionText.text = currentQuest.questDescription;
+            DisplayRewards();
+        }
+
+        public void DisPlayObjectives()
+        {
+            for (int i = 0; i < objectiveSlots.Length; i++)
             {
-                objectiveSlots[i].gameObject.SetActive(false);
+                if (i < currentQuest.questObjectives.Count)
+                {
+                    var obj = currentQuest.questObjectives[i];
+                    int currentAmount =
+                        QuestManager.Instance.GetCurrentObjAmount(currentQuest, obj);
+                    string progress =
+                        QuestManager.Instance.GetProgressText(currentQuest, obj);
+                    bool isCompleted = currentAmount >= obj.requiredAmount;
+
+                    objectiveSlots[i].gameObject.SetActive(true);
+
+                    objectiveSlots[i].RefreshObjectives(obj.description, progress, isCompleted);
+                }
+                else
+                {
+                    objectiveSlots[i].gameObject.SetActive(false);
+                }
             }
         }
-    }
 
-    private void DisplayRewards()
-    {
-        for (int i = 0; i < questRewardsSlot.Length; i++)
+        private void DisplayRewards()
         {
-            if (i < currentQuest.rewards.Count)
+            for (int i = 0; i < questRewardsSlot.Length; i++)
             {
-                var reward = currentQuest.rewards[i];
-                questRewardsSlot[i].DisplayReward(reward.rewardItem.icon, reward.quantity);
+                if (i < currentQuest.rewards.Count)
+                {
+                    var reward = currentQuest.rewards[i];
+                    questRewardsSlot[i].DisplayReward(reward.rewardItem.icon, reward.quantity);
 
-                questRewardsSlot[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                questRewardsSlot[i].gameObject.SetActive(false);
+                    questRewardsSlot[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    questRewardsSlot[i].gameObject.SetActive(false);
+                }
             }
         }
     }

@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 
-public static class DynamicDataHandler
+namespace Gameplay.Save
 {
-    public static void PrepareForNewGameLoad(SaveData data)
+    public static class DynamicDataHandler
     {
-        ClearDynamicData(data);
-    }
+        public static void PrepareForNewGameLoad(SaveData data)
+        {
+            ClearDynamicData(data);
+        }
 
-    public static void ClearDynamicData(SaveData data)
-    {
-        data.lootsStatsDic = new Dictionary<string, LootStatus>();
+        public static void ClearDynamicData(SaveData data)
+        {
+            data.lootsStatsDic = new Dictionary<string, LootStatus>();
+        }
     }
 }

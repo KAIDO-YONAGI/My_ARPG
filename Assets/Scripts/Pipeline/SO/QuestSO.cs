@@ -1,36 +1,38 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu(fileName = "New Quest", menuName = "QuestSO")]
-public class QuestSO : ScriptableObject
+
+namespace Pipeline.SO
 {
-    public string questName;
-    public int lv;
-    [TextArea] public string questDescription;
+    [CreateAssetMenu(fileName = "New Quest", menuName = "QuestSO")]
+    public class QuestSO : ScriptableObject
+    {
+        public string questName;
+        public int lv;
+        [TextArea] public string questDescription;
 
-    public List<QuestObjective> questObjectives;
-    public List<Reward> rewards;
-}
+        public List<QuestObjective> questObjectives;
+        public List<Reward> rewards;
+    }
 
-[Serializable]
-public class Reward
-{
-    public ItemSO rewardItem;
-    public int quantity;
-}
-[Serializable]
-public class QuestObjective
-{
-    public string description;
-    public ItemSO targetItem;
-    public CharacterSO targetCharacter;
-    public LocationSO targetLocation;
+    [Serializable]
+    public class Reward
+    {
+        public ItemSO rewardItem;
+        public int quantity;
+    }
+    [Serializable]
+    public class QuestObjective
+    {
+        public string description;
+        public ItemSO targetItem;
+        public CharacterSO targetCharacter;
+        public LocationSO targetLocation;
 
 
-    public int requiredAmount;
-    public int currentAmount;
-}
+        public int requiredAmount;
+        public int currentAmount;
+    }
 
 /*
  * ============================================================
@@ -88,3 +90,4 @@ public class QuestObjective
  *   - SO 之间是引用关系，重命名/移动资源会断引用。
  * ============================================================
  */
+}

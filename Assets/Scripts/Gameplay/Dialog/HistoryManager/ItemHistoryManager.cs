@@ -1,37 +1,39 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine;
+using Contracts;
+using Pipeline.SO;
 
-public class ItemHistoryManager : YSingleton<ItemHistoryManager>
+namespace Gameplay.Dialog.HistoryManager
 {
-
-    private Dictionary<ItemSO, int> itemHasPicked = new();
-
-    public void RecordItem(ItemSO item, int quantity)
+    public class ItemHistoryManager : YSingleton<ItemHistoryManager>
     {
-        if (itemHasPicked.ContainsKey(item))
+
+        private Dictionary<ItemSO, int> itemHasPicked = new();
+
+        public void RecordItem(ItemSO item, int quantity)
         {
-            itemHasPicked[item] += quantity;
+            if (itemHasPicked.ContainsKey(item))
+            {
+                itemHasPicked[item] += quantity;
+            }
+            else itemHasPicked.Add(item, quantity);
+            // Debug.Log(item.itemName);
+            // Debug.Log(itemHasPicked.Count);
+            // Debug.Log(itemHasPicked[item]);
+
         }
-        else itemHasPicked.Add(item, quantity);
-        // Debug.Log(item.itemName);
-        // Debug.Log(itemHasPicked.Count);
-        // Debug.Log(itemHasPicked[item]);
 
-    }
+        public bool HasPickedOverAmount(ItemSO item, int amount)//实际上会记录是否捡过和数量，当前数量归零的并不会删除
+        {
+            if (itemHasPicked.ContainsKey(item) && itemHasPicked[item] >= amount)
+                return true;
 
-    public bool HasPickedOverAmount(ItemSO item, int amount)//实际上会记录是否捡过和数量，当前数量归零的并不会删除
-    {
-        if (itemHasPicked.ContainsKey(item) && itemHasPicked[item] >= amount)
-            return true;
-
-        return false;
-    }
-    public int GetItemQuantity(ItemSO item)
-    {
-        if (itemHasPicked.TryGetValue(item, out int amount))
-            return amount;
-        return 0;
+            return false;
+        }
+        public int GetItemQuantity(ItemSO item)
+        {
+            if (itemHasPicked.TryGetValue(item, out int amount))
+                return amount;
+            return 0;
+        }
     }
 }

@@ -8,7 +8,7 @@
 - 单位脚本：`EnemyMovement`、`EnemyCombat`、`EnemyHealth`、`EnemyKnockBack`、`NPCStateController`、`NPCWander`、`NPCPatrol`、`NPCDialogTrigger`、`ShopKeeper`
 - 移动依赖面：`PathFollower`、`AStarNodeManager`、`AStarPathFinder`、`AStarOpenHeap`
 - 玩家侧与数值：`PlayerCombat`、`PlayerDamageController`、`StatsService`、`PlayerMovement`
-- 通道与契约：`PlayerDamagedEventSO`、`EnemyDefeatedEventSO`、`ShopKeeperEventSO`、`ToggleCanvasEventSO`、`IDamageable`、`MyEnums`、`YSingleton`
+- 通道与契约：`PlayerDamagedEventSO`、`EnemyDefeatedEventSO`、`ShopKeeperEventSO`、`ToggleCanvasEventSO`、`IDamageable`、`Contracts` 里的枚举、`YSingleton`
 - 预制体与动画控制器：火炬哥布林预制体、紫色棋子 NPC 预制体、黄色棋子 NPC 预制体、店主预制体、单位动画控制器
 
 ## 1. 触发线索
@@ -29,7 +29,7 @@
 
 ### 2.0 三个子域的脚本清单（本域没有统一基类）
 
-九个脚本全部落在全局命名空间，全部直接继承 `MonoBehaviour`，本域没有单位基类，也没有单位通用接口；唯一的共享契约是 `EnemyHealth` 实现的 `IDamageable`，它是全工程唯一实现者。
+九个脚本全部直接继承 `MonoBehaviour`，本域没有单位基类，也没有单位通用接口；唯一的共享契约是 `EnemyHealth` 实现的 `IDamageable`，它是全工程唯一实现者。命名空间按子域切分：敌人 4 个在 `Gameplay.Units.Enemy`，NPC 4 个在 `Gameplay.Units.NPC`，店主 1 个在 `Gameplay.Units.ShopKeeper`。同子域内的组件互相直接可见，跨子域引用要 `using` 对方的命名空间。
 
 | 子域 | 类型 | 职责 |
 |---|---|---|
@@ -65,7 +65,7 @@
 ### 2.3 NPC：互斥 enabled 切行为 + 触发切对话
 
 - `NPCStateController` 持三个行为组件引用与 `DefaultState`，`DefaultState` 的默认值是 `Patrol`，`Start` 调 `SwitchState(DefaultState)`。`SwitchState` 的实现是三行互斥赋值：`wanderScript.enabled = (state == Wander)`、`dialogTrigger.enabled = (state == Chat)`、`patrolScript.enabled = (state == Patrol)`；同一时刻只有一个行为组件被启用。
-- 预制体里三个行为组件出厂即 disabled，首次启用完全依赖 `SwitchState`。`DefaultState = 2` 对应 `MyEnums.NPCState.Patrol`，枚举顺序是 Idle 0、Wander 1、Patrol 2、Chat 3。
+- 预制体里三个行为组件出厂即 disabled，首次启用完全依赖 `SwitchState`。`DefaultState = 2` 对应 `NPCState.Patrol`，枚举顺序是 Idle 0、Wander 1、Patrol 2、Chat 3。
 - 玩家进入或离开触发区时按 tag 切换：`OnTriggerEnter2D` 切 `Chat`，`OnTriggerExit2D` 切 `DefaultState`。触发体是预制体根上的 `CircleCollider2D`，半径 1 且为 Trigger；根物体另有一个非触发 `CapsuleCollider2D` 与 `Rigidbody2D`。
 - `NPCWander` 与 `NPCPatrol` 有同一个时序约定：`Rigidbody2D` 必须在 `Awake` 里取，因为 `OnEnable` 要用它设 `isKinematic = false`。
 - 三个行为组件各自在 `OnDisable` 里收尾：`NPCWander` 与 `NPCPatrol` 关 `isWalking`；`NPCDialogTrigger` 退订通道、禁用输入动作、置 `isKinematic = false`、把交互图标播回 `Idle`，并强制结束对话。

@@ -1,3 +1,4 @@
+using Contracts;
 using UnityEngine;
 
 namespace Gameplay.Player

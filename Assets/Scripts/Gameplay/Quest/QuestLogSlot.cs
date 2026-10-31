@@ -1,73 +1,74 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Pipeline.SO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class QuestLogSlot : MonoBehaviour
+namespace Gameplay.Quest
 {
-    [SerializeField] private TMP_Text questNameText;
-    [SerializeField] private TMP_Text questLevelText;
-    public QuestSO currentQuest;
-    [FormerlySerializedAs("questLogUI")]
-    public QuestLogPanel questLogPanel;
-    private CanvasGroup slotCanvas;
-
-    /// <summary>本槽位的 CanvasGroup（Awake 已缓存，外部直接取，避免 GetComponent）。</summary>
-    public CanvasGroup SlotCanvas => slotCanvas;
-
-    private void Awake()
+    public class QuestLogSlot : MonoBehaviour
     {
-        slotCanvas = GetComponent<CanvasGroup>();
-        ResetSlotState();
-    }
+        [SerializeField] private TMP_Text questNameText;
+        [SerializeField] private TMP_Text questLevelText;
+        public QuestSO currentQuest;
+        [FormerlySerializedAs("questLogUI")]
+        public QuestLogPanel questLogPanel;
+        private CanvasGroup slotCanvas;
 
-    private void OnValidate()
-    {
-        gameObject.SetActive(false);
-        if (currentQuest != null)
-            SetQuest(currentQuest);
-        
-    }
+        /// <summary>本槽位的 CanvasGroup（Awake 已缓存，外部直接取，避免 GetComponent）。</summary>
+        public CanvasGroup SlotCanvas => slotCanvas;
 
-    public void SetQuest(QuestSO quest)
-    {
-
-        currentQuest = quest;
-        questNameText.text = quest.questName;
-        questLevelText.text = "Lv." + quest.lv;
-        ResetSlotState();
-        gameObject.SetActive(true);
-    }
-    public void SetQuestActive(bool state)
-    {
-        if (!state)
-        {
-            currentQuest = null;
-        }
-
-        ResetSlotState();
-        gameObject.SetActive(state);
-    }
-
-    public void ResetSlotState()
-    {
-        if (slotCanvas == null)
+        private void Awake()
         {
             slotCanvas = GetComponent<CanvasGroup>();
+            ResetSlotState();
         }
 
-        if (slotCanvas == null) return;
+        private void OnValidate()
+        {
+            gameObject.SetActive(false);
+            if (currentQuest != null)
+                SetQuest(currentQuest);
+        
+        }
 
-        slotCanvas.alpha = 1f;
-        slotCanvas.interactable = true;
-        slotCanvas.blocksRaycasts = true;
+        public void SetQuest(QuestSO quest)
+        {
+
+            currentQuest = quest;
+            questNameText.text = quest.questName;
+            questLevelText.text = "Lv." + quest.lv;
+            ResetSlotState();
+            gameObject.SetActive(true);
+        }
+        public void SetQuestActive(bool state)
+        {
+            if (!state)
+            {
+                currentQuest = null;
+            }
+
+            ResetSlotState();
+            gameObject.SetActive(state);
+        }
+
+        public void ResetSlotState()
+        {
+            if (slotCanvas == null)
+            {
+                slotCanvas = GetComponent<CanvasGroup>();
+            }
+
+            if (slotCanvas == null) return;
+
+            slotCanvas.alpha = 1f;
+            slotCanvas.interactable = true;
+            slotCanvas.blocksRaycasts = true;
+        }
+
+        public void OnSlotClicked()
+        {
+            questLogPanel.HandleQuestClicked(currentQuest);
+        }
+
     }
-
-    public void OnSlotClicked()
-    {
-        questLogPanel.HandleQuestClicked(currentQuest);
-    }
-
 }

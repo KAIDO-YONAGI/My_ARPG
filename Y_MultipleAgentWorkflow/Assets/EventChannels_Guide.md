@@ -34,10 +34,10 @@
 | 3 | `InventorySlotsStatsSO` | `Action<ItemSO,int,int> InventoryUpdateRequestEvent` | `RaiseInventoryUpdateRequest(...)` | 3 |
 | 4 | `SceneLoadEventSO` | `Action<List<GameSceneSO>,Vector3,bool> LoadRequestEvent` | `RaiseLoadRequestEvent(...)` | 1 |
 | 5 | `SceneLoadedEventSO` | `Action<GameSceneSO> SceneLoadedEvent` | `RaiseSceneLoadedEvent(...)` | 1 |
-| 6 | `DataSaveEventSO` | `Action<MyEnums.SaveType> DataSaveEvent` | `RaiseDataSaveEvent(...)` | 1 |
+| 6 | `DataSaveEventSO` | `Action<SaveType> DataSaveEvent` | `RaiseDataSaveEvent(...)` | 1 |
 | 7 | `LoadQuestEventSO` | `Action<List<QuestSO>> LoadQuestEvent` | `OnLoadQuestEventRaised(...)` | 1 |
 | 8 | `LootEventSO` | `Action<ItemSO,int,Loot> LootEvent` | `OnEventRaised(...)` | 1 |
-| 9 | `QuestOptionsEventSO` | `Action<MyEnums.QuestState> questOptionsEvent` | `OnQuestOptionsEventRaised(...)` | 1 |
+| 9 | `QuestOptionsEventSO` | `Action<QuestState> questOptionsEvent` | `OnQuestOptionsEventRaised(...)` | 1 |
 | 10 | `ShopKeeperEventSO` | `Action<ShopKeeper> ShopKeeperEntered / Exited` | `RaiseShopKeeperEntered/Exited(...)` | 1 |
 | 11 | `PlayerDamagedEventSO` | `Action<int,Transform,float,float> PlayerDamaged` | `OnPlayerDamaged(...)` | 1 |
 | 12 | `EnemyDefeatedEventSO` | `Action<int,Transform> EnemyDefeated` | `OnEnemyDefeated(...)` | 1 |
@@ -50,7 +50,7 @@
 **12 个类每一个都直接继承 `ScriptableObject`，没有公共基类、没有公共接口**，`VoidEventSO`、`SceneLoadedEventSO`、`ShopKeeperEventSO`、`PlayerDamagedEventSO` 都写作 `: ScriptableObject`；`GuidSO` 是另一条无关的继承线，事件通道不使用它。
 
 - 事件字段一律是 `public event Action<...>`，未标注 `[SerializeField]`，因此委托链不序列化，资产文件里只有 `m_Script` 与类内配置字段，看不到任何订阅者。
-- 泛型参数只引用 `ItemSO`、`QuestSO`、`GameSceneSO`、`Loot`、`ShopKeeper` 与 `MyEnums` 枚举；通道类不引用任何 Manager、Controller 或 View。
+- 泛型参数只引用 `ItemSO`、`QuestSO`、`GameSceneSO`、`Loot`、`ShopKeeper` 与 `Contracts` 里的枚举（`SaveType`、`QuestState`、`CanvasToToggle`）；通道类不引用任何 Manager、Controller 或 View。
 - 发布方法命名分两类：`ToggleCanvasEventSO`、`ShopKeeperEventSO`、`SceneLoadEventSO` 等用 `Raise*`；`VoidEventSO.OnEventRaised`、`LootEventSO.OnEventRaised`、`LoadQuestEventSO.OnLoadQuestEventRaised`、`PlayerDamagedEventSO.OnPlayerDamaged` 用 `On*Raised` 或 `On*`。新增通道时照抄同族命名。
 - 每个资产实例是独立通道：同一个类建两个资产就是两条互不相干的广播线，`VoidEventSO` 的 6 个资产各管一件事即此用法。
 
@@ -93,7 +93,7 @@ private void OnDisable() { sceneLoadEventSO.LoadRequestEvent -= OnAutoSave; ... 
 
 ### 2.5 ToggleCanvasEventSO 的内部契约
 
-`ToggleCanvasEventSO` 是 12 个类里唯一带配置字段的，字段是 `public MyEnums.CanvasToToggle canvasToToggle`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
+`ToggleCanvasEventSO` 是 12 个类里唯一带配置字段的，字段是 `public CanvasToToggle canvasToToggle`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
 
 消费侧靠枚举匹配配对：
 
@@ -108,7 +108,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 
 `UIManager.toggleCanvasEvents` 是枚举到资产的登记表；`IsClosableCanvas` 用它判定面板能否被关，未登记的 `CanvasToToggle` 不会被 UIManager 主动关闭。
 
-10 个 toggle 资产映射到 **10 个互不重复**的 `CanvasToToggle` 值。`MyEnums.CanvasToToggle` 共 11 个成员，唯一无资产的是 `Default`。
+10 个 toggle 资产映射到 **10 个互不重复**的 `CanvasToToggle` 值。`CanvasToToggle` 共 11 个成员，唯一无资产的是 `Default`。
 
 | 资产 | `canvasToToggle` |
 |---|---|
@@ -140,7 +140,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 
 ### 3.2 canvasToToggle 是隐式身份，必须唯一
 
-`FindToggleEvent` 取列表中第一个匹配项。两个 toggle 资产填了同一个 `CanvasToToggle` 时，后者永远查不到，该面板的焦点与开关广播静默丢失。当前 10 个资产值互不重复。新增画布时先加枚举成员，`MyEnums.CanvasToToggle` 的注释要求在 `Default` 之前插入；再建资产填值，最后登记进 `toggleCanvasEvents`。
+`FindToggleEvent` 取列表中第一个匹配项。两个 toggle 资产填了同一个 `CanvasToToggle` 时，后者永远查不到，该面板的焦点与开关广播静默丢失。当前 10 个资产值互不重复。新增画布时先加枚举成员，`CanvasToToggle` 的注释要求在 `Default` 之前插入；再建资产填值，最后登记进 `toggleCanvasEvents`。
 
 ### 3.3 新增与改名事件通道的检查清单
 
@@ -152,7 +152,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 | 2 | 发布方：`[SerializeField]` 拖了该资产 | 按该资产 GUID 检索场景、预制体与资产 |
 | 3 | 订阅方：`OnEnable +=` 与 `OnDisable -=` | §2.4 列出的 22 个订阅方各自核对成对改动 |
 | 4 | 场景与预制体里的资产引用 | 按 GUID 计数，改名后引用数不应为 0 |
-| 5 | toggle 通道：`canvasToToggle` 值唯一，且已登记进 `UIManager.toggleCanvasEvents` | `MyEnums.CanvasToToggle` 与 `UIManager` |
+| 5 | toggle 通道：`canvasToToggle` 值唯一，且已登记进 `UIManager.toggleCanvasEvents` | `CanvasToToggle` 与 `UIManager` |
 | 6 | 常驻场景内管理器持有的通道 | 确认它是常驻场景 `PersistentScene` 里的对象 |
 | 7 | 改完后按 GUID 复算引用数，确认与改前一致 | 对全部场景、预制体与资产做 GUID 匹配计数 |
 

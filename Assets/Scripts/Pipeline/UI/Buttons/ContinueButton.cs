@@ -1,25 +1,30 @@
-using UnityEngine.UI;
+using Contracts;
+using Gameplay.Save;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class ContinueButton : MonoBehaviour
+namespace Pipeline.UI.Buttons
 {
-    // public DataSaveEventSO loadDataForContinue;
+    public class ContinueButton : MonoBehaviour
+    {
+        // public DataSaveEventSO loadDataForContinue;
 
-    [SerializeField] private Button continueButton;
-    private void OnEnable()
-    {
-        continueButton.onClick.AddListener(() =>
+        [SerializeField] private Button continueButton;
+        private void OnEnable()
         {
-            string savePath = SaveSystem.Instance.GetLatestLoadableSavePath(MyEnums.SaveType.SystemSave);
-            if (string.IsNullOrEmpty(savePath) || !SaveSystem.Instance.LoadSave(MyEnums.SaveType.SystemSave, savePath))
-            {
-                //TODO加载失败处理
-            }
+            continueButton.onClick.AddListener(() =>
+                {
+                    string savePath = SaveSystem.Instance.GetLatestLoadableSavePath(SaveType.SystemSave);
+                    if (string.IsNullOrEmpty(savePath) || !SaveSystem.Instance.LoadSave(SaveType.SystemSave, savePath))
+                    {
+                        //TODO加载失败处理
+                    }
+                }
+            );
         }
-        );
-    }
-    private void OnDisable()
-    {
-        continueButton.onClick.RemoveAllListeners();
+        private void OnDisable()
+        {
+            continueButton.onClick.RemoveAllListeners();
+        }
     }
 }

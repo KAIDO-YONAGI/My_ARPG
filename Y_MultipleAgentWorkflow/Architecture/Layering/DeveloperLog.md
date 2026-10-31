@@ -33,3 +33,31 @@ maintenance count changes here.
 - 唯一写入口判定链：`IPlayerStatsReadOnly` 有 4 个事件与 15 个只读属性，成员集合里没有写方法；读入口是 `StatsService.Stats`，写入口是 6 个单行转发命令，`model`、`GetStats`、`LoadStats` 均为 private；`PlayerStatsModelTests` 断言 `StatsService` 的公开成员里没有 `Model` 属性。
 
 **维护计数**：`0/5`，本次为首次建档。
+
+## 2026-10-31 命名空间重构后复核分层事实
+
+**触发**
+
+用户整理命名空间：`Assets\Scripts` 下 124 个产品代码文件全部收进与目录同构的命名空间，原 `MyEnums` 类拆成 10 个顶层枚举。测试侧 5 个文件未同步 `using`，Unity 报 6 个 `CS0246`。
+
+**写入的文件**
+
+- `Layering_Guide.md`：§1 线索表、§2.1、§2.2、§2.3、§2.5、§3.2、§3.4 按实测重写；`最后更新` 改为 `2026-10-31`。
+- `Router.md`：`维护计数` 0/5 → 1/5，能力边界三条改为实测数字。
+- 本条目。
+
+**依据的证据**
+
+- 命名空间实测：124 个产品代码文件全部带 `namespace`，零个落在全局命名空间；命名空间共 25 个，与目录一一对应。
+- 逐文件 `using` 统计：`Contracts → Gameplay` 2、`Contracts → Pipeline` 3、`Gameplay → Contracts` 29、`Gameplay → Pipeline` 62、`Pipeline → Contracts` 22、`Pipeline → Gameplay` 6。
+- `Contracts\MyEnums.cs` 现状：`namespace Contracts` 下 `PlayerState`、`EnemyState`、`SceneType`、`PersistentType`、`AStarNodeType`、`NPCState`、`QuestState`、`CanvasToToggle`、`SaveType`、`SaveLoadPanelType` 共 10 个枚举。
+- `Player` 目录 18 个文件的命名空间分布：`Gameplay.Player` 7、`.Controllers` 4、`.Models` 3、`.Views` 3、`.Services` 1。
+- 编辑器侧 `Assets\Editor\InputActionReferenceRebuilder.cs` 仍是全局命名空间，是仅剩的一个。
+- 编译验证：Roslyn `csc.dll` 配 Unity 2022.3.62f3c1 的 286 条程序集引用，编译 130 个源文件，0 error 0 warning。
+
+**结论**
+
+- 旧的"跨层依赖 0 处"不成立，但它不是这轮重构引入的耦合：全局命名空间时代跨层引用不需要 `using`，依赖统计不到。新数字才是真实依赖图。
+- §3.4 从"已满足的约束"改记为"违反 5 处的待偿债务"，因为契约层现在 `using` 了 `Gameplay.Save`、`Pipeline.SO.Events`、`Pipeline.UI.SystemCanvasManagers`、`Pipeline.SO`。
+
+**维护计数**：`0/5` → `1/5`。

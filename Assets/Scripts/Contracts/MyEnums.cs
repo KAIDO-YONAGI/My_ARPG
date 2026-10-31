@@ -1,4 +1,4 @@
-namespace MyEnums
+namespace Contracts
 {
     public enum PlayerState
     {

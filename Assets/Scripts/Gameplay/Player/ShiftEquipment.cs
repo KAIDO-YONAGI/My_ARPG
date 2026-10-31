@@ -1,50 +1,51 @@
-using System.Collections;
-using System.Collections.Generic;
+using Pipeline.SO.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using MyEnums;
 
-public class ShiftEquipment : MonoBehaviour
+namespace Gameplay.Player
 {
-    [SerializeField] private PlayerCombat combat;
-    [SerializeField] private PlayerBow bow;
-
-    [Header("Input Actions")]
-    [SerializeField] private InputActionReference shiftEquipmentAction;
-
-    [Header("Action Finished Events")]
-    [SerializeField] private VoidEventSO slashActionFinishedEvent;
-    [SerializeField] private VoidEventSO shootActionFinishedEvent;
-
-    private float shiftCooldown = 0.3f;
-    private float shiftTimer;
-
-    private void OnEnable()
+    public class ShiftEquipment : MonoBehaviour
     {
-        shiftEquipmentAction.action.Enable();
-    }
+        [SerializeField] private PlayerCombat combat;
+        [SerializeField] private PlayerBow bow;
 
-    private void OnDisable()
-    {
-        shiftEquipmentAction.action.Disable();
-    }
+        [Header("Input Actions")]
+        [SerializeField] private InputActionReference shiftEquipmentAction;
 
-    private void Update()
-    {
-        if (shiftTimer > 0)
-            shiftTimer -= Time.deltaTime;
+        [Header("Action Finished Events")]
+        [SerializeField] private VoidEventSO slashActionFinishedEvent;
+        [SerializeField] private VoidEventSO shootActionFinishedEvent;
 
-        if (shiftEquipmentAction.action.WasPressedThisFrame() && shiftTimer <= 0)
+        private float shiftCooldown = 0.3f;
+        private float shiftTimer;
+
+        private void OnEnable()
         {
-            // 翻转武器模式；动画事件由 Player 根节点的转发器路由到当前武器。
-            combat.SetActive(!combat.IsActive);
-            bow.SetActive(!bow.IsActive);
+            shiftEquipmentAction.action.Enable();
+        }
 
-            // 切换装备时两种动作都视为结束，通过事件通知 PlayerMovement 统一重置状态
-            slashActionFinishedEvent.OnEventRaised();
-            shootActionFinishedEvent.OnEventRaised();
+        private void OnDisable()
+        {
+            shiftEquipmentAction.action.Disable();
+        }
 
-            shiftTimer = shiftCooldown;
+        private void Update()
+        {
+            if (shiftTimer > 0)
+                shiftTimer -= Time.deltaTime;
+
+            if (shiftEquipmentAction.action.WasPressedThisFrame() && shiftTimer <= 0)
+            {
+                // 翻转武器模式；动画事件由 Player 根节点的转发器路由到当前武器。
+                combat.SetActive(!combat.IsActive);
+                bow.SetActive(!bow.IsActive);
+
+                // 切换装备时两种动作都视为结束，通过事件通知 PlayerMovement 统一重置状态
+                slashActionFinishedEvent.OnEventRaised();
+                shootActionFinishedEvent.OnEventRaised();
+
+                shiftTimer = shiftCooldown;
+            }
         }
     }
 }

@@ -1,13 +1,17 @@
 using System;
-using System.Collections.Generic;
+using Contracts;
 using UnityEngine;
-[CreateAssetMenu(fileName = "DataSaveEventSO", menuName = "Events/DataSaveEventSO", order = 0)]
 
-public class DataSaveEventSO : ScriptableObject
+namespace Pipeline.SO.Events
 {
-    public event Action<MyEnums.SaveType> DataSaveEvent;
-    public void RaiseDataSaveEvent(MyEnums.SaveType saveType)
+    [CreateAssetMenu(fileName = "DataSaveEventSO", menuName = "Events/DataSaveEventSO", order = 0)]
+
+    public class DataSaveEventSO : ScriptableObject
     {
-        DataSaveEvent?.Invoke(saveType);
+        public event Action<SaveType> DataSaveEvent;
+        public void RaiseDataSaveEvent(SaveType saveType)
+        {
+            DataSaveEvent?.Invoke(saveType);
+        }
     }
 }

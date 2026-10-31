@@ -83,7 +83,7 @@
 
 `NPCDialogTrigger` 承接 UIManager 的对话开关请求：订阅 `toggleDialogEvent`，收到开启只置 `openDialogRequested`，收到关闭直接 `ForeceEndDialog()`。`Update()` 中，存在开启请求且对话未激活时才 `StartDialog(dialogSO)`；对话进行中且 `advanceDialogAction.WasPressedThisFrame()` 时 `AdvanceDialog()`。`OnDisable` 同样 `ForeceEndDialog()`。
 
-资产与接线：`ToggleDialogEvent` 事件资产的 `canvasToToggle` 为 4，对应 `MyEnums` 画布枚举中 Dialog 的取值；该资产登记在常驻场景 UIManager 的 `toggleCanvasEvents` 列表里，并有 canvas 4 的输入绑定。`DialogManager` 组件挂在常驻场景中，配了 4 个选项按钮与 4 个选项文本。场景内 `NPCDialogTrigger` 的入口对话引用：Scene1 的两个触发器分别用 `PurpleBobPickMushroom` 与 `PurpleBobs Greeting`，Scene2 的一个触发器用 `PurpleBobs Greeting`。
+资产与接线：`ToggleDialogEvent` 事件资产的 `canvasToToggle` 为 4，对应 `CanvasToToggle` 里 Dialog 的取值；该资产登记在常驻场景 UIManager 的 `toggleCanvasEvents` 列表里，并有 canvas 4 的输入绑定。`DialogManager` 组件挂在常驻场景中，配了 4 个选项按钮与 4 个选项文本。场景内 `NPCDialogTrigger` 的入口对话引用：Scene1 的两个触发器分别用 `PurpleBobPickMushroom` 与 `PurpleBobs Greeting`，Scene2 的一个触发器用 `PurpleBobs Greeting`。
 
 ## 3. 约定与硬边界
 

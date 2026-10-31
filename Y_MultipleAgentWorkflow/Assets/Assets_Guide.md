@@ -78,7 +78,7 @@ switch (skillName) {
 
 ### 2.5 GameSceneSO 资产（5 个）
 
-5 个场景资产是 `MenuScene`、`Scene1`、`Scene2`、`TestScene`、`RetrySceneSO`，`sceneType` 取 `MyEnums.SceneType` 的 `Location`、`Menu`、`Retry`。这套资产必须与编辑器 Build Settings 里的场景列表同时维护，加载语义与前置校验见 SceneFlow 域，本文件只声明资产是场景组列表的元素。
+5 个场景资产是 `MenuScene`、`Scene1`、`Scene2`、`TestScene`、`RetrySceneSO`，`sceneType` 取 `SceneType` 的 `Location`、`Menu`、`Retry`。这套资产必须与编辑器 Build Settings 里的场景列表同时维护，加载语义与前置校验见 SceneFlow 域，本文件只声明资产是场景组列表的元素。
 
 ### 2.6 StreamingAssets 现状
 
@@ -99,7 +99,7 @@ StreamingAssets 目录下只有一个有效文件：`GameGuide` 指南文件，1
 ### 3.1 目录与命名约定
 
 - **目录**：GameSO 目录下按用途分目录。事件通道统一放在 Events 目录，再分 `VoidEvents`、`ToggleCanvasEvents`、`InventorySlotsStatsEvents`。
-- **配置资产命名跟随类名或语义名**：`CharacterSO` 放在以角色名命名的文件夹根部；`ToggleCanvasEvents` 下的资产命名为 `Toggle<枚举后缀>Event`，与 `MyEnums.CanvasToToggle` 的成员一一对应，见 `EventChannels_Guide.md` §2.3。
+- **配置资产命名跟随类名或语义名**：`CharacterSO` 放在以角色名命名的文件夹根部；`ToggleCanvasEvents` 下的资产命名为 `Toggle<枚举后缀>Event`，与 `CanvasToToggle` 的成员一一对应，见 `EventChannels_Guide.md` §2.3。
 - **`VoidEventSO` 资产必须带语义前缀**：该规则写在 `VoidEventSO` 的源码注释里，要求资产名含语义前缀，例如 `SlashActionFinishedEventSO`，并禁止再创建无语义的资产名。
 - **`GuidSO` 派生类不要手动改 `guid`**：`OnValidate` 只在为空时补发，手动清空会在下次 Inspector 校验时换成新值。
 

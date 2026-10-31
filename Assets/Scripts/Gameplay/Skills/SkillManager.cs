@@ -1,33 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Gameplay.Player;
 using Gameplay.Player.Services;
+using UnityEngine;
 
-public class SkillManager : MonoBehaviour
+namespace Gameplay.Skills
 {
-    [SerializeField] private PlayerCombat combat;
-    private void OnEnable()
+    public class SkillManager : MonoBehaviour
     {
-        SkillSlot.OnAbilityPointSpent += HandleAbilityPointSpent;
-    }
-    private void OnDisable()
-    {
-        SkillSlot.OnAbilityPointSpent -= HandleAbilityPointSpent;
-    }
-    private void HandleAbilityPointSpent(SkillSlot skillSlot)
-    {
-        string skillName = skillSlot.skillSO.skillName;
-
-        switch (skillName)
+        [SerializeField] private PlayerCombat combat;
+        private void OnEnable()
         {
-            case "MaxHealthBoost":
-                StatsService.Instance.UpdateMaxHealth(1);
-                StatsService.Instance.UpdateHealth(1);
-                break;
-            case "SwordSlash":
-                combat.SetActive(true);
-                break;
+            SkillSlot.OnAbilityPointSpent += HandleAbilityPointSpent;
+        }
+        private void OnDisable()
+        {
+            SkillSlot.OnAbilityPointSpent -= HandleAbilityPointSpent;
+        }
+        private void HandleAbilityPointSpent(SkillSlot skillSlot)
+        {
+            string skillName = skillSlot.skillSO.skillName;
+
+            switch (skillName)
+            {
+                case "MaxHealthBoost":
+                    StatsService.Instance.UpdateMaxHealth(1);
+                    StatsService.Instance.UpdateHealth(1);
+                    break;
+                case "SwordSlash":
+                    combat.SetActive(true);
+                    break;
     
+            }
         }
     }
 }

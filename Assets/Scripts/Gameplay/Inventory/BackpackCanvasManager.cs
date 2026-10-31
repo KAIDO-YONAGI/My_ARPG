@@ -1,41 +1,47 @@
+using Contracts;
+using Pipeline.SO;
+using Pipeline.SO.Events;
 using UnityEngine;
 
-public class BackpackCanvasManager : MonoBehaviour, ICanvasManager
+namespace Gameplay.Inventory
 {
-    [SerializeField] private CanvasGroup currentCanvas;
-    [SerializeField] private Canvas canvas;
-    [SerializeField] private ToggleCanvasEventSO toggleBackpackCanvasEventSO;
-    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
-
-    public ToggleCanvasEventSO ToggleCanvasEvent => toggleBackpackCanvasEventSO;
-    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
-
-    private void OnEnable()
+    public class BackpackCanvasManager : MonoBehaviour, ICanvasManager
     {
-        toggleBackpackCanvasEventSO.toggleCanvasEvent += OnToggleBackpack;
-        toggleBackpackCanvasEventSO.focusEvent += OnFocus;
-        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
-    }
+        [SerializeField] private CanvasGroup currentCanvas;
+        [SerializeField] private Canvas canvas;
+        [SerializeField] private ToggleCanvasEventSO toggleBackpackCanvasEventSO;
+        [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
 
-    private void OnDisable()
-    {
-        toggleBackpackCanvasEventSO.toggleCanvasEvent -= OnToggleBackpack;
-        toggleBackpackCanvasEventSO.focusEvent -= OnFocus;
-        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
-    }
+        public ToggleCanvasEventSO ToggleCanvasEvent => toggleBackpackCanvasEventSO;
+        public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
-    private void OnSceneLoaded(GameSceneSO _)
-    {
-        ((ICanvasManager)this).SetCanvaInactive(currentCanvas, MyEnums.CanvasToToggle.Backpack);
-    }
+        private void OnEnable()
+        {
+            toggleBackpackCanvasEventSO.toggleCanvasEvent += OnToggleBackpack;
+            toggleBackpackCanvasEventSO.focusEvent += OnFocus;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        }
 
-    private void OnToggleBackpack(bool state)
-    {
-        ((ICanvasManager)this).ToggleCanvas(currentCanvas, canvas, MyEnums.CanvasToToggle.Backpack, state);
-    }
+        private void OnDisable()
+        {
+            toggleBackpackCanvasEventSO.toggleCanvasEvent -= OnToggleBackpack;
+            toggleBackpackCanvasEventSO.focusEvent -= OnFocus;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        }
 
-    private void OnFocus()
-    {
-        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Backpack, true);
+        private void OnSceneLoaded(GameSceneSO _)
+        {
+            ((ICanvasManager)this).SetCanvaInactive(currentCanvas, CanvasToToggle.Backpack);
+        }
+
+        private void OnToggleBackpack(bool state)
+        {
+            ((ICanvasManager)this).ToggleCanvas(currentCanvas, canvas, CanvasToToggle.Backpack, state);
+        }
+
+        private void OnFocus()
+        {
+            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasToToggle.Backpack, true);
+        }
     }
 }

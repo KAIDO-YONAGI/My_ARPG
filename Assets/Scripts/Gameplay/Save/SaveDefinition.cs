@@ -1,23 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
+using Contracts;
 using UnityEngine;
-public class SaveDefinition : MonoBehaviour
+
+namespace Gameplay.Save
 {
-    public MyEnums.PersistentType persistentType;
-    //一个标记字段，用来决定这个 GameObject 是否参与存档
-    public string ID;
-    private void OnValidate()
+    public class SaveDefinition : MonoBehaviour
     {
-        if (persistentType == MyEnums.PersistentType.ReadWrite)
+        public PersistentType persistentType;
+        //一个标记字段，用来决定这个 GameObject 是否参与存档
+        public string ID;
+        private void OnValidate()
         {
-            if (string.IsNullOrEmpty(ID))
+            if (persistentType == PersistentType.ReadWrite)
             {
-                ID = System.Guid.NewGuid().ToString();
+                if (string.IsNullOrEmpty(ID))
+                {
+                    ID = System.Guid.NewGuid().ToString();
+                }
             }
-        }
-        else
-        {
-            ID = string.Empty;
+            else
+            {
+                ID = string.Empty;
+            }
         }
     }
 }

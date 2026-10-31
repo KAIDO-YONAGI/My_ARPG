@@ -1,7 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Contracts;
 
-public class VisitedHistoryManager : YSingleton<VisitedHistoryManager>
+namespace Gameplay.Dialog.HistoryManager
 {
+    public class VisitedHistoryManager : YSingleton<VisitedHistoryManager>
+    {
+    }
 }

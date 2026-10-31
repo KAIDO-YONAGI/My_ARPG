@@ -1,46 +1,50 @@
+using Gameplay.Player;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class MobileAttackButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
+namespace Pipeline.UI
 {
-    [SerializeField] private PlayerMovement playerMovement;
-    [SerializeField] private RectTransform pressVisual;
-    [SerializeField, Range(0.5f, 1f)] private float pressedScale = 0.88f;
-
-    private Vector3 normalScale = Vector3.one;
-
-    private void Awake()
+    public class MobileAttackButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
     {
-        if (pressVisual != null)
-            normalScale = pressVisual.localScale;
-    }
+        [SerializeField] private PlayerMovement playerMovement;
+        [SerializeField] private RectTransform pressVisual;
+        [SerializeField, Range(0.5f, 1f)] private float pressedScale = 0.88f;
 
-    private void OnDisable()
-    {
-        SetPressed(false);
-    }
+        private Vector3 normalScale = Vector3.one;
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        SetPressed(true);
+        private void Awake()
+        {
+            if (pressVisual != null)
+                normalScale = pressVisual.localScale;
+        }
 
-        if (playerMovement != null)
-            playerMovement.TryAttack();
-    }
+        private void OnDisable()
+        {
+            SetPressed(false);
+        }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        SetPressed(false);
-    }
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            SetPressed(true);
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        SetPressed(false);
-    }
+            if (playerMovement != null)
+                playerMovement.TryAttack();
+        }
 
-    private void SetPressed(bool pressed)
-    {
-        if (pressVisual != null)
-            pressVisual.localScale = normalScale * (pressed ? pressedScale : 1f);
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            SetPressed(false);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            SetPressed(false);
+        }
+
+        private void SetPressed(bool pressed)
+        {
+            if (pressVisual != null)
+                pressVisual.localScale = normalScale * (pressed ? pressedScale : 1f);
+        }
     }
 }

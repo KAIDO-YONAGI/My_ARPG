@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using Pipeline;
 using UnityEngine;
 
 namespace Gameplay.Tests

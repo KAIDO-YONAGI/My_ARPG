@@ -1,26 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
+using Pipeline.SO.Events;
 using UnityEngine;
 
-public class EnemyCombat : MonoBehaviour
+namespace Gameplay.Units.Enemy
 {
-    [SerializeField] private int damage = 1;
-    [SerializeField] private Transform attackPoint;
-    [SerializeField] private float weaponRange;
-    [SerializeField] private LayerMask playerLayer;
-    [SerializeField] private float knockBackForce = 5;
-    [SerializeField] private float stunTime = 0.3f;
-    [SerializeField] private PlayerDamagedEventSO playerDamagedEvent;
-
-    public void Attack()
+    public class EnemyCombat : MonoBehaviour
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, weaponRange, playerLayer);
-        //意为在玩家层的一个以weaponRange为半径，attackPoint为圆心的圆形范围内查找目标，玩家层在unity中添加，能够排除其它对象
+        [SerializeField] private int damage = 1;
+        [SerializeField] private Transform attackPoint;
+        [SerializeField] private float weaponRange;
+        [SerializeField] private LayerMask playerLayer;
+        [SerializeField] private float knockBackForce = 5;
+        [SerializeField] private float stunTime = 0.3f;
+        [SerializeField] private PlayerDamagedEventSO playerDamagedEvent;
 
-        if (hits.Length > 0 && hits[0].enabled)//如果有目标
+        public void Attack()
         {
-            // 命中后广播玩家受击；扣血、击退与死亡由 PlayerDamageController 统一处理
-            playerDamagedEvent.OnPlayerDamaged(damage, transform, knockBackForce, stunTime);
+            Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, weaponRange, playerLayer);
+            //意为在玩家层的一个以weaponRange为半径，attackPoint为圆心的圆形范围内查找目标，玩家层在unity中添加，能够排除其它对象
+
+            if (hits.Length > 0 && hits[0].enabled)//如果有目标
+            {
+                // 命中后广播玩家受击；扣血、击退与死亡由 PlayerDamageController 统一处理
+                playerDamagedEvent.OnPlayerDamaged(damage, transform, knockBackForce, stunTime);
+            }
         }
     }
 }

@@ -1,7 +1,11 @@
 using System.Collections.Generic;
-using UnityEngine;
+using Contracts;
+using Pipeline.SO;
 
-public class SceneDataForSave : YSingleton<SceneDataForSave>
+namespace Pipeline.Scene
 {
-    public List<GameSceneSO> gameScenes;
+    public class SceneDataForSave : YSingleton<SceneDataForSave>
+    {
+        public List<GameSceneSO> gameScenes;
+    }
 }

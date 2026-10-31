@@ -2,6 +2,7 @@ using UnityEngine;
 using Gameplay.Player.Models;
 using Gameplay.Player.Services;
 using Gameplay.Player.Views;
+using Pipeline.SO.Events;
 
 namespace Gameplay.Player.Controllers
 {

@@ -1,5 +1,9 @@
+using Contracts;
 using UnityEngine;
 using Gameplay.Player.Services;
+using Pipeline.Scene;
+using Pipeline.SO.Events;
+using Pipeline.UI.SystemCanvasManagers;
 
 namespace Gameplay.Player.Controllers
 {
@@ -38,7 +42,7 @@ namespace Gameplay.Player.Controllers
             if (StatsService.Instance.Stats.CurrentHealth <= 0)
             {
                 // GameOver 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈与阻塞体系。
-                UIManager.Instance.RequestCanvasToggle(MyEnums.CanvasToToggle.GameOver);
+                UIManager.Instance.RequestCanvasToggle(CanvasToToggle.GameOver);
 
                 if (playerRoot != null)
                     playerRoot.SetActive(false);

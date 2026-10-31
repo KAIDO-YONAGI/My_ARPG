@@ -1,20 +1,23 @@
-using UnityEngine;
 using System.Diagnostics;
 using System.IO;
+using UnityEngine;
 
-public class OpenTxtWithSystem : MonoBehaviour
+namespace Pipeline.UI
 {
-    public void OpenGuide()
+    public class OpenTxtWithSystem : MonoBehaviour
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "GameGuide.txt");
+        public void OpenGuide()
+        {
+            string path = Path.Combine(Application.streamingAssetsPath, "GameGuide.txt");
 
-        if (File.Exists(path))
-        {
-            Process.Start(path); // 用系统默认程序打开（记事本）
-        }
-        else
-        {
-            UnityEngine.Debug.LogError("找不到游戏指南文件：" + path);
+            if (File.Exists(path))
+            {
+                Process.Start(path); // 用系统默认程序打开（记事本）
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("找不到游戏指南文件：" + path);
+            }
         }
     }
 }

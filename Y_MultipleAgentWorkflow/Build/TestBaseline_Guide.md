@@ -23,7 +23,7 @@
 
 ### 2.1 位置与框架
 
-- 测试集中在 `Tests/Editor` 目录下，共 **5 个文件**，命名空间统一为 `Gameplay.Tests`。
+- 测试集中在 `Tests/Editor` 目录下，共 **5 个文件**，命名空间统一为 `Gameplay.Tests`，与产品代码的 25 个命名空间互不重合。
 - 框架为 Unity Test Framework **1.4.6**；断言用 NUnit，`nunit.framework` 由扩展 NUnit 包提供。
 - **0 个 asmdef**。测试与编辑器侧的 `InputActionReferenceRebuilder` 一起被编译进预定义编辑器程序集 `Assembly-CSharp-Editor`，该程序集引用 `Assembly-CSharp`。
 
@@ -50,14 +50,15 @@
 ### 2.4 选型：测试落在不依赖 UnityEngine 的纯 C# 逻辑上
 
 - `AStarOpenHeap` 的说明写明它是“A* 开表（open list）用的二叉小顶堆，**不依赖 UnityEngine**”；对应测试只引入 `System`、`System.Collections.Generic` 与 `NUnit.Framework`。
-- `CanvasFocusStack` 的说明写明它是“**纯 C# 逻辑**……不依赖 MonoBehaviour 与 ToggleCanvasEventSO……**便于脱离 Unity 生命周期做单元测试**”；对应测试只引入 `System.Collections.Generic`、`MyEnums` 与 `NUnit.Framework`，而 `MyEnums` 是不含 UnityEngine 类型的枚举命名空间。
+- `CanvasFocusStack` 的说明写明它是“**纯 C# 逻辑**……不依赖 MonoBehaviour 与 ToggleCanvasEventSO……**便于脱离 Unity 生命周期做单元测试**”；对应测试只引入 `System.Collections.Generic`、`Contracts`、`Pipeline.UI.SystemCanvasManagers` 与 `NUnit.Framework`，被测类型与 `CanvasToToggle` 都来自不含 UnityEngine 类型的程序集代码。
+- 命名空间改造后，测试侧引用的产品类型全部要显式 `using`：`CanvasFocusStackTests` 用 `using Contracts;`（`CanvasToToggle`）与 `using Pipeline.UI.SystemCanvasManagers;`（`CanvasFocusStack`）；`AStarOpenHeapTests` 用 `using Pipeline.Pathfinding;`；`ObjectPoolTests` 用 `using Pipeline;`（`IPoolable`）；`PlayerStatsSOTests` 用 `using Pipeline.SO;`（`PlayerStatsSO`）。漏写任何一条都是 `CS0246`，不会像全局命名空间时代那样静默可用。
 
 各测试文件的引擎依赖：
 
 | 文件 | 是否 `using UnityEngine` | 说明 |
 |---|---|---|
 | `AStarOpenHeapTests` | 否 | 6 个用例只引入 `System`、`System.Collections.Generic` 与 `NUnit.Framework` |
-| `CanvasFocusStackTests` | 否 | 15 个用例只引入 `System.Collections.Generic`、`MyEnums` 与 `NUnit.Framework` |
+| `CanvasFocusStackTests` | 否 | 15 个用例只引入 `System.Collections.Generic`、`Contracts`、`Pipeline.UI.SystemCanvasManagers` 与 `NUnit.Framework` |
 | `PlayerStatsModelTests` | 是 | 24 个用例中 1 个用引擎 API：`LogAssert.Expect(LogType.Warning, ...)` |
 | `ObjectPoolTests` | 是 | 5 个用例构造 `GameObject` 与 `MonoBehaviour`，依赖 EditMode 下的 `Object.DestroyImmediate` |
 | `PlayerStatsSOTests` | 是 | 2 个用例用 `ScriptableObject.CreateInstance` 与 `Object.DestroyImmediate` |

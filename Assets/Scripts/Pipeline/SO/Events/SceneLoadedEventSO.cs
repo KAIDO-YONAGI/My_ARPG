@@ -1,13 +1,16 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "SceneLoadedEventSO", menuName = "Events/SceneLoadedEventSO", order = 1)]
-public class SceneLoadedEventSO : ScriptableObject
+namespace Pipeline.SO.Events
 {
-    public event Action<GameSceneSO> SceneLoadedEvent;
-
-    public void RaiseSceneLoadedEvent(GameSceneSO currentScene)
+    [CreateAssetMenu(fileName = "SceneLoadedEventSO", menuName = "Events/SceneLoadedEventSO", order = 1)]
+    public class SceneLoadedEventSO : ScriptableObject
     {
-        SceneLoadedEvent?.Invoke(currentScene);
+        public event Action<GameSceneSO> SceneLoadedEvent;
+
+        public void RaiseSceneLoadedEvent(GameSceneSO currentScene)
+        {
+            SceneLoadedEvent?.Invoke(currentScene);
+        }
     }
 }

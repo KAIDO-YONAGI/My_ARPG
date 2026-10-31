@@ -1,21 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class GuidSO : ScriptableObject
+namespace Pipeline.SO
 {
-    [SerializeField] private string guid;
+    public class GuidSO : ScriptableObject
+    {
+        [SerializeField] private string guid;
 
-    public string Guid => guid;
+        public string Guid => guid;
 
 #if UNITY_EDITOR
-    protected virtual void OnValidate()
-    {
-        if (string.IsNullOrEmpty(guid))
+        protected virtual void OnValidate()
         {
-            guid = System.Guid.NewGuid().ToString();
-            UnityEditor.EditorUtility.SetDirty(this);
+            if (string.IsNullOrEmpty(guid))
+            {
+                guid = System.Guid.NewGuid().ToString();
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
         }
-    }
 #endif
+    }
 }

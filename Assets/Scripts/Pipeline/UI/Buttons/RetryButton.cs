@@ -1,17 +1,21 @@
+using Pipeline.SO.Events;
 using UnityEngine;
 
-public class RetryButton : MonoBehaviour
+namespace Pipeline.UI.Buttons
 {
-    [SerializeField] private CanvasGroup ButtonCanvas;
-    [SerializeField] private VoidEventSO retryEventSO;
-
-    public void HandleRetry()//editor内由button组件绑定
+    public class RetryButton : MonoBehaviour
     {
-        ButtonCanvas.alpha = 0;
-        ButtonCanvas.interactable = false;
-        ButtonCanvas.blocksRaycasts = false;
+        [SerializeField] private CanvasGroup ButtonCanvas;
+        [SerializeField] private VoidEventSO retryEventSO;
 
-        TimeManager.Instance.ForceResumeGame();
-        retryEventSO.OnEventRaised();
+        public void HandleRetry()//editor内由button组件绑定
+        {
+            ButtonCanvas.alpha = 0;
+            ButtonCanvas.interactable = false;
+            ButtonCanvas.blocksRaycasts = false;
+
+            TimeManager.Instance.ForceResumeGame();
+            retryEventSO.OnEventRaised();
+        }
     }
 }

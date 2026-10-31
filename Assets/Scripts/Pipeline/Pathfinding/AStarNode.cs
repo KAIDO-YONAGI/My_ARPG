@@ -1,34 +1,37 @@
-using UnityEngine;
-using MyEnums;
-public class AStarNode
+using Contracts;
+
+namespace Pipeline.Pathfinding
 {
-    private int x;
-    private int y;
-    private AStarNodeType nodeType;
-
-    public AStarNode(int x, int y, AStarNodeType nodeType)
+    public class AStarNode
     {
-        this.x = x;
-        this.y = y;
-        this.nodeType = nodeType;
-    }
+        private int x;
+        private int y;
+        private AStarNodeType nodeType;
 
-    public int GetX() => x;
-    public int GetY() => y;
-    public AStarNodeType GetNodeType() => nodeType;
-
-    public void SetNodeType(AStarNodeType newType)
-    {
-        if (CanOverride(nodeType, newType))
+        public AStarNode(int x, int y, AStarNodeType nodeType)
         {
-            nodeType = newType;
+            this.x = x;
+            this.y = y;
+            this.nodeType = nodeType;
         }
-    }
 
-    private bool CanOverride(AStarNodeType existing, AStarNodeType newType)
-    {
-        if (newType == AStarNodeType.Obstacle) return true;
-        if (existing == AStarNodeType.Obstacle) return false;
-        return true;
+        public int GetX() => x;
+        public int GetY() => y;
+        public AStarNodeType GetNodeType() => nodeType;
+
+        public void SetNodeType(AStarNodeType newType)
+        {
+            if (CanOverride(nodeType, newType))
+            {
+                nodeType = newType;
+            }
+        }
+
+        private bool CanOverride(AStarNodeType existing, AStarNodeType newType)
+        {
+            if (newType == AStarNodeType.Obstacle) return true;
+            if (existing == AStarNodeType.Obstacle) return false;
+            return true;
+        }
     }
 }

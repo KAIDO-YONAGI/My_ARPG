@@ -1,5 +1,6 @@
 using Gameplay.Player.Models;
 using NUnit.Framework;
+using Pipeline.SO;
 using UnityEngine;
 
 namespace Gameplay.Tests

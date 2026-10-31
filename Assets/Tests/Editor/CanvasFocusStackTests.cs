@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using MyEnums;
+using Contracts;
 using NUnit.Framework;
+using Pipeline.UI.SystemCanvasManagers;
 
 namespace Gameplay.Tests
 {

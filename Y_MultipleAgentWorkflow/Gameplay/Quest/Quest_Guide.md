@@ -22,7 +22,7 @@
 
 `QuestManager : YSingleton<QuestManager>, ICanvasManager` 是任务域唯一管理者，同时持有 UI 引用、事件资产与进度数据。
 
-状态枚举 `MyEnums.QuestState { Idle, Accepted, Decline, IsToComplete, Completed }` 依次取值 0 到 4，管理器的状态字段初值为 `Idle`。
+状态枚举 `QuestState { Idle, Accepted, Decline, IsToComplete, Completed }` 依次取值 0 到 4，管理器的状态字段初值为 `Idle`。
 
 写入口是 `QuestStateChanged(QuestSO, QuestState)`，流程固定为：未注册的任务直接返回；先关闭 accept、decline、complete 三个 CanvasGroup；写入 `questProgress[quest].questState`；按状态点亮按钮组；调用 `RefreshObjectiveProgress(quest)` 与 `questLogPanel.DisPlayObjectives()`。
 

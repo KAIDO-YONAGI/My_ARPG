@@ -1,124 +1,127 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>对象池化接口：池对象实现此接口可接收 Get/Return 回调</summary>
-public interface IPoolable
+namespace Pipeline
 {
-    void OnPoolGet();
-    void OnPoolReturn();
+    /// <summary>对象池化接口：池对象实现此接口可接收 Get/Return 回调</summary>
+    public interface IPoolable
+    {
+        void OnPoolGet();
+        void OnPoolReturn();
+
+        /// <summary>
+        /// 实例刚由池创建（预热或扩容）时调用一次，默认空实现。
+        /// 只有需要区分「池对象 / 场景摆放对象」的实现才关心它——
+        /// 池创建时 Awake/OnEnable 已自动跑过一遍，实现可借此把那次副作用退回。
+        /// </summary>
+        void OnPoolCreated() { }
+    }
 
     /// <summary>
-    /// 实例刚由池创建（预热或扩容）时调用一次，默认空实现。
-    /// 只有需要区分「池对象 / 场景摆放对象」的实现才关心它——
-    /// 池创建时 Awake/OnEnable 已自动跑过一遍，实现可借此把那次副作用退回。
+    /// 通用泛型对象池，支持预热预制体。迁自 GameJam2607（重构清单 4.10/2.5），
+    /// 增加 Get 时跳过已被场景卸载销毁的池内对象的防护。
     /// </summary>
-    void OnPoolCreated() { }
-}
-
-/// <summary>
-/// 通用泛型对象池，支持预热预制体。迁自 GameJam2607（重构清单 4.10/2.5），
-/// 增加 Get 时跳过已被场景卸载销毁的池内对象的防护。
-/// </summary>
-public class ObjectPool<T> where T : Component
-{
-    private readonly T _prefab;
-    private readonly Transform _parent;
-    private readonly Queue<T> _pool = new();
-    private readonly int _maxSize;
-
-    /// <summary>当前池中可用对象数量</summary>
-    public int Count => _pool.Count;
-
-    /// <summary>累计创建的对象总数（含已销毁）</summary>
-    public int TotalCreated { get; private set; }
-
-    public ObjectPool(T prefab, int prewarmCount, Transform parent = null, int maxSize = 100)
+    public class ObjectPool<T> where T : Component
     {
-        _prefab = prefab;
-        _parent = parent;
-        _maxSize = maxSize;
-        Prewarm(prewarmCount);
-    }
+        private readonly T _prefab;
+        private readonly Transform _parent;
+        private readonly Queue<T> _pool = new();
+        private readonly int _maxSize;
 
-    /// <summary>预热：预先创建指定数量对象并存入池中</summary>
-    private void Prewarm(int count)
-    {
-        for (int i = 0; i < count; i++)
+        /// <summary>当前池中可用对象数量</summary>
+        public int Count => _pool.Count;
+
+        /// <summary>累计创建的对象总数（含已销毁）</summary>
+        public int TotalCreated { get; private set; }
+
+        public ObjectPool(T prefab, int prewarmCount, Transform parent = null, int maxSize = 100)
         {
-            var obj = CreateNew();
+            _prefab = prefab;
+            _parent = parent;
+            _maxSize = maxSize;
+            Prewarm(prewarmCount);
+        }
+
+        /// <summary>预热：预先创建指定数量对象并存入池中</summary>
+        private void Prewarm(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                var obj = CreateNew();
+                obj.gameObject.SetActive(false);
+                _pool.Enqueue(obj);
+            }
+        }
+
+        /// <summary>从池中借出一个对象，池空且未达上限时自动创建；达上限返回 null（由调用方兜底）</summary>
+        public T Get()
+        {
+            T obj;
+            if (_pool.Count > 0)
+            {
+                obj = DequeueAlive();
+                if (obj == null) return null; // 池内对象被场景卸载销毁且无剩余
+                obj.gameObject.SetActive(true);
+            }
+            else if (TotalCreated < _maxSize)
+            {
+                obj = CreateNew();
+                obj.gameObject.SetActive(true);
+            }
+            else
+            {
+                return null;
+            }
+
+            (obj as IPoolable)?.OnPoolGet();
+            return obj;
+        }
+
+        /// <summary>将对象归还池中</summary>
+        public void Return(T obj)
+        {
+            if (obj == null) return;
+            (obj as IPoolable)?.OnPoolReturn();
             obj.gameObject.SetActive(false);
+            // 父级正在切换激活状态时跳过 SetParent，避免设置父级失败。
+            if (_parent != null && _parent.gameObject.activeInHierarchy)
+                obj.transform.SetParent(_parent);
             _pool.Enqueue(obj);
         }
-    }
 
-    /// <summary>从池中借出一个对象，池空且未达上限时自动创建；达上限返回 null（由调用方兜底）</summary>
-    public T Get()
-    {
-        T obj;
-        if (_pool.Count > 0)
+        /// <summary>取出时跳过已被外部销毁（如随场景卸载）的对象</summary>
+        private T DequeueAlive()
         {
-            obj = DequeueAlive();
-            if (obj == null) return null; // 池内对象被场景卸载销毁且无剩余
-            obj.gameObject.SetActive(true);
-        }
-        else if (TotalCreated < _maxSize)
-        {
-            obj = CreateNew();
-            obj.gameObject.SetActive(true);
-        }
-        else
-        {
+            while (_pool.Count > 0)
+            {
+                var obj = _pool.Dequeue();
+                if (obj != null) return obj;
+            }
             return null;
         }
 
-        (obj as IPoolable)?.OnPoolGet();
-        return obj;
-    }
-
-    /// <summary>将对象归还池中</summary>
-    public void Return(T obj)
-    {
-        if (obj == null) return;
-        (obj as IPoolable)?.OnPoolReturn();
-        obj.gameObject.SetActive(false);
-        // 父级正在切换激活状态时跳过 SetParent，避免设置父级失败。
-        if (_parent != null && _parent.gameObject.activeInHierarchy)
-            obj.transform.SetParent(_parent);
-        _pool.Enqueue(obj);
-    }
-
-    /// <summary>取出时跳过已被外部销毁（如随场景卸载）的对象</summary>
-    private T DequeueAlive()
-    {
-        while (_pool.Count > 0)
+        private T CreateNew()
         {
-            var obj = _pool.Dequeue();
-            if (obj != null) return obj;
+            var obj = Object.Instantiate(_prefab, _parent);
+            // 实例化过程中 Awake/OnEnable 已经跑过，这里补一次「由池创建」回调，
+            // 让实现有机会退回那次自动副作用（见 IPoolable.OnPoolCreated）。
+            (obj as IPoolable)?.OnPoolCreated();
+            obj.name = $"{_prefab.name}_{TotalCreated}";
+            TotalCreated++;
+            return obj;
         }
-        return null;
-    }
 
-    private T CreateNew()
-    {
-        var obj = Object.Instantiate(_prefab, _parent);
-        // 实例化过程中 Awake/OnEnable 已经跑过，这里补一次「由池创建」回调，
-        // 让实现有机会退回那次自动副作用（见 IPoolable.OnPoolCreated）。
-        (obj as IPoolable)?.OnPoolCreated();
-        obj.name = $"{_prefab.name}_{TotalCreated}";
-        TotalCreated++;
-        return obj;
-    }
-
-    /// <summary>清空池中所有对象</summary>
-    public void Clear()
-    {
-        while (_pool.Count > 0)
+        /// <summary>清空池中所有对象</summary>
+        public void Clear()
         {
-            var obj = _pool.Dequeue();
-            // 场景卸载可能已销毁池内对象，跳过已销毁对象以避免 MissingReferenceException。
-            if (obj != null)
-                Object.Destroy(obj.gameObject);
+            while (_pool.Count > 0)
+            {
+                var obj = _pool.Dequeue();
+                // 场景卸载可能已销毁池内对象，跳过已销毁对象以避免 MissingReferenceException。
+                if (obj != null)
+                    Object.Destroy(obj.gameObject);
+            }
+            TotalCreated = 0;
         }
-        TotalCreated = 0;
     }
 }

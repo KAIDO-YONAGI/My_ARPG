@@ -2,9 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Contracts;
 using Newtonsoft.Json;
+using Pipeline.Scene;
+using Pipeline.SO;
+using Pipeline.SO.Events;
 using UnityEngine;
-//TODO每次进入新场景需要自动备份上个场景的信息
+
+namespace Gameplay.Save
+{
+    //TODO每次进入新场景需要自动备份上个场景的信息
 //需要备份的信息包括 敌人状态（位置、血量）。物品状态（位置、数量），序列化到json中，下次进场景加载
 //点击备份或者退出游戏的时候额外备份当前玩家所在场景、位置、血量
 //点击加载的时候加载玩家的手动存档
@@ -16,198 +23,199 @@ using UnityEngine;
 
 //SaveDataManager 组装 SaveData 对象，此处打包成 SaveFile 写盘存档
 
-public class SaveFile
-{
-    public SaveMetaData saveInfo;
-    public SaveData data;
-    public SaveFile(SaveMetaData saveInfo, SaveData data)
+    public class SaveFile
     {
-        this.saveInfo = saveInfo;
-        this.data = data;
-    }
-}
-public class SaveSystem : YSingleton<SaveSystem>
-{
-    public bool IsLoadingSaveRequest { get; private set; }
-
-    [Header("Receive")]
-
-    [SerializeField] private DataSaveEventSO dataSavedEvent;
-    private void OnEnable()
-    {
-        dataSavedEvent.DataSaveEvent += OnSaveEvent;
-    }
-    private void OnDisable()
-    {
-        dataSavedEvent.DataSaveEvent -= OnSaveEvent;
-    }
-    public void OnSaveEvent(MyEnums.SaveType saveType)//通过事件确认存档：以收到的Data保存完成事件为准（带存档类型）
-    {
-        WriteSave(saveType);
-    }
-    public string WriteSave(MyEnums.SaveType saveType)
-    {
-        string saveID = System.DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-        SaveMetaData saveInfo = new(saveID, saveType);
-        SaveFile save = new(saveInfo, SaveDataManager.Instance.GetData);
-
-        string json = JsonConvert.SerializeObject(save, Formatting.Indented);
-        string path=Application.persistentDataPath + $"/{saveType}_{saveID}.json";
-        File.WriteAllText(path, json);
-
-        Debug.Log("SaveRoute: " + path);
-
-        return path;
-
-    }
-    public bool DeleteSave(string savePath)
-    {
-        if (string.IsNullOrEmpty(savePath))
+        public SaveMetaData saveInfo;
+        public SaveData data;
+        public SaveFile(SaveMetaData saveInfo, SaveData data)
         {
-            Debug.LogWarning("Save path is empty for delete.");
-            return false;
-        }
-
-        string fullSavePath = Path.GetFullPath(savePath);
-        string fullPersistentPath = Path.GetFullPath(Application.persistentDataPath);
-        if (!fullSavePath.StartsWith(fullPersistentPath, StringComparison.OrdinalIgnoreCase))
-        {
-            Debug.LogWarning($"Save file is outside persistentDataPath: {savePath}");
-            return false;
-        }
-
-        if (!File.Exists(fullSavePath))
-        {
-            Debug.LogWarning($"Save file not found: {savePath}");
-            return false;
-        }
-
-        try
-        {
-            File.Delete(fullSavePath);
-            Debug.Log("DeleteRoute: " + fullSavePath);
-            return true;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to delete save file {savePath}: {e.Message}");
-            return false;
+            this.saveInfo = saveInfo;
+            this.data = data;
         }
     }
-
-
-    public bool LoadSave(MyEnums.SaveType saveType, string savePath)
+    public class SaveSystem : YSingleton<SaveSystem>
     {
-        if (string.IsNullOrEmpty(savePath))
+        public bool IsLoadingSaveRequest { get; private set; }
+
+        [Header("Receive")]
+
+        [SerializeField] private DataSaveEventSO dataSavedEvent;
+        private void OnEnable()
         {
-            Debug.LogWarning($"Save path is empty for {saveType}.");
-            return false;
+            dataSavedEvent.DataSaveEvent += OnSaveEvent;
         }
-
-        if (!File.Exists(savePath))
+        private void OnDisable()
         {
-            Debug.LogWarning($"Save file not found: {savePath}");
-            return false;
+            dataSavedEvent.DataSaveEvent -= OnSaveEvent;
         }
-
-        if (!IsLoadableSaveFile(savePath))
+        public void OnSaveEvent(SaveType saveType)//通过事件确认存档：以收到的Data保存完成事件为准（带存档类型）
         {
-            Debug.LogWarning($"Save file is not loadable: {savePath}");
-            return false;
+            WriteSave(saveType);
         }
-
-        try
+        public string WriteSave(SaveType saveType)
         {
-            string json = File.ReadAllText(savePath);
-            SaveFile save = JsonConvert.DeserializeObject<SaveFile>(json);
+            string saveID = System.DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
+            SaveMetaData saveInfo = new(saveID, saveType);
+            SaveFile save = new(saveInfo, SaveDataManager.Instance.GetData);
 
-            SaveDataManager.Instance.LoadFromData(save.data);
-            //触发加载场景
-            GameSceneSO gameScene = GetScene(save.data);
-            if (gameScene != null)
+            string json = JsonConvert.SerializeObject(save, Formatting.Indented);
+            string path=Application.persistentDataPath + $"/{saveType}_{saveID}.json";
+            File.WriteAllText(path, json);
+
+            Debug.Log("SaveRoute: " + path);
+
+            return path;
+
+        }
+        public bool DeleteSave(string savePath)
+        {
+            if (string.IsNullOrEmpty(savePath))
             {
-                // 某些旧档只缺位置时，仍允许用场景默认出生点继续游戏。
-                Vector3 pos = save.data.sceneIDAndPlayerPos != null && save.data.sceneIDAndPlayerPos.position != null
-                    ? save.data.sceneIDAndPlayerPos.position.ToVector3()//如果存档位置为空，会加载到场景的默认位置
-                    : gameScene.initialPosition;
-                IsLoadingSaveRequest = true;
-                // 标志窗口包住整个入口调用：SaveDataManager.OnAutoSave 在广播段内读到 true，
-                // 读档触发的切换不会写自动存档
-                SceneChanger.Instance.RequestSceneLoad(new List<GameSceneSO> { gameScene }, pos, true);
-                IsLoadingSaveRequest = false;
-            }
-            else
-            {
-                Debug.Log("Failed Load SceneID");
+                Debug.LogWarning("Save path is empty for delete.");
                 return false;
             }
 
-            Debug.Log("LoadRoute: " + savePath);
-            return true;
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"Failed to load save file {savePath}: {e.Message}");
+            string fullSavePath = Path.GetFullPath(savePath);
+            string fullPersistentPath = Path.GetFullPath(Application.persistentDataPath);
+            if (!fullSavePath.StartsWith(fullPersistentPath, StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.LogWarning($"Save file is outside persistentDataPath: {savePath}");
+                return false;
+            }
+
+            if (!File.Exists(fullSavePath))
+            {
+                Debug.LogWarning($"Save file not found: {savePath}");
+                return false;
+            }
+
+            try
+            {
+                File.Delete(fullSavePath);
+                Debug.Log("DeleteRoute: " + fullSavePath);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to delete save file {savePath}: {e.Message}");
+                return false;
+            }
         }
 
 
-        return false;
-    }
-    public string GetLatestLoadableSavePath(MyEnums.SaveType saveType)
-    {
-        string[] files = GetSavesPath(saveType);
-        if (files.Length == 0)
+        public bool LoadSave(SaveType saveType, string savePath)
         {
-            Debug.LogWarning("No save files found.");
-            return null;
-        }
+            if (string.IsNullOrEmpty(savePath))
+            {
+                Debug.LogWarning($"Save path is empty for {saveType}.");
+                return false;
+            }
 
-        //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
-        Array.Sort(files);
-        // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
-        string latestFile = files.LastOrDefault(IsLoadableSaveFile);
-        if (string.IsNullOrEmpty(latestFile))
-        {
-            Debug.LogWarning($"No valid {saveType} save files found.");
-            return null;
-        }
+            if (!File.Exists(savePath))
+            {
+                Debug.LogWarning($"Save file not found: {savePath}");
+                return false;
+            }
 
-        return latestFile;
-    }
-    public string[] GetSavesPath(MyEnums.SaveType saveType)
-    {
-        return Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
-    }
-    private bool IsLoadableSaveFile(string saveFile)
-    {
-        try
-        {
-            // Continue 按钮只尝试读取至少包含场景和角色数据的系统档。
-            string json = File.ReadAllText(saveFile);
-            SaveFile save = JsonConvert.DeserializeObject<SaveFile>(json);
-            return save?.data != null
-                && save.data.playerStatsData != null
-                && GetScene(save.data) != null;
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"Skip invalid save file {saveFile}: {e.Message}");
+            if (!IsLoadableSaveFile(savePath))
+            {
+                Debug.LogWarning($"Save file is not loadable: {savePath}");
+                return false;
+            }
+
+            try
+            {
+                string json = File.ReadAllText(savePath);
+                SaveFile save = JsonConvert.DeserializeObject<SaveFile>(json);
+
+                SaveDataManager.Instance.LoadFromData(save.data);
+                //触发加载场景
+                GameSceneSO gameScene = GetScene(save.data);
+                if (gameScene != null)
+                {
+                    // 某些旧档只缺位置时，仍允许用场景默认出生点继续游戏。
+                    Vector3 pos = save.data.sceneIDAndPlayerPos != null && save.data.sceneIDAndPlayerPos.position != null
+                        ? save.data.sceneIDAndPlayerPos.position.ToVector3()//如果存档位置为空，会加载到场景的默认位置
+                        : gameScene.initialPosition;
+                    IsLoadingSaveRequest = true;
+                    // 标志窗口包住整个入口调用：SaveDataManager.OnAutoSave 在广播段内读到 true，
+                    // 读档触发的切换不会写自动存档
+                    SceneChanger.Instance.RequestSceneLoad(new List<GameSceneSO> { gameScene }, pos, true);
+                    IsLoadingSaveRequest = false;
+                }
+                else
+                {
+                    Debug.Log("Failed Load SceneID");
+                    return false;
+                }
+
+                Debug.Log("LoadRoute: " + savePath);
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to load save file {savePath}: {e.Message}");
+            }
+
+
             return false;
         }
-    }
-
-    private GameSceneSO GetScene(SaveData data)
-    {
-        string sceneID = data?.sceneIDAndPlayerPos?.sceneID;
-        if (string.IsNullOrEmpty(sceneID) || SceneDataForSave.Instance == null || SceneDataForSave.Instance.gameScenes == null)
+        public string GetLatestLoadableSavePath(SaveType saveType)
         {
+            string[] files = GetSavesPath(saveType);
+            if (files.Length == 0)
+            {
+                Debug.LogWarning("No save files found.");
+                return null;
+            }
+
+            //文件名格式: {saveType}_{yyyyMMdd_HHmmss_fff}.json，按文件名排序最后一个即最新
+            Array.Sort(files);
+            // 最新文件可能是坏档，这里回退到最近一个结构完整且能定位场景的档。
+            string latestFile = files.LastOrDefault(IsLoadableSaveFile);
+            if (string.IsNullOrEmpty(latestFile))
+            {
+                Debug.LogWarning($"No valid {saveType} save files found.");
+                return null;
+            }
+
+            return latestFile;
+        }
+        public string[] GetSavesPath(SaveType saveType)
+        {
+            return Directory.GetFiles(Application.persistentDataPath, $"{saveType}_*.json");
+        }
+        private bool IsLoadableSaveFile(string saveFile)
+        {
+            try
+            {
+                // Continue 按钮只尝试读取至少包含场景和角色数据的系统档。
+                string json = File.ReadAllText(saveFile);
+                SaveFile save = JsonConvert.DeserializeObject<SaveFile>(json);
+                return save?.data != null
+                       && save.data.playerStatsData != null
+                       && GetScene(save.data) != null;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Skip invalid save file {saveFile}: {e.Message}");
+                return false;
+            }
+        }
+
+        private GameSceneSO GetScene(SaveData data)
+        {
+            string sceneID = data?.sceneIDAndPlayerPos?.sceneID;
+            if (string.IsNullOrEmpty(sceneID) || SceneDataForSave.Instance == null || SceneDataForSave.Instance.gameScenes == null)
+            {
+                return null;
+            }
+
+            foreach (var scene in SceneDataForSave.Instance.gameScenes.ToList())
+            {
+                if (scene != null && sceneID == scene.SaveKey) return scene;
+            }
             return null;
         }
-
-        foreach (var scene in SceneDataForSave.Instance.gameScenes.ToList())
-        {
-            if (scene != null && sceneID == scene.SaveKey) return scene;
-        }
-        return null;
     }
 }

@@ -1,13 +1,17 @@
 using System;
+using Gameplay.Inventory;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "LootEventSO", menuName = "Events/LootEventSO", order = 0)]
-public class LootEventSO : ScriptableObject
+namespace Pipeline.SO.Events
 {
-    public event Action<ItemSO, int, Loot> LootEvent;
-
-    public void OnEventRaised(ItemSO item, int quantity, Loot loot)
+    [CreateAssetMenu(fileName = "LootEventSO", menuName = "Events/LootEventSO", order = 0)]
+    public class LootEventSO : ScriptableObject
     {
-        LootEvent?.Invoke(item, quantity, loot);
+        public event Action<ItemSO, int, Loot> LootEvent;
+
+        public void OnEventRaised(ItemSO item, int quantity, Loot loot)
+        {
+            LootEvent?.Invoke(item, quantity, loot);
+        }
     }
 }

@@ -1,37 +1,43 @@
+using Contracts;
+using Pipeline.SO;
+using Pipeline.SO.Events;
 using UnityEngine;
 
-public class SkillTreeCanvasManager : MonoBehaviour, ICanvasManager
+namespace Gameplay.Skills
 {
-    [SerializeField] private CanvasGroup skillsCanvas;
-    [SerializeField] private Canvas canvas;
-    [SerializeField] private ToggleCanvasEventSO toggleSkillEvent;
-    [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
-    public ToggleCanvasEventSO ToggleCanvasEvent => toggleSkillEvent;
-    public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
+    public class SkillTreeCanvasManager : MonoBehaviour, ICanvasManager
+    {
+        [SerializeField] private CanvasGroup skillsCanvas;
+        [SerializeField] private Canvas canvas;
+        [SerializeField] private ToggleCanvasEventSO toggleSkillEvent;
+        [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
+        public ToggleCanvasEventSO ToggleCanvasEvent => toggleSkillEvent;
+        public SceneLoadedEventSO SceneLoadedEvent => sceneLoadedEvent;
 
-    private void OnEnable()
-    {
-        toggleSkillEvent.toggleCanvasEvent += OnToggleSkillEvent;
-        toggleSkillEvent.focusEvent += OnFocus;
-        sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
-    }
-    private void OnDisable()
-    {
-        toggleSkillEvent.toggleCanvasEvent -= OnToggleSkillEvent;
-        toggleSkillEvent.focusEvent -= OnFocus;
-        sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+        private void OnEnable()
+        {
+            toggleSkillEvent.toggleCanvasEvent += OnToggleSkillEvent;
+            toggleSkillEvent.focusEvent += OnFocus;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+        }
+        private void OnDisable()
+        {
+            toggleSkillEvent.toggleCanvasEvent -= OnToggleSkillEvent;
+            toggleSkillEvent.focusEvent -= OnFocus;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
 
-    }
-    private void OnSceneLoaded(GameSceneSO _)
-    {
-        ((ICanvasManager)this).SetCanvaInactive(skillsCanvas, MyEnums.CanvasToToggle.Skills);
-    }
-    private void OnToggleSkillEvent(bool state)
-    {
-        ((ICanvasManager)this).ToggleCanvas(skillsCanvas, canvas, MyEnums.CanvasToToggle.Skills, state);
-    }
-    private void OnFocus()
-    {
-        ((ICanvasManager)this).RefreshCanvaOrder(canvas, MyEnums.CanvasToToggle.Skills, true);
+        }
+        private void OnSceneLoaded(GameSceneSO _)
+        {
+            ((ICanvasManager)this).SetCanvaInactive(skillsCanvas, CanvasToToggle.Skills);
+        }
+        private void OnToggleSkillEvent(bool state)
+        {
+            ((ICanvasManager)this).ToggleCanvas(skillsCanvas, canvas, CanvasToToggle.Skills, state);
+        }
+        private void OnFocus()
+        {
+            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasToToggle.Skills, true);
+        }
     }
 }

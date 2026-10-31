@@ -1,68 +1,71 @@
-using System.Collections;
 using System.Collections.Generic;
+using Pipeline.SO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ShopInfoPanel : MonoBehaviour
+namespace Gameplay.Shop
 {
-    [SerializeField] private CanvasGroup infoPanel;
-    [SerializeField] private TMP_Text itemNameText;
-    [SerializeField] private TMP_Text itemDescriptionText;
-
-    [Header("Stats")] [SerializeField] private TMP_Text[] itemStatsText;
-
-    private RectTransform infoPanelRect;
-
-
-    private void Awake()
+    public class ShopInfoPanel : MonoBehaviour
     {
-        infoPanelRect = GetComponent<RectTransform>();
-    }
+        [SerializeField] private CanvasGroup infoPanel;
+        [SerializeField] private TMP_Text itemNameText;
+        [SerializeField] private TMP_Text itemDescriptionText;
 
-    public void ShowItemInfo(ItemSO item)
-    {
-        infoPanel.alpha = 1;
-        itemNameText.text = item.itemName;
-        itemDescriptionText.text = item.itemDescription;
+        [Header("Stats")] [SerializeField] private TMP_Text[] itemStatsText;
 
-        List<string> stats = new List<string>();
-
-        if (item.currentHealth > 0) stats.Add("Health:" + item.currentHealth.ToString());
-        if (item.maxHealth > 0) stats.Add("MaxHealth:" + item.maxHealth.ToString());
-        if (item.damage > 0) stats.Add("Damage:" + item.damage.ToString());
-        if (item.speed > 0) stats.Add("Speed:" + item.speed.ToString());
-        if (item.duration > 0) stats.Add("Duration:" + item.duration.ToString());
+        private RectTransform infoPanelRect;
 
 
-        for (int i = 0; i < itemStatsText.Length; i++)
+        private void Awake()
         {
-            if (i < stats.Count)
+            infoPanelRect = GetComponent<RectTransform>();
+        }
+
+        public void ShowItemInfo(ItemSO item)
+        {
+            infoPanel.alpha = 1;
+            itemNameText.text = item.itemName;
+            itemDescriptionText.text = item.itemDescription;
+
+            List<string> stats = new List<string>();
+
+            if (item.currentHealth > 0) stats.Add("Health:" + item.currentHealth.ToString());
+            if (item.maxHealth > 0) stats.Add("MaxHealth:" + item.maxHealth.ToString());
+            if (item.damage > 0) stats.Add("Damage:" + item.damage.ToString());
+            if (item.speed > 0) stats.Add("Speed:" + item.speed.ToString());
+            if (item.duration > 0) stats.Add("Duration:" + item.duration.ToString());
+
+
+            for (int i = 0; i < itemStatsText.Length; i++)
             {
-                itemStatsText[i].text = stats[i];
-                itemStatsText[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                itemStatsText[i].gameObject.SetActive(false);
-                //不需要显示的位置就禁用游戏对象，而且不会因为删除和使用了gridgroup而改变显示布局
+                if (i < stats.Count)
+                {
+                    itemStatsText[i].text = stats[i];
+                    itemStatsText[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    itemStatsText[i].gameObject.SetActive(false);
+                    //不需要显示的位置就禁用游戏对象，而且不会因为删除和使用了gridgroup而改变显示布局
+                }
             }
         }
-    }
 
 
-    public void HideItemInfo()
-    {
-        infoPanel.alpha = 0;
-        itemNameText.text = "";
-        itemDescriptionText.text = "";
-    }
+        public void HideItemInfo()
+        {
+            infoPanel.alpha = 0;
+            itemNameText.text = "";
+            itemDescriptionText.text = "";
+        }
 
-    public void FollowMouse()
-    {
-        if (Mouse.current == null) return;
-        Vector3 mousePosition = Mouse.current.position.ReadValue();
-        mousePosition += new Vector3(10, -10, 0); //偏移位置以免遮挡
-        infoPanelRect.position = mousePosition;
+        public void FollowMouse()
+        {
+            if (Mouse.current == null) return;
+            Vector3 mousePosition = Mouse.current.position.ReadValue();
+            mousePosition += new Vector3(10, -10, 0); //偏移位置以免遮挡
+            infoPanelRect.position = mousePosition;
+        }
     }
 }

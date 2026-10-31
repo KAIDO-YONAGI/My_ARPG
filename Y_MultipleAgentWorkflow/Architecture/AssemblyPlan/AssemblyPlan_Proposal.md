@@ -64,7 +64,7 @@
   - `MovementController` 类型在工程中未定义，状态机重构的起点是 `PlayerMovement`。
 - **前置依赖**：
   1. 数值写入入口已收敛到 `StatsService`，方法为 `UpdateMaxHealth` / `UpdateHealth` / `UpdateSpeed` / `UpdateDamage` / `UpdateSkillPoints` / `AddExperience`，效果列表要作用的写方法已稳定，可直接作为驱动目标。
-  2. 状态枚举现有三套彼此独立的定义：`MyEnums.PlayerState`、`EnemyState`、`NPCState`。
+  2. 状态枚举现有三套彼此独立的定义，且都已收进 `Contracts`：`PlayerState`、`EnemyState`、`NPCState`。
 
 ### 3.4 事件总线：维持不采用
 

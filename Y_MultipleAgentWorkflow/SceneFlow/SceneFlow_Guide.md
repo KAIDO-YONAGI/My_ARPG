@@ -36,7 +36,7 @@
 
 ### 2.2 GameSceneSO 语义
 
-字段语义：`ID` 标识资产本身，不落盘、跨会话会变，注释明示它不能充当存档键；`sceneAsset` 只在编辑器下存在；`sceneName` 是运行时加载名；`sceneType` 取 `MyEnums.SceneType`；`initialPosition` 是出生点。`OnValidate` 在编辑器下用 `sceneAsset.name` 覆盖 `sceneName`。
+字段语义：`ID` 标识资产本身，不落盘、跨会话会变，注释明示它不能充当存档键；`sceneAsset` 只在编辑器下存在；`sceneName` 是运行时加载名；`sceneType` 取 `SceneType`；`initialPosition` 是出生点。`OnValidate` 在编辑器下用 `sceneAsset.name` 覆盖 `sceneName`。
 
 当前工程的 GameSceneSO 资产共 5 个：MenuScene、Scene1、Scene2、TestScene 与 RetrySceneSO，`sceneName` 分别为 StartingMenu、Scene1、Scene2、TestScene 与空。其中没有常驻场景类型的资产。
 

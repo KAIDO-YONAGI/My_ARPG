@@ -2,15 +2,15 @@
 
 文档 ID：`BUS-ARCHITECTURE`
 状态：`Active`
-维护计数：`0/5`
-最后更新：`2026-10-05`
+维护计数：`1/5`
+最后更新：`2026-10-31`
 
 ## 任务线索
 
 | 线索 | 权威文档 |
 |---|---|
 | `分层` `Layering` `三层目录` `依赖方向` `反向依赖` | `Layering\Layering_Guide.md` |
-| `命名空间` `全局命名空间` `MVCS` `只读接口` | `Layering\Layering_Guide.md` |
+| `命名空间` `namespace` `MyEnums` `MVCS` `只读接口` | `Layering\Layering_Guide.md` |
 | `单例` `YSingleton` `单例预算` `Instance 为 null` | `Composition\Composition_Guide.md` |
 | `初始化顺序` `OnSingletonInitialized` `可重试订阅` | `Composition\Composition_Guide.md` |
 | `isLoading` `IsLoadingSaveRequest` `DefaultExecutionOrder` | `Composition\Composition_Guide.md` |
