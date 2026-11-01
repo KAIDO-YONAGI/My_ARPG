@@ -15,7 +15,7 @@ namespace Pipeline.UI.Runtime
     /// <remarks>
     /// <para>
     /// 数据结构是“字典 + 双向链表”：字典负责按界面 ID 定位，链表负责维护闲置顺序。
-    /// 链表头部是最久未使用、最该被淘汰的实例；正在显示的界面不进入链表。
+    /// 链表头部是最早关闭、最该被淘汰的实例；正在显示的界面不进入链表。
     /// </para>
     /// <para>
     /// 缓存只负责实例生命周期，不持有业务数据。界面关闭后业务状态仍由各 Manager 保存，
@@ -36,7 +36,6 @@ namespace Pipeline.UI.Runtime
             public Action Closed;
             public LinkedListNode<Entry> IdleNode;
             public float ClosedAt;
-            public long LastUsedSequence;
         }
 
         private readonly Dictionary<CanvasToToggle, Entry> entries = new();
@@ -45,7 +44,6 @@ namespace Pipeline.UI.Runtime
         private readonly int maxIdleViews;
         private readonly float idleTimeoutSeconds;
         private bool connected;
-        private long usageSequence;
 
         /// <summary>当前闲置实例数量，供调试和 Inspector 查看。</summary>
         public int IdleCount => idle.Count;
@@ -188,20 +186,7 @@ namespace Pipeline.UI.Runtime
         }
 
         /// <summary>
-        /// 记录一次使用，把界面移到“最近使用”一端。
-        /// UIManager 在画布打开事件后调用，保证闲置淘汰顺序反映真实使用顺序。
-        /// </summary>
-        public void Touch(CanvasToToggle id)
-        {
-            if (entries.TryGetValue(id, out Entry entry) && entry.View != null && entry.View.IsOpen)
-            {
-                RemoveIdle(entry);
-                entry.LastUsedSequence = ++usageSequence;
-            }
-        }
-
-        /// <summary>
-        /// 每帧按关闭时刻检查闲置超时。链表按最近使用顺序排列，需要逐项检查。
+        /// 每帧按关闭时刻检查闲置超时。
         /// 销毁会修改链表，所以循环里先保存下一个节点。
         /// </summary>
         public void Update(float now)
@@ -268,21 +253,15 @@ namespace Pipeline.UI.Runtime
         }
 
         /// <summary>
-        /// 界面关闭回调：按最近使用顺序插入闲置链表，
-        /// 再按容量淘汰最久未使用的实例。正在显示的界面不会进入这条路径。
+        /// 界面关闭回调：将刚关闭的实例放到闲置队尾，
+        /// 再按容量淘汰最早关闭的实例。正在显示的界面不会进入这条路径。
         /// </summary>
         private void OnClosed(Entry entry)
         {
             RemoveIdle(entry);
             entry.ClosedAt = Time.unscaledTime;
 
-            // 链表按 LastUsedSequence 升序排列，关闭时间只用于超时判断。
-            LinkedListNode<Entry> node = idle.First;
-            while (node != null && node.Value.LastUsedSequence <= entry.LastUsedSequence)
-                node = node.Next;
-            entry.IdleNode = node == null
-                ? idle.AddLast(entry)
-                : idle.AddBefore(node, entry);
+            entry.IdleNode = idle.AddLast(entry);
             while (idle.Count > maxIdleViews)
                 DestroyInstance(idle.First.Value);
         }

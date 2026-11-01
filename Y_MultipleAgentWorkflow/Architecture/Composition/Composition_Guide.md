@@ -117,7 +117,7 @@
 
 View 在 `OnOpen` 读取管理器状态并首刷，在 `OnClose` 释放打开期间的订阅，界面被淘汰前调 `OnCacheDestroy`。背包与技能运行状态由持久管理器保存。关闭后停用整个对象；派生类若重写 `OnDisable`，必须调基类实现。
 
-淘汰有两条规则：字典定位实例，双向链表按最近使用序号保存闲置实例，超出 `maxIdleViews` 销毁队首；`idleTimeoutSeconds` 按关闭时刻逐项检查超时。策略参数在 `UICacheManager` 的 Inspector 中配置。打开中的界面不入链表。`UIManager` 打开画布并确认状态后广播 `CanvasOpenedEventSO`，`UICacheManager` 订阅它刷新最近使用序号。切场时先关闭全部界面再清空闲置；管理器销毁时退订并释放缓存。预制体以直接引用方式持有，销毁实例时其引用的资源资产保留在内存中。
+淘汰有两条规则：字典定位实例，双向链表按关闭先后保存闲置实例，刚关闭的实例加入队尾，超出 `maxIdleViews` 销毁最早关闭的队首；`idleTimeoutSeconds` 按关闭时刻逐项检查超时。重新打开时移出闲置链表，再次关闭时重新记录关闭时刻并加入队尾。策略参数在 `UICacheManager` 的 Inspector 中配置。打开中的界面不入链表。`UIManager` 打开画布并确认状态后广播 `CanvasOpenedEventSO`，缓存淘汰顺序由视图关闭回调维护。切场时先关闭全部界面再清空闲置；管理器销毁时退订并释放缓存。预制体以直接引用方式持有，销毁实例时其引用的资源资产保留在内存中。
 
 常驻场景登记了 6 块界面：`StatsCanvas`、`SkillsCanvas`、`ShopCanvas`、`DialogCanvas`、`QuestCanvas`、`BackpackCanvas`，预制体都在 `Assets/Prefabs/UI/Runtime/`。热键、ESC、互斥和排序仍走原有 `CanvasFocusStack`。常驻 HUD（快捷栏）不接入缓存，由 `HotbarCanvasView` 常驻。
 

@@ -3,6 +3,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 闲置实例按关闭顺序淘汰
+
+`UIViewInstanceCache.OnClosed` 将实例加入闲置队尾，容量超限时回收最早关闭的队首；重开移出队列，超时继续从关闭时刻计算。移除打开序号、`Touch` 和 `UICacheManager` 的打开事件订阅，保留 `UIManager` 的通用打开通知。同步 §2.7 与 README。用户要求停止测试前，独立源码脚本的关闭逆序案例由淘汰 Stats 变为淘汰 Skills；此后停止测试，未新增测试用例，未运行 Unity 测试。维护计数 `0/5 -> 1/5`。
+
 ## 2026-11-01 缓存打开前置 CanOpen 检查
 
 `UIViewCache` 在实例化前检查预制体或已有实例的 `CanOpen`；未满足业务条件时不触发界面 `Awake`，通过检查后仍由 `Open` 执行打开期回调。复核并更新 §2.7 生命周期说明。Shop、Dialog、Quest、Stats 的 `CanOpen` 均为只读门槛。Prefab 槽位引用与 YAML 文件 ID 静态检查通过，`git diff --check` 通过；EditMode 未运行，因为当前工程已有 Unity Editor 打开，项目验证规则禁止并行启动批处理 Editor。维护计数 `4/5 -> 5/5`，Guide 复核后清零为 `0/5`。

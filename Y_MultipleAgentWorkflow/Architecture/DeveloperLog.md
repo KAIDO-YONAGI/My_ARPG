@@ -3,6 +3,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 闲置缓存按关闭顺序维护
+
+缓存实例关闭时加入队尾，容量超限回收最早关闭者；打开期间移出闲置队列，超时以关闭时刻为准。缓存侧移除打开序号和打开通知依赖，更新 Composition §2.7 与 README。独立源码脚本已复现并验证关闭逆序案例；按用户要求停止后续测试，未新增测试用例，未运行 Unity 测试。维护计数 `1/5 -> 2/5`。
+
 ## 2026-11-01 缓存画布生命周期统一
 
 缓存服务改名为 `UIViewInstanceCache`，视图基类改为 `CachedUIViewBase` 与 `CachedCanvasViewBase`。缓存只维护实例和事件；视图生命周期通过 `ICanvasManager` 更新显隐状态、焦点与排序。Contracts 脚本按基类、接口、状态与枚举分目录，移动保留脚本 GUID。Unity 编译通过，三条 UI 缓存回归通过；全量 EditMode 有三条既有 `InventorySlot.OnValidate` 空引用失败。维护计数更新为 `0/5 -> 1/5`。

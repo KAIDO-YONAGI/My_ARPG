@@ -197,7 +197,7 @@ QuestStateChangedEvent?.Invoke(quest, currentQuestState);
 只写约定，实现归邮件域：
 
 - 叶子：`MailUnread`、`MailClaimable`；父节点 `Mail` 由树自动求和。
-- JSON 下发复用热更的远端目录与独立版本号（见同目录 `HotUpdate_Plan.md` §4.3）。
+- 邮件 JSON 使用独立的 `mailVersion` 与远端文件清单，由邮件域约定目录和下载接口。
 - 过期按**存档累计在线时长**判定，不用 `DateTime.UtcNow`：本工程存档是本地 JSON，无可信服务器时间，用设备时间可被直接改写绕过。累计时长需要新增 `PlayTimeTracker`——现有 `TimeManager`（`Assets/Scripts/Pipeline/TimeManager.cs`）只有引用计数的 `PauseGame/ResumeGame`，没有累计计时。
 - `SaveData` 新增字段是向后兼容的（旧档缺字段反序列化为 `null`）；**已有字段名不可改**（`Layering_Guide §3.6`：字段名就是存档 JSON 键）。
 

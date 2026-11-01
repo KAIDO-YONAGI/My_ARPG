@@ -34,10 +34,7 @@ namespace Pipeline.UI.Runtime
         [Tooltip("每项登记一个界面预制体和它的场景挂载点；同一 CanvasToToggle 只能登记一次。")]
         [SerializeField] private List<CachedViewBinding> views = new();
 
-        [Header("事件与缓存策略")]
-        [Tooltip("画布打开后发布，用于刷新最近使用顺序。")]
-        [SerializeField] private CanvasOpenedEventSO canvasOpenedEvent;
-
+        [Header("缓存策略")]
         [Tooltip("最多保留的闲置界面实例数，0 表示关闭即销毁。")]
         [Min(0)] [SerializeField] private int maxIdleViews = 3;
 
@@ -57,7 +54,6 @@ namespace Pipeline.UI.Runtime
 
         private void Awake()
         {
-            Debug.Assert(canvasOpenedEvent != null, nameof(canvasOpenedEvent), this);
             Instance = this;
             cache = new UIViewInstanceCache(
                 views,
@@ -70,7 +66,6 @@ namespace Pipeline.UI.Runtime
         {
             Instance = this;
             cache.Connect();
-            canvasOpenedEvent.CanvasOpened += OnCanvasOpened;
         }
 
         private void Update()
@@ -81,7 +76,6 @@ namespace Pipeline.UI.Runtime
 
         private void OnDisable()
         {
-            canvasOpenedEvent.CanvasOpened -= OnCanvasOpened;
             cache?.CloseAll();
             cache?.Disconnect();
         }
@@ -135,10 +129,5 @@ namespace Pipeline.UI.Runtime
             cache?.ClearIdle();
         }
 
-        /// <summary>画布打开后刷新最近使用顺序，供闲置淘汰使用。</summary>
-        private void OnCanvasOpened(CanvasToToggle canvas)
-        {
-            cache?.Touch(canvas);
-        }
     }
 }
