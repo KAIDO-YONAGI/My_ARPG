@@ -1,10 +1,6 @@
 namespace Contracts
 {
-    /// <summary>
-    /// 带脏标记的值：数值与 Mark 标记放在同一个结构体里。
-    /// 管理器写入时自动置脏，视图读取后清除标记。
-    /// </summary>
-    /// <typeparam name="T">值类型或引用类型。</typeparam>
+    /// <summary>保存一个运行期值，并记录它是否需要同步到界面。</summary>
     public struct DirtyValue<T>
     {
         private T value;
@@ -51,7 +47,7 @@ namespace Contracts
             mark = true;
         }
 
-        /// <summary>视图读完当前值后清除标记。</summary>
+        /// <summary>视图完成刷新后清除脏标记。</summary>
         public void ClearMark()
         {
             mark = false;

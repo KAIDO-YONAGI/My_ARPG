@@ -71,6 +71,9 @@ namespace Contracts
             }
         }
 
+        /// <summary>缓存实例化前检查业务门槛，避免拒绝打开的界面触发 Awake。</summary>
+        internal bool CanOpenFromCache() => IsOpen || CanOpen();
+
         /// <summary>
         /// 关闭界面：先给业务一次退订机会，再统一隐藏、还原排序并停用对象。
         /// 即使 <see cref="OnClose"/> 抛异常，也必须完成隐藏和清理，防止界面卡在打开状态。
@@ -147,7 +150,7 @@ namespace Contracts
         /// <summary>实例即将被缓存销毁时执行：保存需要跨实例保留的业务状态。</summary>
         protected virtual void OnCacheDestroy() { }
 
-        /// <summary>是否允许打开；默认允许，业务界面可在此检查管理器是否就绪。</summary>
+        /// <summary>是否允许打开；缓存会在实例化前查询，重写只检查条件，不执行副作用。</summary>
         protected virtual bool CanOpen() => true;
     }
 }

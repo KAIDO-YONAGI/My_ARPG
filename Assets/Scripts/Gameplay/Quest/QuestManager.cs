@@ -10,7 +10,7 @@ namespace Gameplay.Quest
 {
     /// <summary>
     /// 任务系统的持久状态管理器。负责任务板加载、任务状态流转、目标进度计算和奖励发放，
-    /// 界面由 <see cref="QuestCanvasView"/> 读取 <see cref="State"/> 刷新。
+    /// 界面由 <see cref="QuestCanvasView"/> 读取只读状态刷新。
     /// </summary>
     /// <remarks>
     /// 管理器不持有任何 UI 控件引用：任务板打开/关闭通过 <see cref="UICacheManager"/> 发请求，
@@ -18,42 +18,73 @@ namespace Gameplay.Quest
     /// </remarks>
     public class QuestManager : YSingleton<QuestManager>
     {
-        /// <summary>任务运行状态：可变化的数值与各自的脏标记放在同一个结构体字段里。</summary>
         public sealed class State
         {
-            /// <summary>任务板是否处于打开状态。</summary>
-            public DirtyValue<bool> CanvasIsActive;
+            /// <summary>任务板任务列表及其脏标记。</summary>
+            internal DirtyValue<List<QuestSO>> boardQuests;
 
-            /// <summary>当前任务板列表；任务完成态变化时也标脏，以便更新条目与提示。</summary>
-            public DirtyValue<List<QuestSO>> BoardQuests;
+            /// <summary>当前选中的任务及其脏标记。</summary>
+            private DirtyValue<QuestSO> currentQuest;
+
+            /// <summary>当前选中任务的状态及其脏标记。</summary>
+            private DirtyValue<QuestState> currentQuestState;
+
+            /// <summary>任务板数据是否已经加载。</summary>
+            public bool HasBoardData => boardQuests.Value != null;
+
+            /// <summary>任务板中的任务数量。</summary>
+            public int BoardQuestCount => boardQuests.Value?.Count ?? 0;
+
+            /// <summary>按下标读取任务板任务；越界返回 null。</summary>
+            public QuestSO GetBoardQuest(int index) =>
+                index >= 0 && index < BoardQuestCount ? boardQuests.Value[index] : null;
 
             /// <summary>当前选中的任务。</summary>
-            public DirtyValue<QuestSO> CurrentQuest;
+            public QuestSO CurrentQuest => currentQuest.Value;
 
             /// <summary>当前选中任务的状态。</summary>
-            public DirtyValue<QuestState> CurrentQuestState;
+            public QuestState CurrentQuestState => currentQuestState.Value;
 
-            /// <summary>任一字段有变化时为 true。</summary>
-            public bool AnyDirty =>
-                CanvasIsActive.IsDirty || BoardQuests.IsDirty ||
-                CurrentQuest.IsDirty || CurrentQuestState.IsDirty;
+            /// <summary>任务板列表是否需要刷新。</summary>
+            public bool IsBoardQuestsDirty => boardQuests.IsDirty;
 
-            /// <summary>把全部字段标记为待刷新。</summary>
-            public void MarkAllDirty()
+            /// <summary>当前选中任务是否需要刷新。</summary>
+            public bool IsCurrentQuestDirty => currentQuest.IsDirty;
+
+            /// <summary>当前任务状态是否需要刷新。</summary>
+            public bool IsCurrentQuestStateDirty => currentQuestState.IsDirty;
+
+            /// <summary>任一任务字段是否需要刷新。</summary>
+            public bool AnyDirty => IsBoardQuestsDirty || IsCurrentQuestDirty || IsCurrentQuestStateDirty;
+
+            public State() => boardQuests = new DirtyValue<List<QuestSO>>(null);
+
+            /// <summary>写入任务板列表并置脏。</summary>
+            internal void SetBoardQuests(List<QuestSO> value) => boardQuests.Set(value);
+
+            /// <summary>写入当前任务并置脏。</summary>
+            internal void SetCurrentQuest(QuestSO value) => currentQuest.Set(value);
+
+            /// <summary>写入当前任务状态并置脏。</summary>
+            internal void SetCurrentQuestState(QuestState value) => currentQuestState.Set(value);
+
+            /// <summary>值未变但需要重画任务板列表时单独置脏。</summary>
+            internal void MarkBoardQuestsDirty() => boardQuests.MarkDirty();
+
+            /// <summary>把全部任务字段标记为待刷新。</summary>
+            internal void MarkAllDirty()
             {
-                CanvasIsActive.MarkDirty();
-                BoardQuests.MarkDirty();
-                CurrentQuest.MarkDirty();
-                CurrentQuestState.MarkDirty();
+                boardQuests.MarkDirty();
+                currentQuest.MarkDirty();
+                currentQuestState.MarkDirty();
             }
 
-            /// <summary>视图读完后清除全部标记。</summary>
+            /// <summary>视图刷新完成后清除全部脏标记。</summary>
             public void ClearDirty()
             {
-                CanvasIsActive.ClearMark();
-                BoardQuests.ClearMark();
-                CurrentQuest.ClearMark();
-                CurrentQuestState.ClearMark();
+                boardQuests.ClearMark();
+                currentQuest.ClearMark();
+                currentQuestState.ClearMark();
             }
         }
 
@@ -76,21 +107,13 @@ namespace Gameplay.Quest
 
         private readonly Dictionary<QuestSO, QuestProgressData> questProgress = new();
         private readonly State state = new();
+        private bool canvasIsActive;
 
         /// <summary>任务运行状态，供视图读取。</summary>
         public State CurrentState => state;
 
-        public bool CanvasIsActive => state.CanvasIsActive.Value;
-
         /// <summary>任务板数据已经加载，允许打开界面。</summary>
-        public bool CanOpenBoard => state.BoardQuests.Value != null;
-
-        public IReadOnlyList<QuestSO> CurrentBoardQuests => state.BoardQuests.Value;
-
-        /// <summary>当前选中的任务；任务详情面板显示它。</summary>
-        public QuestSO CurrentQuest => state.CurrentQuest.Value;
-
-        public QuestState CurrentQuestState => state.CurrentQuestState.Value;
+        public bool CanOpenBoard => state.HasBoardData;
 
         /// <summary>单个任务的运行期进度：状态 + 每个目标已完成的数量。</summary>
         private sealed class QuestProgressData
@@ -136,8 +159,8 @@ namespace Gameplay.Quest
         /// </summary>
         private void OnQuestOptionChosen(QuestState nextState)
         {
-            if (state.CurrentQuest.Value == null) return;
-            if (nextState == QuestState.Completed && !IsQuestObjDone(state.CurrentQuest.Value))
+            if (state.CurrentQuest == null) return;
+            if (nextState == QuestState.Completed && !IsQuestObjDone(state.CurrentQuest))
             {
 #if UNITY_EDITOR
                 Debug.Log("任务目标未完成。");
@@ -145,20 +168,32 @@ namespace Gameplay.Quest
                 return;
             }
 
-            QuestStateChanged(state.CurrentQuest.Value, nextState);
+            QuestStateChanged(state.CurrentQuest, nextState);
         }
 
         /// <summary>收到打开任务板请求：数据已加载且界面未打开时才请求显示。</summary>
         private void OnOpenQuestBoard()
         {
-            if (state.BoardQuests.Value != null && !state.CanvasIsActive.Value)
-                UICacheManager.Instance?.OpenCanvas(CanvasToToggle.Quest);
+            if (!state.HasBoardData || canvasIsActive) return;
+
+            var cache = UICacheManager.Instance;
+            if (cache == null)
+            {
+                Debug.LogWarning("任务板：UI 缓存不可用，无法打开。");
+                return;
+            }
+
+            cache.OpenCanvas(CanvasToToggle.Quest);
         }
 
         /// <summary>关闭任务板并清空当前选择；下次打开需要重新加载任务板数据。</summary>
         public void CloseQuestBoard()
         {
-            UICacheManager.Instance?.CloseCanvas(CanvasToToggle.Quest);
+            var cache = UICacheManager.Instance;
+            if (cache == null)
+                Debug.LogWarning("任务板：UI 缓存不可用，无法通过界面关闭。");
+            else
+                cache.CloseCanvas(CanvasToToggle.Quest);
             // 没有已打开的视图时也要清理已装载的数据；关闭回调已清理时会直接返回。
             OnCachedViewClosed();
         }
@@ -166,47 +201,46 @@ namespace Gameplay.Quest
         /// <summary>判断当前任务板是否就是传入的这批任务，用于避免重复加载。</summary>
         public bool IsDisplayingQuestBoard(List<QuestSO> quests)
         {
-            return state.BoardQuests.Value == quests;
+            return state.boardQuests.Value == quests;
         }
 
         /// <summary>选中某个任务并把它的当前状态同步到界面。</summary>
         public void OpenQuest(QuestSO quest)
         {
             if (quest == null) return;
-            state.CurrentQuest.Value = quest;
-            state.CurrentQuestState.Value = GetQuestStateFromProgress(quest);
+            state.SetCurrentQuest(quest);
+            state.SetCurrentQuestState(GetQuestStateFromProgress(quest));
             RefreshObjectiveProgress(quest);
         }
 
         /// <summary>缓存界面打开后回调：登记激活状态、补全进度并选中第一个未完成任务。</summary>
         public void OnCachedViewOpened()
         {
-            if (state.BoardQuests.Value == null) return;
+            if (!state.HasBoardData) return;
 
-            state.CanvasIsActive.Value = true;
-            InitializeQuestProgress(state.BoardQuests.Value);
-            if (state.CurrentQuest.Value == null)
-                state.CurrentQuest.Value = GetFirstIncompletedQuest();
+            canvasIsActive = true;
+            InitializeQuestProgress(state.boardQuests.Value);
+            if (state.CurrentQuest == null)
+                state.SetCurrentQuest(GetFirstIncompletedQuest());
 
-            if (state.CurrentQuest.Value != null)
+            if (state.CurrentQuest != null)
             {
-                state.CurrentQuestState.Value = GetQuestStateFromProgress(state.CurrentQuest.Value);
-                RefreshObjectiveProgress(state.CurrentQuest.Value);
+                state.SetCurrentQuestState(GetQuestStateFromProgress(state.CurrentQuest));
+                RefreshObjectiveProgress(state.CurrentQuest);
             }
-            MarkDirty();
+            state.MarkAllDirty();
         }
 
         /// <summary>缓存界面关闭后回调：清空任务板引用，避免继续操作已经关闭的界面。</summary>
         public void OnCachedViewClosed()
         {
-            if (!state.CanvasIsActive.Value && state.BoardQuests.Value == null &&
-                state.CurrentQuest.Value == null)
+            if (!canvasIsActive && !state.HasBoardData && state.CurrentQuest == null)
                 return;
 
-            state.CanvasIsActive.Value = false;
-            state.BoardQuests.Value = null;
-            state.CurrentQuest.Value = null;
-            state.CurrentQuestState.Value = QuestState.Idle;
+            canvasIsActive = false;
+            state.SetBoardQuests(null);
+            state.SetCurrentQuest(null);
+            state.SetCurrentQuestState(QuestState.Idle);
         }
 
         /// <summary>
@@ -215,7 +249,7 @@ namespace Gameplay.Quest
         /// </summary>
         private void OnRefreshQuestState(List<QuestSO> quests)
         {
-            state.BoardQuests.Value = quests;
+            state.SetBoardQuests(quests);
             InitializeQuestProgress(quests);
             if (quests != null)
             {
@@ -253,10 +287,10 @@ namespace Gameplay.Quest
         /// <summary>返回任务板中第一个未完成的任务；全部完成时返回 null。</summary>
         public QuestSO GetFirstIncompletedQuest()
         {
-            List<QuestSO> quests = state.BoardQuests.Value;
-            if (quests == null) return null;
-            foreach (var quest in quests)
+            if (!state.HasBoardData) return null;
+            for (int i = 0; i < state.BoardQuestCount; i++)
             {
+                QuestSO quest = state.GetBoardQuest(i);
                 if (quest != null && questProgress.TryGetValue(quest, out var progress) &&
                     progress.questState != QuestState.Completed)
                     return quest;
@@ -281,13 +315,13 @@ namespace Gameplay.Quest
         {
             if (quest == null || !questProgress.TryGetValue(quest, out var progress)) return;
 
-            bool isCurrentQuest = state.CurrentQuest.Value == quest;
+            bool isCurrentQuest = state.CurrentQuest == quest;
             bool stateChanged = progress.questState != nextState;
             bool isCompletingNow = nextState == QuestState.Completed &&
                                    progress.questState != QuestState.Completed;
             progress.questState = nextState;
             if (isCurrentQuest)
-                state.CurrentQuestState.Value = nextState;
+                state.SetCurrentQuestState(nextState);
 
             if (isCompletingNow)
                 RaiseRewardEvent(quest);
@@ -295,7 +329,7 @@ namespace Gameplay.Quest
             RefreshObjectiveProgress(quest);
             // 选择任务只影响详情；状态实际变化才需要刷新列表中的完成态。
             if (stateChanged)
-                state.BoardQuests.MarkDirty();
+                state.MarkBoardQuestsDirty();
         }
 
         /// <summary>
@@ -347,22 +381,17 @@ namespace Gameplay.Quest
                 : 0;
         }
 
-        /// <summary>判断一批任务是否全部完成；空列表不算全部完成。</summary>
-        public bool IsAllQuestsCompleted(IReadOnlyList<QuestSO> quests)
+        /// <summary>判断任务板上的任务是否全部完成；空列表不算全部完成。</summary>
+        public bool IsAllQuestsCompleted()
         {
-            if (quests == null || quests.Count == 0) return false;
-            foreach (var quest in quests)
+            if (state.BoardQuestCount == 0) return false;
+            for (int i = 0; i < state.BoardQuestCount; i++)
             {
+                QuestSO quest = state.GetBoardQuest(i);
                 if (GetQuestStateFromProgress(quest) != QuestState.Completed)
                     return false;
             }
             return true;
-        }
-
-        /// <summary>把全部状态标记为待刷新。</summary>
-        public void MarkDirty()
-        {
-            state.MarkAllDirty();
         }
 
         /// <summary>判断任务的所有目标是否都已完成；已完成任务直接返回 true。</summary>

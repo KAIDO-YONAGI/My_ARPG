@@ -13,11 +13,17 @@ namespace Gameplay.Quest
         [SerializeField] private Image rewardImage;
         [SerializeField] private TMP_Text rewardQuantity;
 
+        private void Awake()
+        {
+            Debug.Assert(rewardImage != null, nameof(rewardImage), this);
+            Debug.Assert(rewardQuantity != null, nameof(rewardQuantity), this);
+        }
+
         /// <summary>刷新奖励图标与数量。</summary>
         public void DisplayReward(Sprite sprite, int quantity)
         {
-            if (rewardImage != null) rewardImage.sprite = sprite;
-            if (rewardQuantity != null) rewardQuantity.text = quantity.ToString();
+            rewardImage.sprite = sprite;
+            rewardQuantity.text = quantity.ToString();
         }
     }
 }

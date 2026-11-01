@@ -8,7 +8,7 @@ namespace Gameplay.Skills
 {
     /// <summary>
     /// 技能树的持久状态管理器。保存每个技能的等级与解锁状态，并把技能点变化
-    /// 同步给 <see cref="SkillsCanvasView"/>。
+    /// 通过只读状态查询同步给 <see cref="SkillsCanvasView"/>。
     /// </summary>
     /// <remarks>
     /// 技能槽位在界面关闭后会被缓存，但状态不能跟着界面走，所以统一存在这里。
@@ -29,14 +29,25 @@ namespace Gameplay.Skills
             }
         }
 
-        /// <summary>技能树运行状态：可变化的数值与各自的脏标记放在同一个结构体字段里。</summary>
         public sealed class State
         {
-            /// <summary>按稳定路径保存的技能状态。</summary>
-            public DirtyValue<Dictionary<string, SkillState>> Skills;
+            /// <summary>按稳定路径保存的技能状态及其脏标记。</summary>
+            internal DirtyValue<Dictionary<string, SkillState>> Skills;
+
+            /// <summary>当前可用技能点及其脏标记。</summary>
+            internal DirtyValue<int> AbilityPoints;
 
             /// <summary>当前可用技能点。</summary>
-            public DirtyValue<int> AbilityPoints;
+            public int AbilityPointsValue => AbilityPoints.Value;
+
+            /// <summary>技能状态是否需要刷新。</summary>
+            public bool IsSkillsDirty => Skills.IsDirty;
+
+            /// <summary>技能点是否需要刷新。</summary>
+            public bool IsAbilityPointsDirty => AbilityPoints.IsDirty;
+
+            /// <summary>任一技能字段是否需要刷新。</summary>
+            public bool AnyDirty => IsSkillsDirty || IsAbilityPointsDirty;
 
             public State()
             {
@@ -45,22 +56,39 @@ namespace Gameplay.Skills
                 AbilityPoints = new DirtyValue<int>(0, true);
             }
 
-            /// <summary>任一字段有变化时为 true。</summary>
-            public bool AnyDirty => Skills.IsDirty || AbilityPoints.IsDirty;
+            /// <summary>读取技能状态；没有记录时返回初始等级与解锁状态。</summary>
+            public SkillState GetSkillState(string key, int initialLevel, bool initiallyUnlocked)
+            {
+                return !string.IsNullOrEmpty(key) && Skills.Value.TryGetValue(key, out var saved)
+                    ? saved
+                    : new SkillState(initialLevel, initiallyUnlocked);
+            }
 
-            /// <summary>把全部字段标记为待刷新。</summary>
-            public void MarkAllDirty()
+            /// <summary>把技能状态与技能点都标记为待刷新。</summary>
+            public void MarkDirty()
             {
                 Skills.MarkDirty();
                 AbilityPoints.MarkDirty();
             }
 
-            /// <summary>视图读完后清除全部标记。</summary>
+            /// <summary>视图刷新完成后清除全部脏标记。</summary>
             public void ClearDirty()
             {
                 Skills.ClearMark();
                 AbilityPoints.ClearMark();
             }
+
+            /// <summary>值未变但需要重画技能槽位时单独置脏。</summary>
+            internal void MarkSkillsDirty() => Skills.MarkDirty();
+
+            /// <summary>写入当前技能点并置脏。</summary>
+            internal void SetAbilityPoints(int points) => AbilityPoints.Set(points);
+
+            /// <summary>当前可用技能点。</summary>
+            internal int CurrentAbilityPoints => AbilityPoints.Value;
+
+            /// <summary>已保存的技能状态字典。</summary>
+            internal Dictionary<string, SkillState> SkillValues => Skills.Value;
         }
 
         private readonly State state = new();
@@ -68,9 +96,6 @@ namespace Gameplay.Skills
 
         /// <summary>技能树运行状态，供视图读取。</summary>
         public State CurrentState => state;
-
-        /// <summary>当前可用技能点；数值服务尚未就绪时返回 0。</summary>
-        public int AbilityPoints => state.AbilityPoints.Value;
 
         private void OnEnable()
         {
@@ -113,30 +138,21 @@ namespace Gameplay.Skills
         /// <summary>有技能点被消耗时扣减一点；技能点不足时忽略。</summary>
         private void HandleAbilityPointSpent(SkillSlot _)
         {
-            if (AbilityPoints > 0)
+            if (state.CurrentAbilityPoints > 0)
                 UpdateAbilityPoints(-1);
         }
 
         /// <summary>
         /// 读取技能状态。没有保存记录时返回槽位在预制体上配置的初始等级与解锁状态。
         /// </summary>
-        public SkillState GetSkillState(string key, int initialLevel, bool initiallyUnlocked)
-        {
-            Dictionary<string, SkillState> skills = state.Skills.Value;
-            if (!string.IsNullOrEmpty(key) && skills.TryGetValue(key, out var saved))
-                return saved;
-
-            return new SkillState(initialLevel, initiallyUnlocked);
-        }
-
         /// <summary>保存技能状态；空键不写入，避免多个槽位互相覆盖。</summary>
         public void SaveSkillState(string key, int level, bool unlocked)
         {
             if (string.IsNullOrEmpty(key)) return;
 
-            Dictionary<string, SkillState> skills = state.Skills.Value;
+            Dictionary<string, SkillState> skills = state.SkillValues;
             skills[key] = new SkillState(level, unlocked);
-            state.Skills.MarkDirty();
+            state.MarkSkillsDirty();
         }
 
         /// <summary>调整技能点并刷新界面；数值服务未就绪时忽略。</summary>
@@ -151,14 +167,9 @@ namespace Gameplay.Skills
         private void RefreshAbilityPoints()
         {
             int points = StatsService.Instance != null ? StatsService.Instance.Stats.SkillPoints : 0;
-            state.AbilityPoints.Value = points;
+            state.SetAbilityPoints(points);
         }
 
         /// <summary>从数值服务刷新技能点，并把全部状态标记为待刷新。</summary>
-        public void MarkDirty()
-        {
-            RefreshAbilityPoints();
-            state.MarkAllDirty();
-        }
     }
 }

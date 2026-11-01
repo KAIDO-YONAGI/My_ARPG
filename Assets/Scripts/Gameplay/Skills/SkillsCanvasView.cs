@@ -21,6 +21,14 @@ namespace Gameplay.Skills
         [Tooltip("技能点数量文本。")]
         [SerializeField] private TMP_Text pointsText;
 
+        private void Awake()
+        {
+            Debug.Assert(slots != null, nameof(slots), this);
+            Debug.Assert(pointsText != null, nameof(pointsText), this);
+            for (int i = 0; i < slots.Length; i++)
+                Debug.Assert(slots[i] != null, $"{nameof(slots)}[{i}]", this);
+        }
+
         private SkillTreeManager manager;
 
         /// <summary>
@@ -29,16 +37,12 @@ namespace Gameplay.Skills
         /// </summary>
         protected override void OnOpen()
         {
-            manager = SkillTreeManager.Instance;
-            if (slots != null)
-            {
-                foreach (var slot in slots)
-                    if (slot != null)
-                        slot.BindStateRoot(transform);
-            }
+            manager = SkillTreeManager.RequiredInstance;
+            foreach (var slot in slots)
+                slot.BindStateRoot(transform);
 
             SkillSlot.OnMaxSkillLevel += HandleSkillMaxed;
-            manager?.MarkDirty();
+            manager.CurrentState.MarkDirty();
             RefreshIfDirty();
         }
 
@@ -55,13 +59,15 @@ namespace Gameplay.Skills
             var state = manager.CurrentState;
             if (!state.AnyDirty) return;
 
-            if (pointsText != null)
-                pointsText.text = "Skill Points: " + state.AbilityPoints.Value;
-            if (slots != null)
+            if (state.IsAbilityPointsDirty)
+            {
+                pointsText.text = "Skill Points: " + state.AbilityPointsValue;
+            }
+
+            if (state.IsSkillsDirty)
             {
                 foreach (var slot in slots)
-                    if (slot != null)
-                        slot.RefreshFromManager();
+                    slot.RefreshFromManager();
             }
 
             state.ClearDirty();
@@ -70,10 +76,9 @@ namespace Gameplay.Skills
         /// <summary>某个技能升满后，检查并解锁满足前置条件的其他技能。</summary>
         private void HandleSkillMaxed(SkillSlot _)
         {
-            if (slots == null) return;
             foreach (var slot in slots)
             {
-                if (slot != null && !slot.IsUnlocked && slot.CanUnlockSkill())
+                if (!slot.IsUnlocked && slot.CanUnlockSkill())
                     slot.Unlock();
             }
         }

@@ -4,12 +4,14 @@ using System.Reflection;
 using Contracts;
 using Gameplay.Inventory;
 using Gameplay.Quest;
+using Gameplay.Shop;
 using NUnit.Framework;
 using Pipeline.SO;
 using Pipeline.UI.Runtime;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
 namespace Gameplay.Tests
@@ -60,10 +62,13 @@ namespace Gameplay.Tests
             var description = CreateComponent<TextMeshProUGUI>();
             SetField(panel, "questNameText", title);
             SetField(panel, "questDescriptionText", description);
+            SetField(panel, "objectiveSlots", System.Array.Empty<QuestObjectiveSlot>());
+            SetField(panel, "questRewardsSlots", System.Array.Empty<QuestRewardsSlot>());
             panel.DisplayQuest(first);
 
             panel.HandleQuestClicked(second);
-            panel.RefreshFromManager(questManager.CurrentQuest);
+            panel.RefreshFromManager(questManager.CurrentState.CurrentQuest);
+            questManager.CurrentState.ClearDirty();
 
             Assert.AreEqual("任务二", title.text);
             Assert.AreEqual("说明二", description.text);
@@ -74,12 +79,12 @@ namespace Gameplay.Tests
         {
             QuestSO quest = CreateQuest("任务", "说明");
             LoadBoard(quest);
-            questManager.CurrentState.ClearDirty();
+            AcknowledgeQuestChanges();
 
             questManager.OpenQuest(quest);
 
-            Assert.IsTrue(questManager.CurrentState.CurrentQuest.IsDirty);
-            Assert.IsFalse(questManager.CurrentState.BoardQuests.IsDirty,
+            Assert.IsTrue(questManager.CurrentState.IsCurrentQuestDirty);
+            Assert.IsFalse(questManager.CurrentState.IsBoardQuestsDirty,
                 "切换选择应只刷新详情，避免重建任务列表。");
         }
 
@@ -88,11 +93,11 @@ namespace Gameplay.Tests
         {
             QuestSO quest = CreateQuest("任务", "说明");
             LoadBoard(quest);
-            questManager.CurrentState.ClearDirty();
+            AcknowledgeQuestChanges();
 
             questManager.QuestStateChanged(quest, QuestState.Completed);
 
-            Assert.IsTrue(questManager.CurrentState.BoardQuests.IsDirty,
+            Assert.IsTrue(questManager.CurrentState.IsBoardQuestsDirty,
                 "完成任务需要刷新条目完成态和全部完成的提示。");
         }
 
@@ -100,11 +105,11 @@ namespace Gameplay.Tests
         public void QuestClose_WithoutViewClearsBoard_RepeatedCloseStaysClean()
         {
             LoadBoard(CreateQuest("任务", "说明"));
+            LogAssert.Expect(LogType.Warning,
+                "任务板：UI 缓存不可用，无法通过界面关闭。");
             questManager.CloseQuestBoard();
-            Assert.IsNull(questManager.CurrentBoardQuests);
-            Assert.IsNull(questManager.CurrentQuest);
-            Assert.IsFalse(questManager.CanvasIsActive);
-            questManager.CurrentState.ClearDirty();
+            Assert.IsFalse(questManager.CanOpenBoard);
+            AcknowledgeQuestChanges();
 
             questManager.OnCachedViewClosed();
 
@@ -135,17 +140,34 @@ namespace Gameplay.Tests
             var slot = CreateComponent<InventorySlot>();
             var item = ScriptableObject.CreateInstance<ItemSO>();
             temporaryObjects.Add(item);
-            inventoryManager.InitializeHotbarState(new[] { item }, new[] { 1 });
+            inventoryManager.InitializeHotbarState(new[] { CreateInitialSlot(item, 1) });
             SetField(view, "hotbarSlots", new[] { slot });
-            Invoke(view, "RefreshIfDirty", true);
+            Invoke(view, "RefreshIfDirty");
 
             // 显示副本用不同数量充当探针：只更新金币时不应触碰干净的槽位。
             slot.RestoreState(item, 5);
-            inventoryManager.CurrentState.Gold.Value = 10;
-            Invoke(view, "RefreshIfDirty", false);
+            inventoryManager.UpdateGold(-10);
+            Invoke(view, "RefreshIfDirty");
 
             Assert.AreEqual(5, slot.Quantity);
-            Assert.IsFalse(inventoryManager.CurrentState.Gold.IsDirty);
+            Assert.IsFalse(inventoryManager.CurrentState.IsGoldDirty);
+        }
+
+        [Test]
+        public void InventoryState_ProvidesStableReadOnlySlotQueries()
+        {
+            var item = ScriptableObject.CreateInstance<ItemSO>();
+            temporaryObjects.Add(item);
+            inventoryManager.InitializeHotbarState(new[] { CreateInitialSlot(item, 1) });
+
+            var state = inventoryManager.CurrentState;
+            Assert.AreSame(state, inventoryManager.CurrentState);
+            Assert.AreEqual(1, state.HotbarCount);
+            Assert.AreEqual(item, state.GetHotbarSlot(0).item);
+            Assert.AreEqual(1, state.GetHotbarSlot(0).quantity);
+            Assert.IsTrue(state.IsHotbarDirty);
+            Assert.IsNull(typeof(InventoryManager.State).GetProperty("Hotbar"));
+            Assert.IsNull(typeof(InventoryManager.State).GetProperty("Gold"));
         }
 
         [TestCase("DialogCanvas")]
@@ -185,10 +207,62 @@ namespace Gameplay.Tests
             }
         }
 
+        [Test]
+        public void ShopOpen_WithoutKeeperDoesNotInstantiateOrRunAwake()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/UI/Runtime/ShopCanvas.prefab").GetComponent<CachedUIView>();
+            var originalShopManager = ShopManager.Instance;
+            SetSingleton<ShopManager>(null);
+
+            var anchor = new GameObject("ShopCacheAnchor") { hideFlags = HideFlags.HideAndDontSave };
+            temporaryObjects.Add(anchor);
+            var cache = new UIViewCache(
+                new[] { new CachedViewBinding { prefab = prefab, anchor = anchor } },
+                anchor.transform, 3, 120f, (_, _, _, _) => { }, (_, _) => 0);
+
+            try
+            {
+                Assert.IsFalse(cache.OpenCanvas(prefab.CanvasId), "没有店主时商店应拒绝打开。");
+                Assert.AreEqual(0, cache.InstanceCount,
+                    "CanOpen 拒绝后不应实例化界面，也不应触发 ShopSlot.Awake。");
+                LogAssert.NoUnexpectedReceived();
+            }
+            finally
+            {
+                cache.Dispose();
+                SetSingleton(originalShopManager);
+            }
+        }
+
+        [Test]
+        public void ShopCanvasPrefab_ContainsOnlyConfiguredProductSlots()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/UI/Runtime/ShopCanvas.prefab");
+            var slots = (ShopSlot[])typeof(ShopCanvasView)
+                .GetField("slots", InstanceFlags).GetValue(prefab.GetComponent<ShopCanvasView>());
+
+            Assert.AreEqual(8, slots.Length, "详情面板的属性文本不能混入商品槽数组。");
+            foreach (var slot in slots)
+            {
+                Assert.IsNotNull(slot);
+                Assert.IsNotNull(typeof(ShopSlot).GetField("itemNameText", InstanceFlags).GetValue(slot));
+                Assert.IsNotNull(typeof(ShopSlot).GetField("priceText", InstanceFlags).GetValue(slot));
+                Assert.IsNotNull(typeof(ShopSlot).GetField("itemImage", InstanceFlags).GetValue(slot));
+            }
+        }
+
         /// <summary>直接装载任务板数据，隔离场景触发器和输入事件。</summary>
         private void LoadBoard(params QuestSO[] quests)
         {
             Invoke(questManager, "OnRefreshQuestState", new List<QuestSO>(quests));
+        }
+
+        /// <summary>清掉任务管理器当前的脏标记，隔离后续断言。</summary>
+        private void AcknowledgeQuestChanges()
+        {
+            questManager.CurrentState.ClearDirty();
         }
 
         private QuestSO CreateQuest(string title, string description)
@@ -202,6 +276,14 @@ namespace Gameplay.Tests
             return quest;
         }
 
+        private InventorySlot CreateInitialSlot(ItemSO item, int quantity)
+        {
+            var slot = CreateComponent<InventorySlot>();
+            SetField(slot, "initialItem", item);
+            SetField(slot, "initialQuantity", quantity);
+            return slot;
+        }
+
         /// <summary>停用临时对象，避免场景生命周期和事件订阅干扰定向调用。</summary>
         private T CreateComponent<T>() where T : Component
         {
@@ -213,8 +295,8 @@ namespace Gameplay.Tests
 
         private static void SetSingleton<T>(T instance) where T : MonoBehaviour
         {
-            typeof(YSingleton<T>).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic)
-                .SetValue(null, instance);
+            typeof(YSingleton<T>).GetProperty("Instance", BindingFlags.Static | BindingFlags.Public)
+                .GetSetMethod(true).Invoke(null, new object[] { instance });
         }
 
         private static void SetField(object target, string field, object value)

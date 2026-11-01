@@ -89,7 +89,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         [ContextMenu("UI Cache/Clear Idle Views")]
         public void ClearIdleViews()
         {
-            cacheManager?.ClearIdle();
+            cacheManager.ClearIdle();
         }
 
         private void OnLoadScene(List<GameSceneSO> arg0, Vector3 arg1, bool arg2)
@@ -175,7 +175,7 @@ namespace Pipeline.UI.SystemCanvasManagers
 
             focusStack.ReportState(canvas, state);
             if (state)
-                canvasOpenedEvent?.RaiseCanvasOpened(canvas);
+                canvasOpenedEvent.RaiseCanvasOpened(canvas);
         }
 
         public bool IsCanvasFocused(CanvasToToggle canvas)

@@ -12,10 +12,15 @@ namespace Gameplay.Quest
         [SerializeField] private TMP_Text objectiveText;
         [SerializeField] private TMP_Text trackingText;
 
+        private void Awake()
+        {
+            Debug.Assert(objectiveText != null, nameof(objectiveText), this);
+            Debug.Assert(trackingText != null, nameof(trackingText), this);
+        }
+
         /// <summary>刷新目标显示；已完成的目标统一显示为灰色。</summary>
         public void RefreshObjectives(string description, string progress, bool isCompleted)
         {
-            if (objectiveText == null || trackingText == null) return;
             objectiveText.text = description;
             trackingText.text = progress;
 

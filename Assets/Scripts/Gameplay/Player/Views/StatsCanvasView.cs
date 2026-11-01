@@ -48,6 +48,13 @@ namespace Gameplay.Player.Views
         private Vector2 originPosition;
         private bool positionCaptured;
 
+        private void Awake()
+        {
+            Debug.Assert(statTexts != null, nameof(statTexts), this);
+            for (int i = 0; i < statTexts.Length; i++)
+                Debug.Assert(statTexts[i] != null, $"{nameof(statTexts)}[{i}]", this);
+        }
+
         /// <summary>数值服务尚未初始化时不打开，避免控制器拿到空模型。</summary>
         protected override bool CanOpen()
         {
@@ -74,7 +81,7 @@ namespace Gameplay.Player.Views
         {
             if (sceneLoadedEvent != null)
                 sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
-            controller?.Dispose();
+            controller.Dispose();
             controller = null;
 
             // 停用后 UIDrag.LateUpdate 不再运行，因此在这里恢复拖动前的位置。
@@ -85,15 +92,23 @@ namespace Gameplay.Player.Views
         /// <summary>切场景时请求关闭属性面板；真正的关闭仍走 UIManager 的统一流程。</summary>
         private void OnSceneLoaded(GameSceneSO _)
         {
-            UIManager.Instance?.RequestCanvasClose(CanvasToToggle.Stats);
+            var manager = UIManager.Instance;
+            if (manager == null)
+            {
+                Debug.LogWarning("UIManager 不可用，场景加载后无法关闭属性面板。");
+                return;
+            }
+
+            manager.RequestCanvasClose(CanvasToToggle.Stats);
         }
 
         /// <summary>把当前属性画到面板：statTexts[0] 是伤害，statTexts[1] 是速度。</summary>
         public void SetStats(int damage, float speed)
         {
-            if (statTexts == null || statTexts.Length < 1) return;
-            if (statTexts[0] != null) statTexts[0].text = "Damage:" + damage;
-            if (statTexts.Length >= 2 && statTexts[1] != null) statTexts[1].text = "Speed:" + speed;
+            if (statTexts.Length < 1) return;
+            statTexts[0].text = "Damage:" + damage;
+            if (statTexts.Length >= 2)
+                statTexts[1].text = "Speed:" + speed;
         }
     }
 }

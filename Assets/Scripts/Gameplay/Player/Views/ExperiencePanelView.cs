@@ -28,7 +28,7 @@ namespace Gameplay.Player.Views
 
         private void OnDestroy()
         {
-            controller?.Dispose();
+            controller.Dispose();
             controller = null;
         }
 

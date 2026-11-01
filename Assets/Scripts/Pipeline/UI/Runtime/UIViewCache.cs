@@ -244,6 +244,9 @@ namespace Pipeline.UI.Runtime
 
             try
             {
+                CachedUIView candidate = entry.View != null ? entry.View : entry.Prefab;
+                if (!candidate.CanOpenFromCache()) return false;
+
                 if (entry.View == null)
                 {
                     // 直接建在挂载点下并立即停用，等 Open 时再激活，避免半初始化的界面参与布局。

@@ -22,61 +22,64 @@ namespace Gameplay.Inventory
         [Tooltip("金币数量文本；没有金币显示需求时可以留空。")]
         [SerializeField] private TMP_Text goldAmountText;
 
+        private void Awake()
+        {
+            Debug.Assert(hotbarSlots != null, nameof(hotbarSlots), this);
+            for (int i = 0; i < hotbarSlots.Length; i++)
+                Debug.Assert(hotbarSlots[i] != null, $"{nameof(hotbarSlots)}[{i}]", this);
+        }
+
         private void Start()
         {
-            var manager = InventoryManager.Instance;
-            if (manager == null) return;
+            var manager = InventoryManager.RequiredInstance;
 
-            if (hotbarSlots != null)
+            for (int i = 0; i < hotbarSlots.Length; i++)
             {
-                var items = new ItemSO[hotbarSlots.Length];
-                var quantities = new int[hotbarSlots.Length];
-                for (int i = 0; i < hotbarSlots.Length; i++)
-                {
-                    items[i] = hotbarSlots[i].InitialItem;
-                    quantities[i] = hotbarSlots[i].InitialQuantity;
-                    // 快捷栏槽位在管理器里固定排在背包之前，先标记自己的地址。
-                    hotbarSlots[i].ConfigureSlot(false, i);
-                }
-                manager.InitializeHotbarState(items, quantities);
+                // 快捷栏槽位在管理器里固定排在背包之前，先标记自己的地址。
+                hotbarSlots[i].ConfigureSlot(false, i);
             }
+            manager.InitializeHotbarState(hotbarSlots);
 
-            RefreshIfDirty(true);
+            manager.CurrentState.MarkHotbarDirty();
+            manager.CurrentState.MarkGoldDirty();
+            RefreshIfDirty();
         }
 
         private void Update()
         {
-            RefreshIfDirty(false);
+            RefreshIfDirty();
         }
 
         /// <summary>
         /// 分别按脏标记刷新快捷栏和金币，避免金币变化时遍历槽位。
-        /// <paramref name="force"/> 用于视图首次进入时完整绘制一次。
         /// </summary>
-        private void RefreshIfDirty(bool force)
+        private void RefreshIfDirty()
         {
             var manager = InventoryManager.Instance;
             if (manager == null) return;
 
             var state = manager.CurrentState;
-            if (force || state.Hotbar.IsDirty)
+            if (state.IsHotbarDirty)
             {
-                int slotCount = hotbarSlots != null ? hotbarSlots.Length : 0;
+                int slotCount = hotbarSlots.Length;
                 for (int i = 0; i < slotCount; i++)
                 {
-                    if (manager.TryGetSlotState(false, i, out var item, out int quantity))
-                        hotbarSlots[i].RestoreState(item, quantity);
+                    if (i < state.HotbarCount)
+                    {
+                        var slot = state.GetHotbarSlot(i);
+                        hotbarSlots[i].RestoreState(slot.item, slot.quantity);
+                    }
                     else
                         hotbarSlots[i].RestoreState(null, 0);
                 }
-                state.Hotbar.ClearMark();
+                state.ClearHotbarDirty();
             }
 
-            if (force || state.Gold.IsDirty)
+            if (state.IsGoldDirty)
             {
                 if (goldAmountText != null)
-                    goldAmountText.text = manager.GoldAmount.ToString();
-                state.Gold.ClearMark();
+                    goldAmountText.text = state.GoldAmount.ToString();
+                state.ClearGoldDirty();
             }
         }
     }

@@ -56,6 +56,9 @@ namespace Gameplay.Inventory
 
         private void Awake()
         {
+            Debug.Assert(itemImage != null, nameof(itemImage), this);
+            Debug.Assert(quantityText != null, nameof(quantityText), this);
+
             // 先保存预制体上的初始值，后面的 RestoreState 会覆盖 itemSO/quantity。
             initialItem = itemSO;
             initialQuantity = quantity;
@@ -124,20 +127,14 @@ namespace Gameplay.Inventory
 
             if (itemSO != null)
             {
-                if (itemImage != null)
-                {
-                    itemImage.sprite = itemSO.icon;
-                    itemImage.gameObject.SetActive(true);
-                }
-                if (quantityText != null)
-                    quantityText.text = quantity.ToString();
+                itemImage.sprite = itemSO.icon;
+                itemImage.gameObject.SetActive(true);
+                quantityText.text = quantity.ToString();
             }
             else
             {
-                if (itemImage != null)
-                    itemImage.gameObject.SetActive(false);
-                if (quantityText != null)
-                    quantityText.text = "";
+                itemImage.gameObject.SetActive(false);
+                quantityText.text = "";
             }
         }
     }

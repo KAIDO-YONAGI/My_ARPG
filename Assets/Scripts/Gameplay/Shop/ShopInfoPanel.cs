@@ -29,13 +29,21 @@ namespace Gameplay.Shop
         [Header("Stats")]
         [SerializeField] private TMP_Text[] itemStatsText;
 
+        private void Awake()
+        {
+            Debug.Assert(infoPanel != null, nameof(infoPanel), this);
+            Debug.Assert(infoPanelRect != null, nameof(infoPanelRect), this);
+            Debug.Assert(itemNameText != null, nameof(itemNameText), this);
+            Debug.Assert(itemDescriptionText != null, nameof(itemDescriptionText), this);
+        }
+
         /// <summary>显示物品详情，并按有效属性动态填充属性行。</summary>
         public void ShowItemInfo(ItemSO item)
         {
             if (item == null) return;
-            if (infoPanel != null) infoPanel.alpha = 1;
-            if (itemNameText != null) itemNameText.text = item.itemName;
-            if (itemDescriptionText != null) itemDescriptionText.text = item.itemDescription;
+            infoPanel.alpha = 1;
+            itemNameText.text = item.itemName;
+            itemDescriptionText.text = item.itemDescription;
 
             List<string> stats = new List<string>();
             if (item.currentHealth > 0) stats.Add("Health:" + item.currentHealth);
@@ -64,15 +72,15 @@ namespace Gameplay.Shop
         /// <summary>隐藏浮窗并清空文本。</summary>
         public void HideItemInfo()
         {
-            if (infoPanel != null) infoPanel.alpha = 0;
-            if (itemNameText != null) itemNameText.text = "";
-            if (itemDescriptionText != null) itemDescriptionText.text = "";
+            infoPanel.alpha = 0;
+            itemNameText.text = "";
+            itemDescriptionText.text = "";
         }
 
         /// <summary>让浮窗跟随鼠标，并向右下偏移一点避免遮住指针。</summary>
         public void FollowMouse()
         {
-            if (Mouse.current == null || infoPanelRect == null) return;
+            if (Mouse.current == null) return;
             Vector3 mousePosition = Mouse.current.position.ReadValue();
             mousePosition += new Vector3(10, -10, 0);
             infoPanelRect.position = mousePosition;

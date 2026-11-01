@@ -18,28 +18,28 @@ namespace Gameplay.Inventory
         [Tooltip("背包网格里的槽位，顺序即管理器中的背包槽位顺序。")]
         [SerializeField] private InventorySlot[] slots;
 
+        private void Awake()
+        {
+            Debug.Assert(slots != null, nameof(slots), this);
+            for (int i = 0; i < slots.Length; i++)
+                Debug.Assert(slots[i] != null, $"{nameof(slots)}[{i}]", this);
+        }
+
         /// <summary>
         /// 打开时先登记预制体上的初始物品，再刷新显示。
-        /// 管理器只在第一次调用时接收快照，后续打开不会重置玩家已经获得的物品。
+        /// 管理器只在第一次调用时接收初始槽位，后续打开不会重置玩家已经获得的物品。
         /// </summary>
         protected override void OnOpen()
         {
-            var manager = InventoryManager.Instance;
-            if (manager != null && slots != null)
+            var manager = InventoryManager.RequiredInstance;
+            for (int i = 0; i < slots.Length; i++)
             {
-                var items = new ItemSO[slots.Length];
-                var quantities = new int[slots.Length];
-                for (int i = 0; i < slots.Length; i++)
-                {
-                    // 每个新实例都要登记槽位地址，点击才能定位管理器中的背包数据。
-                    slots[i].ConfigureSlot(true, i);
-                    items[i] = slots[i].InitialItem;
-                    quantities[i] = slots[i].InitialQuantity;
-                }
-                manager.InitializeBackpackState(items, quantities);
+                // 每个新实例都要登记槽位地址，点击才能定位管理器中的背包数据。
+                slots[i].ConfigureSlot(true, i);
             }
+            manager.InitializeBackpackState(slots);
 
-            manager?.CurrentState.Backpack.MarkDirty();
+            manager.CurrentState.MarkBackpackDirty();
             RefreshIfDirty();
         }
 
@@ -55,18 +55,21 @@ namespace Gameplay.Inventory
             if (!IsOpen || manager == null) return;
 
             var state = manager.CurrentState;
-            if (!state.Backpack.IsDirty) return;
+            if (!state.IsBackpackDirty) return;
 
-            int slotCount = slots != null ? slots.Length : 0;
+            int slotCount = slots.Length;
             for (int i = 0; i < slotCount; i++)
             {
-                if (manager.TryGetSlotState(true, i, out var item, out int quantity))
-                    slots[i].RestoreState(item, quantity);
+                if (i < state.BackpackCount)
+                {
+                    var slot = state.GetBackpackSlot(i);
+                    slots[i].RestoreState(slot.item, slot.quantity);
+                }
                 else
                     slots[i].RestoreState(null, 0);
             }
 
-            state.Backpack.ClearMark();
+            state.ClearBackpackDirty();
         }
     }
 }

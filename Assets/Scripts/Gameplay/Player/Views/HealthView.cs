@@ -16,6 +16,11 @@ namespace Gameplay.Player.Views
 
         private HealthController controller;
 
+        private void Awake()
+        {
+            Debug.Assert(healthText != null, nameof(healthText), this);
+        }
+
         private void Start()
         {
             // Start 在所有 Awake 之后：此时 StatsService 必然就绪，Controller 可以立即订阅
@@ -25,7 +30,7 @@ namespace Gameplay.Player.Views
 
         private void OnDestroy()
         {
-            controller?.Dispose();
+            controller.Dispose();
             controller = null;
         }
 

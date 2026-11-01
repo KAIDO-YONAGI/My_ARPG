@@ -30,11 +30,24 @@ namespace Gameplay.Quest
         // 只记录已经绘制的任务，默认选择由 QuestManager 在界面打开时决定。
         private QuestSO currentQuest;
 
+        private void Awake()
+        {
+            Debug.Assert(questNameText != null, nameof(questNameText), this);
+            Debug.Assert(questDescriptionText != null, nameof(questDescriptionText), this);
+            Debug.Assert(objectiveSlots != null, nameof(objectiveSlots), this);
+            Debug.Assert(questRewardsSlots != null, nameof(questRewardsSlots), this);
+
+            for (int i = 0; i < objectiveSlots.Length; i++)
+                Debug.Assert(objectiveSlots[i] != null, $"{nameof(objectiveSlots)}[{i}]", this);
+            for (int i = 0; i < questRewardsSlots.Length; i++)
+                Debug.Assert(questRewardsSlots[i] != null, $"{nameof(questRewardsSlots)}[{i}]", this);
+        }
+
         /// <summary>任务条目被点击：向管理器提交选择，由视图读取脏标记后刷新详情。</summary>
         public void HandleQuestClicked(QuestSO quest)
         {
             // currentQuest 记录已经绘制的任务；提前修改会让刷新误判为同一任务。
-            QuestManager.Instance?.OpenQuest(quest);
+            QuestManager.RequiredInstance.OpenQuest(quest);
         }
 
         /// <summary>
@@ -46,15 +59,15 @@ namespace Gameplay.Quest
             currentQuest = quest;
             if (currentQuest == null)
             {
-                if (questNameText != null) questNameText.text = string.Empty;
-                if (questDescriptionText != null) questDescriptionText.text = string.Empty;
+                questNameText.text = string.Empty;
+                questDescriptionText.text = string.Empty;
                 SetSlotsActive(objectiveSlots, false);
                 SetSlotsActive(questRewardsSlots, false);
                 return;
             }
 
-            if (questNameText != null) questNameText.text = currentQuest.questName;
-            if (questDescriptionText != null) questDescriptionText.text = currentQuest.questDescription;
+            questNameText.text = currentQuest.questName;
+            questDescriptionText.text = currentQuest.questDescription;
             DisplayRewards();
             DisplayObjectives();
         }
@@ -75,7 +88,7 @@ namespace Gameplay.Quest
         public void DisplayObjectives()
         {
             var manager = QuestManager.Instance;
-            if (currentQuest == null || manager == null || objectiveSlots == null) return;
+            if (currentQuest == null || manager == null) return;
 
             for (int i = 0; i < objectiveSlots.Length; i++)
             {
@@ -99,7 +112,7 @@ namespace Gameplay.Quest
         /// <summary>按任务奖励配置刷新奖励槽位；多余槽位隐藏。</summary>
         private void DisplayRewards()
         {
-            if (currentQuest == null || questRewardsSlots == null) return;
+            if (currentQuest == null) return;
 
             for (int i = 0; i < questRewardsSlots.Length; i++)
             {
@@ -119,12 +132,8 @@ namespace Gameplay.Quest
         /// <summary>批量显示或隐藏一组任务槽位。</summary>
         private static void SetSlotsActive(Component[] slots, bool state)
         {
-            if (slots == null) return;
             foreach (var slot in slots)
-            {
-                if (slot != null)
-                    slot.gameObject.SetActive(state);
-            }
+                slot.gameObject.SetActive(state);
         }
     }
 }

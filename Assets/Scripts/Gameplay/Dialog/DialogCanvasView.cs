@@ -39,17 +39,25 @@ namespace Gameplay.Dialog
 
         private void Awake()
         {
+            Debug.Assert(speakerPortrait != null, nameof(speakerPortrait), this);
+            Debug.Assert(dialogText != null, nameof(dialogText), this);
+            Debug.Assert(speakerNameText != null, nameof(speakerNameText), this);
+
             optionButtons ??= Array.Empty<Button>();
             optionTexts ??= Array.Empty<TMP_Text>();
             optionListeners = new UnityAction[optionButtons.Length];
+
+            for (int i = 0; i < optionButtons.Length; i++)
+                Debug.Assert(optionButtons[i] != null, $"{nameof(optionButtons)}[{i}]", this);
+            for (int i = 0; i < optionTexts.Length; i++)
+                Debug.Assert(optionTexts[i] != null, $"{nameof(optionTexts)}[{i}]", this);
 
             // 闭包捕获的是循环变量副本，避免所有按钮都指向最后一个选项。
             for (int i = 0; i < optionButtons.Length; i++)
             {
                 int optionIndex = i;
-                optionListeners[i] = () => DialogManager.Instance?.SelectOption(optionIndex);
-                if (optionButtons[i] != null)
-                    optionButtons[i].onClick.AddListener(optionListeners[i]);
+                optionListeners[i] = () => DialogManager.RequiredInstance.SelectOption(optionIndex);
+                optionButtons[i].onClick.AddListener(optionListeners[i]);
             }
         }
 
@@ -62,7 +70,7 @@ namespace Gameplay.Dialog
         /// <summary>打开后通知管理器，并立即刷新当前行。</summary>
         protected override void OnOpen()
         {
-            DialogManager.Instance?.OnCachedViewOpened();
+            DialogManager.RequiredInstance.OnCachedViewOpened();
             RefreshIfDirty();
         }
 
@@ -81,9 +89,9 @@ namespace Gameplay.Dialog
             if (!IsOpen || manager == null) return;
 
             var state = manager.CurrentState;
-            if (!state.AnyDirty) return;
+            if (!state.IsDirty) return;
 
-            var dialog = state.CurrentDialog.Value;
+            var dialog = state.CurrentDialog;
             if (dialog == null || dialog.dialogLines == null || dialog.dialogLines.Length == 0)
             {
                 SetChoicesVisible(false);
@@ -91,22 +99,21 @@ namespace Gameplay.Dialog
                 return;
             }
 
-            int lineIndex = Mathf.Clamp(state.CurrentLineIndex.Value - 1, 0, dialog.dialogLines.Length - 1);
+            int lineIndex = Mathf.Clamp(state.CurrentLineIndex - 1, 0, dialog.dialogLines.Length - 1);
             var line = dialog.dialogLines[lineIndex];
-            if (speakerPortrait != null && line.speaker != null)
+            if (line.speaker != null)
+            {
                 speakerPortrait.sprite = line.speaker.characterPortrait;
-            if (speakerNameText != null && line.speaker != null)
                 speakerNameText.text = line.speaker.characterName;
-            if (dialogText != null)
-                dialogText.text = line.text;
+            }
+            dialogText.text = line.text;
 
-            bool showChoices = state.ShowingChoices.Value;
+            bool showChoices = state.ShowingChoices;
             for (int i = 0; i < optionButtons.Length; i++)
             {
                 bool hasOption = showChoices && i < dialog.nextDialogOptions.Length;
-                if (optionButtons[i] != null)
-                    optionButtons[i].gameObject.SetActive(hasOption);
-                if (hasOption && i < optionTexts.Length && optionTexts[i] != null)
+                optionButtons[i].gameObject.SetActive(hasOption);
+                if (hasOption && i < optionTexts.Length)
                     optionTexts[i].text = dialog.nextDialogOptions[i].optionText;
             }
 
@@ -117,22 +124,27 @@ namespace Gameplay.Dialog
         private void SetChoicesVisible(bool visible)
         {
             foreach (var button in optionButtons)
-                if (button != null)
-                    button.gameObject.SetActive(visible);
+                button.gameObject.SetActive(visible);
         }
 
         /// <summary>关闭时通知管理器退出对话状态。</summary>
         protected override void OnClose()
         {
-            DialogManager.Instance?.OnCachedViewClosed();
+            var manager = DialogManager.Instance;
+            if (manager == null)
+            {
+                Debug.LogWarning("DialogManager 不可用，对话视图无法上报关闭。");
+                return;
+            }
+
+            manager.OnCachedViewClosed();
         }
 
         /// <summary>销毁实例时移除按钮监听，避免缓存重建后旧监听残留。</summary>
         private void OnDestroy()
         {
             for (int i = 0; i < optionButtons.Length; i++)
-                if (optionButtons[i] != null && optionListeners[i] != null)
-                    optionButtons[i].onClick.RemoveListener(optionListeners[i]);
+                optionButtons[i].onClick.RemoveListener(optionListeners[i]);
         }
     }
 }

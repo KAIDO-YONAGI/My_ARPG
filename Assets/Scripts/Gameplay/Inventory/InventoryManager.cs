@@ -14,7 +14,7 @@ namespace Gameplay.Inventory
 {
     /// <summary>
     /// 背包与快捷栏的持久状态管理器。保存槽位内容、金币和选中槽位，
-    /// 界面由 <see cref="HotbarCanvasView"/> 与 <see cref="BackpackCanvasView"/> 读取 <see cref="State"/> 刷新。
+    /// 界面由 <see cref="HotbarCanvasView"/> 与 <see cref="BackpackCanvasView"/> 读取只读状态刷新。
     /// </summary>
     /// <remarks>
     /// 管理器不持有 UI 控件引用，也不在运行时遍历预制体。
@@ -55,14 +55,58 @@ namespace Gameplay.Inventory
         /// <summary>背包运行状态：金币与两侧槽位列表各自带脏标记。</summary>
         public sealed class State
         {
+            /// <summary>金币数量及其脏标记。</summary>
+            internal DirtyValue<int> Gold;
+
+            /// <summary>快捷栏槽位及其脏标记。</summary>
+            internal DirtyValue<List<InventorySlotState>> Hotbar;
+
+            /// <summary>背包槽位及其脏标记。</summary>
+            internal DirtyValue<List<InventorySlotState>> Backpack;
+
             /// <summary>金币数量。</summary>
-            public DirtyValue<int> Gold;
+            public int GoldAmount => Gold.Value;
 
-            /// <summary>快捷栏槽位。</summary>
-            public DirtyValue<List<InventorySlotState>> Hotbar;
+            /// <summary>金币是否需要刷新。</summary>
+            public bool IsGoldDirty => Gold.IsDirty;
 
-            /// <summary>背包槽位。</summary>
-            public DirtyValue<List<InventorySlotState>> Backpack;
+            /// <summary>快捷栏槽位数量。</summary>
+            public int HotbarCount => Hotbar.Value.Count;
+
+            /// <summary>背包槽位数量。</summary>
+            public int BackpackCount => Backpack.Value.Count;
+
+            /// <summary>快捷栏是否需要刷新。</summary>
+            public bool IsHotbarDirty => Hotbar.IsDirty;
+
+            /// <summary>背包是否需要刷新。</summary>
+            public bool IsBackpackDirty => Backpack.IsDirty;
+
+            /// <summary>读取快捷栏槽位；下标越界时返回空槽。</summary>
+            public InventorySlotState GetHotbarSlot(int index) =>
+                index >= 0 && index < HotbarCount ? Hotbar.Value[index] : default;
+
+            /// <summary>读取背包槽位；下标越界时返回空槽。</summary>
+            public InventorySlotState GetBackpackSlot(int index) =>
+                index >= 0 && index < BackpackCount ? Backpack.Value[index] : default;
+
+            /// <summary>值未变但需要重画快捷栏时单独置脏。</summary>
+            public void MarkHotbarDirty() => Hotbar.MarkDirty();
+
+            /// <summary>值未变但需要重画金币时单独置脏。</summary>
+            public void MarkGoldDirty() => Gold.MarkDirty();
+
+            /// <summary>值未变但需要重画背包时单独置脏。</summary>
+            public void MarkBackpackDirty() => Backpack.MarkDirty();
+
+            /// <summary>视图刷新完成后清除快捷栏脏标记。</summary>
+            public void ClearHotbarDirty() => Hotbar.ClearMark();
+
+            /// <summary>视图刷新完成后清除金币脏标记。</summary>
+            public void ClearGoldDirty() => Gold.ClearMark();
+
+            /// <summary>视图刷新完成后清除背包脏标记。</summary>
+            public void ClearBackpackDirty() => Backpack.ClearMark();
 
             public State()
             {
@@ -82,8 +126,8 @@ namespace Gameplay.Inventory
             }
         }
 
-        private bool hasHotbarSnapshot;
-        private bool hasBackpackSnapshot;
+        private bool hasHotbarState;
+        private bool hasBackpackState;
         private SlotAddress? selectedSlot;
         private bool hasSelectedSlot;
         private readonly State state = new();
@@ -119,10 +163,7 @@ namespace Gameplay.Inventory
         /// <summary>背包运行状态，供视图读取。</summary>
         public State CurrentState => state;
 
-        public int GoldAmount => state.Gold.Value;
-        public int HotbarSlotCount => state.Hotbar.Value.Count;
-        public int BackpackSlotCount => state.Backpack.Value.Count;
-
+        /// <summary>创建掉落物对象池。</summary>
         private void Start()
         {
             lootPool = new ObjectPool<Loot>(lootPrefab, lootPrewarm, transform, lootPoolMaxSize);
@@ -146,17 +187,18 @@ namespace Gameplay.Inventory
         /// 用快捷栏视图的初始配置建立槽位状态。只在第一次调用时生效，
         /// 之后重复打开界面不会把玩家已经获得的物品重置回初始值。
         /// </summary>
-        public void InitializeHotbarState(ItemSO[] items, int[] quantities)
+        public void InitializeHotbarState(InventorySlot[] initialSlots)
         {
-            if (hasHotbarSnapshot) return;
+            if (hasHotbarState) return;
 
             List<InventorySlotState> slots = state.Hotbar.Value;
             slots.Clear();
-            int count = Mathf.Min(items?.Length ?? 0, quantities?.Length ?? 0);
-            for (int i = 0; i < count; i++)
-                slots.Add(new InventorySlotState(items[i], quantities[i]));
+            if (initialSlots != null)
+                for (int i = 0; i < initialSlots.Length; i++)
+                    slots.Add(new InventorySlotState(
+                        initialSlots[i].InitialItem, initialSlots[i].InitialQuantity));
 
-            hasHotbarSnapshot = true;
+            hasHotbarState = true;
             state.Hotbar.Set(slots);
         }
 
@@ -164,17 +206,18 @@ namespace Gameplay.Inventory
         /// 用背包视图的初始配置建立槽位状态。只在第一次调用时生效，
         /// 后续背包界面被缓存销毁再重建也不会覆盖运行期数据。
         /// </summary>
-        public void InitializeBackpackState(ItemSO[] items, int[] quantities)
+        public void InitializeBackpackState(InventorySlot[] initialSlots)
         {
-            if (hasBackpackSnapshot) return;
+            if (hasBackpackState) return;
 
             List<InventorySlotState> slots = state.Backpack.Value;
             slots.Clear();
-            int count = Mathf.Min(items?.Length ?? 0, quantities?.Length ?? 0);
-            for (int i = 0; i < count; i++)
-                slots.Add(new InventorySlotState(items[i], quantities[i]));
+            if (initialSlots != null)
+                for (int i = 0; i < initialSlots.Length; i++)
+                    slots.Add(new InventorySlotState(
+                        initialSlots[i].InitialItem, initialSlots[i].InitialQuantity));
 
-            hasBackpackSnapshot = true;
+            hasBackpackState = true;
             state.Backpack.Set(slots);
         }
 
@@ -237,14 +280,14 @@ namespace Gameplay.Inventory
             if (item.isGold)
             {
                 state.Gold.Value += quantity;
-                ItemHistoryManager.Instance?.RecordItem(item, quantity);
+                ItemHistoryManager.RequiredInstance.RecordItem(item, quantity);
                 lootObj?.MarkAsDisable();
                 return;
             }
 
             if (item.isEXP)
             {
-                StatsService.Instance?.AddExperience(quantity);
+                StatsService.RequiredInstance.AddExperience(quantity);
                 return;
             }
 
@@ -261,7 +304,7 @@ namespace Gameplay.Inventory
                 int removed = RemoveFromSlot(selectedSlot.Value, -quantity);
                 hasSelectedSlot = false;
                 if (removed > 0)
-                    ItemHistoryManager.Instance?.RecordItem(item, -removed);
+                    ItemHistoryManager.RequiredInstance.RecordItem(item, -removed);
                 return;
             }
 
@@ -272,8 +315,8 @@ namespace Gameplay.Inventory
             remaining = AddToSlots(state.Backpack.Value, item, remaining);
             if (remaining != quantity)
             {
-                state.Hotbar.MarkDirty();
-                state.Backpack.MarkDirty();
+                state.MarkHotbarDirty();
+                state.MarkBackpackDirty();
             }
 
             if (remaining > 0)
@@ -300,7 +343,7 @@ namespace Gameplay.Inventory
                 slot.item = item;
                 slot.quantity += placed;
                 slots[i] = slot;
-                ItemHistoryManager.Instance?.RecordItem(item, placed);
+                ItemHistoryManager.RequiredInstance.RecordItem(item, placed);
                 quantity -= placed;
             }
             return quantity;
@@ -324,9 +367,9 @@ namespace Gameplay.Inventory
             slots[address.index] = slot;
 
             if (address.isBackpack)
-                state.Backpack.MarkDirty();
+                state.MarkBackpackDirty();
             else
-                state.Hotbar.MarkDirty();
+                state.MarkHotbarDirty();
             return removed;
         }
 
@@ -427,7 +470,7 @@ namespace Gameplay.Inventory
 
             DropLoot(item, 1);
             RemoveFromSlot(address, 1);
-            ItemHistoryManager.Instance?.RecordItem(item, -1);
+            ItemHistoryManager.Instance.RecordItem(item, -1);
         }
 
         /// <summary>使用一个物品：先执行效果，再从槽位移除。</summary>
@@ -441,7 +484,7 @@ namespace Gameplay.Inventory
 
             useItem.ApplyItemEffects(item);
             RemoveFromSlot(address, 1);
-            ItemHistoryManager.Instance?.RecordItem(item, -1);
+            ItemHistoryManager.Instance.RecordItem(item, -1);
         }
 
         /// <summary>结算金币：购买时传入正价格扣钱，出售时传入负价格加钱。</summary>
@@ -450,10 +493,5 @@ namespace Gameplay.Inventory
             state.Gold.Value -= price;
         }
 
-        /// <summary>把全部状态标记为待刷新。</summary>
-        public void MarkDirty()
-        {
-            state.MarkAllDirty();
-        }
     }
 }

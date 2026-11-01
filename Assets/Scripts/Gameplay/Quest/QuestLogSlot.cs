@@ -34,6 +34,10 @@ namespace Gameplay.Quest
 
         private void Awake()
         {
+            Debug.Assert(questNameText != null, nameof(questNameText), this);
+            Debug.Assert(questLevelText != null, nameof(questLevelText), this);
+            Debug.Assert(slotCanvas != null, nameof(slotCanvas), this);
+            Debug.Assert(questLogPanel != null, nameof(questLogPanel), this);
             ResetSlotState();
         }
 
@@ -52,8 +56,8 @@ namespace Gameplay.Quest
         public void SetQuest(QuestSO quest)
         {
             currentQuest = quest;
-            if (questNameText != null) questNameText.text = quest.questName;
-            if (questLevelText != null) questLevelText.text = "Lv." + quest.lv;
+            questNameText.text = quest.questName;
+            questLevelText.text = "Lv." + quest.lv;
             ResetSlotState();
             gameObject.SetActive(true);
         }
@@ -71,7 +75,6 @@ namespace Gameplay.Quest
         /// <summary>恢复条目的正常显示状态。</summary>
         public void ResetSlotState()
         {
-            if (slotCanvas == null) return;
             slotCanvas.alpha = 1f;
             slotCanvas.interactable = true;
             slotCanvas.blocksRaycasts = true;
@@ -80,7 +83,6 @@ namespace Gameplay.Quest
         /// <summary>把条目置为已完成：降低透明度并禁用点击。</summary>
         public void SetCompletedState()
         {
-            if (slotCanvas == null) return;
             slotCanvas.alpha = .2f;
             slotCanvas.interactable = false;
             slotCanvas.blocksRaycasts = false;
@@ -89,7 +91,7 @@ namespace Gameplay.Quest
         /// <summary>条目点击回调：把当前任务交给详情面板处理。</summary>
         public void OnSlotClicked()
         {
-            if (questLogPanel != null && currentQuest != null)
+            if (currentQuest != null)
                 questLogPanel.HandleQuestClicked(currentQuest);
         }
     }

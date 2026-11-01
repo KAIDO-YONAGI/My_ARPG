@@ -17,6 +17,13 @@ namespace Gameplay.Shop
         [Tooltip("商店里的商品槽位，顺序与当前分类的商品列表一致。")]
         [SerializeField] private ShopSlot[] slots;
 
+        private void Awake()
+        {
+            Debug.Assert(slots != null, nameof(slots), this);
+            for (int i = 0; i < slots.Length; i++)
+                Debug.Assert(slots[i] != null, $"{nameof(slots)}[{i}]", this);
+        }
+
         /// <summary>附近没有店主时不允许打开商店。</summary>
         protected override bool CanOpen()
         {
@@ -26,8 +33,7 @@ namespace Gameplay.Shop
         /// <summary>打开后通知管理器进入商店状态，并立即刷新商品。</summary>
         protected override void OnOpen()
         {
-            var manager = ShopManager.Instance;
-            if (manager == null) return;
+            var manager = ShopManager.RequiredInstance;
 
             manager.OnCachedViewOpened();
             RefreshIfDirty();
@@ -48,25 +54,32 @@ namespace Gameplay.Shop
             if (!IsOpen || manager == null) return;
 
             var state = manager.CurrentState;
-            if (!state.AnyDirty) return;
+            if (!state.IsItemsDirty) return;
 
-            var items = state.CurrentItems.Value;
-            int slotCount = slots != null ? slots.Length : 0;
+            int slotCount = slots.Length;
             for (int i = 0; i < slotCount; i++)
             {
-                bool hasItem = i < items.Count && items[i] != null && items[i].item != null;
+                var item = i < state.CurrentItemCount ? state.GetItem(i) : null;
+                bool hasItem = item != null;
                 slots[i].gameObject.SetActive(hasItem);
                 if (hasItem)
-                    slots[i].Initialize(items[i].item, items[i].price);
+                    slots[i].Initialize(item, state.GetPrice(i));
             }
 
-            state.ClearDirty();
+            state.ClearItemsDirty();
         }
 
         /// <summary>关闭时通知管理器退出商店状态。</summary>
         protected override void OnClose()
         {
-            ShopManager.Instance?.OnCachedViewClosed();
+            var manager = ShopManager.Instance;
+            if (manager == null)
+            {
+                Debug.LogWarning("ShopManager 不可用，商店视图无法上报关闭。");
+                return;
+            }
+
+            manager.OnCachedViewClosed();
         }
     }
 }

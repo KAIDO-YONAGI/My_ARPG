@@ -1,5 +1,4 @@
 using Pipeline.SO;
-using UnityEngine;
 
 namespace Contracts
 {
@@ -11,7 +10,6 @@ namespace Contracts
     public interface IShopInteractable
     {
         bool IsShopOpen { get; }
-        Transform CurrentPortraitTarget { get; }
 
         void TryBuyItem(ItemSO item, int price);
         void SellItem(ItemSO item);

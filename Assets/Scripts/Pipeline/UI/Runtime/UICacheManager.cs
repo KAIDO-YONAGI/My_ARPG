@@ -71,7 +71,7 @@ namespace Pipeline.UI.Runtime
         private void OnEnable()
         {
             Instance = this;
-            cache?.Connect();
+            cache.Connect();
             if (canvasOpenedEvent != null)
                 canvasOpenedEvent.CanvasOpened += OnCanvasOpened;
         }
@@ -79,7 +79,7 @@ namespace Pipeline.UI.Runtime
         private void Update()
         {
             // 用不受时间缩放影响的时钟，暂停时也能按真实时间淘汰闲置界面。
-            cache?.Update(Time.unscaledTime);
+            cache.Update(Time.unscaledTime);
         }
 
         private void OnDisable()

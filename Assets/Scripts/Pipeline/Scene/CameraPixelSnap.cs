@@ -5,7 +5,7 @@ namespace Pipeline.Scene
     /// <summary>
     /// 2D 正交相机渲染像素对齐。
     ///
-    /// Cinemachine 可以继续平滑移动真实 Transform；渲染前仅修正 worldToCameraMatrix，
+    /// Cinemachine 可以继续平滑移动真实 Transform
     /// 把最终画面吸附到屏幕像素网格，避免直接修改 Transform 后与 Cinemachine 相互覆盖。
     /// </summary>
     [DefaultExecutionOrder(10000)]

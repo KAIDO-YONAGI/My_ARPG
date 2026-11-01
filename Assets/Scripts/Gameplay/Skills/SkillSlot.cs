@@ -55,6 +55,13 @@ namespace Gameplay.Skills
             stateRoot = root;
         }
 
+        private void Awake()
+        {
+            Debug.Assert(skillIcon != null, nameof(skillIcon), this);
+            Debug.Assert(skillLevelText != null, nameof(skillLevelText), this);
+            Debug.Assert(skillButton != null, nameof(skillButton), this);
+        }
+
         private void OnValidate()
         {
             if (skillSO != null)
@@ -63,15 +70,13 @@ namespace Gameplay.Skills
 
         private void OnEnable()
         {
-            if (skillButton != null)
-                skillButton.onClick.AddListener(TryUpgradeSkill);
+            skillButton.onClick.AddListener(TryUpgradeSkill);
             RefreshFromManager();
         }
 
         private void OnDisable()
         {
-            if (skillButton != null)
-                skillButton.onClick.RemoveListener(TryUpgradeSkill);
+            skillButton.onClick.RemoveListener(TryUpgradeSkill);
         }
 
         /// <summary>用管理器状态覆盖当前等级与解锁状态，并刷新显示。</summary>
@@ -86,7 +91,7 @@ namespace Gameplay.Skills
         public void RefreshFromManager()
         {
             if (skillSO == null || SkillTreeManager.Instance == null) return;
-            SkillTreeManager.SkillState state = SkillTreeManager.Instance.GetSkillState(
+            SkillTreeManager.SkillState state = SkillTreeManager.Instance.CurrentState.GetSkillState(
                 GetStateKey(), currentLevel, isUnlocked);
             RestoreState(state.Level, state.IsUnlocked);
         }
@@ -94,7 +99,7 @@ namespace Gameplay.Skills
         /// <summary>把图标、等级文本、按钮交互和颜色刷新为当前状态。</summary>
         private void UpdateUI()
         {
-            if (skillSO == null || skillIcon == null || skillButton == null || skillLevelText == null)
+            if (skillSO == null)
                 return;
 
             skillIcon.sprite = skillSO.skillIcon;
@@ -144,7 +149,7 @@ namespace Gameplay.Skills
         /// <summary>把当前状态写回管理器。</summary>
         private void SaveState()
         {
-            SkillTreeManager.Instance?.SaveSkillState(GetStateKey(), currentLevel, isUnlocked);
+            SkillTreeManager.RequiredInstance.SaveSkillState(GetStateKey(), currentLevel, isUnlocked);
         }
 
         /// <summary>

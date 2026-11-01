@@ -18,47 +18,44 @@ namespace Gameplay.Shop
         [SerializeField] private Button weaponButton;
         [SerializeField] private Button armorButton;
 
+        private void Awake()
+        {
+            Debug.Assert(itemButton != null, nameof(itemButton), this);
+            Debug.Assert(weaponButton != null, nameof(weaponButton), this);
+            Debug.Assert(armorButton != null, nameof(armorButton), this);
+        }
+
         private void Start()
         {
-            if (itemButton != null)
-                itemButton.onClick.AddListener(OpenItemShop);
-
-            if (weaponButton != null)
-                weaponButton.onClick.AddListener(OpenWeaponShop);
-
-            if (armorButton != null)
-                armorButton.onClick.AddListener(OpenArmorShop);
+            itemButton.onClick.AddListener(OpenItemShop);
+            weaponButton.onClick.AddListener(OpenWeaponShop);
+            armorButton.onClick.AddListener(OpenArmorShop);
         }
 
         /// <summary>切换到物品分类。</summary>
         public void OpenItemShop()
         {
-            ShopManager.Instance?.OpenItemShop();
+            ShopManager.RequiredInstance.OpenItemShop();
         }
 
         /// <summary>切换到武器分类。</summary>
         public void OpenWeaponShop()
         {
-            ShopManager.Instance?.OpenWeaponShop();
+            ShopManager.RequiredInstance.OpenWeaponShop();
         }
 
         /// <summary>切换到护甲分类。</summary>
         public void OpenArmorShop()
         {
-            ShopManager.Instance?.OpenArmorShop();
+            ShopManager.RequiredInstance.OpenArmorShop();
         }
 
         /// <summary>销毁时移除监听，防止按钮持有已销毁组件的委托。</summary>
         private void OnDestroy()
         {
-            if (itemButton != null)
-                itemButton.onClick.RemoveListener(OpenItemShop);
-
-            if (weaponButton != null)
-                weaponButton.onClick.RemoveListener(OpenWeaponShop);
-
-            if (armorButton != null)
-                armorButton.onClick.RemoveListener(OpenArmorShop);
+            itemButton.onClick.RemoveListener(OpenItemShop);
+            weaponButton.onClick.RemoveListener(OpenWeaponShop);
+            armorButton.onClick.RemoveListener(OpenArmorShop);
         }
     }
 }

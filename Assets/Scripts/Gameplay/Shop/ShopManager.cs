@@ -11,7 +11,7 @@ namespace Gameplay.Shop
 {
     /// <summary>
     /// 商店的持久状态管理器。保存当前店主、三个分类的商品列表和当前分类，
-    /// 界面由 <see cref="ShopCanvasView"/> 读取 <see cref="State"/> 刷新。
+    /// 界面由 <see cref="ShopCanvasView"/> 读取商品状态刷新。
     /// </summary>
     /// <remarks>
     /// 管理器不持有商品槽位或画布引用：买卖只发事件，显隐只请求界面缓存，
@@ -19,43 +19,60 @@ namespace Gameplay.Shop
     /// </remarks>
     public class ShopManager : YSingleton<ShopManager>, IShopInteractable
     {
-        /// <summary>商店运行状态：可变化的数值与各自的脏标记放在同一个结构体字段里。</summary>
         public sealed class State
         {
             /// <summary>当前进入范围的店主。</summary>
-            public DirtyValue<ShopKeeper> ActiveKeeper;
+            private ShopKeeper activeKeeper;
 
             /// <summary>商店界面是否打开。</summary>
-            public DirtyValue<bool> IsOpen;
+            private bool isOpen;
 
-            /// <summary>当前分类要显示的商品列表。</summary>
-            public DirtyValue<IReadOnlyList<ShopItems>> CurrentItems;
+            /// <summary>当前分类的商品列表及其脏标记。</summary>
+            private DirtyValue<IReadOnlyList<ShopItems>> currentItems;
+
+            /// <summary>当前进入范围的店主。</summary>
+            public ShopKeeper ActiveKeeper => activeKeeper;
+
+            /// <summary>商店界面是否打开。</summary>
+            public bool IsOpen => isOpen;
+
+            /// <summary>商品列表是否需要刷新。</summary>
+            public bool IsItemsDirty => currentItems.IsDirty;
+
+            /// <summary>当前分类的商品数量。</summary>
+            public int CurrentItemCount => currentItems.Value.Count;
+
+            /// <summary>按下标读取商品物品；越界返回 null。</summary>
+            public ItemSO GetItem(int index) =>
+                index >= 0 && index < CurrentItemCount ? currentItems.Value[index]?.item : null;
+
+            /// <summary>按下标读取商品价格；越界返回 0。</summary>
+            public int GetPrice(int index) =>
+                index >= 0 && index < CurrentItemCount ? currentItems.Value[index]?.price ?? 0 : 0;
 
             public State()
             {
-                CurrentItems = new DirtyValue<IReadOnlyList<ShopItems>>(
+                currentItems = new DirtyValue<IReadOnlyList<ShopItems>>(
                     System.Array.Empty<ShopItems>(), true);
             }
 
-            /// <summary>任一字段有变化时为 true。</summary>
-            public bool AnyDirty =>
-                ActiveKeeper.IsDirty || IsOpen.IsDirty || CurrentItems.IsDirty;
+            /// <summary>值未变但需要重画商品时单独置脏。</summary>
+            public void MarkItemsDirty() => currentItems.MarkDirty();
 
-            /// <summary>把全部字段标记为待刷新。</summary>
-            public void MarkAllDirty()
-            {
-                ActiveKeeper.MarkDirty();
-                IsOpen.MarkDirty();
-                CurrentItems.MarkDirty();
-            }
+            /// <summary>视图刷新完成后清除商品脏标记。</summary>
+            public void ClearItemsDirty() => currentItems.ClearMark();
 
-            /// <summary>视图读完后清除全部标记。</summary>
-            public void ClearDirty()
-            {
-                ActiveKeeper.ClearMark();
-                IsOpen.ClearMark();
-                CurrentItems.ClearMark();
-            }
+            /// <summary>写入当前店主。</summary>
+            internal void SetActiveKeeper(ShopKeeper keeper) => activeKeeper = keeper;
+
+            /// <summary>写入商店界面开关标记。</summary>
+            internal void SetIsOpen(bool value) => isOpen = value;
+
+            /// <summary>写入当前分类的商品列表并置脏。</summary>
+            internal void SetCurrentItems(IReadOnlyList<ShopItems> items) => currentItems.Set(items);
+
+            /// <summary>当前分类的商品列表。</summary>
+            internal IReadOnlyList<ShopItems> Items => currentItems.Value;
         }
 
         [Header("触发事件")]
@@ -78,23 +95,11 @@ namespace Gameplay.Shop
         /// <summary>商店运行状态，供视图读取。</summary>
         public State CurrentState => state;
 
-        /// <summary>店主用于展示立绘的相机目标；没有店主时为空。</summary>
-        public Transform CurrentPortraitTarget
-        {
-            get
-            {
-                ShopKeeper keeper = state.ActiveKeeper.Value;
-                return keeper != null ? keeper.PortraitTarget : null;
-            }
-        }
-
-        public bool IsShopOpen => state.IsOpen.Value;
+        /// <summary>商店界面是否打开。</summary>
+        public bool IsShopOpen => state.IsOpen;
 
         /// <summary>附近有店主时才允许打开商店界面。</summary>
-        public bool CanOpenFromView => state.ActiveKeeper.Value != null;
-
-        /// <summary>当前分类的商品列表；没有配置时返回空列表。</summary>
-        public IReadOnlyList<ShopItems> CurrentShopItems => state.CurrentItems.Value;
+        public bool CanOpenFromView => state.ActiveKeeper != null;
 
         /// <summary>商店的三个商品分类。</summary>
         private enum ShopCategory
@@ -135,22 +140,18 @@ namespace Gameplay.Shop
         /// <summary>店主进入范围：记录当前店主；商店若已打开则换用新店主的商品。</summary>
         private void OnKeeperEntered(ShopKeeper keeper)
         {
-            state.ActiveKeeper.Value = keeper;
-            if (state.IsOpen.Value)
-            {
+            state.SetActiveKeeper(keeper);
+            if (state.IsOpen)
                 LoadKeeperItems();
-                state.MarkAllDirty();
-            }
         }
 
         /// <summary>店主离开范围：清空当前店主，并关闭已经打开的商店。</summary>
         private void OnKeeperExited(ShopKeeper keeper)
         {
-            if (state.ActiveKeeper.Value != keeper) return;
-            state.ActiveKeeper.Value = null;
-            if (state.IsOpen.Value)
+            if (state.ActiveKeeper != keeper) return;
+            state.SetActiveKeeper(null);
+            if (state.IsOpen)
                 CloseShop();
-            state.MarkAllDirty();
         }
 
         /// <summary>按店主配置打开商店；界面缓存负责真正的实例创建和显示。</summary>
@@ -164,7 +165,14 @@ namespace Gameplay.Shop
             shopArmor = armor;
             currentCategory = ShopCategory.Items;
             PublishCurrentItems();
-            UICacheManager.Instance?.OpenCanvas(CanvasToToggle.Shop);
+            var cache = UICacheManager.Instance;
+            if (cache == null)
+            {
+                Debug.LogWarning("商店画布：UI 缓存不可用，无法打开。");
+                return;
+            }
+
+            cache.OpenCanvas(CanvasToToggle.Shop);
         }
 
         /// <summary>
@@ -173,15 +181,15 @@ namespace Gameplay.Shop
         /// </summary>
         public void CloseShop()
         {
-            if (state.IsOpen.Value)
+            if (state.IsOpen)
             {
                 if (UIManager.Instance != null)
                     UIManager.Instance.RequestCanvasClose(CanvasToToggle.Shop);
                 else
-                    UICacheManager.Instance?.CloseCanvas(CanvasToToggle.Shop);
+                    CloseShopCanvas();
             }
             else
-                UICacheManager.Instance?.CloseCanvas(CanvasToToggle.Shop);
+                CloseShopCanvas();
         }
 
         /// <summary>缓存界面打开后回调：重新读取店主商品并回到物品分类。</summary>
@@ -190,19 +198,19 @@ namespace Gameplay.Shop
             LoadKeeperItems();
             currentCategory = ShopCategory.Items;
             PublishCurrentItems();
-            state.IsOpen.Value = true;
+            state.SetIsOpen(true);
         }
 
         /// <summary>缓存界面关闭后回调：清除打开标记。</summary>
         public void OnCachedViewClosed()
         {
-            state.IsOpen.Value = false;
+            state.SetIsOpen(false);
         }
 
         /// <summary>从当前店主复制三个分类的商品列表；没有店主时保持原数据。</summary>
         private void LoadKeeperItems()
         {
-            ShopKeeper keeper = state.ActiveKeeper.Value;
+            ShopKeeper keeper = state.ActiveKeeper;
             if (keeper == null) return;
             shopItems = keeper.ShopItems;
             shopWeapon = keeper.ShopWeapon;
@@ -213,7 +221,7 @@ namespace Gameplay.Shop
         /// <summary>把当前分类的商品列表写进状态，并标记视图刷新。</summary>
         private void PublishCurrentItems()
         {
-            state.CurrentItems.Value = GetItems(currentCategory);
+            state.SetCurrentItems(GetItems(currentCategory));
         }
 
         /// <summary>取指定分类的商品列表；列表未配置时返回空列表。</summary>
@@ -229,11 +237,6 @@ namespace Gameplay.Shop
         }
 
         /// <summary>把全部状态标记为待刷新。</summary>
-        public void MarkDirty()
-        {
-            state.MarkAllDirty();
-        }
-
         /// <summary>购买一个商品：向背包系统发正数量请求，金币检查在背包侧完成。</summary>
         public void TryBuyItem(ItemSO item, int price)
         {
@@ -245,7 +248,7 @@ namespace Gameplay.Shop
         public void SellItem(ItemSO item)
         {
             if (item == null || InventoryUpdateRequest == null) return;
-            foreach (var slot in CurrentShopItems)
+            foreach (var slot in state.Items)
             {
                 if (slot != null && slot.item == item)
                 {
@@ -275,6 +278,19 @@ namespace Gameplay.Shop
         {
             currentCategory = ShopCategory.Armor;
             PublishCurrentItems();
+        }
+
+        /// <summary>请求界面缓存关闭商店画布；缓存缺失时只记录警告。</summary>
+        private static void CloseShopCanvas()
+        {
+            var cache = UICacheManager.Instance;
+            if (cache == null)
+            {
+                Debug.LogWarning("商店画布：UI 缓存不可用，无法通过界面关闭。");
+                return;
+            }
+
+            cache.CloseCanvas(CanvasToToggle.Shop);
         }
     }
 

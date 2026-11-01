@@ -38,22 +38,7 @@ namespace Pipeline.Scene
         [SerializeField] private Object[] objectsToUnableWhileMenuOrReset;
 
         /// <summary>当前已加载的内容场景组（不含常驻场景）</summary>
-        private readonly List<LoadedScene> currentScenes = new List<LoadedScene>();
-
-        private sealed class LoadedScene
-        {
-            public readonly GameSceneSO Asset;
-            public readonly UnityEngine.SceneManagement.Scene Instance;
-
-            public LoadedScene(GameSceneSO asset, UnityEngine.SceneManagement.Scene instance)
-            {
-                Asset = asset;
-                Instance = instance;
-            }
-        }
-
-        /// <summary>最近一次整组加载完成后的首个内容场景，供 GetCurrentScene/GetCurrentGameScene 回读</summary>
-        private GameSceneSO currentScene;
+        private readonly List<GameSceneSO> currentScenes = new List<GameSceneSO>();
 
         /// <summary>已加载的场景对象</summary>
         private UnityEngine.SceneManagement.Scene loadedScene;
@@ -77,7 +62,7 @@ namespace Pipeline.Scene
         // 供存档系统在切场前读取当前场景 SO。
         public GameSceneSO GetCurrentGameScene()
         {
-            return currentScenes.Count > 0 ? currentScenes[0].Asset : null;
+            return currentScenes.Count > 0 ? currentScenes[0] : null;
         }
 
         /// <summary>
@@ -86,10 +71,7 @@ namespace Pipeline.Scene
         /// </summary>
         public List<GameSceneSO> GetCurrentScenes()
         {
-            var scenes = new List<GameSceneSO>(currentScenes.Count);
-            foreach (LoadedScene scene in currentScenes)
-                scenes.Add(scene.Asset);
-            return scenes;
+            return new List<GameSceneSO>(currentScenes);
         }
 
         /// <summary>
@@ -214,38 +196,25 @@ namespace Pipeline.Scene
 
             for (int i = currentScenes.Count - 1; i >= 0; i--)
             {
-                LoadedScene scene = currentScenes[i];
-                UnityEngine.SceneManagement.Scene loaded = scene.Instance;
+                GameSceneSO scene = currentScenes[i];
+                if (scene == null || string.IsNullOrEmpty(scene.sceneName))
+                    continue;
 
-                if (PersistentSceneRegistry.IsPersistent(scene.Asset) ||
-                    PersistentSceneRegistry.IsPersistent(loaded.name))
+                if (PersistentSceneRegistry.IsPersistent(scene))
                 {
 #if UNITY_EDITOR
                     Debug.LogWarning(
-                        $"[SceneChanger] 已跳过卸载注册的常驻场景“{loaded.name}”。");
+                        $"[SceneChanger] 已跳过卸载注册的常驻场景“{scene.sceneName}”。");
 #endif
-                    currentScenes.RemoveAt(i);
                     continue;
                 }
 
+                UnityEngine.SceneManagement.Scene loaded = SceneManager.GetSceneByName(scene.sceneName);
                 if (loaded.IsValid() && loaded.isLoaded)
                     yield return SceneManager.UnloadSceneAsync(loaded);
-
-                if (loaded.IsValid() && loaded.isLoaded)
-                {
-#if UNITY_EDITOR
-                    Debug.LogError($"[SceneChanger] 场景“{loaded.name}”仍未卸载，已中止场景切换。");
-#endif
-                    if (targetFade && !isInitialScene)
-                        PlayLoadingAnimation("FadeOut");
-                    AllowInput();
-                    TimeManager.Instance.ForceResumeGame();
-                    isLoading = false;
-                    yield break;
-                }
-                currentScenes.RemoveAt(i);
             }
 
+            currentScenes.Clear();
             yield return LoadScenesRoutine(targetScenes, targetPosition, targetFade);
         }
 
@@ -280,28 +249,12 @@ namespace Pipeline.Scene
                 else if (scene.sceneType == SceneType.Location)
                     SetObjects(true);
 
-                UnityEngine.SceneManagement.Scene loaded = default;
-                UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, LoadSceneMode> onSceneLoaded =
-                    (instance, mode) =>
-                    {
-                        if (mode == LoadSceneMode.Additive && instance.name == scene.sceneName)
-                            loaded = instance;
-                    };
+                AsyncOperation loadOperation = SceneManager.LoadSceneAsync(scene.sceneName, LoadSceneMode.Additive);
+                while (loadOperation != null && !loadOperation.isDone)
+                    yield return null;
 
-                // 保存本次加载通知中的实际实例，避免同名的未加载条目干扰查找。
-                SceneManager.sceneLoaded += onSceneLoaded;
-                try
-                {
-                    AsyncOperation loadOperation =
-                        SceneManager.LoadSceneAsync(scene.sceneName, LoadSceneMode.Additive);
-                    while (loadOperation != null && !loadOperation.isDone)
-                        yield return null;
-                }
-                finally
-                {
-                    SceneManager.sceneLoaded -= onSceneLoaded;
-                }
-
+                // 场景组按顺序加载，等待完成后按配置名称取得场景。
+                UnityEngine.SceneManagement.Scene loaded = SceneManager.GetSceneByName(scene.sceneName);
                 if (!loaded.IsValid() || !loaded.isLoaded)
                 {
 #if UNITY_EDITOR
@@ -315,7 +268,7 @@ namespace Pipeline.Scene
                     firstLoaded = scene;
                     loadedScene = loaded;
                 }
-                currentScenes.Add(new LoadedScene(scene, loaded));
+                currentScenes.Add(scene);
             }
             SetPlayerPostion(targetPosition);
             OnLoadCompleted(firstLoaded, targetFade);
@@ -333,23 +286,20 @@ namespace Pipeline.Scene
         }
 
         /// <summary>
-        /// 场景组加载完成回调
-        /// 更新当前场景引用，播放淡出动画
+        /// 场景组加载完成后播放淡出动画、广播通知，并恢复玩家输入与时间。
         /// </summary>
         /// <param name="loadedTarget">本次加载的场景组首个场景</param>
         /// <param name="targetFade">本次加载是否需要播放淡出动画</param>
         private void OnLoadCompleted(GameSceneSO loadedTarget, bool targetFade)
         {
-            // 不变量：currentScene 赋值必须在 sceneLoadedEvent 广播之前——
-            // 订阅方（画布管理器/SaveDataManager/MenuSceneCanvasHider 等）经 GetCurrentGameScene() 回读
-            currentScene = loadedTarget;
+            // 广播前已更新场景组与主场景引用，订阅方可直接回读当前场景。
             if (targetFade && !isInitialScene)
             {
                 PlayLoadingAnimation("FadeOut");
             }
 
             isInitialScene = false;
-            sceneLoadedEvent?.RaiseSceneLoadedEvent(currentScene);
+            sceneLoadedEvent?.RaiseSceneLoadedEvent(loadedTarget);
             AllowInput();
             TimeManager.Instance.ForceResumeGame();
             isLoading = false; // 全部完成后才解锁，允许下一次加载请求

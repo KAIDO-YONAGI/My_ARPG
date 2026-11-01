@@ -9,7 +9,7 @@ namespace Gameplay.Dialog
 {
     /// <summary>
     /// 对话系统的持久状态管理器。负责对话条件判定、拒绝对话、逐行推进和选项分支，
-    /// 界面由 <see cref="DialogCanvasView"/> 读取 <see cref="State"/> 刷新。
+    /// 界面由 <see cref="DialogCanvasView"/> 读取只读状态刷新。
     /// </summary>
     /// <remarks>
     /// 管理器不持有任何 UI 控件引用：打开对话时通过 <see cref="UICacheManager"/> 请求显示画布，
@@ -17,36 +17,52 @@ namespace Gameplay.Dialog
     /// </remarks>
     public class DialogManager : YSingleton<DialogManager>
     {
-        /// <summary>对话运行状态：可变化的数值与各自的脏标记放在同一个结构体字段里。</summary>
         public sealed class State
         {
-            /// <summary>当前已显示到第几行；界面用 <c>CurrentLineIndex - 1</c> 取当前行。</summary>
-            public DirtyValue<int> CurrentLineIndex;
+            /// <summary>当前已显示到第几行及其脏标记。</summary>
+            private DirtyValue<int> currentLineIndex;
+
+            /// <summary>当前对话资产及其脏标记。</summary>
+            private DirtyValue<DialogSO> currentDialog;
+
+            /// <summary>是否正在显示选项及其脏标记。</summary>
+            private DirtyValue<bool> showingChoices;
+
+            /// <summary>当前已显示到第几行。</summary>
+            public int CurrentLineIndex => currentLineIndex.Value;
 
             /// <summary>当前对话资产。</summary>
-            public DirtyValue<DialogSO> CurrentDialog;
+            public DialogSO CurrentDialog => currentDialog.Value;
 
             /// <summary>是否正在显示选项。</summary>
-            public DirtyValue<bool> ShowingChoices;
+            public bool ShowingChoices => showingChoices.Value;
 
-            /// <summary>任一字段有变化时为 true。</summary>
-            public bool AnyDirty =>
-                CurrentLineIndex.IsDirty || CurrentDialog.IsDirty || ShowingChoices.IsDirty;
+            /// <summary>任一对话字段是否需要刷新。</summary>
+            public bool IsDirty => currentLineIndex.IsDirty || currentDialog.IsDirty || showingChoices.IsDirty;
 
-            /// <summary>把全部字段标记为待刷新。</summary>
-            public void MarkAllDirty()
+            /// <summary>写入当前行号并置脏。</summary>
+            internal void SetCurrentLineIndex(int value) => currentLineIndex.Set(value);
+
+            /// <summary>写入当前对话并置脏。</summary>
+            internal void SetCurrentDialog(DialogSO value) => currentDialog.Set(value);
+
+            /// <summary>写入选项显隐并置脏。</summary>
+            internal void SetShowingChoices(bool value) => showingChoices.Set(value);
+
+            /// <summary>把全部对话字段标记为待刷新。</summary>
+            internal void MarkAllDirty()
             {
-                CurrentLineIndex.MarkDirty();
-                CurrentDialog.MarkDirty();
-                ShowingChoices.MarkDirty();
+                currentLineIndex.MarkDirty();
+                currentDialog.MarkDirty();
+                showingChoices.MarkDirty();
             }
 
-            /// <summary>视图读完后清除全部标记。</summary>
+            /// <summary>视图刷新完成后清除全部脏标记。</summary>
             public void ClearDirty()
             {
-                CurrentLineIndex.ClearMark();
-                CurrentDialog.ClearMark();
-                ShowingChoices.ClearMark();
+                currentLineIndex.ClearMark();
+                currentDialog.ClearMark();
+                showingChoices.ClearMark();
             }
         }
 
@@ -59,15 +75,11 @@ namespace Gameplay.Dialog
         /// <summary>对话画布是否处于打开状态，供外部系统查询。</summary>
         public bool isDialogActive;
 
-        /// <summary>当前对话状态，供视图读取。</summary>
+        /// <summary>供视图按需读取的同一份只读状态对象。</summary>
         public State CurrentState => state;
 
         /// <summary>是否有活动对话；没有对话时界面拒绝打开。</summary>
-        public bool HasActiveDialog => state.CurrentDialog.Value != null;
-
-        public DialogSO CurrentDialog => state.CurrentDialog.Value;
-        public int CurrentLineIndex => state.CurrentLineIndex.Value;
-        public bool IsShowingChoices => state.ShowingChoices.Value;
+        public bool HasActiveDialog => state.CurrentDialog != null;
 
         private void OnEnable()
         {
@@ -94,33 +106,33 @@ namespace Gameplay.Dialog
         {
             if (state)
             {
-                if (this.state.CurrentDialog.Value != null)
-                    UICacheManager.Instance?.OpenCanvas(CanvasToToggle.Dialog);
+                if (this.state.CurrentDialog != null)
+                    TryOpenDialogCanvas();
                 return;
             }
 
-            UICacheManager.Instance?.CloseCanvas(CanvasToToggle.Dialog);
+            CloseDialogCanvas();
         }
 
         /// <summary>缓存界面打开后回调：标记对话画布已激活并刷新状态。</summary>
         public void OnCachedViewOpened()
         {
             isDialogActive = true;
-            state.MarkAllDirty();
+            MarkAllDialogFieldsDirty();
         }
 
         /// <summary>缓存界面关闭后回调：清除激活标记并刷新状态。</summary>
         public void OnCachedViewClosed()
         {
             isDialogActive = false;
-            state.MarkAllDirty();
+            MarkAllDialogFieldsDirty();
         }
 
         /// <summary>兼容旧调用：收起选项按钮。</summary>
         public void DisableButtons()
         {
-            if (!state.ShowingChoices.Value) return;
-            state.ShowingChoices.Set(false);
+            if (!state.ShowingChoices) return;
+            state.SetShowingChoices(false);
         }
 
         /// <summary>
@@ -131,11 +143,11 @@ namespace Gameplay.Dialog
         {
             if (dialog == null || !MatchConditionsToStartDialog(dialog)) return;
 
-            state.CurrentDialog.Set(dialog);
-            state.CurrentLineIndex.Set(0);
-            state.ShowingChoices.Set(false);
+            state.SetCurrentDialog(dialog);
+            state.SetCurrentLineIndex(0);
+            state.SetShowingChoices(false);
 
-            if (UICacheManager.Instance == null || !UICacheManager.Instance.OpenCanvas(CanvasToToggle.Dialog))
+            if (!TryOpenDialogCanvas())
             {
                 ClearCurrentDialog();
                 return;
@@ -150,15 +162,15 @@ namespace Gameplay.Dialog
         /// </summary>
         public void AdvanceDialog()
         {
-            if (state.CurrentDialog.Value == null || state.ShowingChoices.Value) return;
+            if (state.CurrentDialog == null || state.ShowingChoices) return;
 
-            if (state.CurrentLineIndex.Value < state.CurrentDialog.Value.dialogLines.Length)
+            if (state.CurrentLineIndex < state.CurrentDialog.dialogLines.Length)
             {
                 ShowDialog();
                 return;
             }
 
-            if (state.CurrentDialog.Value.nextDialogOptions.Length == 0)
+            if (state.CurrentDialog.nextDialogOptions.Length == 0)
             {
                 EndDialog();
                 return;
@@ -170,11 +182,11 @@ namespace Gameplay.Dialog
         /// <summary>选择第 <paramref name="index"/> 个选项；只有选项状态且下标合法时才生效。</summary>
         public void SelectOption(int index)
         {
-            if (state.CurrentDialog.Value == null || !state.ShowingChoices.Value ||
-                index < 0 || index >= state.CurrentDialog.Value.nextDialogOptions.Length)
+            if (state.CurrentDialog == null || !state.ShowingChoices ||
+                index < 0 || index >= state.CurrentDialog.nextDialogOptions.Length)
                 return;
 
-            DialogSO nextDialog = state.CurrentDialog.Value.nextDialogOptions[index].nextDialogNode;
+            DialogSO nextDialog = state.CurrentDialog.nextDialogOptions[index].nextDialogNode;
             if (nextDialog != null)
                 StartDialog(nextDialog);
             else
@@ -186,7 +198,7 @@ namespace Gameplay.Dialog
         /// </summary>
         public void EndDialog()
         {
-            DialogSO dialog = state.CurrentDialog.Value;
+            DialogSO dialog = state.CurrentDialog;
             if (dialog != null)
             {
                 if (ConversationHistoryManager.Instance != null)
@@ -197,14 +209,14 @@ namespace Gameplay.Dialog
                     ConversationHistoryManager.Instance.RecordDialogHasChated(dialog.parentDialog);
             }
 
-            UICacheManager.Instance?.CloseCanvas(CanvasToToggle.Dialog);
+            CloseDialogCanvas();
             ClearCurrentDialog();
         }
 
         /// <summary>强制结束对话：不记录历史，用于切场景或外部中断。</summary>
         public void ForceEndDialog()
         {
-            UICacheManager.Instance?.CloseCanvas(CanvasToToggle.Dialog);
+            CloseDialogCanvas();
             ClearCurrentDialog();
         }
 
@@ -217,9 +229,9 @@ namespace Gameplay.Dialog
         /// <summary>清空当前对话与行号，并标记界面刷新。</summary>
         private void ClearCurrentDialog()
         {
-            state.CurrentDialog.Set(null);
-            state.CurrentLineIndex.Set(0);
-            state.ShowingChoices.Set(false);
+            state.SetCurrentDialog(null);
+            state.SetCurrentLineIndex(0);
+            state.SetShowingChoices(false);
         }
 
         /// <summary>
@@ -283,11 +295,11 @@ namespace Gameplay.Dialog
         /// <summary>进入拒绝对话：重置行号并打开画布，打不开时回滚。</summary>
         private void StartRefuseDialog(RefuseDialogSO refuse)
         {
-            state.CurrentDialog.Set(refuse);
-            state.CurrentLineIndex.Set(0);
-            state.ShowingChoices.Set(false);
+            state.SetCurrentDialog(refuse);
+            state.SetCurrentLineIndex(0);
+            state.SetShowingChoices(false);
 
-            if (UICacheManager.Instance == null || !UICacheManager.Instance.OpenCanvas(CanvasToToggle.Dialog))
+            if (!TryOpenDialogCanvas())
             {
                 ClearCurrentDialog();
                 return;
@@ -299,7 +311,7 @@ namespace Gameplay.Dialog
         /// <summary>切换到选项状态，等待玩家点击。</summary>
         private void ShowChoices()
         {
-            state.ShowingChoices.Set(true);
+            state.SetShowingChoices(true);
         }
 
         /// <summary>
@@ -308,19 +320,51 @@ namespace Gameplay.Dialog
         /// </summary>
         private void ShowDialog()
         {
-            DialogSO dialog = state.CurrentDialog.Value;
+            DialogSO dialog = state.CurrentDialog;
             if (dialog == null || dialog.dialogLines.Length == 0)
             {
                 EndDialog();
                 return;
             }
 
-            if (state.CurrentLineIndex.Value < 0 ||
-                state.CurrentLineIndex.Value >= dialog.dialogLines.Length)
+            if (state.CurrentLineIndex < 0 ||
+                state.CurrentLineIndex >= dialog.dialogLines.Length)
                 return;
 
-            state.CurrentLineIndex.Set(state.CurrentLineIndex.Value + 1);
-            state.ShowingChoices.Set(false);
+            state.SetCurrentLineIndex(state.CurrentLineIndex + 1);
+            state.SetShowingChoices(false);
+        }
+
+        /// <summary>把对话状态的全部字段标记为待刷新。</summary>
+        private void MarkAllDialogFieldsDirty()
+        {
+            state.MarkAllDirty();
+        }
+
+        /// <summary>请求界面缓存打开对话画布；缓存缺失时返回 false。</summary>
+        private static bool TryOpenDialogCanvas()
+        {
+            var cache = UICacheManager.Instance;
+            if (cache == null)
+            {
+                Debug.LogWarning("对话画布：UI 缓存不可用，无法打开。");
+                return false;
+            }
+
+            return cache.OpenCanvas(CanvasToToggle.Dialog);
+        }
+
+        /// <summary>请求界面缓存关闭对话画布；缓存缺失时只记录警告。</summary>
+        private static void CloseDialogCanvas()
+        {
+            var cache = UICacheManager.Instance;
+            if (cache == null)
+            {
+                Debug.LogWarning("对话画布：UI 缓存不可用，无法通过界面关闭。");
+                return;
+            }
+
+            cache.CloseCanvas(CanvasToToggle.Dialog);
         }
     }
 }

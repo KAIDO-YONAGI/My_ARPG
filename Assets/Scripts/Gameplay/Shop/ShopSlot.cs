@@ -30,6 +30,14 @@ namespace Gameplay.Shop
         [SerializeField] private TMP_Text priceText;
         [SerializeField] private Image itemImage;
 
+        private void Awake()
+        {
+            Debug.Assert(shopInfoPanel != null, nameof(shopInfoPanel), this);
+            Debug.Assert(itemNameText != null, nameof(itemNameText), this);
+            Debug.Assert(priceText != null, nameof(priceText), this);
+            Debug.Assert(itemImage != null, nameof(itemImage), this);
+        }
+
         /// <summary>当前槽位的物品；供旧的出售流程查询。</summary>
         public ItemSO GetItemSO()
         {
@@ -47,35 +55,34 @@ namespace Gameplay.Shop
         {
             this.item = item;
             this.price = price;
-            if (itemNameText != null) itemNameText.text = item != null ? item.itemName : string.Empty;
-            if (itemImage != null) itemImage.sprite = item != null ? item.icon : null;
-            if (priceText != null) priceText.text = price.ToString();
+            itemNameText.text = item != null ? item.itemName : string.Empty;
+            itemImage.sprite = item != null ? item.icon : null;
+            priceText.text = price.ToString();
         }
 
         /// <summary>购买按钮回调；实际扣款与入包由管理器处理。</summary>
         public void OnBuyButtonClick()
         {
-            ShopManager.Instance?.TryBuyItem(item, price);
+            ShopManager.RequiredInstance.TryBuyItem(item, price);
         }
 
         /// <summary>鼠标进入：有商品时显示详情。</summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (item == null || shopInfoPanel == null) return;
+            if (item == null) return;
             shopInfoPanel.ShowItemInfo(item);
         }
 
         /// <summary>鼠标离开：隐藏详情。</summary>
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (shopInfoPanel != null)
-                shopInfoPanel.HideItemInfo();
+            shopInfoPanel.HideItemInfo();
         }
 
         /// <summary>鼠标移动：让详情面板跟随指针。</summary>
         public void OnPointerMove(PointerEventData eventData)
         {
-            if (item == null || shopInfoPanel == null) return;
+            if (item == null) return;
             shopInfoPanel.FollowMouse();
         }
     }

@@ -38,6 +38,20 @@ namespace Gameplay.Quest
         [Tooltip("没有任务时显示的提示文字区域。")]
         [SerializeField] private CanvasGroup promptCanvasGroup;
 
+        private void Awake()
+        {
+            Debug.Assert(questLogPanel != null, nameof(questLogPanel), this);
+            Debug.Assert(questLogSlots != null, nameof(questLogSlots), this);
+            Debug.Assert(acceptCanvasGroup != null, nameof(acceptCanvasGroup), this);
+            Debug.Assert(declineCanvasGroup != null, nameof(declineCanvasGroup), this);
+            Debug.Assert(completeCanvasGroup != null, nameof(completeCanvasGroup), this);
+            Debug.Assert(detailsCanvasGroup != null, nameof(detailsCanvasGroup), this);
+            Debug.Assert(promptCanvasGroup != null, nameof(promptCanvasGroup), this);
+
+            for (int i = 0; i < questLogSlots.Length; i++)
+                Debug.Assert(questLogSlots[i] != null, $"{nameof(questLogSlots)}[{i}]", this);
+        }
+
         /// <summary>只有任务板数据已经加载时才允许打开。</summary>
         protected override bool CanOpen()
         {
@@ -47,7 +61,7 @@ namespace Gameplay.Quest
         /// <summary>打开后通知管理器进入面板状态，并立即拉取一次最新数据。</summary>
         protected override void OnOpen()
         {
-            QuestManager.Instance?.OnCachedViewOpened();
+            QuestManager.RequiredInstance.OnCachedViewOpened();
             RefreshIfDirty();
         }
 
@@ -68,45 +82,42 @@ namespace Gameplay.Quest
             var state = manager.CurrentState;
             if (!state.AnyDirty) return;
 
-            var quests = state.BoardQuests.Value;
-            int questCount = quests != null ? quests.Count : 0;
+            int questCount = state.BoardQuestCount;
             // 列表或任务完成态变化时才填充条目，切换选择只刷新右侧详情。
-            if (state.BoardQuests.IsDirty)
+            if (state.IsBoardQuestsDirty)
             {
-                int slotCount = questLogSlots != null ? questLogSlots.Length : 0;
+                int slotCount = questLogSlots.Length;
                 for (int i = 0; i < slotCount; i++)
                 {
-                    bool hasQuest = i < questCount && quests[i] != null;
+                    QuestSO quest = i < questCount ? state.GetBoardQuest(i) : null;
+                    bool hasQuest = quest != null;
                     if (!hasQuest)
                     {
                         questLogSlots[i].SetQuestActive(false);
                         continue;
                     }
 
-                    QuestSO quest = quests[i];
                     questLogSlots[i].SetQuest(quest);
                     if (manager.GetQuestStateFromProgress(quest) == QuestState.Completed)
                         questLogSlots[i].SetCompletedState();
                 }
 
-                bool showNoQuests = questCount == 0 || manager.IsAllQuestsCompleted(quests);
+                bool showNoQuests = questCount == 0 || manager.IsAllQuestsCompleted();
                 SetCanvasState(detailsCanvasGroup, !showNoQuests);
                 SetCanvasState(promptCanvasGroup, showNoQuests);
             }
 
-            if (state.BoardQuests.IsDirty || state.CurrentQuest.IsDirty || state.CurrentQuestState.IsDirty)
-                RefreshDetails(manager);
+            if (state.IsBoardQuestsDirty || state.IsCurrentQuestDirty ||
+                state.IsCurrentQuestStateDirty)
+                RefreshDetails(manager, state.CurrentQuest, state.CurrentQuestState);
 
             state.ClearDirty();
         }
 
         /// <summary>刷新选中任务的详情和操作按钮；同一任务只重绘目标进度。</summary>
-        private void RefreshDetails(QuestManager manager)
+        private void RefreshDetails(QuestManager manager, QuestSO selectedQuest, QuestState questState)
         {
-            var state = manager.CurrentState;
-            var selectedQuest = state.CurrentQuest.Value;
-            questLogPanel?.RefreshFromManager(selectedQuest);
-            QuestState questState = state.CurrentQuestState.Value;
+            questLogPanel.RefreshFromManager(selectedQuest);
 
             // 接取按钮只在任务未接取、或玩家拒绝后重新显示。
             SetCanvasState(acceptCanvasGroup,
@@ -127,7 +138,6 @@ namespace Gameplay.Quest
         /// <summary>统一设置 CanvasGroup 的透明度、射线阻挡和交互状态。</summary>
         private static void SetCanvasState(CanvasGroup group, bool state)
         {
-            if (group == null) return;
             group.alpha = state ? 1 : 0;
             group.blocksRaycasts = state;
             group.interactable = state;
@@ -136,7 +146,14 @@ namespace Gameplay.Quest
         /// <summary>关闭时通知管理器退出面板状态，下次打开重新拉取数据。</summary>
         protected override void OnClose()
         {
-            QuestManager.Instance?.OnCachedViewClosed();
+            var manager = QuestManager.Instance;
+            if (manager == null)
+            {
+                Debug.LogWarning("QuestManager 不可用，任务视图无法上报关闭。");
+                return;
+            }
+
+            manager.OnCachedViewClosed();
         }
     }
 }
