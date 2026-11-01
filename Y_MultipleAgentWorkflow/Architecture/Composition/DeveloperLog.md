@@ -3,6 +3,14 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 缓存打开前置 CanOpen 检查
+
+`UIViewCache` 在实例化前检查预制体或已有实例的 `CanOpen`；未满足业务条件时不触发界面 `Awake`，通过检查后仍由 `Open` 执行打开期回调。复核并更新 §2.7 生命周期说明。Shop、Dialog、Quest、Stats 的 `CanOpen` 均为只读门槛。Prefab 槽位引用与 YAML 文件 ID 静态检查通过，`git diff --check` 通过；EditMode 未运行，因为当前工程已有 Unity Editor 打开，项目验证规则禁止并行启动批处理 Editor。维护计数 `4/5 -> 5/5`，Guide 复核后清零为 `0/5`。
+
+## 2026-11-01 区分可选与必需的单例访问
+
+`YSingleton<T>.Instance` 保留可空访问语义，新增 `RequiredInstance` 供必需依赖使用；未注册时抛出明确异常。缓存业务视图和槽位的必需依赖改用该入口。维护计数更新为 `3/5 -> 4/5`。
+
 ## 2026-10-31 面板迁出后复核单例与画布契约
 
 - §2.6：`ICanvasManager` 实现者 9 → 6，`DialogManager`、`QuestManager`、`ShopManager` 与 `SkillTreeManager` 已迁出。

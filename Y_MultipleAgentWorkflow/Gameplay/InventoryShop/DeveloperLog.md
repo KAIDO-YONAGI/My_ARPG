@@ -3,6 +3,18 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 商店无效槽位与打开门槛
+
+`ShopCanvas.prefab` 移除误挂在 5 个属性文本上的 `ShopSlot` 组件，商品槽数组保留 8 个配置有效的嵌套槽位。复核 §2.5 与 §2.6，商店仍在 `CanOpen` 通过并进入 `OnOpen` 后通知管理器装载商品，无需改动业务 Guide。槽位引用与 YAML 文件 ID 静态检查通过，`git diff --check` 通过；EditMode 未运行，因为当前工程已有 Unity Editor 打开，项目验证规则禁止并行启动批处理 Editor。维护计数 `4/5 -> 5/5`，Guide 复核无变更后清零为 `0/5`。
+
+## 2026-11-01 背包与商店视图直接查询 State
+
+背包与快捷栏按索引读取金币和槽位，商店按索引读取商品与价格；脏标记操作由对应 `State` 提供。刷新不复制集合或创建快照。维护计数更新为 `3/5 -> 4/5`。
+
+## 2026-11-01 背包与商店改用只读快照
+
+`InventoryManager` 将金币、快捷栏和背包分开提供版本快照，集合使用只读副本；`ShopManager` 向画布提供商品快照。视图完成对应区域绘制后按版本确认，金币变化不会刷新快捷栏槽位。维护计数更新为 `2/5 -> 3/5`。
+
 ## 2026-10-31 商店与背包界面迁入缓存预制体
 
 - `ShopManager` 不再实现 `ICanvasManager`，改由 `ShopCanvasView`（`CanOpenFromView` 判店主）承接界面；`BackpackCanvasManager` 仍保留 `ICanvasManager` 用于背包画布。

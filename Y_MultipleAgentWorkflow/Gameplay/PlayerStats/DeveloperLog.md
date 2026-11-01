@@ -3,6 +3,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 数值视图显式获取必需服务
+
+`HealthView`、`ExperiencePanelView` 与 `StatsCanvasView` 通过 `StatsService.RequiredInstance` 获取必需的数值服务；可选依赖仍使用可空的 `Instance`。维护计数更新为 `3/5 -> 4/5`。
+
 ## 2026-10-31 属性面板登记路径更正
 
 - §2.10：属性面板的登记位置从 `UIManager.cachedViewPrefabs` 改为 `UICacheManager.views`（`prefab + anchor`）。

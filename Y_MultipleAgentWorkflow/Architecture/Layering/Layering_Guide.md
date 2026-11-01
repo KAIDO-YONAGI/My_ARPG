@@ -2,7 +2,7 @@
 
 文档 ID：`ARCH-LAYERING-GUIDE`
 状态：`Active`
-最后更新：`2026-10-31`
+最后更新：`2026-11-01`
 权威范围：`Contracts`、`Pipeline`、`Gameplay` 三层目录的含义、跨层依赖方向、命名空间与程序集边界、唯一写入口与只读接口的判定标准。各玩法域的内部实现归对应玩法域的 Guide，存档格式与场景流程细节由各自文档负责。
 
 ## 1. 触发线索
@@ -33,7 +33,7 @@
 | `Pipeline` | 59 | 引擎级基建：场景切换、寻路、对象池、UI 系统基建、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
 | `Gameplay` | 62 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
 
-`Contracts` 的 12 个文件全部声明 `namespace Contracts`。`MyEnums.cs` 提供 `PlayerState` `EnemyState` `SceneType` `PersistentType` `AStarNodeType` `NPCState` `QuestState` `CanvasToToggle` `SaveType` `SaveLoadPanelType` 十个顶层枚举，引用时写 `using Contracts;` 后直接用枚举名。缓存界面的基类 `CachedUIView`、`CachedCanvasView`，管理器与视图共享的 `DirtyValue<T>`，以及资产基类 `GuidSO` 都在这一层。
+`Contracts` 的 12 个文件全部声明 `namespace Contracts`。`MyEnums.cs` 提供 `PlayerState` `EnemyState` `SceneType` `PersistentType` `AStarNodeType` `NPCState` `QuestState` `CanvasToToggle` `SaveType` `SaveLoadPanelType` 十个顶层枚举，引用时写 `using Contracts;` 后直接用枚举名。缓存界面的基类 `CachedUIView`、`CachedCanvasView`，管理器内部用于保存值与脏标记的 `DirtyValue<T>`，以及资产基类 `GuidSO` 都在这一层。
 
 ### 2.2 跨层依赖方向
 
@@ -60,7 +60,7 @@
 | Controller | `ExperienceController` `HealthController` `StatsCanvasController` `PlayerDamageController` | `Gameplay.Player.Controllers` | 前三个纯 C#，由 View 托管 `new`；`PlayerDamageController` 挂场景 |
 | View | `ExperiencePanelView` `HealthView` `StatsCanvasView` | `Gameplay.Player.Views` | MonoBehaviour，不挂单例；属性面板继承契约层的 `CachedUIView` |
 
-另外五个域的"数据 / 界面"配对：`DialogManager` → `DialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`（常驻快捷栏另由 `HotbarCanvasView` 承担）、`SkillTreeManager` → `SkillsCanvasView`。视图统一继承 `Contracts.CachedCanvasView`，由 `UICacheManager` 按预制体懒创建；管理器向视图暴露 `State` 与状态查询，视图自行拉取刷新，二者之间没有控件级引用。
+另外五个域的"数据 / 界面"配对：`DialogManager` → `DialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`（常驻快捷栏另由 `HotbarCanvasView` 承担）、`SkillTreeManager` → `SkillsCanvasView`。视图统一继承 `Contracts.CachedCanvasView`，由 `UICacheManager` 按预制体懒创建；管理器通过稳定的 `CurrentState` 对象提供字段或索引只读查询，状态集合不直接暴露。视图按脏标记按需读取并在绘制后通过 State 方法清理标记，不创建刷新快照或复制集合，二者之间没有控件级引用。
 
 `Player` 相关产品代码文件 18 个，全部带命名空间，按层分布为 `Gameplay.Player` 7 个、`Gameplay.Player.Controllers` 4 个、`Gameplay.Player.Models` 3 个、`Gameplay.Player.Views` 3 个、`Gameplay.Player.Services` 1 个。`Arrow` `PlayerAnimationEventRelay` `PlayerBow` `PlayerCombat` `PlayerMovement` `ShiftEquipment` 这 6 个类型同样在 `Gameplay.Player` 里，移动、战斗、弓箭这条线是整体 Manager 形态。12 个带命名空间的类型中含 `PlayerLocator`，命名空间为 `Gameplay.Player`，是存档域专用的坐标查询单例，不归属上述四层。
 
@@ -122,7 +122,7 @@
 
 ### 2.7 边界测试
 
-编辑器侧测试共 6 个文件、合计 60 项用例：
+编辑器侧测试共 6 个文件、合计 61 项用例：
 
 | 文件 | 用例数 | 守的边界 |
 |---|---|---|
@@ -131,7 +131,7 @@
 | `AStarOpenHeapTests` | 6 | 寻路的开放列表堆 |
 | `ObjectPoolTests` | 5 | 对象池 |
 | `PlayerStatsSOTests` | 2 | 配置资产的拷贝语义 |
-| `UICacheRegressionTests` | 8 | 缓存事件路由、任务选择与关闭、背包槽位地址、快捷栏局部刷新 |
+| `UICacheRegressionTests` | 9 | 缓存事件路由、任务选择与关闭、背包槽位地址、快捷栏局部刷新 |
 
 这 6 个文件位于编辑器侧测试目录、无 asmdef，编译进默认程序集，与产品代码同程序集，可直接 `new` 内部类型并反射 `StatsService`。
 

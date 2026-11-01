@@ -3,6 +3,14 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 对话视图直接读取 State
+
+`DialogCanvasView` 从 `DialogManager.CurrentState` 读取当前行、对话与选项显隐，绘制后调用 `ClearDirty()`；不创建刷新快照。维护计数达到 `5/5`，复核实现并更新 Guide 后清零为 `0/5`。
+
+## 2026-11-01 对话面板使用版本快照
+
+`DialogManager` 隐藏可变刷新状态，`DialogCanvasView` 按当前行、对话资产和选项显隐字段读取快照，并只确认已经绘制且版本未变化的字段。维护计数更新为 `3/5 -> 4/5`。
+
 ## 2026-10-31 对话界面迁入缓存预制体
 
 - `DialogManager` 不再实现 `ICanvasManager`、不持控件引用，只留对话状态与推进；新增 `DialogCanvasView`（继承 `CachedCanvasView`）承接立绘、正文与选项。

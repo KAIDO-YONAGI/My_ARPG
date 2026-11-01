@@ -21,7 +21,7 @@
 
 ### 2.1 会话流程（`DialogManager`）
 
-`DialogManager : YSingleton<DialogManager>` 是唯一的会话驱动者，只持对话状态、不持 UI 引用；立绘、正文与选项按钮在 `DialogCanvasView`（预制体 `DialogCanvas.prefab`）。它对外暴露 `CurrentDialog`、`CurrentLineIndex`、`IsShowingChoices` 与 `State`，视图按脏标记拉取。开与关的请求仍由 NPC 触发器承接，见 §2.5。
+`DialogManager : YSingleton<DialogManager>` 是唯一的会话驱动者，只持对话状态、不持 UI 引用；立绘、正文与选项按钮在 `DialogCanvasView`（预制体 `DialogCanvas.prefab`）。管理器通过稳定的 `CurrentState` 对象提供当前行、对话资产和选项显隐的只读查询；`DialogCanvasView` 按脏标记读取字段，绘制后调用 `State.ClearDirty()`。状态字段不向视图公开，视图不创建刷新快照。开与关的请求仍由 NPC 触发器承接，见 §2.5。
 
 - `StartDialog(DialogSO)`：先做空引用与条件判定，再 `SetDialogCanvas(true)`、`DisableButtons()`、记录 `currentDialog` 与 `currentLineIndex = 0`、调用 `ShowDialog()`。
 - `AdvanceDialog()`：三段式推进。台词未播完时 `ShowDialog()` 播下一句；台词播完且 `nextDialogOptions` 为空时 `EndDialog()`；台词有内容且 `currentLineIndex` 已到台词数末尾时 `ShowChoices()`。

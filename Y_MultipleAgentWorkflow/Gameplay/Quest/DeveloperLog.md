@@ -3,6 +3,14 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 任务视图直接读取 State
+
+`QuestCanvasView` 通过任务数量与索引查询读取列表、当前任务和状态，绘制后清理 `State` 脏标记；不创建刷新快照或复制任务列表。维护计数达到 `5/5`，复核实现并更新 Guide 后清零为 `0/5`。
+
+## 2026-11-01 任务面板按字段读取快照
+
+`QuestManager` 将任务列表、当前任务与当前状态保留在内部状态中；视图消费只读快照，并按绘制字段与版本确认刷新。维护计数更新为 `3/5 -> 4/5`。
+
 ## 2026-10-31 任务面板迁入缓存预制体
 
 - `QuestManager` 不再实现 `ICanvasManager`，去掉 `questLogPanel`、`questLogSlots` 与三组 `CanvasGroup` 引用；`QuestStateChanged` 只写状态、发奖、重算并 `MarkDirty()`。

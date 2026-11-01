@@ -2,7 +2,7 @@
 
 文档 ID：`WF-PROJECT-VALIDATION`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-11-01`
 权威范围：只负责本工程的验证命令与流程——环境检查、命令清单、进程与产物处理、环境变量。配置项语义归 `..\Build\ProjectConfig_Guide.md`；Android 故障根因归 `..\Build\AndroidBuild_Guide.md`。
 
 ## 1. 触发线索
@@ -111,7 +111,7 @@
 
 ### C12 EditMode 测试
 
-- 用途：跑现有 60 个 EditMode 用例。
+- 用途：跑现有 61 个 EditMode 用例。
 - 命令：
   ```powershell
   & "D:\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe" `

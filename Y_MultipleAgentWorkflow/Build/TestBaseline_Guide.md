@@ -29,7 +29,7 @@
 
 ### 2.2 用例分布
 
-6 个文件，共 60 项用例：
+6 个文件，共 61 项用例：
 
 | 文件 | 用例数 | 被测对象 |
 |---|---|---|
@@ -38,10 +38,10 @@
 | `AStarOpenHeapTests` | 6 | `AStarOpenHeap`：堆序、平局规则、重复入堆、随机输入排序 |
 | `ObjectPoolTests` | 5 | `ObjectPool<T>`：预热、Get/Return 回调、池内对象销毁后的选取 |
 | `PlayerStatsSOTests` | 2 | `PlayerStatsSO.CreateInitialData()`：模板拷贝语义 |
-| `UICacheRegressionTests` | 8 | 任务选择与关闭、背包槽位地址、金币局部刷新、对话与任务的开关路由 |
-| **合计** | **60** | |
+| `UICacheRegressionTests` | 9 | 任务选择与关闭、快照版本确认与只读性、背包槽位地址、金币局部刷新、对话与任务的开关路由 |
+| **合计** | **61** | |
 
-- 特性统计：`[Test]` 58，`[TestCase]` 2，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
+- 特性统计：`[Test]` 59，`[TestCase]` 2，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
 - `[SetUp]` 与 `[TearDown]` 分布在 `ObjectPoolTests`、`PlayerStatsSOTests`、`PlayerStatsModelTests`、`UICacheRegressionTests`，`CanvasFocusStackTests` 亦有 `SetUp`。
 
 ### 2.3 用例计数的口径
@@ -69,7 +69,7 @@
 
 ### 2.5 覆盖与零覆盖
 
-有覆盖的对象包括 `PlayerStatsModel` / `StatsService`、`CanvasFocusStack`、`AStarOpenHeap`、`ObjectPool<T>`、`PlayerStatsSO`，以及任务视图、背包槽位、快捷栏与缓存事件路由。
+有覆盖的对象包括 `PlayerStatsModel` / `StatsService`、`CanvasFocusStack`、`AStarOpenHeap`、`ObjectPool<T>`、`PlayerStatsSO`，以及任务视图字段刷新、快照过期确认、集合只读性、背包槽位、快捷栏局部刷新与缓存事件路由。
 
 缓存回归覆盖对话与任务预制体的开关策略、任务选择与关闭、背包槽位地址、快捷栏局部刷新。商店交易、完整对话流程、存档、场景编排与加载、技能、单位与 NPC 的业务路径依靠手工验证。
 

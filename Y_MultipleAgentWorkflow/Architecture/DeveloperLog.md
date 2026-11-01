@@ -3,6 +3,14 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 Gameplay 视图通过 State 查询刷新
+
+五个管理器视图改为从稳定的 `CurrentState` 按需读取，`DirtyValue<T>` 只保留管理器内部值与脏标记跟踪，不再向视图提供快照包装或集合副本。Architecture 维护计数达到 `5/5`，复核 Layering 路由与 Guide 并同步实现说明后清零为 `0/5`。Unity Editor 刷新后控制台返回 0 条错误。
+
+## 2026-11-01 单例与业务刷新契约收紧
+
+`YSingleton<T>` 新增必需依赖访问器；Contracts 的 DirtyValue 以版本快照向视图提供只读数据，Gameplay 各面板按绘制字段确认刷新。更新 Composition 与 Layering 权威说明。维护计数更新为 `3/5 -> 4/5`。
+
 ## 2026-10-31 属性面板预制体与闲置缓存
 
 新增 Pipeline.UI.Runtime 的 CachedUIView / UIViewCache；UIManager 组合预制体注册与闲置 LRU，复用既有输入和焦点栈。更新组合契约与分层统计。

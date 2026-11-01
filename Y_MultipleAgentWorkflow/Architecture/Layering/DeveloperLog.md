@@ -3,6 +3,14 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 刷新边界改为 State 只读查询
+
+五个 Gameplay 管理器通过稳定的 `State` 提供字段或索引查询；`DirtyValue<T>` 不再生成快照包装，集合查询不复制数据。维护计数达到 `5/5`，复核实现并更新 Layering Guide 后清零为 `0/5`。Unity Editor 刷新完成，控制台返回 0 条错误。
+
+## 2026-11-01 Contracts 刷新边界改为只读快照
+
+分层说明更正 `DirtyValue<T>` 为管理器内部变更跟踪，并登记 `DirtySnapshot<T>` 作为视图读取的只读版本快照；数据管理器不再向视图暴露可变 `State`。维护计数更新为 `3/5 -> 4/5`。
+
 ## 2026-10-31 面板迁出后复核分层与命名空间
 
 - 文件数：`Pipeline` 59 → 62、`Gameplay` 59 → 65，产品代码合计 126 → 135；`Pipeline.UI.Runtime` 2 → 4、`Pipeline.SO.Events` 12 → 13，命名空间仍为 26 个。

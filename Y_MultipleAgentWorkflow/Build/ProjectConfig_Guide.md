@@ -128,7 +128,7 @@
 
 ### 3.3 不要给测试加 asmdef 而不改引用
 
-当前 0 asmdef，现有 60 项用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
+当前 0 asmdef，现有 61 项用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
 
 ### 3.4 不要依赖仓库外依赖能解析
 

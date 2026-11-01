@@ -2,7 +2,7 @@
 
 文档 ID：`BUS-ARCHITECTURE-COMPOSITION`
 状态：`Active`
-维护计数：`3/5`
+维护计数：`0/5`
 最后更新：`2026-11-01`
 
 ## 任务线索

@@ -3,6 +3,14 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 技能面板直接查询 State
+
+`SkillsCanvasView` 通过 `CurrentState` 按键查询技能状态并读取技能点与脏标记，绘制后清理标记；不创建刷新快照。维护计数更新为 `3/5 -> 4/5`。
+
+## 2026-11-01 技能面板改用只读刷新快照
+
+`SkillTreeManager` 不再公开可变 `State`；槽位通过状态键读取技能记录，技能点文本和刷新字段通过版本快照同步并按绘制结果确认。维护计数更新为 `2/5 -> 3/5`。
+
 ## 2026-10-31 技能界面迁入缓存预制体
 
 - `SkillTreeManager` 不再持 `skillSlots` 与 `pointsText`，改为 `SkillState` 存取 + `State` 脏标记；界面被淘汰前由 `SkillsCanvasView` 触发保存。

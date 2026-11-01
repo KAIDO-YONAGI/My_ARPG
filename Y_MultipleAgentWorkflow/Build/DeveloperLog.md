@@ -3,6 +3,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 快照刷新回归覆盖增加
+
+`UICacheRegressionTests` 增加快照过期确认与集合只读性验证，金币只刷新金币文本的回归测试按无参刷新方法调用；EditMode 用例总数更新为 62。Unity Editor 编译测试程序集成功；测试未执行，因为该工程的 Editor 仍打开。Build 维护计数更新为 `2/5 -> 3/5`。
+
 ## 2026-10-05 单元测试目录约定
 
 **写入的文件**

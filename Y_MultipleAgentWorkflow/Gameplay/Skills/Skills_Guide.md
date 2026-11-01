@@ -26,7 +26,7 @@
 - 解锁条件：`CanUnlockSkill` 要求前置列表中每个槽位都 `isUnlocked`，并且 `currentLevel` 达到该槽位 `skillSO` 的 `maxLevel`；前置列表为空时结果为 true。解锁动作只有 `Unlock()` 一个入口。
 - 升级规则：`TryUpgradeSkill` 要求 `isUnlocked` 为真且 `currentLevel` 小于 `skillSO` 的 `maxLevel`，随后 `currentLevel` 自增、广播 `OnAbilityPointSpent`，满级再广播 `OnMaxSkillLevel`，最后 `UpdateUI`。技能点的扣减由订阅方完成，见 §2.2。
 - 两个 static 事件是唯一的状态广播通道。`UpdateUI` 按解锁态切换按钮可交互、文本与图标颜色：未解锁显示 `Locked`，已解锁显示当前等级与上限。
-- `SkillsCanvasView` 的槽位数组、技能点文本以及各槽位的前置依赖均在预制体上序列化接线；管理器只保存业务状态，视图按脏标记刷新。
+- `SkillsCanvasView` 的槽位数组、技能点文本以及各槽位的前置依赖均在预制体上序列化接线；管理器通过稳定的 `CurrentState` 提供技能点、脏标记和按键读取技能槽位状态。视图按需查询并在绘制后调用 `State.ClearDirty()`，不创建刷新快照。
 - 初始解锁态：技能按钮预制体的 `isUnlocked` 默认为 0，前置列表为空，`skillSO` 为空引用；场景里有 3 个实例把 `isUnlocked` 设为 1，分别是 `MaxHealthBoost` 两个与 `CombatUnlock` 一个。技能树从预先解锁的根往外生长。
 - 技能等级与解锁状态不入档：`SaveData` 顶层字段里没有技能相关字段，技能点数随 `PlayerStatsData.skillPoints` 入档。
 
@@ -34,20 +34,20 @@
 
 - 技能点属于玩家数值域：字段是 `PlayerStatsModel.skillPoints`，写命令 `UpdateSkillPoints` 不广播事件，经 `StatsService.UpdateSkillPoints` 转发。
 - 来源是升级：`PlayerStatsModel.AddExp` 结算完升级后广播 `LevelUp(levelsGained)`。
-- 发放：`SkillTreeManager.UpdateAbilityPoints(amount)` 调 `StatsService.UpdateSkillPoints(amount)`；技能点文本由 `SkillsCanvasView` 按 `State` 刷新，管理器不碰控件。一次升多级就发多点，读档不补发。
+- 发放：`SkillTreeManager.UpdateAbilityPoints(amount)` 调 `StatsService.UpdateSkillPoints(amount)`；技能点文本由 `SkillsCanvasView` 读取 `State.AbilityPointsValue` 刷新，管理器不碰控件。一次升多级就发多点，读档不补发。
 - 支出：点击槽位由 `SkillSlot` 自己在 `OnEnable` 绑定 `TryUpgradeSkill`；升级成功广播 `OnAbilityPointSpent`，`SkillTreeManager.HandleAbilityPointSpent` 再查一次余额并 `UpdateAbilityPoints(-1)`。
 - 界面刷新点有三处：`Start` 结束时调 `UpdateAbilityPoints(0)`、升级事件、扣点回调。技能点变化本身不发事件，跳过 `UpdateAbilityPoints` 直接写 `StatsService` 会让点数文本变旧。
 
 ### 2.3 SkillTreeManager 的职责
 
-`SkillTreeManager` 订阅 `SkillSlot.OnAbilityPointSpent`、`SkillSlot.OnMaxSkillLevel` 与 `PlayerStatsModel.LevelUp`，负责点数收支、满级后按前置条件批量解锁，并按 `SkillState` 保存各槽位的等级与解锁状态；文本与按钮由 `SkillsCanvasView` 负责。订阅在 `OnEnable`，退订在 `OnDisable`。
+`SkillTreeManager` 订阅 `SkillSlot.OnAbilityPointSpent`、`SkillSlot.OnMaxSkillLevel` 与 `PlayerStatsModel.LevelUp`，负责点数收支、满级后按前置条件批量解锁，并按 `SkillState` 保存各槽位的等级与解锁状态；技能点及脏状态由 `State` 提供只读查询和标记清理方法，文本与按钮由视图负责。订阅在 `OnEnable`，退订在 `OnDisable`。
 
 - 满级解锁：`HandleSkillMaxed` 遍历全部槽位，把所有未解锁且前置满足的槽位一次性 `Unlock()`，按前置图整体推进。
 - 可重试订阅：`StatsService` 是 `Awake` 里注册的单例，`SkillTreeManager.OnEnable` 可能先于它执行，此时 `StatsService.Instance` 为 null。订阅因此写在 `TrySubscribeLevelUp()` 里，用 `listeningToLevelUp` 标记幂等，并在 `OnEnable` 与 `Start` 各调一次。`UnsubscribeLevelUp` 先用标记短路，`StatsService.Instance` 为空时直接返回。
 
 ### 2.4 界面与状态同步
 
-`SkillsCanvasView` 由 `UICacheManager` 管理实例生命周期，开关、焦点与场景切换复位由缓存与 `UIManager` 协同处理。打开时遍历槽位调 `RestoreState` 恢复 `currentLevel` 与 `isUnlocked`；槽位在升级、解锁与界面销毁前调 `SaveSkillState` 把状态写回管理器。
+`SkillsCanvasView` 由 `UICacheManager` 管理实例生命周期，开关、焦点与场景切换复位由缓存与 `UIManager` 协同处理。打开时遍历槽位调 `RestoreState` 恢复 `currentLevel` 与 `isUnlocked`；槽位在升级、解锁与界面销毁前调 `SaveSkillState` 把状态写回管理器。技能点文本和槽位按需读取 `CurrentState`，刷新后清理 State 脏标记。
 
 ## 3. 约定与硬边界
 

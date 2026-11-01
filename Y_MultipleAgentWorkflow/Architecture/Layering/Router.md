@@ -2,8 +2,8 @@
 
 文档 ID：`BUS-ARCHITECTURE-LAYERING`
 状态：`Active`
-维护计数：`3/5`
-最后更新：`2026-10-31`
+维护计数：`0/5`
+最后更新：`2026-11-01`
 
 ## 任务线索
 
@@ -40,7 +40,7 @@
 - 玩家数值线 MVCS 四层的层归属、命名空间与实例化方式。
 - 命名空间分布：26 个命名空间覆盖全部 133 个产品代码文件，命名空间一律等于目录路径，全局命名空间只剩 1 个编辑器脚本。
 - "唯一写入口 + 只读接口"的可执行判定标准：读经 `StatsService.Instance.Stats`，写经 6 个 Service 命令，Model 私有。
-- 测试基线：编辑器侧 6 个测试文件、60 项用例，命名空间 `Gameplay.Tests`，测试侧对产品类型的引用靠 `using Contracts` / `using Pipeline.*`。
+- 测试基线：编辑器侧 6 个测试文件、61 项用例，命名空间 `Gameplay.Tests`，测试侧对产品类型的引用靠 `using Contracts` / `using Pipeline.*`。
 
 **约束**
 

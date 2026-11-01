@@ -20,7 +20,7 @@
 
 ### 2.1 状态机与面板（`QuestManager`）
 
-`QuestManager : YSingleton<QuestManager>` 是任务域唯一管理者，只持进度数据与事件资产、不持 UI 引用；任务板界面在 `QuestCanvasView`（预制体 `QuestCanvas.prefab`），由 `UICacheManager` 按需创建。对外暴露 `CanOpenBoard`、`CurrentBoardQuests`、`CurrentQuest`、`CurrentQuestState` 与 `State`，视图按脏标记拉取。
+`QuestManager : YSingleton<QuestManager>` 是任务域唯一管理者，只持进度数据与事件资产、不持 UI 引用；任务板界面在 `QuestCanvasView`（预制体 `QuestCanvas.prefab`），由 `UICacheManager` 按需创建。任务板界面通过 `CanOpenBoard` 判断是否可打开，经稳定的 `CurrentState` 对象读取任务列表、当前任务和当前状态；列表通过 `BoardQuestCount` 与 `GetBoardQuest(index)` 按索引查询，不复制集合。视图按脏标记绘制并调用 `State.ClearDirty()`。
 
 状态枚举 `QuestState { Idle, Accepted, Decline, IsToComplete, Completed }` 依次取值 0 到 4，管理器的状态字段初值为 `Idle`。
 
@@ -86,7 +86,7 @@
 - `HandleQuestClicked` 向管理器提交选择；`currentQuest` 仅记录已绘制任务。`RefreshFromManager` 比较任务引用，切换时整页刷新，同一任务只刷新目标进度。
 - `DisplayObjectives` 读取目标数量与进度文本；`DisplayRewards` 显示物品图标与数量；多余槽位隐藏。
 
-`QuestCanvasView` 的详情面板、列表槽位和各组 `CanvasGroup` 均在预制体上序列化接线。`BoardQuests` 脏时刷新列表与空任务提示，选择或当前任务状态脏时刷新详情与操作按钮。
+`QuestCanvasView` 的详情面板、列表槽位和各组 `CanvasGroup` 均在预制体上序列化接线。`BoardQuests` 脏时刷新列表与空任务提示，选择或当前任务状态脏时刷新详情与操作按钮；完成刷新后调用 `State.ClearDirty()` 清理状态标记。
 
 ### 2.5 槽位视图
 

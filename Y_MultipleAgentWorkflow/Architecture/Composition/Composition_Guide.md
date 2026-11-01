@@ -25,7 +25,7 @@
 
 ### 2.1 单例基类与初始化钩子
 
-`YSingleton<T>` 是 CRTP 基类：`Awake` 先做重复实例判定，命中则停用组件、`Destroy(this)` 后直接返回；合法实例写入 `_instance` 并调用钩子 `OnSingletonInitialized()`；`OnDestroy` 只在 `_instance == this` 时复位。`Instance` 只读、无惰性创建，因此拿不到实例是设计上成立的运行状态，调用方按 `Instance` 可为 null 处理。
+`YSingleton<T>` 是 CRTP 基类：`Awake` 先做重复实例判定，命中则停用组件、`Destroy(this)` 后直接返回；合法实例写入 `Instance` 并调用钩子 `OnSingletonInitialized()`；`OnDestroy` 只在 `Instance == this` 时复位。`Instance` 只读、无惰性创建，适用于允许实例暂缺的路径；`RequiredInstance` 用于必需依赖，实例未注册时抛出带类型名的 `InvalidOperationException`。
 
 当前 18 个直接派生类都沿用基类 `Awake`，`base.Awake()` 链路完整。
 
@@ -101,7 +101,7 @@
 
 ### 2.6 UI 画布焦点栈契约
 
-`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 4 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SaveLoadCanvasManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。属性、对话、任务、商店、技能、背包六个面板由 §2.7 的缓存托管；各业务管理器保存数据，预制体视图持有控件引用并按脏标记拉取状态。
+`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 4 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SaveLoadCanvasManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。属性、对话、任务、商店、技能、背包六个面板由 §2.7 的缓存托管；各业务管理器保存数据并向视图提供只读快照，视图持有控件引用，按字段绘制后确认对应版本。
 
 反向依赖有两处，都在默认实现里直读单例：`SetCanvaState` 末行调静态入口 `UIManager.Report(...)`，该入口集中判空，未注册时静默跳过；`RefreshCanvaOrder` 直读 `UIManager.Instance`，`Instance` 为 null 时静默退化为 `UIManager.DefaultOrder`。`UIManager` 为此保留常量转发与 `GetCanvasOrder` 转发，接口引用保持不变。
 
@@ -111,7 +111,7 @@
 
 缓存归 `UICacheManager` 这个独立 MonoBehaviour 单例所有，`UIManager` 只持一个引用并转发开关请求。它是全工程唯一不经 `YSingleton` 的手写单例（`static Instance` 自管），因此不计入 §2.1 的 19 个具体单例。
 
-注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasView` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。首次打开才实例化。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
+注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasView` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。打开请求先在预制体或已有实例上执行只读的 `CanOpen`，通过后首次实例化，再由 `Open` 检查门槛并执行 `OnOpen`；门槛拒绝时不创建界面，也不会触发其 `Awake`。`CanOpen` 只检查条件，不执行副作用。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
 
 缓存持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。`OpenOnToggleEvent` 决定打开请求是否直接交给缓存；对话与任务由业务入口先准备数据，再调用 `OpenCanvas`。关闭请求始终由缓存处理，ESC 与互斥沿用同一路径。
 
@@ -129,7 +129,7 @@ View 在 `OnOpen` 读取管理器状态并首刷，在 `OnClose` 释放打开期
 
 ### 3.2 派生类重写 `Awake` 时必须调 `base.Awake()`
 
-漏调会让 `_instance` 永不赋值、`Instance` 全局为 null，同时重复实例销毁逻辑失效，同场景两份实例各自运行，过程中无异常、无日志。
+漏调会让 `Instance` 永不赋值、全局为 null，同时重复实例销毁逻辑失效，同场景两份实例各自运行，过程中无异常、无日志。
 
 ### 3.3 重写 `SaveableService.OnSingletonInitialized` 时必须调 `base`
 

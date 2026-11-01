@@ -2,7 +2,7 @@
 
 文档 ID：`SCENE-FLOW-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-11-01`
 权威范围：场景组加载管线，由场景切换脚本组、启动加载脚本 `InitialLoad` 与场景 SO 契约 `GameSceneSO` 组成，覆盖加载入口、场景组语义、常驻场景注册、存档键来源与构建场景列表依赖。存档读写与存档 schema 归 Data 域；UI 画布管理与事件通道定义归资产域与玩法域；Addressables 包的构建配置不在本域。
 
 - 场景管线代码：`SceneChanger`、`PersistentSceneRegistry`、`Teleport`、`SceneDataForSave`、`CameraPixelSnap`
@@ -43,9 +43,9 @@
 ### 2.3 组语义与加载顺序
 
 - 卸载段先等 `fadeDuration`，再按倒序遍历 `currentScenes` 逐一 `UnloadSceneAsync`，跳过常驻场景，随后 `currentScenes.Clear()`。
-- 加载段按列表正序逐个用 `Application.CanStreamedLevelBeLoaded` 校验，失败只 `LogError` 并 `continue`，整组不中断；`sceneType == Menu` 时调 `SetObjects(false)`，`Location` 时调 `SetObjects(true)`。
-- `firstLoaded` 取组内第一个成功加载的场景，作为 `loadedScene` 与 `currentScene`；`currentScenes[0]` 是 `GetCurrentGameScene()` 的返回值。
-- 完成后 `sceneLoadedEvent` 广播前必须先赋 `currentScene`，这是源码里写明的不变量。
+- 加载段按列表正序逐个用 `Application.CanStreamedLevelBeLoaded` 校验，失败只 `LogError` 并 `continue`，整组不中断；`sceneType == Menu` 时调 `SetObjects(false)`，`Location` 时调 `SetObjects(true)`。等待异步加载完成后按 `sceneName` 取得场景，确认有效且已加载再加入 `currentScenes`。
+- `firstLoaded` 取组内第一个成功加载的场景，作为完成事件的参数；对应的场景实例保存到 `loadedScene`，供 `GetCurrentScene()` 回读。`currentScenes[0]` 是 `GetCurrentGameScene()` 的返回值。
+- `sceneLoadedEvent` 广播前已更新场景组与主场景引用，订阅方通过查询接口读取当前场景。
 
 ### 2.4 常驻场景注册表
 

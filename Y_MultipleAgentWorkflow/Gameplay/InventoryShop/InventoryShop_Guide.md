@@ -23,10 +23,10 @@
 
 ### 2.1 背包数据结构与堆叠规则
 
-- `InventoryManager.State` 保存金币与快捷栏、背包两组 `InventorySlotState` 列表，每组各带脏标记。入包先遍历快捷栏再遍历背包，各组顺序由视图的序列化槽位数组决定。
+- `InventoryManager` 的 `State` 持有金币与快捷栏、背包两组 `InventorySlotState` 列表，各自独立追踪脏标记。视图通过稳定的 `CurrentState` 对象读取金币、槽位数量和按索引取得的槽位值；列表本身不公开，也不为刷新复制集合或创建快照。快捷栏和背包的标记、清标记方法均由 `State` 提供。入包先遍历快捷栏再遍历背包，各组顺序由视图的序列化槽位数组决定。
 - `InventorySlot` 保存物品与数量的显示副本，并以 `IsBackpackSlot`、`SlotIndex` 标记槽位地址。快捷栏在首次初始化时配置地址，背包每次打开时为当前实例配置地址。
 - 堆叠上限来自 `ItemSO.stackableSize`，`AddToSlots` 按顺序填充空槽或同类物品槽位，返回剩余数量；`HasSpaceForItem` 检查两组列表的剩余空间。
-- `RemoveFromSlot` 在数量归零时清空物品引用并标记对应列表。视图读取状态后通过 `RestoreState` 更新控件；首次初始化接收视图初始配置，缓存重建沿用管理器中的数据。
+- `RemoveFromSlot` 在数量归零时清空物品引用并标记对应列表。视图按索引查询对应槽位，再通过 `RestoreState` 更新控件；首次初始化接收视图初始配置，缓存重建沿用管理器中的数据。
 - 背包内容与金币都不入档：`SaveData` 顶层只有 `lootsStatsDic`、`sceneIDAndPlayerPos`、`playerStatsData` 三个字段，`InventoryManager` 未实现 `ISaveable`。组件挂在常驻场景上，因此一次运行内跨游戏场景保留，读档后回到本局的运行值。
 
 ### 2.2 拾取、丢弃、使用三条入口
@@ -61,7 +61,7 @@
 - 买入：`ShopSlot.OnBuyButtonClick` 调 `ShopManager.TryBuyItem`，后者发布正价格与正数量请求。
 - 卖出：左键物品槽位且商店打开时，先 `SetSlotBeenClicked` 保存地址，再 `ShopManager.SellItem` 按当前分类的物品引用匹配报价，发布负价格与负数量请求。
 - 结算集中在 `InventoryManager.HandleShopping`：`goldAmount` 小于 `price` 时直接返回；买入在 `HasSpaceForItem` 通过后先 `UpdateGold(price)` 再 `UpdateInventorySlots(item, amount)`；卖出先 `UpdateGold(price)` 再 `UpdateInventorySlots(item, amount)`。
-- 金币的写入点是 `UpdateGold` 与 `UpdateInventorySlots` 的 `isGold` 分支，两处只修改 `State.Gold` 并置脏；`HotbarCanvasView` 拉取并刷新金币文本，快捷栏槽位按自己的脏标记刷新。
+- 金币的写入点是 `UpdateGold` 与 `UpdateInventorySlots` 的 `isGold` 分支，两处只修改管理器内部的金币值并置脏；`HotbarCanvasView` 独立读取 `State.GoldAmount` 刷新文本，快捷栏槽位只在快捷栏脏时按索引刷新。
 - 货币来源：`goldAmount` 初值为 0，增加路径是拾取或奖励 `isGold` 物品时的 `goldAmount += quantity`，以及出售时经 `UpdateGold` 以负价格反向增加；金币没有其它增加入口。
 - 商店不消耗库存：`TryBuyItem` 只发事件，商店侧没有数量扣减与售罄处理。
 
@@ -69,7 +69,7 @@
 
 - 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`；场景加载事件统一用来复位画布。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 统一订阅。
 - 背包与商店分别由 `BackpackCanvasView`、`ShopCanvasView` 承担，预制体登记在 `UICacheManager.views`。缓存统一管理实例、开关和焦点，业务管理器持有运行状态。
-- 面板内部控件由 `ShopCanvasView` 注入数据：`ShopSlot` 与 `ShopCategoryToggles` 不持 `shopRef`，也不做 `IShopInteractable` 转换；管理器对外暴露 `State` 与买卖命令。
+- 面板内部控件由 `ShopCanvasView` 注入数据：`ShopSlot` 与 `ShopCategoryToggles` 不持 `shopRef`，也不做 `IShopInteractable` 转换；`ShopManager.State` 通过商品数量、按索引查询商品与价格以及脏标记方法供视图读取，不创建商品快照。
 - `InventorySlot` 直接走 `ShopManager.Instance`。
 - 商店头像相机订阅同一 `ShopKeeperEventSO`，无 keeper 时按 `hideWhenNoShopKeeper` 关闭 Camera，`LateUpdate` 跟目标偏移。
 - 悬停信息面板只读 `ItemSO` 的展示字段与五个数值字段，负数与零不显示。
@@ -105,7 +105,7 @@
 
 ### 3.4 金币与槽位分别标脏
 
-管理器写 `State.Gold` 后由常驻 `HotbarCanvasView` 更新文本；金币变化只触发金币显示，快捷栏与背包按对应列表的脏标记刷新。
+管理器写入金币后由常驻 `HotbarCanvasView` 读取 `State.GoldAmount` 并更新文本；金币变化只触发金币显示，快捷栏与背包按各自的 State 脏标记和索引查询刷新。
 
 ### 3.5 `isGold` 与 `isEXP` 分支先于数量正负判断
 

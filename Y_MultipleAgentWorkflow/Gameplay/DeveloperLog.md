@@ -3,6 +3,16 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 管理器视图改为直接查询 State
+
+对话、任务、背包、商店与技能视图通过稳定的 `CurrentState` 按字段或索引查询；刷新不再创建快照或复制集合，刷新标记与清理由各 `State` 方法提供。Gameplay 维护计数达到 `5/5`，复核路由与五个子域 Guide 后同步实现事实并清零为 `0/5`。Unity Editor 刷新完成，控制台返回 0 条错误；未运行 EditMode 测试，工程验证要求测试前关闭该工程的 Editor。
+
+## 2026-11-01 管理器刷新状态改为版本化只读快照
+
+对话、任务、商店、背包与技能管理器不再公开可变刷新状态，视图按只读快照与字段版本确认刷新；快捷栏金币与槽位独立刷新。必需的单例依赖统一通过 `RequiredInstance` 明确取得。
+
+Unity Editor 对 `Assembly-CSharp` 与 `Assembly-CSharp-Editor` 均有成功编译记录；未运行 EditMode 测试，因工程验证要求运行前关闭该工程的 Unity 实例。Gameplay 维护计数更新为 `3/5 -> 4/5`。
+
 ## 2026-10-31 五个玩法域拆出界面层
 
 - 对话、任务、商店、背包、技能五个域统一改为「管理器持数据 + `CachedCanvasView` 持界面」：管理器不再实现 `ICanvasManager`，也不再持有 `CanvasGroup` 与控件引用，改暴露 `State` 与 `DirtyValue` 字段。
