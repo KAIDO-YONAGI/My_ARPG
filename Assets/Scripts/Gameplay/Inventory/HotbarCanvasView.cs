@@ -1,4 +1,3 @@
-using Contracts;
 using Pipeline.SO;
 using TMPro;
 using UnityEngine;
@@ -31,7 +30,7 @@ namespace Gameplay.Inventory
 
         private void Start()
         {
-            var manager = InventoryManager.RequiredInstance;
+            InventoryManager manager = InventoryManager.RequiredInstance;
 
             for (int i = 0; i < hotbarSlots.Length; i++)
             {
@@ -55,10 +54,10 @@ namespace Gameplay.Inventory
         /// </summary>
         private void RefreshIfDirty()
         {
-            var manager = InventoryManager.Instance;
+            InventoryManager manager = InventoryManager.Instance;
             if (manager == null) return;
 
-            var state = manager.CurrentState;
+            InventoryManager.State state = manager.CurrentState;
             if (state.IsHotbarDirty)
             {
                 int slotCount = hotbarSlots.Length;
@@ -66,7 +65,7 @@ namespace Gameplay.Inventory
                 {
                     if (i < state.HotbarCount)
                     {
-                        var slot = state.GetHotbarSlot(i);
+                        InventoryManager.InventorySlotState slot = state.GetHotbarSlot(i);
                         hotbarSlots[i].RestoreState(slot.item, slot.quantity);
                     }
                     else

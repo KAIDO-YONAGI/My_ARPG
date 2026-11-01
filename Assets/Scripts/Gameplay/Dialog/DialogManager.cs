@@ -1,4 +1,6 @@
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
+using Contracts.State;
 using Gameplay.Dialog.HistoryManager;
 using Pipeline.SO;
 using Pipeline.SO.Events;
@@ -81,16 +83,19 @@ namespace Gameplay.Dialog
         /// <summary>是否有活动对话；没有对话时界面拒绝打开。</summary>
         public bool HasActiveDialog => state.CurrentDialog != null;
 
+        protected override void OnSingletonInitialized()
+        {
+            Debug.Assert(sceneLoadedEvent != null, nameof(sceneLoadedEvent), this);
+        }
+
         private void OnEnable()
         {
-            if (sceneLoadedEvent != null)
-                sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
         }
 
         private void OnDisable()
         {
-            if (sceneLoadedEvent != null)
-                sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
         }
 
         private void OnSceneLoaded(GameSceneSO _)
@@ -241,7 +246,7 @@ namespace Gameplay.Dialog
         /// </summary>
         private bool MatchConditionsToStartDialog(DialogSO dialog)
         {
-            foreach (var refuse in dialog.refuseDialogs)
+            foreach (RefuseDialogSO refuse in dialog.refuseDialogs)
             {
                 bool shouldRefuse;
                 if (refuse.isDefaultChat)
@@ -271,7 +276,7 @@ namespace Gameplay.Dialog
         {
             if (refuse.requireCharacters != null && refuse.requireCharacters.Count > 0)
             {
-                foreach (var character in refuse.requireCharacters)
+                foreach (CharacterSO character in refuse.requireCharacters)
                 {
                     if (ConversationHistoryManager.Instance == null ||
                         !ConversationHistoryManager.Instance.HasChatedWith(character))
@@ -281,7 +286,7 @@ namespace Gameplay.Dialog
 
             if (refuse.requireItems != null && refuse.requireItems.Count > 0)
             {
-                foreach (var item in refuse.requireItems)
+                foreach (Item item in refuse.requireItems)
                 {
                     if (ItemHistoryManager.Instance == null ||
                         !ItemHistoryManager.Instance.HasPickedOverAmount(item.itemSO, item.quantity))
@@ -344,7 +349,7 @@ namespace Gameplay.Dialog
         /// <summary>请求界面缓存打开对话画布；缓存缺失时返回 false。</summary>
         private static bool TryOpenDialogCanvas()
         {
-            var cache = UICacheManager.Instance;
+            UICacheManager cache = UICacheManager.Instance;
             if (cache == null)
             {
                 Debug.LogWarning("对话画布：UI 缓存不可用，无法打开。");
@@ -357,7 +362,7 @@ namespace Gameplay.Dialog
         /// <summary>请求界面缓存关闭对话画布；缓存缺失时只记录警告。</summary>
         private static void CloseDialogCanvas()
         {
-            var cache = UICacheManager.Instance;
+            UICacheManager cache = UICacheManager.Instance;
             if (cache == null)
             {
                 Debug.LogWarning("对话画布：UI 缓存不可用，无法通过界面关闭。");

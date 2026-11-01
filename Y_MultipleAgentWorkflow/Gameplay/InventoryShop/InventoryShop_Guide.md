@@ -67,7 +67,7 @@
 
 ### 2.6 订阅惯例与画布
 
-- 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`；场景加载事件统一用来复位画布。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 统一订阅。
+- 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`；场景加载事件统一用来复位画布。缓存界面的开关与焦点事件由 `UIViewInstanceCache.Connect/Disconnect` 统一订阅。
 - 背包与商店分别由 `BackpackCanvasView`、`ShopCanvasView` 承担，预制体登记在 `UICacheManager.views`。缓存统一管理实例、开关和焦点，业务管理器持有运行状态。
 - 面板内部控件由 `ShopCanvasView` 注入数据：`ShopSlot` 与 `ShopCategoryToggles` 不持 `shopRef`，也不做 `IShopInteractable` 转换；`ShopManager.State` 通过商品数量、按索引查询商品与价格以及脏标记方法供视图读取，不创建商品快照。
 - `InventorySlot` 直接走 `ShopManager.Instance`。

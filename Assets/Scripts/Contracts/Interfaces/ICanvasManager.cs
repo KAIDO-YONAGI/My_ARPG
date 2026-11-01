@@ -1,8 +1,9 @@
+using Contracts.Enums;
 using Pipeline.SO.Events;
 using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 
-namespace Contracts
+namespace Contracts.Interfaces
 {
     public interface ICanvasManager
     {
@@ -72,9 +73,12 @@ namespace Contracts
             CanvasToToggle canvasToToggle,
             bool state)
         {
-            canva.alpha = state ? 1 : 0;
-            canva.blocksRaycasts = state;
-            canva.interactable = state;
+            if (canva != null)
+            {
+                canva.alpha = state ? 1 : 0;
+                canva.blocksRaycasts = state;
+                canva.interactable = state;
+            }
 
             UIManager.Report(canvasToToggle, state, CloseOnEscape, BlocksGlobalInput);
         }

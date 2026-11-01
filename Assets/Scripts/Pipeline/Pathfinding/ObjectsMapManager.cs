@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
 using UnityEngine;
 
 namespace Pipeline.Pathfinding

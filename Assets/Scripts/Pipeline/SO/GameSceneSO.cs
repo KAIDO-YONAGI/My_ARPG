@@ -1,5 +1,5 @@
 using System;
-using Contracts;
+using Contracts.Enums;
 using UnityEditor;
 using UnityEngine;
 

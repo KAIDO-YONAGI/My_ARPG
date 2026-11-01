@@ -87,14 +87,14 @@ namespace Gameplay.Quest
         /// <summary>按管理器中的当前进度刷新所有目标槽位；多余槽位隐藏。</summary>
         public void DisplayObjectives()
         {
-            var manager = QuestManager.Instance;
+            QuestManager manager = QuestManager.Instance;
             if (currentQuest == null || manager == null) return;
 
             for (int i = 0; i < objectiveSlots.Length; i++)
             {
                 if (i < currentQuest.questObjectives.Count)
                 {
-                    var objective = currentQuest.questObjectives[i];
+                    QuestObjective objective = currentQuest.questObjectives[i];
                     int currentAmount = manager.GetCurrentObjAmount(currentQuest, objective);
                     string progress = manager.GetProgressText(currentQuest, objective);
                     bool isCompleted = currentAmount >= objective.requiredAmount;
@@ -118,7 +118,7 @@ namespace Gameplay.Quest
             {
                 if (i < currentQuest.rewards.Count)
                 {
-                    var reward = currentQuest.rewards[i];
+                    Reward reward = currentQuest.rewards[i];
                     questRewardsSlots[i].DisplayReward(reward.rewardItem.icon, reward.quantity);
                     questRewardsSlots[i].gameObject.SetActive(true);
                 }
@@ -132,7 +132,7 @@ namespace Gameplay.Quest
         /// <summary>批量显示或隐藏一组任务槽位。</summary>
         private static void SetSlotsActive(Component[] slots, bool state)
         {
-            foreach (var slot in slots)
+            foreach (Component slot in slots)
                 slot.gameObject.SetActive(state);
         }
     }

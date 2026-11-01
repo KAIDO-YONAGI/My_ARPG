@@ -1,4 +1,4 @@
-namespace Contracts
+namespace Contracts.State
 {
     /// <summary>保存一个运行期值，并记录它是否需要同步到界面。</summary>
     public struct DirtyValue<T>

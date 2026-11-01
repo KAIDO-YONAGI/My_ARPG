@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.InputSystem;
+using System;
+using System.Reflection;
+using System.Collections.Generic;
 
 /// <summary>
 /// 监听 GameInput.inputactions 被修改/重新导入，自动同步重建 ActionRefs/ 下的所有 InputActionReference 资源。
@@ -39,7 +42,7 @@ public class InputActionReferenceRebuilder : AssetPostprocessor
     /// </summary>
     public static void RebuildReferences()
     {
-        var asset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(INPUT_ACTIONS_PATH);
+        InputActionAsset asset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(INPUT_ACTIONS_PATH);
         if (asset == null)
         {
             Debug.LogWarning("[InputActionRefRebuilder] 找不到 " + INPUT_ACTIONS_PATH + "，跳过重建。");
@@ -51,14 +54,14 @@ public class InputActionReferenceRebuilder : AssetPostprocessor
             AssetDatabase.CreateFolder("Assets/Settings/Input", "ActionRefs");
         }
 
-        var tRef = typeof(InputActionReference);
-        var mCreate = tRef.GetMethod("Create", new System.Type[] { typeof(InputAction) });
+        Type tRef = typeof(InputActionReference);
+        MethodInfo mCreate = tRef.GetMethod("Create", new System.Type[] { typeof(InputAction) });
 
         // 收集当前所有 action 的（map+name）→ action
         var desired = new System.Collections.Generic.Dictionary<string, InputAction>();
-        foreach (var map in asset.actionMaps)
+        foreach (InputActionMap map in asset.actionMaps)
         {
-            foreach (var action in map.actions)
+            foreach (InputAction action in map.actions)
             {
                 string refName = map.name + "_" + action.name;
                 desired[refName] = action;
@@ -68,7 +71,7 @@ public class InputActionReferenceRebuilder : AssetPostprocessor
         // 先清理：删除 ActionRefs 里不再需要的 ref（对应 action 已被删）
         var existingGuids = AssetDatabase.FindAssets("", new[] { REFS_FOLDER });
         int removed = 0;
-        foreach (var guid in existingGuids)
+        foreach (string guid in existingGuids)
         {
             string p = AssetDatabase.GUIDToAssetPath(guid);
             if (!p.EndsWith(".asset")) continue;
@@ -84,10 +87,10 @@ public class InputActionReferenceRebuilder : AssetPostprocessor
         // 再重建：对每个当前 action，更新或创建 ref
         int created = 0;
         int updated = 0;
-        foreach (var kvp in desired)
+        foreach (KeyValuePair<string, InputAction> kvp in desired)
         {
             string refPath = REFS_FOLDER + "/" + kvp.Key + ".asset";
-            var existing = AssetDatabase.LoadAssetAtPath<InputActionReference>(refPath);
+            InputActionReference existing = AssetDatabase.LoadAssetAtPath<InputActionReference>(refPath);
 
             if (existing != null)
             {

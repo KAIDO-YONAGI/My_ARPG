@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.State;
 using Gameplay.Player.Services;
 using Pipeline.SO;
 using UnityEngine;
@@ -59,7 +60,7 @@ namespace Gameplay.Skills
             /// <summary>读取技能状态；没有记录时返回初始等级与解锁状态。</summary>
             public SkillState GetSkillState(string key, int initialLevel, bool initiallyUnlocked)
             {
-                return !string.IsNullOrEmpty(key) && Skills.Value.TryGetValue(key, out var saved)
+                return !string.IsNullOrEmpty(key) && Skills.Value.TryGetValue(key, out SkillState saved)
                     ? saved
                     : new SkillState(initialLevel, initiallyUnlocked);
             }

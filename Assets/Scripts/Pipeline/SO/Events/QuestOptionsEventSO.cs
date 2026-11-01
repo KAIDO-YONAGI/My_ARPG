@@ -1,5 +1,5 @@
 using System;
-using Contracts;
+using Contracts.Enums;
 using UnityEngine;
 
 namespace Pipeline.SO.Events

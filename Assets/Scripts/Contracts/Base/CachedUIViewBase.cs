@@ -1,13 +1,13 @@
 using System;
+using Contracts.Enums;
+using Contracts.Interfaces;
 using Pipeline.SO.Events;
-using Pipeline.UI.Runtime;
-using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 
-namespace Contracts
+namespace Contracts.Base
 {
     /// <summary>
-    /// 可被 <see cref="UIViewCache"/> 缓存的普通界面基类。
+    /// 可被 <see cref="UIViewInstanceCache"/> 缓存的普通界面基类。
     /// 负责“打开时激活并绑定、关闭时退订并隐藏、销毁前收尾”的固定生命周期，
     /// 业务界面只实现 <see cref="OnOpen"/>、<see cref="OnClose"/>、<see cref="OnCacheDestroy"/>。
     /// </summary>
@@ -16,10 +16,13 @@ namespace Contracts
     /// 因此打开期间产生的订阅、监听和临时对象必须在关闭时释放，
     /// 不能在字段初始化或 <c>Awake</c> 里长期持有业务事件。
     /// </remarks>
-    public abstract class CachedUIView : MonoBehaviour
+    public abstract class CachedUIViewBase : MonoBehaviour, ICanvasManager
     {
         /// <summary>该界面绑定的开关事件；缓存按它的事件通道接收显隐请求。</summary>
         public abstract ToggleCanvasEventSO ToggleEvent { get; }
+
+        ToggleCanvasEventSO ICanvasManager.ToggleCanvasEvent => ToggleEvent;
+        SceneLoadedEventSO ICanvasManager.SceneLoadedEvent => null;
 
         /// <summary>界面身份。默认取开关事件上的枚举，预制体也可以单独覆写。</summary>
         public virtual CanvasToToggle CanvasId =>
@@ -61,7 +64,7 @@ namespace Contracts
             {
                 gameObject.SetActive(true);
                 OnOpen();
-                SetVisible(true);
+                ToggleCanvasLifecycle(true);
                 return true;
             }
             catch
@@ -95,17 +98,16 @@ namespace Contracts
             }
             finally
             {
-                SetVisible(false);
-                SetOrder(UIManager.DefaultOrder);
+                ToggleCanvasLifecycle(false);
                 gameObject.SetActive(false);
                 Closed?.Invoke();
             }
         }
 
-        /// <summary>设置画布排序；没有接 Canvas 时保持原样。</summary>
-        internal void SetOrder(int order)
+        /// <summary>焦点栈变化时刷新画布排序。</summary>
+        internal void RefreshOrder()
         {
-            if (ViewCanvas != null) ViewCanvas.sortingOrder = order;
+            ((ICanvasManager)this).RefreshCanvaOrder(ViewCanvas, CanvasId, true);
         }
 
         /// <summary>缓存销毁实例前的最后清理入口；异常只记录，不阻断销毁流程。</summary>
@@ -123,13 +125,10 @@ namespace Contracts
             }
         }
 
-        /// <summary>统一设置透明度、交互和射线阻挡，避免各界面各写一套。</summary>
-        private void SetVisible(bool state)
+        /// <summary>复用画布管理契约统一更新显隐、输入状态、焦点和排序。</summary>
+        private void ToggleCanvasLifecycle(bool state)
         {
-            if (ViewGroup == null) return;
-            ViewGroup.alpha = state ? 1 : 0;
-            ViewGroup.interactable = state;
-            ViewGroup.blocksRaycasts = state;
+            ((ICanvasManager)this).ToggleCanvas(ViewGroup, ViewCanvas, CanvasId, state);
         }
 
         /// <summary>

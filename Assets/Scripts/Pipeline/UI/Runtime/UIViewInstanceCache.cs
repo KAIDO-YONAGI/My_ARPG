@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using Pipeline.SO.Events;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -21,15 +22,14 @@ namespace Pipeline.UI.Runtime
     /// 重新打开时由 View 通过管理器的 <c>State</c> 拉取最新状态。
     /// </para>
     /// </remarks>
-    public sealed class UIViewCache : IDisposable
+    public sealed class UIViewInstanceCache : IDisposable
     {
         /// <summary>单个界面的注册信息与运行期引用。</summary>
         private sealed class Entry
         {
-            public CanvasToToggle Id;
-            public CachedUIView Prefab;
+            public CachedUIViewBase Prefab;
             public GameObject Anchor;
-            public CachedUIView View;
+            public CachedUIViewBase View;
             public ToggleCanvasEventSO ToggleEvent;
             public Action<bool> Toggle;
             public Action Focus;
@@ -44,8 +44,6 @@ namespace Pipeline.UI.Runtime
         private readonly Transform owner;
         private readonly int maxIdleViews;
         private readonly float idleTimeoutSeconds;
-        private readonly Action<CanvasToToggle, bool, bool, bool> reportState;
-        private readonly Func<CanvasToToggle, bool, int> getOrder;
         private bool connected;
         private long usageSequence;
 
@@ -58,7 +56,7 @@ namespace Pipeline.UI.Runtime
             get
             {
                 int count = 0;
-                foreach (var entry in entries.Values)
+                foreach (Entry entry in entries.Values)
                     if (entry.View != null) count++;
                 return count;
             }
@@ -66,32 +64,26 @@ namespace Pipeline.UI.Runtime
 
         /// <summary>
         /// 建立缓存并校验注册项。预制体、挂载点和开关事件缺一不可，
-        /// 且开关事件上的枚举必须与预制体的 <see cref="CachedUIView.CanvasId"/> 一致。
+        /// 且开关事件上的枚举必须与预制体的 <see cref="CachedUIViewBase.CanvasId"/> 一致。
         /// </summary>
         /// <param name="bindings">界面注册表：预制体 + 场景挂载点。</param>
         /// <param name="owner">缓存根节点，用于判断界面当前是否可以打开。</param>
         /// <param name="maxIdleViews">最多保留的闲置实例数，0 表示关闭即销毁。</param>
         /// <param name="idleTimeoutSeconds">闲置超时秒数，0 表示关闭后下一帧淘汰。</param>
-        /// <param name="reportState">向 UIManager 上报显隐、ESC 与输入阻断状态。</param>
-        /// <param name="getOrder">查询画布排序值。</param>
-        public UIViewCache(
+        public UIViewInstanceCache(
             IEnumerable<CachedViewBinding> bindings,
             Transform owner,
             int maxIdleViews,
-            float idleTimeoutSeconds,
-            Action<CanvasToToggle, bool, bool, bool> reportState,
-            Func<CanvasToToggle, bool, int> getOrder)
+            float idleTimeoutSeconds)
         {
             this.owner = owner;
             this.maxIdleViews = Math.Max(0, maxIdleViews);
             this.idleTimeoutSeconds = Mathf.Max(0f, idleTimeoutSeconds);
-            this.reportState = reportState;
-            this.getOrder = getOrder;
 
             if (bindings == null) return;
-            foreach (var binding in bindings)
+            foreach (CachedViewBinding binding in bindings)
             {
-                var prefab = binding?.prefab;
+                CachedUIViewBase prefab = binding?.prefab;
                 if (prefab == null || binding.anchor == null ||
                     prefab.CanvasId == CanvasToToggle.Default || prefab.ToggleEvent == null ||
                     prefab.ToggleEvent.canvasToToggle != prefab.CanvasId)
@@ -111,7 +103,7 @@ namespace Pipeline.UI.Runtime
                     continue;
                 }
 
-                var id = prefab.CanvasId;
+                CanvasToToggle id = prefab.CanvasId;
                 if (entries.ContainsKey(id))
                 {
 #if UNITY_EDITOR
@@ -120,9 +112,8 @@ namespace Pipeline.UI.Runtime
                     continue;
                 }
 
-                var entry = new Entry
+                Entry entry = new Entry
                 {
-                    Id = id,
                     Prefab = prefab,
                     Anchor = binding.anchor,
                     ToggleEvent = prefab.ToggleEvent
@@ -133,7 +124,7 @@ namespace Pipeline.UI.Runtime
                     if (!state || entry.Prefab.OpenOnToggleEvent)
                         SetOpen(entry, state);
                 };
-                entry.Focus = () => RefreshOrder(entry);
+                entry.Focus = () => entry.View?.RefreshOrder();
                 entry.Closed = () => OnClosed(entry);
                 entries.Add(id, entry);
             }
@@ -142,13 +133,13 @@ namespace Pipeline.UI.Runtime
         /// <summary>按界面 ID 取开关事件，供 UIManager 统一分发按键、ESC 和外部请求。</summary>
         public ToggleCanvasEventSO GetToggleEvent(CanvasToToggle id)
         {
-            return entries.TryGetValue(id, out var entry) ? entry.ToggleEvent : null;
+            return entries.TryGetValue(id, out Entry entry) ? entry.ToggleEvent : null;
         }
 
         /// <summary>按界面 ID 取注册的预制体，供需要读取预制体初始数据的业务使用。</summary>
-        public CachedUIView GetPrefab(CanvasToToggle id)
+        public CachedUIViewBase GetPrefab(CanvasToToggle id)
         {
-            return entries.TryGetValue(id, out var entry) ? entry.Prefab : null;
+            return entries.TryGetValue(id, out Entry entry) ? entry.Prefab : null;
         }
 
         /// <summary>订阅所有开关事件与焦点事件；重复调用无副作用。</summary>
@@ -156,7 +147,7 @@ namespace Pipeline.UI.Runtime
         {
             if (connected) return;
             connected = true;
-            foreach (var entry in entries.Values)
+            foreach (Entry entry in entries.Values)
             {
                 entry.ToggleEvent.toggleCanvasEvent += entry.Toggle;
                 entry.ToggleEvent.focusEvent += entry.Focus;
@@ -168,7 +159,7 @@ namespace Pipeline.UI.Runtime
         {
             if (!connected) return;
             connected = false;
-            foreach (var entry in entries.Values)
+            foreach (Entry entry in entries.Values)
             {
                 entry.ToggleEvent.toggleCanvasEvent -= entry.Toggle;
                 entry.ToggleEvent.focusEvent -= entry.Focus;
@@ -178,21 +169,21 @@ namespace Pipeline.UI.Runtime
         /// <summary>按代码请求打开界面；界面未注册时返回 false。</summary>
         public bool OpenCanvas(CanvasToToggle id)
         {
-            if (!entries.TryGetValue(id, out var entry)) return false;
+            if (!entries.TryGetValue(id, out Entry entry)) return false;
             return SetOpen(entry, true);
         }
 
         /// <summary>按代码请求关闭界面；界面未注册或本来没开时静默返回。</summary>
         public void CloseCanvas(CanvasToToggle id)
         {
-            if (entries.TryGetValue(id, out var entry))
+            if (entries.TryGetValue(id, out Entry entry))
                 SetOpen(entry, false);
         }
 
         /// <summary>查询界面是否处于打开状态；实例尚未创建时视为关闭。</summary>
         public bool IsCanvasOpen(CanvasToToggle id)
         {
-            return entries.TryGetValue(id, out var entry) &&
+            return entries.TryGetValue(id, out Entry entry) &&
                    entry.View != null && entry.View.IsOpen;
         }
 
@@ -202,7 +193,7 @@ namespace Pipeline.UI.Runtime
         /// </summary>
         public void Touch(CanvasToToggle id)
         {
-            if (entries.TryGetValue(id, out var entry) && entry.View != null && entry.View.IsOpen)
+            if (entries.TryGetValue(id, out Entry entry) && entry.View != null && entry.View.IsOpen)
             {
                 RemoveIdle(entry);
                 entry.LastUsedSequence = ++usageSequence;
@@ -215,10 +206,10 @@ namespace Pipeline.UI.Runtime
         /// </summary>
         public void Update(float now)
         {
-            var node = idle.First;
+            LinkedListNode<Entry> node = idle.First;
             while (node != null)
             {
-                var next = node.Next;
+                LinkedListNode<Entry> next = node.Next;
                 if (now - node.Value.ClosedAt >= idleTimeoutSeconds)
                     DestroyInstance(node.Value);
                 node = next;
@@ -244,7 +235,7 @@ namespace Pipeline.UI.Runtime
 
             try
             {
-                CachedUIView candidate = entry.View != null ? entry.View : entry.Prefab;
+                CachedUIViewBase candidate = entry.View != null ? entry.View : entry.Prefab;
                 if (!candidate.CanOpenFromCache()) return false;
 
                 if (entry.View == null)
@@ -264,15 +255,11 @@ namespace Pipeline.UI.Runtime
                 }
 
                 RemoveIdle(entry);
-                reportState(entry.Id, true,
-                    entry.View.CloseOnEscape, entry.View.BlocksGlobalInput);
-                RefreshOrder(entry);
                 return true;
             }
             catch (Exception exception)
             {
                 DestroyInstance(entry);
-                reportState(entry.Id, false, true, false);
 #if UNITY_EDITOR
                 Debug.LogException(exception);
 #endif
@@ -280,26 +267,17 @@ namespace Pipeline.UI.Runtime
             }
         }
 
-        /// <summary>把已打开界面重新排到最前；关闭中的实例没有排序意义。</summary>
-        private void RefreshOrder(Entry entry)
-        {
-            if (entry.View != null && entry.View.IsOpen)
-                entry.View.SetOrder(getOrder(entry.Id, true));
-        }
-
         /// <summary>
-        /// 界面关闭回调：上报状态、按最近使用顺序插入闲置链表，
+        /// 界面关闭回调：按最近使用顺序插入闲置链表，
         /// 再按容量淘汰最久未使用的实例。正在显示的界面不会进入这条路径。
         /// </summary>
         private void OnClosed(Entry entry)
         {
-            reportState(entry.Id, false,
-                entry.View.CloseOnEscape, entry.View.BlocksGlobalInput);
             RemoveIdle(entry);
             entry.ClosedAt = Time.unscaledTime;
 
             // 链表按 LastUsedSequence 升序排列，关闭时间只用于超时判断。
-            var node = idle.First;
+            LinkedListNode<Entry> node = idle.First;
             while (node != null && node.Value.LastUsedSequence <= entry.LastUsedSequence)
                 node = node.Next;
             entry.IdleNode = node == null
@@ -331,7 +309,7 @@ namespace Pipeline.UI.Runtime
         /// <summary>关闭所有已打开界面；闲置实例保持不动。</summary>
         public void CloseAll()
         {
-            foreach (var entry in entries.Values)
+            foreach (Entry entry in entries.Values)
                 if (entry.View != null) entry.View.Close();
         }
 

@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Enums;
 using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 using UnityEngine.EventSystems;

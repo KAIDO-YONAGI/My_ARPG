@@ -1,4 +1,5 @@
-using Contracts;
+using Contracts.Base;
+using Pipeline.SO;
 using UnityEngine;
 
 namespace Gameplay.Shop
@@ -11,7 +12,7 @@ namespace Gameplay.Shop
     /// 商品价格和物品数据由管理器持有，视图只在显示时写入槽位；
     /// 槽位被隐藏或界面被缓存销毁都不会影响商店数据。
     /// </remarks>
-    public sealed class ShopCanvasView : CachedCanvasView
+    public sealed class ShopCanvasView : CachedCanvasViewBase
     {
         [Header("商品槽位")]
         [Tooltip("商店里的商品槽位，顺序与当前分类的商品列表一致。")]
@@ -33,7 +34,7 @@ namespace Gameplay.Shop
         /// <summary>打开后通知管理器进入商店状态，并立即刷新商品。</summary>
         protected override void OnOpen()
         {
-            var manager = ShopManager.RequiredInstance;
+            ShopManager manager = ShopManager.RequiredInstance;
 
             manager.OnCachedViewOpened();
             RefreshIfDirty();
@@ -50,16 +51,16 @@ namespace Gameplay.Shop
         /// </summary>
         private void RefreshIfDirty()
         {
-            var manager = ShopManager.Instance;
+            ShopManager manager = ShopManager.Instance;
             if (!IsOpen || manager == null) return;
 
-            var state = manager.CurrentState;
+            ShopManager.State state = manager.CurrentState;
             if (!state.IsItemsDirty) return;
 
             int slotCount = slots.Length;
             for (int i = 0; i < slotCount; i++)
             {
-                var item = i < state.CurrentItemCount ? state.GetItem(i) : null;
+                ItemSO item = i < state.CurrentItemCount ? state.GetItem(i) : null;
                 bool hasItem = item != null;
                 slots[i].gameObject.SetActive(hasItem);
                 if (hasItem)
@@ -72,7 +73,7 @@ namespace Gameplay.Shop
         /// <summary>关闭时通知管理器退出商店状态。</summary>
         protected override void OnClose()
         {
-            var manager = ShopManager.Instance;
+            ShopManager manager = ShopManager.Instance;
             if (manager == null)
             {
                 Debug.LogWarning("ShopManager 不可用，商店视图无法上报关闭。");

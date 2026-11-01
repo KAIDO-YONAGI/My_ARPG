@@ -1,7 +1,9 @@
+using Contracts.Interfaces;
+using Contracts.State;
 using Gameplay.Save;
 using UnityEngine;
 
-namespace Contracts
+namespace Contracts.Base
 {
     /// <summary>
     /// 可存档服务的基础范式，与 YSingleton 同类的能力基类。继承即获得三件事：

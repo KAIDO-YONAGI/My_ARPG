@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
+using Contracts.Interfaces;
+using Contracts.State;
 using Gameplay.Player;
 using Gameplay.Player.Services;
 using Pipeline.Scene;
@@ -67,7 +70,7 @@ namespace Gameplay.Save
                 : currentScene.initialPosition;
             dataToSave.sceneIDAndPlayerPos = new SceneAndPosition(currentScene.SaveKey, savePosition);
 
-            foreach (var saveable in SaveRegistry.All.ToList())
+            foreach (ISaveable saveable in SaveRegistry.All.ToList())
             {
                 saveable.SaveData(dataToSave);
             }
@@ -84,7 +87,7 @@ namespace Gameplay.Save
                 return;
             }
 
-            foreach (var saveable in SaveRegistry.All.ToList())
+            foreach (ISaveable saveable in SaveRegistry.All.ToList())
             {
                 saveable.SaveData(dataToSave);
             }
@@ -105,7 +108,7 @@ namespace Gameplay.Save
             //上个场景是Menu则不存档
             if (lastSceneType != SceneType.Menu)
             {
-                var sceneChanger = SceneChanger.Instance;
+                SceneChanger sceneChanger = SceneChanger.Instance;
                 // 切到新 Location 时沿用目标场景和入口点，退回 Menu 时则记录当前游玩场景。
                 GameSceneSO saveScene = sceneToLoadSO.sceneType == SceneType.Location
                     ? sceneToLoadSO
@@ -125,7 +128,7 @@ namespace Gameplay.Save
 
         void OnAutoLoad(GameSceneSO _)
         {
-            foreach (var saveable in SaveRegistry.All.ToList())
+            foreach (ISaveable saveable in SaveRegistry.All.ToList())
             {
                 // 只回灌按 GUID 参与动态数据的场景物体（如 Loot）：它们随场景重新实例化，
                 // 必须按存档恢复拾取态与位移，回灌是必需的。
@@ -150,7 +153,7 @@ namespace Gameplay.Save
                 return;
             }
             dataToSave = data;
-            foreach (var saveable in SaveRegistry.All.ToList())//拷贝一份再操作，防止耗时操作中发生时序竞态修改
+            foreach (ISaveable saveable in SaveRegistry.All.ToList())//拷贝一份再操作，防止耗时操作中发生时序竞态修改
             {
                 saveable.LoadData(dataToSave);
             }

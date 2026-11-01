@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Enums;
 using Pipeline.Pathfinding;
 using UnityEngine;
 using UnityEngine.Serialization;

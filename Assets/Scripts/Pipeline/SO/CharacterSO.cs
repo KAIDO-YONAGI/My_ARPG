@@ -1,4 +1,3 @@
-using Contracts;
 using UnityEngine;
 
 namespace Pipeline.SO

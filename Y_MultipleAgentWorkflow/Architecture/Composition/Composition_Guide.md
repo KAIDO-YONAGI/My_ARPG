@@ -18,7 +18,7 @@
 | `执行顺序`、`DefaultExecutionOrder`、`10000` | 本文 §2.4 |
 | `SaveRegistry`、`注册表`、`Domain Reload`、`局间复位` | 本文 §2.5 |
 | `ICanvasManager`、`焦点栈`、`sortingOrder`、`UIManager.Instance` | 本文 §2.6 |
-| `UI 缓存`、`预制体注册`、`UIViewCache`、`UICacheManager`、`Anchor`、`LRU` | 本文 §2.7 |
+| `UI 缓存`、`预制体注册`、`UIViewInstanceCache`、`UICacheManager`、`Anchor`、`LRU` | 本文 §2.7 |
 | `重试`、`RetryRequestEvent`、`Respawn`、`重载当前场景组` | 本文 §2.3.4 |
 
 ## 2. 当前实现
@@ -63,11 +63,11 @@
 
 #### 2.3.1 统一钩子：`OnSingletonInitialized`
 
-实例注册成功后的初始化统一写在 `OnSingletonInitialized` 钩子里，各类都省去自写 `Awake`。重写点共 5 个：`StatsService` 建模型并调 `base` 注册，`SceneChanger` 设初始位置，`UIManager` 枚举建 `inputState` 并接线焦点栈回调，另有 `IntegratedUICanvasManager`、`AStarNodeManager`。
+实例注册成功后的初始化统一写在 `OnSingletonInitialized` 钩子里，各类沿用基类 `Awake`。`StatsService` 建模型并调 `base` 注册，`SceneChanger` 设初始位置，`UIManager` 枚举建 `inputState` 并接线焦点栈回调；`InventoryManager`、`QuestManager`、`ShopManager` 与 `DialogManager` 在钩子中校验必需的事件资产引用。该钩子只表示当前实例正在初始化，其他单例的就绪由各调用路径安排。
 
 #### 2.3.2 可重试订阅：`SkillTreeManager` 式
 
-`SkillTreeManager` 是不挂单例的 `MonoBehaviour`，需要订阅 `StatsService` 的 `LevelUp`。`OnEnable` 可能早于 `StatsService.Awake`，订阅因此写成可重试的：`TrySubscribeLevelUp()` 以 `Instance == null` 为提前返回条件、用 `listeningToLevelUp` 防重复订阅，并在 `OnEnable` 与 `Start` 各调一次；退订侧同样先判 null 再解绑。其前提是 `Start` 排在所有 `Awake` 之后。
+`SkillTreeManager` 需要订阅 `StatsService` 的 `LevelUp`。`OnEnable` 可能早于 `StatsService.Awake`，订阅因此写成可重试的：`TrySubscribeLevelUp()` 以 `Instance == null` 为提前返回条件、用 `listeningToLevelUp` 防重复订阅，并在 `OnEnable` 与 `Start` 各调一次；退订侧重新读取当前 `StatsService.Instance.Stats`，判空后解绑。这覆盖同批场景加载中已激活服务的初始化顺序；`Start` 只补试一次，异步或稍后创建服务需由调用流程另行安排就绪衔接。
 
 同类判空即跳过的兜底还有 `SaveLoadCanvasManager`，其启动期 `OnEnable` 早于 `SaveSystem.Awake`；`ESCButton`、`Loot`、`PathFollower` 同属这一类。
 
@@ -101,7 +101,7 @@
 
 ### 2.6 UI 画布焦点栈契约
 
-`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。实现者共 4 个：`ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SaveLoadCanvasManager`；调用惯例统一写成 `((ICanvasManager)this).方法(...)`。属性、对话、任务、商店、技能、背包六个面板由 §2.7 的缓存托管；各业务管理器保存数据并向视图提供只读快照，视图持有控件引用，按字段绘制后确认对应版本。
+`ICanvasManager` 的四个方法 `ToggleCanvas`、`SetCanvaInactive`、`SetCanvaState`、`RefreshCanvaOrder` 都是接口默认实现。场景管理组件 `ESCMenuManager`、`IntegratedUICanvasManager`、`GameOverCanvasManager`、`SaveLoadCanvasManager` 与缓存视图基类 `CachedUIViewBase` 共用这组能力，调用惯例为 `((ICanvasManager)this).方法(...)`。属性、对话、任务、商店、技能、背包六个面板由 §2.7 的实例缓存托管；各业务管理器保存数据并向视图提供只读查询，视图持有控件引用并按字段绘制。
 
 反向依赖有两处，都在默认实现里直读单例：`SetCanvaState` 末行调静态入口 `UIManager.Report(...)`，该入口集中判空，未注册时静默跳过；`RefreshCanvaOrder` 直读 `UIManager.Instance`，`Instance` 为 null 时静默退化为 `UIManager.DefaultOrder`。`UIManager` 为此保留常量转发与 `GetCanvasOrder` 转发，接口引用保持不变。
 
@@ -111,9 +111,9 @@
 
 缓存归 `UICacheManager` 这个独立 MonoBehaviour 单例所有，`UIManager` 只持一个引用并转发开关请求。它是全工程唯一不经 `YSingleton` 的手写单例（`static Instance` 自管），因此不计入 §2.1 的 19 个具体单例。
 
-注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasView` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。打开请求先在预制体或已有实例上执行只读的 `CanOpen`，通过后首次实例化，再由 `Open` 检查门槛并执行 `OnOpen`；门槛拒绝时不创建界面，也不会触发其 `Awake`。`CanOpen` 只检查条件，不执行副作用。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
+注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasViewBase` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。打开请求先在预制体或已有实例上执行只读的 `CanOpen`，通过后首次实例化，再由 `Open` 检查门槛并执行 `OnOpen`；门槛拒绝时不创建界面，也不会触发其 `Awake`。`CanOpen` 只检查条件，不执行副作用。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
 
-缓存持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。`OpenOnToggleEvent` 决定打开请求是否直接交给缓存；对话与任务由业务入口先准备数据，再调用 `OpenCanvas`。关闭请求始终由缓存处理，ESC 与互斥沿用同一路径。
+`UIViewInstanceCache` 持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。`OpenOnToggleEvent` 决定打开请求是否直接交给缓存；对话与任务由业务入口先准备数据，再调用 `OpenCanvas`。关闭请求始终由缓存处理，ESC 与互斥沿用同一路径。缓存只负责注册、实例创建、事件订阅与闲置淘汰；`CachedUIViewBase` 在打开和关闭生命周期中调用 `ICanvasManager` 更新显隐、焦点状态与排序，焦点刷新事件也由视图基类处理。
 
 View 在 `OnOpen` 读取管理器状态并首刷，在 `OnClose` 释放打开期间的订阅，界面被淘汰前调 `OnCacheDestroy`。背包与技能运行状态由持久管理器保存。关闭后停用整个对象；派生类若重写 `OnDisable`，必须调基类实现。
 

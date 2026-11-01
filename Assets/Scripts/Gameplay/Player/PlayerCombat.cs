@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Interfaces;
 using Gameplay.Player.Services;
 using Pipeline.SO.Events;
 using UnityEngine;
@@ -32,7 +32,7 @@ namespace Gameplay.Player
             foreach (Collider2D enemy in enemis)
             {
                 // 例外保留：碰撞/命中对象运行时才知道是谁，无法预引用（见重构清单 GetComponent 治理一节）
-                if (!enemy.TryGetComponent<IDamageable>(out var damageable)) continue;
+                if (!enemy.TryGetComponent<IDamageable>(out IDamageable damageable)) continue;
                 damageable.TakeDamage(StatsService.Instance.Stats.Damage, transform);
             }
 

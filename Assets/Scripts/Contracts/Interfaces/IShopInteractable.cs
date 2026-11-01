@@ -1,6 +1,6 @@
 using Pipeline.SO;
 
-namespace Contracts
+namespace Contracts.Interfaces
 {
     /// <summary>
     /// 商店面板对外交互接口。

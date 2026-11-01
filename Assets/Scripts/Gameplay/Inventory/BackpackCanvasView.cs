@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Base;
 using Pipeline.SO;
 using UnityEngine;
 
@@ -12,7 +12,7 @@ namespace Gameplay.Inventory
     /// 背包数据由管理器按“快捷栏在前、背包在后”的顺序保存，视图只负责把状态画到槽位上。
     /// 首次打开时把预制体里配置的初始物品交给管理器，此后管理器以内存中的槽位状态为准，预制体只提供初始值。
     /// </remarks>
-    public sealed class BackpackCanvasView : CachedCanvasView
+    public sealed class BackpackCanvasView : CachedCanvasViewBase
     {
         [Header("背包槽位")]
         [Tooltip("背包网格里的槽位，顺序即管理器中的背包槽位顺序。")]
@@ -31,7 +31,7 @@ namespace Gameplay.Inventory
         /// </summary>
         protected override void OnOpen()
         {
-            var manager = InventoryManager.RequiredInstance;
+            InventoryManager manager = InventoryManager.RequiredInstance;
             for (int i = 0; i < slots.Length; i++)
             {
                 // 每个新实例都要登记槽位地址，点击才能定位管理器中的背包数据。
@@ -51,10 +51,10 @@ namespace Gameplay.Inventory
         /// <summary>按管理器脏标记刷新背包槽位；槽位数量不足时多余的槽位清空。</summary>
         private void RefreshIfDirty()
         {
-            var manager = InventoryManager.Instance;
+            InventoryManager manager = InventoryManager.Instance;
             if (!IsOpen || manager == null) return;
 
-            var state = manager.CurrentState;
+            InventoryManager.State state = manager.CurrentState;
             if (!state.IsBackpackDirty) return;
 
             int slotCount = slots.Length;
@@ -62,7 +62,7 @@ namespace Gameplay.Inventory
             {
                 if (i < state.BackpackCount)
                 {
-                    var slot = state.GetBackpackSlot(i);
+                    InventoryManager.InventorySlotState slot = state.GetBackpackSlot(i);
                     slots[i].RestoreState(slot.item, slot.quantity);
                 }
                 else

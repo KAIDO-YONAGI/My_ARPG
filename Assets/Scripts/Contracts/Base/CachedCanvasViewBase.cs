@@ -1,8 +1,9 @@
+using Contracts.Enums;
 using Pipeline.SO.Events;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Contracts
+namespace Contracts.Base
 {
     /// <summary>
     /// 缓存画布的通用实现：界面身份、开关事件、Canvas 与 CanvasGroup 全部由预制体序列化接线，
@@ -12,7 +13,7 @@ namespace Contracts
     /// 各业务画布（任务、商店、技能、对话、背包）只需继承本类，
     /// 然后在自己的预制体里把根节点的 Canvas 和 CanvasGroup 拖到对应槽位。
     /// </remarks>
-    public class CachedCanvasView : CachedUIView
+    public class CachedCanvasViewBase : CachedUIViewBase
     {
         [Header("画布身份")]
         [Tooltip("该画布在 CanvasToToggle 中的身份，必须与开关事件上的枚举一致。")]

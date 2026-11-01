@@ -3,6 +3,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-01 缓存画布基类命名统一
+
+五个玩法画布视图改继承 `CachedCanvasViewBase`，属性面板 `StatsCanvasView` 改继承 `CachedUIViewBase`。更新玩家属性、背包商店和事件通道指南中的当前类型名。UI 缓存生命周期回归通过；全量 EditMode 的三条背包槽位 `OnValidate` 空引用失败与本次修改无关。维护计数更新为 `0/5 -> 1/5`。
+
 ## 2026-11-01 管理器视图改为直接查询 State
 
 对话、任务、背包、商店与技能视图通过稳定的 `CurrentState` 按字段或索引查询；刷新不再创建快照或复制集合，刷新标记与清理由各 `State` 方法提供。Gameplay 维护计数达到 `5/5`，复核路由与五个子域 Guide 后同步实现事实并清零为 `0/5`。Unity Editor 刷新完成，控制台返回 0 条错误；未运行 EditMode 测试，工程验证要求测试前关闭该工程的 Editor。

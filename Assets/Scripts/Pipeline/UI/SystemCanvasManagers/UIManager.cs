@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using Pipeline.SO;
 using Pipeline.SO.Events;
 using Pipeline.UI.Runtime;
@@ -70,7 +71,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         {
             loadEventSO.LoadRequestEvent += OnLoadScene;
 
-            foreach (var binding in inputBindings)
+            foreach (CanvasInputBinding binding in inputBindings)
             {
                 binding.action.action.Enable();
             }
@@ -80,7 +81,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         {
             loadEventSO.LoadRequestEvent -= OnLoadScene;
 
-            foreach (var binding in inputBindings)
+            foreach (CanvasInputBinding binding in inputBindings)
             {
                 binding.action.action.Disable();
             }
@@ -211,10 +212,10 @@ namespace Pipeline.UI.SystemCanvasManagers
         // 优先查预制体注册表，再查场景画布列表；开关、焦点与可关闭判定共用此入口。
         private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas)
         {
-            var cachedEvent = cacheManager != null ? cacheManager.GetToggleEvent(canvas) : null;
+            ToggleCanvasEventSO cachedEvent = cacheManager != null ? cacheManager.GetToggleEvent(canvas) : null;
             if (cachedEvent != null) return cachedEvent;
 
-            foreach (var eventSO in toggleCanvasEvents)
+            foreach (ToggleCanvasEventSO eventSO in toggleCanvasEvents)
             {
                 if (eventSO != null && eventSO.canvasToToggle == canvas)
                     return eventSO;
@@ -271,7 +272,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// </summary>
         private void CollectInputBindingRequests()
         {
-            foreach (var binding in inputBindings)
+            foreach (CanvasInputBinding binding in inputBindings)
             {
                 bool pressed = binding.action.action.WasPressedThisFrame();
                 inputState[binding.canvas] = inputState[binding.canvas] || pressed;
@@ -324,7 +325,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         private CanvasToToggle FindRequestedCanvas()
         {
             // 有按键绑定的画布保持 Inspector 列表顺序，保证多个输入同帧触发时行为稳定。
-            foreach (var binding in inputBindings)
+            foreach (CanvasInputBinding binding in inputBindings)
             {
                 if (binding.canvas == CanvasToToggle.ESC)
                 {
@@ -356,7 +357,7 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         private bool HasInputBinding(CanvasToToggle canvas)
         {
-            foreach (var binding in inputBindings)
+            foreach (CanvasInputBinding binding in inputBindings)
             {
                 if (binding.canvas == canvas)
                 {
@@ -379,8 +380,8 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         private void ResetInputState()
         {
-            var keys = new List<CanvasToToggle>(inputState.Keys);
-            foreach (var key in keys)
+            List<CanvasToToggle> keys = new List<CanvasToToggle>(inputState.Keys);
+            foreach (CanvasToToggle key in keys)
             {
                 inputState[key] = false;
             }

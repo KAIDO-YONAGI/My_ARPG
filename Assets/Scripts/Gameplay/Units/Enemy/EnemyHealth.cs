@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Interfaces;
 using Gameplay.Player.Services;
 using Pipeline.SO.Events;
 using UnityEngine;

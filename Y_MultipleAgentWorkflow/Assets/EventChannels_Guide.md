@@ -64,7 +64,7 @@
 
 ### 2.4 订阅与发布惯例
 
-**订阅必须成对。** 场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订；纯 C# Controller 在构造与 `Dispose` 中成对处理。缓存界面的开关与焦点事件由 `UIViewCache.Connect/Disconnect` 承接，并随 `UICacheManager` 启停；View 停用时开关入口仍然有效。`OpenOnToggleEvent` 控制是否直接响应打开，对话与任务先由业务入口准备数据再打开；缓存始终接收关闭请求。
+**订阅必须成对。** 场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订；纯 C# Controller 在构造与 `Dispose` 中成对处理。缓存界面的开关与焦点事件由 `UIViewInstanceCache.Connect/Disconnect` 承接，并随 `UICacheManager` 启停；View 停用时开关入口仍然有效。`OpenOnToggleEvent` 控制是否直接响应打开，对话与任务先由业务入口准备数据再打开；缓存始终接收关闭请求。
 
 代表写法，取字段、`+=` 与同名 `-=` 一次可见：
 
@@ -131,7 +131,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 1. 新建类时把它放在事件通道目录，`[CreateAssetMenu(menuName = "Events/<类名>")]`，包一层 `public event Action<...>` 加一个发布方法，照抄同族命名风格，见 §2.2。
 2. 在 Events 目录或多实例子目录右键 `Create > Events > ...` 建资产，随即改名；默认文件名是类名，`VoidEventSO` 必须补语义前缀。
 3. 发布方用 `[SerializeField]` 拖该资产；订阅方在 `OnEnable` 与 `OnDisable` 成对 `+=` 与 `-=`；两侧都拖到同一个资产，见 §3.3。
-4. 画布开关通道要给资产设 `canvasToToggle`。场景画布将事件登记进 `UIManager.toggleCanvasEvents`；缓存界面把带该事件的 `Contracts.CachedCanvasView` 预制体登记进 `UICacheManager.views`。
+4. 画布开关通道要给资产设 `canvasToToggle`。场景画布将事件登记进 `UIManager.toggleCanvasEvents`；缓存界面把带该事件的 `Contracts.CachedCanvasViewBase` 预制体登记进 `UICacheManager.views`。
 
 ## 3. 约定与硬边界
 

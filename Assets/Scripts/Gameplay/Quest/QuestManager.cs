@@ -1,5 +1,7 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
+using Contracts.State;
 using Gameplay.Dialog.HistoryManager;
 using Pipeline.SO;
 using Pipeline.SO.Events;
@@ -121,7 +123,7 @@ namespace Gameplay.Quest
             public QuestProgressData(List<QuestObjective> objectives)
             {
                 if (objectives == null) return;
-                foreach (var objective in objectives)
+                foreach (QuestObjective objective in objectives)
                 {
                     if (objective != null)
                         questObjectives[objective] = 0;
@@ -132,20 +134,29 @@ namespace Gameplay.Quest
             public readonly Dictionary<QuestObjective, int> questObjectives = new();
         }
 
+        protected override void OnSingletonInitialized()
+        {
+            Debug.Assert(openQuestEventSO != null, nameof(openQuestEventSO), this);
+            Debug.Assert(loadQuestEventSO != null, nameof(loadQuestEventSO), this);
+            Debug.Assert(questOptionsEventSO != null, nameof(questOptionsEventSO), this);
+            Debug.Assert(sceneLoadedEvent != null, nameof(sceneLoadedEvent), this);
+            Debug.Assert(QuestRewardRequest != null, nameof(QuestRewardRequest), this);
+        }
+
         private void OnEnable()
         {
-            if (openQuestEventSO != null) openQuestEventSO.VoidEvent += OnOpenQuestBoard;
-            if (loadQuestEventSO != null) loadQuestEventSO.LoadQuestEvent += OnRefreshQuestState;
-            if (questOptionsEventSO != null) questOptionsEventSO.questOptionsEvent += OnQuestOptionChosen;
-            if (sceneLoadedEvent != null) sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+            openQuestEventSO.VoidEvent += OnOpenQuestBoard;
+            loadQuestEventSO.LoadQuestEvent += OnRefreshQuestState;
+            questOptionsEventSO.questOptionsEvent += OnQuestOptionChosen;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
         }
 
         private void OnDisable()
         {
-            if (openQuestEventSO != null) openQuestEventSO.VoidEvent -= OnOpenQuestBoard;
-            if (loadQuestEventSO != null) loadQuestEventSO.LoadQuestEvent -= OnRefreshQuestState;
-            if (questOptionsEventSO != null) questOptionsEventSO.questOptionsEvent -= OnQuestOptionChosen;
-            if (sceneLoadedEvent != null) sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+            openQuestEventSO.VoidEvent -= OnOpenQuestBoard;
+            loadQuestEventSO.LoadQuestEvent -= OnRefreshQuestState;
+            questOptionsEventSO.questOptionsEvent -= OnQuestOptionChosen;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
         }
 
         /// <summary>切换场景时关闭任务板，避免旧场景的任务板跨场景残留。</summary>
@@ -176,7 +187,7 @@ namespace Gameplay.Quest
         {
             if (!state.HasBoardData || canvasIsActive) return;
 
-            var cache = UICacheManager.Instance;
+            UICacheManager cache = UICacheManager.Instance;
             if (cache == null)
             {
                 Debug.LogWarning("任务板：UI 缓存不可用，无法打开。");
@@ -189,7 +200,7 @@ namespace Gameplay.Quest
         /// <summary>关闭任务板并清空当前选择；下次打开需要重新加载任务板数据。</summary>
         public void CloseQuestBoard()
         {
-            var cache = UICacheManager.Instance;
+            UICacheManager cache = UICacheManager.Instance;
             if (cache == null)
                 Debug.LogWarning("任务板：UI 缓存不可用，无法通过界面关闭。");
             else
@@ -253,7 +264,7 @@ namespace Gameplay.Quest
             InitializeQuestProgress(quests);
             if (quests != null)
             {
-                foreach (var quest in quests)
+                foreach (QuestSO quest in quests)
                 {
                     if (quest != null && IsQuestObjDone(quest) &&
                         GetQuestStateFromProgress(quest) == QuestState.Accepted)
@@ -265,8 +276,8 @@ namespace Gameplay.Quest
         /// <summary>向背包系统发放任务奖励；奖励内容由任务配置决定。</summary>
         private void RaiseRewardEvent(QuestSO quest)
         {
-            if (quest == null || quest.rewards == null || QuestRewardRequest == null) return;
-            foreach (var reward in quest.rewards)
+            if (quest == null || quest.rewards == null) return;
+            foreach (Reward reward in quest.rewards)
             {
                 if (reward?.rewardItem != null)
                     QuestRewardRequest.RaiseInventoryUpdateRequest(reward.rewardItem, 0, reward.quantity);
@@ -277,7 +288,7 @@ namespace Gameplay.Quest
         private void InitializeQuestProgress(List<QuestSO> quests)
         {
             if (quests == null) return;
-            foreach (var quest in quests)
+            foreach (QuestSO quest in quests)
             {
                 if (quest != null && !questProgress.ContainsKey(quest))
                     questProgress.Add(quest, new QuestProgressData(quest.questObjectives));
@@ -291,7 +302,7 @@ namespace Gameplay.Quest
             for (int i = 0; i < state.BoardQuestCount; i++)
             {
                 QuestSO quest = state.GetBoardQuest(i);
-                if (quest != null && questProgress.TryGetValue(quest, out var progress) &&
+                if (quest != null && questProgress.TryGetValue(quest, out QuestProgressData progress) &&
                     progress.questState != QuestState.Completed)
                     return quest;
             }
@@ -302,7 +313,7 @@ namespace Gameplay.Quest
         public QuestState GetQuestStateFromProgress(QuestSO quest)
         {
             if (quest == null) return QuestState.Idle;
-            return questProgress.TryGetValue(quest, out var progress)
+            return questProgress.TryGetValue(quest, out QuestProgressData progress)
                 ? progress.questState
                 : QuestState.Idle;
         }
@@ -313,7 +324,7 @@ namespace Gameplay.Quest
         /// </summary>
         public void QuestStateChanged(QuestSO quest, QuestState nextState)
         {
-            if (quest == null || !questProgress.TryGetValue(quest, out var progress)) return;
+            if (quest == null || !questProgress.TryGetValue(quest, out QuestProgressData progress)) return;
 
             bool isCurrentQuest = state.CurrentQuest == quest;
             bool stateChanged = progress.questState != nextState;
@@ -338,7 +349,7 @@ namespace Gameplay.Quest
         /// </summary>
         public void UpdateObjectiveProgress(QuestSO quest, QuestObjective objective)
         {
-            if (objective == null || !questProgress.TryGetValue(quest, out var progress)) return;
+            if (objective == null || !questProgress.TryGetValue(quest, out QuestProgressData progress)) return;
 
             int newAmount = 0;
             if (objective.targetItem != null && ItemHistoryManager.Instance != null)
@@ -358,7 +369,7 @@ namespace Gameplay.Quest
                 return;
 
             if (quest.questObjectives == null) return;
-            foreach (var objective in quest.questObjectives)
+            foreach (QuestObjective objective in quest.questObjectives)
                 UpdateObjectiveProgress(quest, objective);
         }
 
@@ -375,7 +386,7 @@ namespace Gameplay.Quest
         public int GetCurrentObjAmount(QuestSO quest, QuestObjective objective)
         {
             if (quest == null || objective == null) return 0;
-            return questProgress.TryGetValue(quest, out var progress) &&
+            return questProgress.TryGetValue(quest, out QuestProgressData progress) &&
                    progress.questObjectives.TryGetValue(objective, out int amount)
                 ? amount
                 : 0;
@@ -401,7 +412,7 @@ namespace Gameplay.Quest
             if (GetQuestStateFromProgress(quest) == QuestState.Completed) return true;
             if (quest.questObjectives == null) return false;
 
-            foreach (var objective in quest.questObjectives)
+            foreach (QuestObjective objective in quest.questObjectives)
             {
                 if (objective == null) continue;
                 if (GetCurrentObjAmount(quest, objective) < objective.requiredAmount)

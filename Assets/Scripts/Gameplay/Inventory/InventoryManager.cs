@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.State;
 using Gameplay.Dialog.HistoryManager;
 using Gameplay.Player.Services;
 using Pipeline;
@@ -169,18 +170,25 @@ namespace Gameplay.Inventory
             lootPool = new ObjectPool<Loot>(lootPrefab, lootPrewarm, transform, lootPoolMaxSize);
         }
 
+        protected override void OnSingletonInitialized()
+        {
+            Debug.Assert(lootEvent != null, nameof(lootEvent), this);
+            Debug.Assert(ShoppingRequest != null, nameof(ShoppingRequest), this);
+            Debug.Assert(QuestRewardRequest != null, nameof(QuestRewardRequest), this);
+        }
+
         private void OnEnable()
         {
-            if (lootEvent != null) lootEvent.LootEvent += OnItemLootedHandler;
-            if (ShoppingRequest != null) ShoppingRequest.InventoryUpdateRequestEvent += HandleShopping;
-            if (QuestRewardRequest != null) QuestRewardRequest.InventoryUpdateRequestEvent += HandleQuestReward;
+            lootEvent.LootEvent += OnItemLootedHandler;
+            ShoppingRequest.InventoryUpdateRequestEvent += HandleShopping;
+            QuestRewardRequest.InventoryUpdateRequestEvent += HandleQuestReward;
         }
 
         private void OnDisable()
         {
-            if (lootEvent != null) lootEvent.LootEvent -= OnItemLootedHandler;
-            if (ShoppingRequest != null) ShoppingRequest.InventoryUpdateRequestEvent -= HandleShopping;
-            if (QuestRewardRequest != null) QuestRewardRequest.InventoryUpdateRequestEvent -= HandleQuestReward;
+            lootEvent.LootEvent -= OnItemLootedHandler;
+            ShoppingRequest.InventoryUpdateRequestEvent -= HandleShopping;
+            QuestRewardRequest.InventoryUpdateRequestEvent -= HandleQuestReward;
         }
 
         /// <summary>
@@ -384,7 +392,7 @@ namespace Gameplay.Inventory
         private static bool HasSpaceInSlots(List<InventorySlotState> slots, ItemSO item)
         {
             if (item == null) return false;
-            foreach (var slot in slots)
+            foreach (InventorySlotState slot in slots)
             {
                 if (slot.item == null || slot.item == item)
                 {
@@ -464,7 +472,7 @@ namespace Gameplay.Inventory
         {
             if (slot == null || slot.SlotIndex < 0) return;
             SlotAddress address = new(slot.IsBackpackSlot, slot.SlotIndex);
-            if (!TryGetSlotState(address.isBackpack, address.index, out var item, out int quantity) ||
+            if (!TryGetSlotState(address.isBackpack, address.index, out ItemSO item, out int quantity) ||
                 item == null || quantity <= 0)
                 return;
 
@@ -478,7 +486,7 @@ namespace Gameplay.Inventory
         {
             if (slot == null || slot.SlotIndex < 0 || useItem == null) return;
             SlotAddress address = new(slot.IsBackpackSlot, slot.SlotIndex);
-            if (!TryGetSlotState(address.isBackpack, address.index, out var item, out int quantity) ||
+            if (!TryGetSlotState(address.isBackpack, address.index, out ItemSO item, out int quantity) ||
                 item == null || quantity <= 0)
                 return;
 

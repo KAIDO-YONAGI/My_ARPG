@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Enums;
 
 namespace Pipeline.UI.SystemCanvasManagers
 {
@@ -175,7 +175,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         // 链表顺序变化（打开/关闭/提升）后，通知所有已打开画布按新顺序刷新 order
         private void RefreshAllCanvasOrders()
         {
-            foreach (var canvas in canvasOpenOrder)
+            foreach (CanvasToToggle canvas in canvasOpenOrder)
             {
                 OnFocusRefreshRequested?.Invoke(canvas);
             }

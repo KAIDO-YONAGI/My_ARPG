@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Contracts.Interfaces;
 using UnityEngine;
 
-namespace Contracts
+namespace Contracts.State
 {
     /// <summary>
     /// 存档注册表，ISaveable 的登记处。静态类先于一切场景实例存在，

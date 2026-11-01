@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using Pipeline.SO.Events;
-using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 
 namespace Pipeline.UI.Runtime
@@ -14,16 +14,15 @@ namespace Pipeline.UI.Runtime
     [Serializable]
     public sealed class CachedViewBinding
     {
-        [Tooltip("要缓存的界面预制体，必须挂有 CachedUIView 派生组件。")]
-        public CachedUIView prefab;
+        [Tooltip("要缓存的界面预制体，必须挂有 CachedUIViewBase 派生组件。")]
+        public CachedUIViewBase prefab;
 
         [Tooltip("常驻场景里的挂载点，界面实例会以它为父节点创建。")]
         public GameObject anchor;
     }
 
     /// <summary>
-    /// 界面缓存的场景入口：持有注册表，创建 <see cref="UIViewCache"/>，
-    /// 并把画布开关事件与 UIManager 的状态上报连接起来。
+    /// 界面缓存的场景入口：持有注册表并创建 <see cref="UIViewInstanceCache"/>。
     /// </summary>
     /// <remarks>
     /// 本组件挂在常驻场景的 RuntimeViews 下。它不直接处理输入，
@@ -45,7 +44,7 @@ namespace Pipeline.UI.Runtime
         [Tooltip("闲置超过多少秒后销毁实例，0 表示关闭后下一帧销毁。")]
         [Min(0f)] [SerializeField] private float idleTimeoutSeconds = 120f;
 
-        private UIViewCache cache;
+        private UIViewInstanceCache cache;
 
         /// <summary>当前场景中的缓存入口；场景切换时可能短暂为空。</summary>
         public static UICacheManager Instance { get; private set; }
@@ -58,22 +57,20 @@ namespace Pipeline.UI.Runtime
 
         private void Awake()
         {
+            Debug.Assert(canvasOpenedEvent != null, nameof(canvasOpenedEvent), this);
             Instance = this;
-            cache = new UIViewCache(
+            cache = new UIViewInstanceCache(
                 views,
                 transform,
                 maxIdleViews,
-                idleTimeoutSeconds,
-                UIManager.Report,
-                GetCanvasOrder);
+                idleTimeoutSeconds);
         }
 
         private void OnEnable()
         {
             Instance = this;
             cache.Connect();
-            if (canvasOpenedEvent != null)
-                canvasOpenedEvent.CanvasOpened += OnCanvasOpened;
+            canvasOpenedEvent.CanvasOpened += OnCanvasOpened;
         }
 
         private void Update()
@@ -84,8 +81,7 @@ namespace Pipeline.UI.Runtime
 
         private void OnDisable()
         {
-            if (canvasOpenedEvent != null)
-                canvasOpenedEvent.CanvasOpened -= OnCanvasOpened;
+            canvasOpenedEvent.CanvasOpened -= OnCanvasOpened;
             cache?.CloseAll();
             cache?.Disconnect();
         }
@@ -104,7 +100,7 @@ namespace Pipeline.UI.Runtime
         }
 
         /// <summary>取某个界面的预制体资产；未注册时返回 null。</summary>
-        public CachedUIView GetPrefab(CanvasToToggle canvas)
+        public CachedUIViewBase GetPrefab(CanvasToToggle canvas)
         {
             return cache?.GetPrefab(canvas);
         }
@@ -137,14 +133,6 @@ namespace Pipeline.UI.Runtime
         public void ClearIdle()
         {
             cache?.ClearIdle();
-        }
-
-        /// <summary>向 UIManager 查询画布排序；UIManager 尚未就绪时回落到默认层级。</summary>
-        private int GetCanvasOrder(CanvasToToggle canvas, bool state)
-        {
-            return UIManager.Instance != null
-                ? UIManager.Instance.GetCanvasOrder(canvas, state)
-                : UIManager.DefaultOrder;
         }
 
         /// <summary>画布打开后刷新最近使用顺序，供闲置淘汰使用。</summary>

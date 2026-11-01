@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Base;
 
 namespace Gameplay.Dialog.HistoryManager
 {

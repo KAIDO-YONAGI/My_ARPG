@@ -1,5 +1,7 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
+using Contracts.Interfaces;
 using Pipeline.SO;
 using Pipeline.SO.Events;
 using TMPro;
@@ -127,7 +129,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         {
             if (pageNumText != null)
                 pageNumText.text = ((startNum / buttonsEachPage) + 1).ToString();
-            foreach (var button in integratedButtons)
+            foreach (Button button in integratedButtons)
             {
                 if (button == null) continue;
                 button.gameObject.SetActive(false);

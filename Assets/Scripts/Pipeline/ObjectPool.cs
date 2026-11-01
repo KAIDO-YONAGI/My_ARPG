@@ -47,7 +47,7 @@ namespace Pipeline
         {
             for (int i = 0; i < count; i++)
             {
-                var obj = CreateNew();
+                T obj = CreateNew();
                 obj.gameObject.SetActive(false);
                 _pool.Enqueue(obj);
             }
@@ -94,7 +94,7 @@ namespace Pipeline
         {
             while (_pool.Count > 0)
             {
-                var obj = _pool.Dequeue();
+                T obj = _pool.Dequeue();
                 if (obj != null) return obj;
             }
             return null;
@@ -102,7 +102,7 @@ namespace Pipeline
 
         private T CreateNew()
         {
-            var obj = Object.Instantiate(_prefab, _parent);
+            T obj = Object.Instantiate(_prefab, _parent);
             // 实例化过程中 Awake/OnEnable 已经跑过，这里补一次「由池创建」回调，
             // 让实现有机会退回那次自动副作用（见 IPoolable.OnPoolCreated）。
             (obj as IPoolable)?.OnPoolCreated();
@@ -116,7 +116,7 @@ namespace Pipeline
         {
             while (_pool.Count > 0)
             {
-                var obj = _pool.Dequeue();
+                T obj = _pool.Dequeue();
                 // 场景卸载可能已销毁池内对象，跳过已销毁对象以避免 MissingReferenceException。
                 if (obj != null)
                     Object.Destroy(obj.gameObject);

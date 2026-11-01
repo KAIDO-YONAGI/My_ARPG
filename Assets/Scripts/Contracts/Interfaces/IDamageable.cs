@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Contracts
+namespace Contracts.Interfaces
 {
     /// <summary>
     /// 可受伤目标统一入口：玩家攻击命中时只需 GetComponent 一次，调用 TakeDamage 即可。

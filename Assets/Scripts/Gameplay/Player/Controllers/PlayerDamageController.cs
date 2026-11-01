@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Enums;
 using UnityEngine;
 using Gameplay.Player.Services;
 using Pipeline.Scene;

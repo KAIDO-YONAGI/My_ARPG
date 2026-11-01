@@ -15,7 +15,7 @@
 | `执行顺序`、`DefaultExecutionOrder`、`CameraPixelSnap` | `Composition_Guide.md` §2.4 |
 | `SaveRegistry`、`注册表`、`Domain Reload`、`局间复位`、`ISaveable` | `Composition_Guide.md` §2.5 |
 | `ICanvasManager`、`焦点栈`、`CanvasFocusStack`、`sortingOrder` | `Composition_Guide.md` §2.6 |
-| `界面缓存`、`预制体注册`、`UIViewCache`、`LRU` | `Composition_Guide.md` §2.7 |
+| `界面缓存`、`预制体注册`、`UIViewInstanceCache`、`LRU` | `Composition_Guide.md` §2.7 |
 | `新增单例吗`、`能不能加个 Manager`、`接线约定` | `Composition_Guide.md` §3 |
 
 ## 下级导航

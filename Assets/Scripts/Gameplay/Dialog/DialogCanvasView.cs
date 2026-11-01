@@ -1,5 +1,6 @@
 using System;
-using Contracts;
+using Contracts.Base;
+using Pipeline.SO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,7 +16,7 @@ namespace Gameplay.Dialog
     /// 选项按钮在 <c>Awake</c> 里一次性注册点击监听，按钮和文本全部来自预制体序列化引用；
     /// 对话数据本身由管理器持有，缓存销毁界面不会丢失剧情进度。
     /// </remarks>
-    public sealed class DialogCanvasView : CachedCanvasView
+    public sealed class DialogCanvasView : CachedCanvasViewBase
     {
         [Header("对话内容")]
         [Tooltip("说话者立绘。")]
@@ -85,13 +86,13 @@ namespace Gameplay.Dialog
         /// </summary>
         private void RefreshIfDirty()
         {
-            var manager = DialogManager.Instance;
+            DialogManager manager = DialogManager.Instance;
             if (!IsOpen || manager == null) return;
 
-            var state = manager.CurrentState;
+            DialogManager.State state = manager.CurrentState;
             if (!state.IsDirty) return;
 
-            var dialog = state.CurrentDialog;
+            DialogSO dialog = state.CurrentDialog;
             if (dialog == null || dialog.dialogLines == null || dialog.dialogLines.Length == 0)
             {
                 SetChoicesVisible(false);
@@ -100,7 +101,7 @@ namespace Gameplay.Dialog
             }
 
             int lineIndex = Mathf.Clamp(state.CurrentLineIndex - 1, 0, dialog.dialogLines.Length - 1);
-            var line = dialog.dialogLines[lineIndex];
+            DialogLine line = dialog.dialogLines[lineIndex];
             if (line.speaker != null)
             {
                 speakerPortrait.sprite = line.speaker.characterPortrait;
@@ -123,14 +124,14 @@ namespace Gameplay.Dialog
         /// <summary>统一隐藏或显示所有选项按钮。</summary>
         private void SetChoicesVisible(bool visible)
         {
-            foreach (var button in optionButtons)
+            foreach (Button button in optionButtons)
                 button.gameObject.SetActive(visible);
         }
 
         /// <summary>关闭时通知管理器退出对话状态。</summary>
         protected override void OnClose()
         {
-            var manager = DialogManager.Instance;
+            DialogManager manager = DialogManager.Instance;
             if (manager == null)
             {
                 Debug.LogWarning("DialogManager 不可用，对话视图无法上报关闭。");

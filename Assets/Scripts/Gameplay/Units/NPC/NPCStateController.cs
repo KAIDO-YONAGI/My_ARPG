@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Enums;
 using UnityEngine;
 using UnityEngine.Serialization;
 

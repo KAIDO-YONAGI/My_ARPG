@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Enums;
+using Contracts.Interfaces;
 using Pipeline.Scene;
 using Pipeline.SO;
 using Pipeline.SO.Events;
@@ -54,10 +55,10 @@ namespace Gameplay.Save
         private void Start()
         {
             // 一次性注册按钮监听（引用已在 Inspector 序列化好）
-            foreach (var group in saveLoadButtonGroups)
+            foreach (SaveLoadButtonGroup group in saveLoadButtonGroups)
             {
                 if (group == null || group.saveButton == null || group.loadButton == null) continue;
-                var g = group;
+                SaveLoadButtonGroup g = group;
                 g.saveButton.onClick.AddListener(() => OnClickSave(g));
                 g.loadButton.onClick.AddListener(() => OnClickLoad(g));
             }
@@ -118,7 +119,7 @@ namespace Gameplay.Save
             files = SaveSystem.Instance.GetSavesPath(saveType);
 
             int i = 0;
-            foreach (var group in saveLoadButtonGroups)
+            foreach (SaveLoadButtonGroup group in saveLoadButtonGroups)
             {
                 if (i >= files.Length)
                 {
@@ -176,7 +177,7 @@ namespace Gameplay.Save
         private void RefreshSaveButtonState()
         {
             bool isMenuScene = IsMenuScene();
-            foreach (var group in saveLoadButtonGroups)
+            foreach (SaveLoadButtonGroup group in saveLoadButtonGroups)
             {
                 if (group.saveButtonText != null)
                 {

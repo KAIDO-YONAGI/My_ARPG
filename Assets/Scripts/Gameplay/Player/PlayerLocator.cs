@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Base;
 using UnityEngine;
 
 namespace Gameplay.Player

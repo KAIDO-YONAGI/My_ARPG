@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Contracts
+namespace Pipeline.SO
 {
     /// <summary>
     /// 带稳定 GUID 的 ScriptableObject 基类。首次在 Inspector 校验时生成 GUID，

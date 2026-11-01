@@ -1,5 +1,5 @@
 using System.Collections;
-using Contracts;
+using Contracts.Enums;
 using Gameplay.Player.Services;
 using Pipeline;
 using Pipeline.SO.Events;

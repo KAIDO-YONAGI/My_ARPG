@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Contracts
+namespace Contracts.Base
 {
     /// <summary>
     /// 抽象单例基类：提供只读 Instance 访问、重复实例销毁、OnDestroy 复位。

@@ -1,4 +1,5 @@
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using TMPro;
 using UnityEngine;
 using Gameplay.Player.Controllers;
@@ -17,7 +18,7 @@ namespace Gameplay.Player.Views
     /// 数值状态保存在 <see cref="StatsService"/>，视图只负责显示；
     /// 面板被缓存销毁后重新打开，会重新读取当前数值，不会丢失属性进度。
     /// </remarks>
-    public class StatsCanvasView : CachedUIView
+    public class StatsCanvasView : CachedUIViewBase
     {
         [Header("属性文本")]
         [Tooltip("属性文本数组：0 是伤害，1 是速度。")]
@@ -51,6 +52,7 @@ namespace Gameplay.Player.Views
         private void Awake()
         {
             Debug.Assert(statTexts != null, nameof(statTexts), this);
+            Debug.Assert(sceneLoadedEvent != null, nameof(sceneLoadedEvent), this);
             for (int i = 0; i < statTexts.Length; i++)
                 Debug.Assert(statTexts[i] != null, $"{nameof(statTexts)}[{i}]", this);
         }
@@ -72,15 +74,13 @@ namespace Gameplay.Player.Views
 
             controller = new StatsCanvasController(this);
             controller.Refresh();
-            if (sceneLoadedEvent != null)
-                sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
         }
 
         /// <summary>关闭时退订、释放控制器，并把面板恢复到打开前的位置。</summary>
         protected override void OnClose()
         {
-            if (sceneLoadedEvent != null)
-                sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
             controller.Dispose();
             controller = null;
 
@@ -92,7 +92,7 @@ namespace Gameplay.Player.Views
         /// <summary>切场景时请求关闭属性面板；真正的关闭仍走 UIManager 的统一流程。</summary>
         private void OnSceneLoaded(GameSceneSO _)
         {
-            var manager = UIManager.Instance;
+            UIManager manager = UIManager.Instance;
             if (manager == null)
             {
                 Debug.LogWarning("UIManager 不可用，场景加载后无法关闭属性面板。");

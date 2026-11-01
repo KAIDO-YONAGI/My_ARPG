@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -64,7 +65,7 @@ namespace Pipeline.Pathfinding
 
             for (int i = 0; i < 8; i++)
             {
-                var neighborKey = (cx + dirX[i], cy + dirY[i]);
+                (int, int) neighborKey = (cx + dirX[i], cy + dirY[i]);
                 if (nodeCellMap.TryGetValue(neighborKey, out AStarNode neighbor)
                     && neighbor.GetNodeType() == AStarNodeType.Obstacle)
                 {
@@ -89,7 +90,7 @@ namespace Pipeline.Pathfinding
             marginY = Mathf.Clamp(marginY, -maxMargin, maxMargin);
 
             Vector3 optNode = new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
-            var optCell = WorldToCell(optNode);
+            (int x, int y) optCell = WorldToCell(optNode);
             if (nodeCellMap.TryGetValue(optCell, out AStarNode optCellNode)
                 && optCellNode.GetNodeType() != AStarNodeType.Obstacle)
                 return optNode;
@@ -150,8 +151,8 @@ namespace Pipeline.Pathfinding
                 if ((obstacleLayers.value & (1 << col.gameObject.layer)) == 0) continue;
 
                 Vector3 worldPos = col.transform.position;
-                var (cx, cy) = WorldToCell(worldPos);
-                var key = (cx, cy);
+                (int cx, int cy) = WorldToCell(worldPos);
+                (int cx, int cy) key = (cx, cy);
 
                 if (nodeCellMap.TryGetValue(key, out AStarNode node))
                 {
@@ -181,7 +182,7 @@ namespace Pipeline.Pathfinding
 
         private void ProcessTile(string layerName, int cx, int cy)
         {
-            var key = (cx, cy);
+            (int cx, int cy) key = (cx, cy);
 
             switch (layerName)
             {

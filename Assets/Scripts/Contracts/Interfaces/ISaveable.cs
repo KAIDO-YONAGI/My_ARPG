@@ -1,6 +1,7 @@
+using Contracts.State;
 using Gameplay.Save;
 
-namespace Contracts
+namespace Contracts.Interfaces
 {
     public interface ISaveable
     {

@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using Gameplay.Inventory;
 using Gameplay.Quest;
 using Gameplay.Shop;
 using NUnit.Framework;
 using Pipeline.SO;
+using Pipeline.SO.Events;
+using Pipeline.UI.SystemCanvasManagers;
 using Pipeline.UI.Runtime;
 using TMPro;
 using UnityEditor;
@@ -27,6 +30,7 @@ namespace Gameplay.Tests
         private readonly List<Object> temporaryObjects = new();
         private QuestManager originalQuestManager;
         private InventoryManager originalInventoryManager;
+        private UIManager originalUIManager;
         private QuestManager questManager;
         private InventoryManager inventoryManager;
 
@@ -35,6 +39,7 @@ namespace Gameplay.Tests
         {
             originalQuestManager = QuestManager.Instance;
             originalInventoryManager = InventoryManager.Instance;
+            originalUIManager = UIManager.Instance;
             questManager = CreateComponent<QuestManager>();
             inventoryManager = CreateComponent<InventoryManager>();
             SetSingleton(questManager);
@@ -49,6 +54,42 @@ namespace Gameplay.Tests
             temporaryObjects.Clear();
             SetSingleton(originalQuestManager);
             SetSingleton(originalInventoryManager);
+            SetSingleton(originalUIManager);
+        }
+
+        [Test]
+        public void CachedCanvasViewBase_OpenAndClose_ReportsThroughCanvasManagerLifecycle()
+        {
+            var uiManager = CreateComponent<UIManager>();
+            var openedEvent = ScriptableObject.CreateInstance<CanvasOpenedEventSO>();
+            temporaryObjects.Add(openedEvent);
+            SetField(uiManager, "canvasOpenedEvent", openedEvent);
+            SetSingleton(uiManager);
+
+            int openedCount = 0;
+            openedEvent.CanvasOpened += _ => openedCount++;
+
+            var view = CreateComponent<CachedCanvasViewBase>();
+            var group = view.gameObject.AddComponent<CanvasGroup>();
+            var canvas = view.gameObject.AddComponent<Canvas>();
+            SetField(view, "canvasId", CanvasToToggle.Shop);
+            SetField(view, "viewGroup", group);
+            SetField(view, "viewCanvas", canvas);
+
+            typeof(CachedUIViewBase).GetMethod("Open", InstanceFlags).Invoke(view, null);
+
+            Assert.AreEqual(1, openedCount);
+            var focusStack = (CanvasFocusStack)typeof(UIManager)
+                .GetField("focusStack", InstanceFlags).GetValue(uiManager);
+            Assert.IsTrue(focusStack.IsCanvasOpen(CanvasToToggle.Shop));
+            Assert.AreEqual(1f, group.alpha);
+            Assert.AreEqual(focusStack.GetCanvasOrder(CanvasToToggle.Shop, true), canvas.sortingOrder);
+
+            typeof(CachedUIViewBase).GetMethod("Close", InstanceFlags).Invoke(view, null);
+
+            Assert.IsFalse(focusStack.IsCanvasOpen(CanvasToToggle.Shop));
+            Assert.AreEqual(0f, group.alpha);
+            Assert.AreEqual(focusStack.GetCanvasOrder(CanvasToToggle.Shop, false), canvas.sortingOrder);
         }
 
         [Test]
@@ -176,14 +217,14 @@ namespace Gameplay.Tests
         {
             var asset = AssetDatabase.LoadAssetAtPath<GameObject>(
                 $"Assets/Prefabs/UI/Runtime/{prefabName}.prefab");
-            var prefab = asset.GetComponent<CachedCanvasView>();
+            var prefab = asset.GetComponent<CachedCanvasViewBase>();
             Assert.IsFalse(prefab.OpenOnToggleEvent);
 
-            var view = CreateComponent<CachedCanvasView>();
+            var view = CreateComponent<CachedCanvasViewBase>();
             view.gameObject.SetActive(true);
-            var cache = new UIViewCache(
+            var cache = new UIViewInstanceCache(
                 new[] { new CachedViewBinding { prefab = prefab, anchor = view.gameObject } },
-                view.transform, 3, 120f, (_, _, _, _) => { }, (_, _) => 0);
+                view.transform, 3, 120f);
             cache.Connect();
             try
             {
@@ -191,8 +232,8 @@ namespace Gameplay.Tests
                 Assert.AreEqual(0, cache.InstanceCount, "业务数据准备前不应创建界面。");
 
                 // 注入已打开的临时界面，验证关闭路由，无需在编辑模式创建整棵业务预制体。
-                typeof(CachedUIView).GetMethod("Open", InstanceFlags).Invoke(view, null);
-                var entries = (IDictionary)typeof(UIViewCache).GetField("entries", InstanceFlags)
+                typeof(CachedUIViewBase).GetMethod("Open", InstanceFlags).Invoke(view, null);
+                var entries = (IDictionary)typeof(UIViewInstanceCache).GetField("entries", InstanceFlags)
                     .GetValue(cache);
                 object entry = entries[prefab.CanvasId];
                 entry.GetType().GetField("View").SetValue(entry, view);
@@ -211,15 +252,15 @@ namespace Gameplay.Tests
         public void ShopOpen_WithoutKeeperDoesNotInstantiateOrRunAwake()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/Prefabs/UI/Runtime/ShopCanvas.prefab").GetComponent<CachedUIView>();
+                "Assets/Prefabs/UI/Runtime/ShopCanvas.prefab").GetComponent<CachedUIViewBase>();
             var originalShopManager = ShopManager.Instance;
             SetSingleton<ShopManager>(null);
 
             var anchor = new GameObject("ShopCacheAnchor") { hideFlags = HideFlags.HideAndDontSave };
             temporaryObjects.Add(anchor);
-            var cache = new UIViewCache(
+            var cache = new UIViewInstanceCache(
                 new[] { new CachedViewBinding { prefab = prefab, anchor = anchor } },
-                anchor.transform, 3, 120f, (_, _, _, _) => { }, (_, _) => 0);
+                anchor.transform, 3, 120f);
 
             try
             {

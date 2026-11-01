@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Base;
 using Gameplay.Player.Models;
 using Gameplay.Save;
 using Pipeline.SO;

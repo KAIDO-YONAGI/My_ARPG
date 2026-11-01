@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using Newtonsoft.Json;
 using Pipeline.Scene;
 using Pipeline.SO;
@@ -241,7 +242,7 @@ namespace Gameplay.Save
                 return null;
             }
 
-            foreach (var scene in SceneDataForSave.Instance.gameScenes.ToList())
+            foreach (GameSceneSO scene in SceneDataForSave.Instance.gameScenes.ToList())
             {
                 if (scene != null && sceneID == scene.SaveKey) return scene;
             }

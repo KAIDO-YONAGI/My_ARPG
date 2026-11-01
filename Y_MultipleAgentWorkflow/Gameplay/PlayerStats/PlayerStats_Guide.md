@@ -143,11 +143,11 @@ expToUpgrade = Mathf.Max(1, expToUpgrade + step)  // 下限仍受 MinExpToUpgrad
 
 ### 2.10 属性面板的预制体与缓存
 
-`StatsCanvasView` 继承 `Contracts.CachedUIView`，预制体是 `Assets/Prefabs/UI/Runtime/StatsCanvas.prefab`。常驻场景只在 `UICacheManager.views` 里以 `prefab + anchor` 登记，不预放面板实例。首次打开创建，关闭后退订模型与场景完成事件、恢复拖动位置并停用对象；重开时重新创建 Controller，读取当前数值。
+`StatsCanvasView` 继承 `Contracts.CachedUIViewBase`，预制体是 `Assets/Prefabs/UI/Runtime/StatsCanvas.prefab`。常驻场景只在 `UICacheManager.views` 里以 `prefab + anchor` 登记，不预放面板实例。首次打开创建，关闭后退订模型与场景完成事件、恢复拖动位置并停用对象；重开时重新创建 Controller，读取当前数值。
 
 `StatsCanvasController` 保留构造时实际订阅的 `IPlayerStatsReadOnly`，`Dispose` 对同一对象退订。缓存淘汰只销毁 View，数值继续由 `StatsService` 持有。场景加载期间临时打开的面板仍会在加载完成时通过 `RequestCanvasClose(Stats)` 关闭。
 
-`HealthView`、`ExperiencePanelView` 与 `StatsCanvasView` 在创建 Controller 时通过 `StatsService.RequiredInstance` 取得必需服务；服务尚未注册时该访问会明确抛出 `InvalidOperationException`。
+三个 Controller 在构造时通过 `StatsService.Instance.Stats` 取得模型。血量与经验 View 在 `Start` 创建 Controller；属性面板在 `CanOpen` 确认服务存在后，于 `OnOpen` 创建 Controller。`StatsCanvasController` 保存实际订阅的模型，`HealthController` 与 `ExperienceController` 在退订时重新读取当前单例并判空。
 
 ## 3. 约定与硬边界
 

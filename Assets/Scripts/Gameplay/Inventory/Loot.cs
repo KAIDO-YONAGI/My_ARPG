@@ -1,5 +1,6 @@
 using System.Collections;
-using Contracts;
+using Contracts.Enums;
+using Contracts.Interfaces;
 using Gameplay.Save;
 using Pipeline;
 using Pipeline.SO;
@@ -92,7 +93,7 @@ namespace Gameplay.Inventory
         {
             if (registered) return;
 
-            var dataId = GetDataID();
+            SaveDefinition dataId = GetDataID();
             if (dataId == null) return;
             if (dataId.persistentType != PersistentType.ReadWrite) return;
             if (string.IsNullOrEmpty(dataId.ID)) dataId.ID = System.Guid.NewGuid().ToString();
@@ -116,7 +117,7 @@ namespace Gameplay.Inventory
         /// 否则新掉落物会继承上一个实体的拾取态。</summary>
         private void AssignNewIdentity()
         {
-            var dataId = GetDataID();
+            SaveDefinition dataId = GetDataID();
             if (dataId == null) return;
 
             if (!string.IsNullOrEmpty(dataId.ID) && SaveDataManager.Instance != null)
@@ -210,7 +211,7 @@ namespace Gameplay.Inventory
         {
             if (data == null || data.lootsStatsDic == null) return;
 
-            var dataId = GetDataID();
+            SaveDefinition dataId = GetDataID();
             if (dataId == null || string.IsNullOrEmpty(dataId.ID)) return;
 
             // 位置只有偏离生成态才算「改动量」；没挪过就只记拾取态，
@@ -234,7 +235,7 @@ namespace Gameplay.Inventory
             if (data == null) return;
             if (data.lootsStatsDic == null) return;
 
-            var dataId = GetDataID();
+            SaveDefinition dataId = GetDataID();
             if (dataId == null || string.IsNullOrEmpty(dataId.ID)) return;
 
             if (data.lootsStatsDic.TryGetValue(dataId.ID, out LootStatus lootStatus) && lootStatus != null)

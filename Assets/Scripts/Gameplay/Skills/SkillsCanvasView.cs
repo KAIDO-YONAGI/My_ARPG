@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Base;
 using TMPro;
 using UnityEngine;
 
@@ -12,7 +12,7 @@ namespace Gameplay.Skills
     /// 技能等级与解锁状态保存在管理器里，视图关闭后不保留业务数据；
     /// 重新打开时槽位会向管理器重新拉取状态，因此缓存销毁和重建不会重置技能。
     /// </remarks>
-    public sealed class SkillsCanvasView : CachedCanvasView
+    public sealed class SkillsCanvasView : CachedCanvasViewBase
     {
         [Header("技能控件")]
         [Tooltip("技能槽位，顺序即技能树中的显示顺序。")]
@@ -38,7 +38,7 @@ namespace Gameplay.Skills
         protected override void OnOpen()
         {
             manager = SkillTreeManager.RequiredInstance;
-            foreach (var slot in slots)
+            foreach (SkillSlot slot in slots)
                 slot.BindStateRoot(transform);
 
             SkillSlot.OnMaxSkillLevel += HandleSkillMaxed;
@@ -56,7 +56,7 @@ namespace Gameplay.Skills
         {
             if (!IsOpen || manager == null) return;
 
-            var state = manager.CurrentState;
+            SkillTreeManager.State state = manager.CurrentState;
             if (!state.AnyDirty) return;
 
             if (state.IsAbilityPointsDirty)
@@ -66,7 +66,7 @@ namespace Gameplay.Skills
 
             if (state.IsSkillsDirty)
             {
-                foreach (var slot in slots)
+                foreach (SkillSlot slot in slots)
                     slot.RefreshFromManager();
             }
 
@@ -76,7 +76,7 @@ namespace Gameplay.Skills
         /// <summary>某个技能升满后，检查并解锁满足前置条件的其他技能。</summary>
         private void HandleSkillMaxed(SkillSlot _)
         {
-            foreach (var slot in slots)
+            foreach (SkillSlot slot in slots)
             {
                 if (!slot.IsUnlocked && slot.CanUnlockSkill())
                     slot.Unlock();

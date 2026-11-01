@@ -1,5 +1,8 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
+using Contracts.Interfaces;
+using Contracts.State;
 using Gameplay.Units.ShopKeeper;
 using Pipeline.SO;
 using Pipeline.SO.Events;
@@ -109,26 +112,25 @@ namespace Gameplay.Shop
             Armor
         }
 
+        protected override void OnSingletonInitialized()
+        {
+            Debug.Assert(shopKeeperEvent != null, nameof(shopKeeperEvent), this);
+            Debug.Assert(sceneLoadedEvent != null, nameof(sceneLoadedEvent), this);
+            Debug.Assert(InventoryUpdateRequest != null, nameof(InventoryUpdateRequest), this);
+        }
+
         private void OnEnable()
         {
-            if (shopKeeperEvent != null)
-            {
-                shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
-                shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
-            }
-            if (sceneLoadedEvent != null)
-                sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
+            shopKeeperEvent.ShopKeeperEntered += OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited += OnKeeperExited;
+            sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
         }
 
         private void OnDisable()
         {
-            if (shopKeeperEvent != null)
-            {
-                shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
-                shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
-            }
-            if (sceneLoadedEvent != null)
-                sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
+            shopKeeperEvent.ShopKeeperEntered -= OnKeeperEntered;
+            shopKeeperEvent.ShopKeeperExited -= OnKeeperExited;
+            sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
         }
 
         /// <summary>切换场景时关闭商店，避免旧场景的店主数据残留。</summary>
@@ -165,7 +167,7 @@ namespace Gameplay.Shop
             shopArmor = armor;
             currentCategory = ShopCategory.Items;
             PublishCurrentItems();
-            var cache = UICacheManager.Instance;
+            UICacheManager cache = UICacheManager.Instance;
             if (cache == null)
             {
                 Debug.LogWarning("商店画布：UI 缓存不可用，无法打开。");
@@ -240,15 +242,15 @@ namespace Gameplay.Shop
         /// <summary>购买一个商品：向背包系统发正数量请求，金币检查在背包侧完成。</summary>
         public void TryBuyItem(ItemSO item, int price)
         {
-            if (item == null || InventoryUpdateRequest == null) return;
+            if (item == null) return;
             InventoryUpdateRequest.RaiseInventoryUpdateRequest(item, price, 1);
         }
 
         /// <summary>出售一个商品：在当前分类里按物品匹配报价，再发负数量请求。</summary>
         public void SellItem(ItemSO item)
         {
-            if (item == null || InventoryUpdateRequest == null) return;
-            foreach (var slot in state.Items)
+            if (item == null) return;
+            foreach (ShopItems slot in state.Items)
             {
                 if (slot != null && slot.item == item)
                 {
@@ -283,7 +285,7 @@ namespace Gameplay.Shop
         /// <summary>请求界面缓存关闭商店画布；缓存缺失时只记录警告。</summary>
         private static void CloseShopCanvas()
         {
-            var cache = UICacheManager.Instance;
+            UICacheManager cache = UICacheManager.Instance;
             if (cache == null)
             {
                 Debug.LogWarning("商店画布：UI 缓存不可用，无法通过界面关闭。");

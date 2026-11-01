@@ -2,7 +2,7 @@
 
 文档 ID：`BUS-ARCHITECTURE`
 状态：`Active`
-维护计数：`0/5`
+维护计数：`1/5`
 最后更新：`2026-11-01`
 
 ## 任务线索
@@ -16,7 +16,7 @@
 | `isLoading` `IsLoadingSaveRequest` `DefaultExecutionOrder` | `Composition\Composition_Guide.md` |
 | `SaveRegistry` `Domain Reload` `局间复位` | `Composition\Composition_Guide.md` |
 | `ICanvasManager` `焦点栈` `sortingOrder` `画布契约` | `Composition\Composition_Guide.md` |
-| `界面缓存` `预制体注册` `UIViewCache` `LRU` | `Composition\Composition_Guide.md` §2.7 |
+| `界面缓存` `预制体注册` `UIViewInstanceCache` `LRU` | `Composition\Composition_Guide.md` §2.7 |
 | `asmdef` `程序集拆分` `xLua` `热更` `事件总线` `事件可视化` | `AssemblyPlan\AssemblyPlan_Proposal.md` |
 
 ## 下级导航

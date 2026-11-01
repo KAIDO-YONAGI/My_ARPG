@@ -1,4 +1,5 @@
-using Contracts;
+using Contracts.Enums;
+using Contracts.Interfaces;
 using Pipeline.SO;
 using Pipeline.SO.Events;
 using UnityEngine;

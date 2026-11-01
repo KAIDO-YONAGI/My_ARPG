@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using UnityEngine;
 
 //TODO 可能的优化：动态A*，距离算法的优化
@@ -40,9 +41,9 @@ namespace Pipeline.Pathfinding
             closeSet.Clear();
             heap.Clear();
 
-            var startCell = WorldToCell(startPos);
-            var endCell = WorldToCell(endPos);
-            var optCell = WorldToCell(optPos);
+            (int x, int y) startCell = WorldToCell(startPos);
+            (int x, int y) endCell = WorldToCell(endPos);
+            (int x, int y) optCell = WorldToCell(optPos);
 
 
             if (startCell != optCell
@@ -68,7 +69,7 @@ namespace Pipeline.Pathfinding
                 if (!openDic.TryGetValue(entry.Pos, out AStarDetails current)) continue;
                 if (entry.G > current.GetDisToBeg()) continue;
 
-                var currentPos = entry.Pos;
+                (int x, int y) currentPos = entry.Pos;
                 openDic.Remove(currentPos);
                 closeSet.Add(currentPos);
 
@@ -94,7 +95,7 @@ namespace Pipeline.Pathfinding
                 int cx = (int)Math.Round(startCell.x + vecX * threshold);
                 int cy = (int)Math.Round(startCell.y + vecY * threshold);
 
-                var key = (cx, cy);
+                (int cx, int cy) key = (cx, cy);
                 if (NodeCellMap.TryGetValue(key, out AStarNode node))
                 {
                     if (node.GetNodeType() == AStarNodeType.Obstacle)
@@ -132,7 +133,7 @@ namespace Pipeline.Pathfinding
             {
                 int nx = cx + dirX[i];
                 int ny = cy + dirY[i];
-                var neighborPos = (x: nx, y: ny);
+                (int x, int y) neighborPos = (x: nx, y: ny);
 
                 if (closeSet.Contains(neighborPos)) continue;
                 if (!NodeCellMap.TryGetValue(neighborPos, out AStarNode neighbor)

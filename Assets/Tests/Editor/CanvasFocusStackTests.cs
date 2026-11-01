@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Enums;
 using NUnit.Framework;
 using Pipeline.UI.SystemCanvasManagers;
 

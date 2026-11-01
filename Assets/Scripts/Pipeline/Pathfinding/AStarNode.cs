@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Enums;
 
 namespace Pipeline.Pathfinding
 {

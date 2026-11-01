@@ -1,5 +1,5 @@
 using System.Collections;
-using Contracts;
+using Contracts.Enums;
 using UnityEngine;
 
 namespace Gameplay.Units.Enemy

@@ -36,13 +36,13 @@
 - 来源是升级：`PlayerStatsModel.AddExp` 结算完升级后广播 `LevelUp(levelsGained)`。
 - 发放：`SkillTreeManager.UpdateAbilityPoints(amount)` 调 `StatsService.UpdateSkillPoints(amount)`；技能点文本由 `SkillsCanvasView` 读取 `State.AbilityPointsValue` 刷新，管理器不碰控件。一次升多级就发多点，读档不补发。
 - 支出：点击槽位由 `SkillSlot` 自己在 `OnEnable` 绑定 `TryUpgradeSkill`；升级成功广播 `OnAbilityPointSpent`，`SkillTreeManager.HandleAbilityPointSpent` 再查一次余额并 `UpdateAbilityPoints(-1)`。
-- 界面刷新点有三处：`Start` 结束时调 `UpdateAbilityPoints(0)`、升级事件、扣点回调。技能点变化本身不发事件，跳过 `UpdateAbilityPoints` 直接写 `StatsService` 会让点数文本变旧。
+- 管理器在 `Start` 通过 `RefreshAbilityPoints()` 同步当前技能点，升级事件与扣点回调通过 `UpdateAbilityPoints` 写入数值并更新 State。技能点变化本身不发事件，跳过管理器直接写 `StatsService` 会让 State 中的点数变旧。
 
 ### 2.3 SkillTreeManager 的职责
 
-`SkillTreeManager` 订阅 `SkillSlot.OnAbilityPointSpent`、`SkillSlot.OnMaxSkillLevel` 与 `PlayerStatsModel.LevelUp`，负责点数收支、满级后按前置条件批量解锁，并按 `SkillState` 保存各槽位的等级与解锁状态；技能点及脏状态由 `State` 提供只读查询和标记清理方法，文本与按钮由视图负责。订阅在 `OnEnable`，退订在 `OnDisable`。
+`SkillTreeManager` 订阅 `SkillSlot.OnAbilityPointSpent` 与 `PlayerStatsModel.LevelUp`，负责点数收支，并按 `SkillState` 保存各槽位的等级与解锁状态；技能点及脏状态由 `State` 提供只读查询和标记清理方法，文本与按钮由视图负责。订阅在 `OnEnable`，退订在 `OnDisable`。
 
-- 满级解锁：`HandleSkillMaxed` 遍历全部槽位，把所有未解锁且前置满足的槽位一次性 `Unlock()`，按前置图整体推进。
+- 满级解锁：`SkillsCanvasView` 在 `OnOpen` 订阅 `SkillSlot.OnMaxSkillLevel`，在 `OnClose` 退订；其 `HandleSkillMaxed` 遍历全部槽位，把所有未解锁且前置满足的槽位一次性 `Unlock()`，按前置图整体推进。
 - 可重试订阅：`StatsService` 是 `Awake` 里注册的单例，`SkillTreeManager.OnEnable` 可能先于它执行，此时 `StatsService.Instance` 为 null。订阅因此写在 `TrySubscribeLevelUp()` 里，用 `listeningToLevelUp` 标记幂等，并在 `OnEnable` 与 `Start` 各调一次。`UnsubscribeLevelUp` 先用标记短路，`StatsService.Instance` 为空时直接返回。
 
 ### 2.4 界面与状态同步
@@ -61,7 +61,7 @@
 
 ### 3.3 两个 static 事件必须成对退订
 
-`OnAbilityPointSpent` 与 `OnMaxSkillLevel` 都是 static，清空手段是订阅方在 `OnDisable` 退订；Domain Reload 关闭时残留订阅会跨局呼叫已销毁对象。
+`OnAbilityPointSpent` 与 `OnMaxSkillLevel` 都是 static。`SkillTreeManager` 在 `OnDisable` 退订扣点事件，`SkillsCanvasView` 在 `OnClose` 退订满级事件；Domain Reload 关闭时残留订阅会跨局呼叫已销毁对象。
 
 ### 3.4 根技能由场景预先解锁
 
@@ -83,6 +83,6 @@
 
 绕过它直接写 `StatsService.UpdateSkillPoints` 会让 `pointsText` 与实际值不一致。
 
-### 3.9 按钮回调只挂不退订
+### 3.9 按钮回调随槽位启停成对管理
 
-`skillButton.onClick.AddListener` 传的是匿名闭包，`OnDisable` 只退订两个 static 事件，不做 `RemoveListener`。`Start` 每个实例只跑一次，正常生命周期下不会叠加。
+`SkillSlot.OnEnable` 使用 `AddListener(TryUpgradeSkill)` 绑定按钮，`OnDisable` 使用 `RemoveListener(TryUpgradeSkill)` 移除同一回调，槽位重新启用时重新绑定。

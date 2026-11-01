@@ -146,11 +146,11 @@ namespace Pipeline.Pathfinding
             AStarDetails[] pathArray = path.ToArray();
 
             Gizmos.color = startColor;
-            var startCell = WorldToCell(startPos);
+            (int x, int y) startCell = WorldToCell(startPos);
             Gizmos.DrawWireSphere(CellToWorld(startCell.x, startCell.y), nodeRadius);
 
             Gizmos.color = endColor;
-            var endCell = WorldToCell(endPos);
+            (int x, int y) endCell = WorldToCell(endPos);
             Gizmos.DrawWireSphere(CellToWorld(endCell.x, endCell.y), nodeRadius);
 
             Gizmos.color = pathColor;

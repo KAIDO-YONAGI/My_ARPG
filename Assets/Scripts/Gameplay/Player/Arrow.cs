@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Contracts;
+using Contracts.Interfaces;
 using Gameplay.Player.Services;
 using Pipeline;
 using UnityEngine;
@@ -82,7 +82,7 @@ namespace Gameplay.Player
             // 例外保留：碰撞对象运行时才知道是谁，无法预引用（见重构清单 GetComponent 治理一节）
             if ((enemyLayer.value & (1 << collision.gameObject.layer)) > 0)
             {
-                if (collision.gameObject.TryGetComponent<IDamageable>(out var damageable))
+                if (collision.gameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
                 {
                     damageable.TakeDamage(damage, transform);
                     AttachToTarget(collision.gameObject.transform);

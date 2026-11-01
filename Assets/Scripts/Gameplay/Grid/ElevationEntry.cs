@@ -22,7 +22,7 @@ namespace Gameplay.Grid
             }
             else return;
             // 例外保留：触发对方是玩家碰撞体，运行时才知道是谁；补判空防 NRE
-            if (collision.gameObject.TryGetComponent<SpriteRenderer>(out var sr))
+            if (collision.gameObject.TryGetComponent<SpriteRenderer>(out SpriteRenderer sr))
                 sr.sortingOrder = 15;
         }
     }

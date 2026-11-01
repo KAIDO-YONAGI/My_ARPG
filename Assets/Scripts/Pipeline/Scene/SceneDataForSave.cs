@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
 using Pipeline.SO;
 
 namespace Pipeline.Scene

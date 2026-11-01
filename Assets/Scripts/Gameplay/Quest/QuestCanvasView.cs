@@ -1,4 +1,5 @@
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using Pipeline.SO;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace Gameplay.Quest
     /// 所有子控件都在 QuestCanvas 预制体里直接拖引用，运行时直接从这些引用读取，且不用
     /// <c>GetComponent</c> 或按名字遍历层级；管理器与视图之间只通过只读状态和脏标记通信。
     /// </remarks>
-    public sealed class QuestCanvasView : CachedCanvasView
+    public sealed class QuestCanvasView : CachedCanvasViewBase
     {
         [Header("任务列表")]
         [Tooltip("右侧任务详情面板，显示当前任务的目标与奖励。")]
@@ -76,10 +77,10 @@ namespace Gameplay.Quest
         /// </summary>
         private void RefreshIfDirty()
         {
-            var manager = QuestManager.Instance;
+            QuestManager manager = QuestManager.Instance;
             if (!IsOpen || manager == null) return;
 
-            var state = manager.CurrentState;
+            QuestManager.State state = manager.CurrentState;
             if (!state.AnyDirty) return;
 
             int questCount = state.BoardQuestCount;
@@ -146,7 +147,7 @@ namespace Gameplay.Quest
         /// <summary>关闭时通知管理器退出面板状态，下次打开重新拉取数据。</summary>
         protected override void OnClose()
         {
-            var manager = QuestManager.Instance;
+            QuestManager manager = QuestManager.Instance;
             if (manager == null)
             {
                 Debug.LogWarning("QuestManager 不可用，任务视图无法上报关闭。");

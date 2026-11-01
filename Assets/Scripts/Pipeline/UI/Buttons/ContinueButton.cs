@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Enums;
 using Gameplay.Save;
 using UnityEngine;
 using UnityEngine.UI;

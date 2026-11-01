@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Base;
+using Contracts.Enums;
 using Gameplay.Player;
 using Pipeline.SO;
 using Pipeline.SO.Events;
@@ -79,6 +80,7 @@ namespace Pipeline.Scene
         /// </summary>
         protected override void OnSingletonInitialized()
         {
+            Debug.Assert(sceneLoadedEvent != null, nameof(sceneLoadedEvent), this);
             SetPlayerPostion(initialPosition);
         }
 
@@ -299,7 +301,7 @@ namespace Pipeline.Scene
             }
 
             isInitialScene = false;
-            sceneLoadedEvent?.RaiseSceneLoadedEvent(loadedTarget);
+            sceneLoadedEvent.RaiseSceneLoadedEvent(loadedTarget);
             AllowInput();
             TimeManager.Instance.ForceResumeGame();
             isLoading = false; // 全部完成后才解锁，允许下一次加载请求
@@ -308,14 +310,14 @@ namespace Pipeline.Scene
         private void ForbidInput()
         {
             if (player == null) return;
-            var movement = PlayerMovement.Main;
+            PlayerMovement movement = PlayerMovement.Main;
             if (movement != null) movement.enabled = false;
         }
 
         private void AllowInput()
         {
             if (player == null) return;
-            var movement = PlayerMovement.Main;
+            PlayerMovement movement = PlayerMovement.Main;
             if (movement != null) movement.enabled = true;
         }
     }

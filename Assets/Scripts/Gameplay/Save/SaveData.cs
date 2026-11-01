@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Contracts;
+using Contracts.Enums;
 using Gameplay.Player.Models;
 using UnityEngine;
 
