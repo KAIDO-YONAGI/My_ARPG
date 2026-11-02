@@ -93,9 +93,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5954039841285698747}
-  - component: {fileID: 300813345599123674}
   - component: {fileID: 1870836630986557636}
   - component: {fileID: 3866848329499056819}
+  - component: {fileID: 300813345599123674}
   - component: {fileID: 4746021137863698182}
   m_Layer: 0
   m_Name: Gold
@@ -120,25 +120,6 @@ Transform:
   - {fileID: 883914944838011537}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &300813345599123674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7178226962014870998}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c20d7772c0b33bb4f8e5074ea2cac581, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: e0fc862ae13f8bb41bedb94ba6d68c17, type: 2}
-  sr: {fileID: 7171248118452406504}
-  animator: {fileID: 1870836630986557636}
-  lootEvent: {fileID: 11400000, guid: 2df8d406342501048a2adc57a2ee2d20, type: 2}
-  quantity: 0
-  canBePick: 1
-  hasBeenPicked: 0
 --- !u!95 &1870836630986557636
 Animator:
   serializedVersion: 5
@@ -195,6 +176,25 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &300813345599123674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7178226962014870998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c20d7772c0b33bb4f8e5074ea2cac581, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item: {fileID: 11400000, guid: e0fc862ae13f8bb41bedb94ba6d68c17, type: 2}
+  sr: {fileID: 7171248118452406504}
+  animator: {fileID: 1870836630986557636}
+  lootEvent: {fileID: 11400000, guid: 2df8d406342501048a2adc57a2ee2d20, type: 2}
+  quantity: 0
+  canBePick: 1
+  hasBeenPicked: 0
 --- !u!114 &4746021137863698182
 MonoBehaviour:
   m_ObjectHideFlags: 0

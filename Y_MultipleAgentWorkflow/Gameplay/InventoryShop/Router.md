@@ -2,7 +2,7 @@
 
 文档 ID：`BUS-GAMEPLAY-INVENTORYSHOP`
 状态：`Active`
-维护计数：`2/5`
+维护计数：`3/5`
 最后更新：`2026-11-02`
 
 ## 任务线索

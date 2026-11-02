@@ -3,6 +3,14 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-02 公共掉落池沿用独立 Loot 预制体
+
+- 结构：沿用 `Assets/Prefabs/Inventory/Loot.prefab`，其根对象包含 Animator、触发器、Loot 与存档标记，Sprite 子物体负责显示；实际物品由 `Initialize` 注入。
+- 接线：常驻场景 `InventoryManager.lootPrefab` 指向 `Loot.prefab`，池预热、扩容和池满时直接实例化共用该引用。具体物品预制体继续承担场景摆放职责。
+- 模板：整理根对象和 Sprite 子物体的局部位置，清理残留默认数量，沿用空物品与空图标配置、现有组件引用及动画默认值恢复配置。
+- 证据：全工程资产检索确认公共 `lootPrefab` 配置位于常驻场景；Unity 在编辑模式导入模板并保存常驻场景，返回实际模板路径为 `Assets/Prefabs/Inventory/Loot.prefab`，物品和图标为空、保存结果为成功。按用户要求未启动游戏或运行测试。
+- 文档：Guide 同步公共模板职责和引用关系，维护计数 `2/5 -> 3/5`。
+
 ## 2026-11-02 修正实际掉落模板与动画复位顺序
 
 现场检查用户指出的 `(8.5488, 2.1695, 0)` 掉落物：贴图为 `Mushroom03`，透明度为 0、子物体缩放为 `(0.7, 1, 1)`；Animator 已在空 Blend Tree 的 `Idle`，`isPicked` 为 false，记录的静止基线仍为透明度 1、缩放 `(1, 1, 1)`。残留外观与 `Pickup.anim` 末帧一致。常驻场景实际引用 `Gold.prefab`，此前修改的 `Loot.prefab` 是另一份资产，未覆盖真实池模板。

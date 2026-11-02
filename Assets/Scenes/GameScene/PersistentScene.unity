@@ -397,7 +397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useItem: {fileID: 2916573849178605761}
-  lootPrefab: {fileID: 300813345599123674, guid: b81abb055519ff5439495c48b134a0ee, type: 3}
+  lootPrefab: {fileID: 6966510994417648430, guid: 96f2efcecf1a358409f694adadbddbed, type: 3}
   player: {fileID: 5360259125137984082}
   lootPrewarm: 4
   lootPoolMaxSize: 20
