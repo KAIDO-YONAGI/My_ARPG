@@ -13,6 +13,7 @@ namespace Gameplay.Inventory
     public class Loot : MonoBehaviour, ISaveable, IPoolable
     {
         private static readonly int IsPicked = Animator.StringToHash("isPicked");
+        private static readonly int IdleState = Animator.StringToHash("Idle");
 
         public ItemSO item;
         public SpriteRenderer sr;
@@ -40,6 +41,14 @@ namespace Gameplay.Inventory
         /// OnPoolReturn、OnDestroy 里都会走到，用标记保证幂等。</summary>
         private bool registered;
 
+        /// <summary>预制体上的静止显示状态：Pickup 片段会写掉透明度、排序层级和子物体缩放，
+        /// 池复用前按这几项写回。首次取用前不会跑任何动画，所以第一次读到的就是基线。</summary>
+        private Color restColor;
+        private int restSortingOrder;
+        private Vector3 restSpriteScale;
+        private Vector3 restSpritePosition;
+        private bool visualBaselineCaptured;
+
         /// <summary>由 InventoryManager 在取件后注入，拾取/回收时经它归还池中</summary>
         public void SetSourcePool(ObjectPool<Loot> pool) => sourcePool = pool;
 
@@ -47,6 +56,7 @@ namespace Gameplay.Inventory
         {
             saveDef = GetComponent<SaveDefinition>();//自身组件一次性缓存
             baselinePosition = transform.position;//场景摆放位置即生成态基准
+            CaptureVisualBaseline();
             // 场景摆放的 loot 靠这里进存档系统（它们没有池的 Get/Return 生命周期）；
             // 池化实例紧随其后由 OnPoolCreated 退回未注册态，不会混进存档。
             RegisterSelf();
@@ -146,6 +156,9 @@ namespace Gameplay.Inventory
             canBePick = false;
             this.item = item;
             this.quantity = quantity;
+            gameObject.SetActive(true);//先激活，动画状态才可复位
+            CaptureVisualBaseline();
+            ResetVisualState();
 
             if (needsNewBaseline)
             {
@@ -158,8 +171,40 @@ namespace Gameplay.Inventory
             // 否则它的存档条目会跟着 RemoveLootRegistration 一起消失（重进场景复活）。
             // 全新掉落的身份由 OnPoolGet 换发，见那边注释。
             UpdateAppearence();
-            gameObject.SetActive(true);
             RegisterSelf();
+        }
+
+        /// <summary>记录预制体上的静止显示状态。池对象在第一次被取用前只经历 Awake 与启用停用，
+        /// 不跑动画，这时读到的是预制体原样。</summary>
+        private void CaptureVisualBaseline()
+        {
+            if (visualBaselineCaptured) return;
+
+            Transform spriteTransform = sr.transform;
+            visualBaselineCaptured = true;
+            restColor = sr.color;
+            restSortingOrder = sr.sortingOrder;
+            restSpriteScale = spriteTransform.localScale;
+            restSpritePosition = spriteTransform.localPosition;
+        }
+
+        /// <summary>静止时由脚本管理外观。空 Idle 的动画图仍可能写回 Pickup 末帧，
+        /// 因此先退出拾取状态并停用 Animator，再恢复本实例的显示基线；
+        /// 下次开始拾取时重新启用 Animator。</summary>
+        private void ResetVisualState()
+        {
+            animator.enabled = true;
+            animator.SetBool(IsPicked, false);
+            animator.Play(IdleState, 0, 0f);
+            animator.Update(0f);
+            animator.enabled = false;
+
+            Transform spriteTransform = sr.transform;
+            sr.enabled = true;
+            sr.color = restColor;
+            sr.sortingOrder = restSortingOrder;
+            spriteTransform.localScale = restSpriteScale;
+            spriteTransform.localPosition = restSpritePosition;
         }
 
         private void UpdateAppearence()
@@ -171,7 +216,8 @@ namespace Gameplay.Inventory
         {
             if (collision.CompareTag("Player") && canBePick)
             {
-                animator.Play("Pickup");
+                animator.enabled = true;
+                animator.Play("Pickup", 0, 0f);
                 animator.SetBool(IsPicked, true);
                 lootEvent.OnEventRaised(item, quantity, this);
                 hasBeenPicked = true;

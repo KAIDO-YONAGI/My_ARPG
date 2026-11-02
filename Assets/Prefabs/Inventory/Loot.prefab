@@ -140,7 +140,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 1
 --- !u!58 &4669241266981396972
 CircleCollider2D:
   m_ObjectHideFlags: 0

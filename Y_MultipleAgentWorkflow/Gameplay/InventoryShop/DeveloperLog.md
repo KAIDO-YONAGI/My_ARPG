@@ -3,6 +3,25 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-02 修正实际掉落模板与动画复位顺序
+
+现场检查用户指出的 `(8.5488, 2.1695, 0)` 掉落物：贴图为 `Mushroom03`，透明度为 0、子物体缩放为 `(0.7, 1, 1)`；Animator 已在空 Blend Tree 的 `Idle`，`isPicked` 为 false，记录的静止基线仍为透明度 1、缩放 `(1, 1, 1)`。残留外观与 `Pickup.anim` 末帧一致。常驻场景实际引用 `Gold.prefab`，此前修改的 `Loot.prefab` 是另一份资产，未覆盖真实池模板。
+
+- 代码：`Loot.ResetVisualState` 先启用 Animator、清除拾取参数、播放并立即求值 `Idle`，再停用 Animator，最后恢复 SpriteRenderer 启用状态、颜色、排序、缩放与位置；拾取入口重新启用 Animator 并从头播放 `Pickup`。
+- 资产：实际模板 `Assets/Prefabs/Inventory/Gold.prefab` 开启 `m_WriteDefaultValuesOnDisable`。
+- 验证边界：刷新后 Unity 已完成编译，`isCompiling` 与 `isUpdating` 均为 false，控制台错误为 0。已进入运行模式准备跨帧验证，但用户明确要求停止测试，因此未执行预热、扩容及回收复用的跨帧验证，也未以旧合成用例作为修复证明；退出本次启动的运行模式。
+- 文档：Guide 同步真实模板与当前复位顺序；保留上次修复记录供追溯，维护计数 `1/5 -> 2/5`。
+
+## 2026-11-02 掉落物池复用的显示状态复原
+
+现象：从快捷栏或背包丢出的物品落地后看不见，拾取、堆叠、存档都正常。原因是 `Pickup.anim` 末帧把子物体 `Sprite` 的 `m_Color.a` 写到 0、排序层级临时抬到 50、缩放压到 0.7，而 `Loot.prefab` 的 Animator 关闭了禁用时写回默认值，这些值随对象留在池里；`Loot.Initialize` 只写贴图，全仓库没有一处写 `sr.color`，池取出的实例就是全透明精灵。
+
+- 代码：`Loot` 记录预制体静止显示状态（`Awake` 与首次 `Initialize`），取用时写回颜色、排序层级、子物体缩放与位置，并把状态机切回 `Idle`。
+- 资产：`Loot.prefab` 的 Animator 开启禁用时写回默认值，归还后再兜一层复原。
+- 用例：新增 `Assets/Tests/Editor/LootPoolingTests.cs`，模拟片段写下的透明与压扁后再次 `Initialize`，断言四项显示状态复原。
+- 验证：Unity 在 17:10:43 重建 `Assembly-CSharp.dll` 与 `Assembly-CSharp-Editor.dll`，编辑器日志无 `error CS`，两个程序集分别含 `ResetVisualState` 与 `LootPoolingTests`。EditMode 全量未跑：批处理 Editor 在本会话沙箱内启动即退出（退出码 140063，不产出 log 与结果 XML）。
+- 文档：Guide 新增 §2.2 池复用复原与 §3.9 硬边界；维护计数 `0/5 -> 1/5`。
+
 ## 2026-11-01 商店无效槽位与打开门槛
 
 `ShopCanvas.prefab` 移除误挂在 5 个属性文本上的 `ShopSlot` 组件，商品槽数组保留 8 个配置有效的嵌套槽位。复核 §2.5 与 §2.6，商店仍在 `CanOpen` 通过并进入 `OnOpen` 后通知管理器装载商品，无需改动业务 Guide。槽位引用与 YAML 文件 ID 静态检查通过，`git diff --check` 通过；EditMode 未运行，因为当前工程已有 Unity Editor 打开，项目验证规则禁止并行启动批处理 Editor。维护计数 `4/5 -> 5/5`，Guide 复核无变更后清零为 `0/5`。

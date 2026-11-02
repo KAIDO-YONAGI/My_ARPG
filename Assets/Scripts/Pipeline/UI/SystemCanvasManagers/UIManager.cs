@@ -21,11 +21,20 @@ namespace Pipeline.UI.SystemCanvasManagers
     /// </remarks>
     public class UIManager : YSingleton<UIManager>
     {
+        /// <summary>按键与画布的绑定：按下输入动作时请求切换对应画布。</summary>
+        [Serializable]
+        public class CanvasInputBinding
+        {
+            [Tooltip("要切换的画布。")] public CanvasToToggle canvas;
+
+            [Tooltip("触发切换的输入动作。")] public InputActionReference action;
+        }
         // 常量保留转发，避免破坏 ICanvasManager.RefreshCanvaOrder 对 UIManager.DefaultOrder 的引用。
         public const int FocusOrder = CanvasFocusStack.FocusOrder;
         public const int DefaultOrder = CanvasFocusStack.DefaultOrder;
 
         [Header("事件")] [SerializeField] private SceneLoadEventSO loadEventSO;
+        [SerializeField] private CanvasOpenedEventSO canvasOpenedEvent;
 
         [Tooltip(
             "场景中已有画布的开关事件。按需创建的界面在 Prefab Cache 中登记；两种登记均支持热键、ESC、切场复位和互斥关闭。")]
@@ -39,10 +48,6 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
         private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
-
-        [Header("画布运行时")]
-        [SerializeField] private UICacheManager cacheManager;
-        [SerializeField] private CanvasOpenedEventSO canvasOpenedEvent;
 
         // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
         private readonly CanvasFocusStack focusStack = new();
@@ -90,7 +95,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         [ContextMenu("UI Cache/Clear Idle Views")]
         public void ClearIdleViews()
         {
-            cacheManager.ClearIdle();
+            UICacheManager.Instance.ClearIdle();
         }
 
         private void OnLoadScene(List<GameSceneSO> arg0, Vector3 arg1, bool arg2)
@@ -212,7 +217,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         // 优先查预制体注册表，再查场景画布列表；开关、焦点与可关闭判定共用此入口。
         private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas)
         {
-            ToggleCanvasEventSO cachedEvent = cacheManager != null ? cacheManager.GetToggleEvent(canvas) : null;
+            ToggleCanvasEventSO cachedEvent = UICacheManager.Instance.GetToggleEvent(canvas);
             if (cachedEvent != null) return cachedEvent;
 
             foreach (ToggleCanvasEventSO eventSO in toggleCanvasEvents)
@@ -396,20 +401,11 @@ namespace Pipeline.UI.SystemCanvasManagers
                 FindToggleEvent(canvas)?.RaiseToggleCanvasEvent(false);
             }
 
-            cacheManager?.CloseAll();
+            UICacheManager.Instance.CloseAll();
 
             ResetInputState();
         }
     }
 
-    /// <summary>按键与画布的绑定：按下输入动作时请求切换对应画布。</summary>
-    [Serializable]
-    public class CanvasInputBinding
-    {
-        [Tooltip("要切换的画布。")]
-        public CanvasToToggle canvas;
 
-        [Tooltip("触发切换的输入动作。")]
-        public InputActionReference action;
-    }
 }

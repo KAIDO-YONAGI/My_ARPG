@@ -2,7 +2,7 @@
 
 文档 ID：`GP-INVENTORYSHOP-GUIDE`
 状态：`Active`
-最后更新：`2026-11-01`
+最后更新：`2026-11-02`
 权威范围：本域负责背包槽位数据与堆叠、拾取与丢弃、物品使用、金币与商店买卖这条链路；玩家数值域的内部规则归 `Gameplay.PlayerStats`，掉落物存档格式的内部规则归存档域，任务与对话如何发起奖励归各自域。
 
 ## 1. 触发线索
@@ -32,9 +32,10 @@
 ### 2.2 拾取、丢弃、使用三条入口
 
 - 拾取：`Loot.OnTriggerEnter2D` 判定 `Player` 标签与 `canBePick`，播 `Pickup` 动画并广播 `lootEvent.OnEventRaised(item, quantity, this)`，由 `InventoryManager.OnItemLootedHandler` 接手并调 `UpdateInventorySlots`。
-- 丢弃：右键槽位触发 `InventoryManager.DropByClick`，管理器按槽位地址取物品，先 `DropLoot` 再 `RemoveFromSlot` 扣减。掉落物通过 `ObjectPool<Loot>` 取得，池耗尽时实例化兜底，随后移到当前场景。
+- 丢弃：右键槽位触发 `InventoryManager.DropByClick`，管理器按槽位地址取物品，先 `DropLoot` 再 `RemoveFromSlot` 扣减。掉落物通过 `ObjectPool<Loot>` 取得，池耗尽时实例化兜底，随后移到当前场景。池的预热、扩容与实例化兜底均使用 `InventoryManager.lootPrefab` 引用的资产；常驻场景中的该引用指向 `Gold.prefab`。
 - 使用：左键槽位且商店未打开时调 `InventoryManager.UseItem`，按槽位地址取物品，执行效果后扣减状态并更新物品史。
 - 拾取余量：`UpdateInventorySlots` 放完所有槽位后仍有 `quantity > 0` 时，用 `DropLoot` 把余量掉在玩家脚下；来源是同一个 `Loot` 对象时走原地重掉分支，位移到玩家位置、`Initialize`、重新激活并延时恢复可拾取。
+- 池复用复原：`Pickup` 片段驱动子物体 `Sprite` 的透明度、排序层级、缩放与位置。`Loot.Initialize` 先启用 Animator、清除拾取参数，调用 `Animator.Play` 切回 `Idle` 并通过 `Animator.Update(0f)` 完成求值，然后停用 Animator，最后按 `CaptureVisualBaseline` 记录的静止状态写回显示属性并启用 SpriteRenderer。当前 `Idle` 使用空的 Blend Tree，静止外观由脚本管理，避免后续动画求值再次覆盖复原值；下次拾取时重新启用 Animator 并从头播放 `Pickup`。实际掉落模板是常驻场景 `InventoryManager.lootPrefab` 引用的 `Gold.prefab`，其 Animator 已开启禁用时写回默认值。
 
 ### 2.3 物品使用对数值域的写命令
 
@@ -122,3 +123,7 @@
 ### 3.8 槽位顺序即优先级
 
 管理器先填快捷栏再填背包；各组内的优先级由视图序列化槽位数组的顺序决定。
+
+### 3.9 池复用的掉落物必须经 `Initialize` 复原显示状态
+
+掉落入口在取得池对象、设置位置并移入目标场景后调用 `Initialize`。该方法设置本次物品与数量，先完成动画复位并停用 Animator，再恢复显示属性与贴图并登记存档。再次拾取时才重新启用 Animator。预热通过实例化后立即停用对象入队完成，首次借出与池空后扩容分别经过重新激活和直接使用新实例两条路径。
