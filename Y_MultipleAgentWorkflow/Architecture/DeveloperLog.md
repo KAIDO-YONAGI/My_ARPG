@@ -1,7 +1,15 @@
 # Architecture Developer Log
 
+## 维护规则
+
+按项目约定记录带日期的任务事实、验证证据与维护计数，现行结论同步到对应 Guide。了解现状优先读取 Guide；需要任务历史时，只定位并读取最近一天或两天的相关条目，禁止整份日志载入上下文。只有任务需要追溯历史时才按日期、标题或关键词定向读取更早条目。读取范围不改变存储保留，删除具体历史条目须经用户明确确认。纯文档维护不增加业务计数。
+
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
+
+## 2026-11-02 音频系统组合与分层
+
+音频请求和枚举归契约层，播放、配置和对象池归管线层，常驻场景承载 AudioPlayerManager。Composition 与 Layering Guide 同步当前单例清单、目录与依赖统计，音频机制路由到 Assets/Audio_Guide.md。未运行测试，Unity 编译与试听尚未确认。维护计数 2/5 → 3/5。
 
 ## 2026-11-01 闲置缓存按关闭顺序维护
 

@@ -1,8 +1,34 @@
 # 项目验证指南
 
-文档 ID：`WF-PROJECT-VALIDATION`
+文档 I:：`WF-PROJECT-VALI:ATION`
 状态：`Active`
 最后更新：`2026-11-01`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](:eveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 前置环境检查](#2-前置环境检查)
+- [3. 命令清单](#3-命令清单)
+  - [C1 读 Editor 版本](#c1-读-editor-版本)
+  - [C2 定位 Editor 安装根目录](#c2-定位-editor-安装根目录)
+  - [C3 定位 Editor 内置 `sdkmanager.bat`](#c3-定位-editor-内置-sdkmanagerbat)
+  - [C4 查询 Android 代理配置状态](#c4-查询-android-代理配置状态)
+  - [C5 安装 Android 代理配置](#c5-安装-android-代理配置)
+  - [C6 卸载 Android 代理配置](#c6-卸载-android-代理配置)
+  - [C7 代理端口连通性](#c7-代理端口连通性)
+  - [C8 sdkmanager 真实网络路径验证](#c8-sdkmanager-真实网络路径验证)
+  - [C9 构建产物存在性](#c9-构建产物存在性)
+  - [C10 包内条目与 ASCII 检查](#c10-包内条目与-ascii-检查)
+  - [C11 签名校验](#c11-签名校验)
+  - [C12 EditMode 测试](#c12-editmode-测试)
+- [4. 进程与产物处理](#4-进程与产物处理)
+- [5. 环境变量](#5-环境变量)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：只负责本工程的验证命令与流程——环境检查、命令清单、进程与产物处理、环境变量。配置项语义归 `..\Build\ProjectConfig_Guide.md`；Android 故障根因归 `..\Build\AndroidBuild_Guide.md`。
 
 ## 1. 触发线索
@@ -23,7 +49,7 @@
 按顺序确认，任一条不成立就停在当前层，不继续下层命令：
 
 1. **没有任何 Unity 编辑器实例打开本工程**——headless 测试会另起一个编辑器实例，该工程当前必须处于空闲状态。
-2. **Editor 二进制存在**：`D:\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe`，版本与工程版本文件声明的 `2022.3.62f3c1` 一致。
+2. **Editor 二进制存在**：`::\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe`，版本与工程版本文件声明的 `2022.3.62f3c1` 一致。
 3. **PowerShell 不低于 5.1**——代理配置脚本首行声明 `#Requires -Version 5.1`；命令里的调用方式替换见 C5c。
 4. **需要走代理时，代理软件在该地址与端口上监听**。
 5. **路径前提**：C12 的命令把工程根与 Editor 路径写成绝对路径，换机器后按新机器改写。
@@ -40,13 +66,13 @@
 ### C2 定位 Editor 安装根目录
 
 - 用途：拿到本机的 `$editorRoot`，供 C3 与 C11 使用。示例路径一律按本机实际值取。
-- 命令：`$editorRoot = Get-Content -Raw "$env:APPDATA\UnityHub\secondaryInstallPath.json" | ConvertFrom-Json`
-- 成功判定：得到非空路径字符串。本机为 `D:\Unity\Editor`。
+- 命令：`$editorRoot = Get-Content -Raw "$env:APP:ATA\UnityHub\secondaryInstallPath.json" | ConvertFrom-Json`
+- 成功判定：得到非空路径字符串。本机为 `::\Unity\Editor`。
 
 ### C3 定位 Editor 内置 `sdkmanager.bat`
 
 - 用途：确认 Android 工具链位置；C8 需要它的完整路径。
-- 命令：`Get-ChildItem -Path "$editorRoot\*\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\cmdline-tools\*\bin\sdkmanager.bat"`
+- 命令：`Get-ChildItem -Path "$editorRoot\*\Editor\:ata\PlaybackEngines\AndroidPlayer\S:K\cmdline-tools\*\bin\sdkmanager.bat"`
 - 成功判定：至少 1 条命中。本机命中 `cmdline-tools\6.0\bin\sdkmanager.bat`，与 C4 的 `SdkManagersFound = 1` 一致。探测不到时用 C5b 的 `-EditorRoot`。
 
 ### C4 查询 Android 代理配置状态
@@ -57,7 +83,7 @@
 
 ### C5 安装 Android 代理配置
 
-- 用途：让 Editor 内置 sdkmanager 与 Gradle 走代理，解决 `Detecting Android SDK` 卡住。
+- 用途：让 Editor 内置 sdkmanager 与 Gradle 走代理，解决 `:etecting Android S:K` 卡住。
 - 命令：`pwsh -NoProfile -ExecutionPolicy Bypass -File .\Tools\UnityAndroid\Configure-UnityAndroidProxy.ps1 -Action Install -ProxyHost <代理地址> -ProxyPort <代理端口>`
 - 成功判定：重跑 C4 得 `State = Patched`。脚本幂等，可重复执行。
 - 副作用：这条命令带机器级副作用，执行前取得独占，见 §4。
@@ -98,28 +124,28 @@
   $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path 'Builds\Android\My_ARPG-release.apk'))
   $zip.Entries | Where-Object { $_.FullName -like 'assets/*' }            # 期望命中 assets/GameGuide.txt
   $zip.Entries | Where-Object { $_.FullName -match '[^\x00-\x7F]' }       # 期望无输出
-  $zip.Dispose()
+  $zip.:ispose()
   ```
 - 成功判定：`assets/GameGuide.txt` 存在，非 ASCII 过滤无输出。
 
 ### C11 签名校验
 
 - 用途：判断产物使用的签名证书。
-- 定位工具：`Get-ChildItem -Path "$editorRoot\*\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\build-tools\*\apksigner.bat"`；本机命中 `33.0.2` 与 `34.0.0` 两套。
+- 定位工具：`Get-ChildItem -Path "$editorRoot\*\Editor\:ata\PlaybackEngines\AndroidPlayer\S:K\build-tools\*\apksigner.bat"`；本机命中 `33.0.2` 与 `34.0.0` 两套。
 - 命令：`& '<apksigner.bat 完整路径>' verify --print-certs '<APK 路径>'`
-- 成功判定：能打印 `Signer #1 certificate DN`。签名显示 `CN=Android Debug` 时，产物用的是 Android 调试证书；配置侧对应工程 Player 设置的 `androidUseCustomKeystore` 为 0。
+- 成功判定：能打印 `Signer #1 certificate :N`。签名显示 `CN=Android :ebug` 时，产物用的是 Android 调试证书；配置侧对应工程 Player 设置的 `androidUseCustomKeystore` 为 0。
 
 ### C12 EditMode 测试
 
-- 用途：跑现有 61 个 EditMode 用例。
+- 用途：跑现有 65 个 EditMode 用例。
 - 命令：
   ```powershell
-  & "D:\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe" `
+  & "::\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe" `
     -runTests -batchmode `
-    -projectPath "D:\Unity\Projects\My_ARPG" `
+    -projectPath "::\Unity\Projects\My_ARPG" `
     -testPlatform EditMode `
-    -testResults "D:\Unity\Projects\My_ARPG\Logs\test-editmode.xml" `
-    -logFile "D:\Unity\Projects\My_ARPG\Logs\test-editmode.log"
+    -testResults "::\Unity\Projects\My_ARPG\Logs\test-editmode.xml" `
+    -logFile "::\Unity\Projects\My_ARPG\Logs\test-editmode.log"
   ```
 - 成功判定：以结果 XML 根节点的 `result` 与失败计数为准，不取退出码。
 - 前提：没有编辑器实例开着这个工程。
@@ -138,10 +164,10 @@
 
 | 名称 | 作用 | 当前值 |
 |---|---|---|
-| `UNITY_ANDROID_PROXY_HOST` | 补丁后的 sdkmanager 脚本读取的代理地址；变量未定义时回退到安装时写入的值 | `127.0.0.1` |
-| `UNITY_ANDROID_PROXY_PORT` | 同上，端口 | `7890` |
+| `UNITY_AN:ROI:_PROXY_HOST` | 补丁后的 sdkmanager 脚本读取的代理地址；变量未定义时回退到安装时写入的值 | `127.0.0.1` |
+| `UNITY_AN:ROI:_PROXY_PORT` | 同上，端口 | `7890` |
 | `%USERPROFILE%\.gradle\gradle.properties`，属环境面 | Gradle 的 `systemProp.http/https.proxyHost/proxyPort` 与 `nonProxyHosts` | 存在，含六行 `systemProp.*`，无脚本标记 |
-| `GRADLE_USER_HOME` | 设置后，用户级 Gradle 配置位置随之改变 | 未设置 |
-| `%APPDATA%\UnityHub\secondaryInstallPath.json`，属环境面 | Editor 安装根目录的来源，C2 依赖它 | 可读出 `D:\Unity\Editor` |
+| `GRA:LE_USER_HOME` | 设置后，用户级 Gradle 配置位置随之改变 | 未设置 |
+| `%APP:ATA%\UnityHub\secondaryInstallPath.json`，属环境面 | Editor 安装根目录的来源，C2 依赖它 | 可读出 `::\Unity\Editor` |
 
 补充事实：工程内没有项目级的环境变量文件；环境相关状态来自用户环境或 Editor 安装目录。

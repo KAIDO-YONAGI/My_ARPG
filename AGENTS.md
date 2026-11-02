@@ -8,9 +8,9 @@
 
 开工顺序：
 
-1. 先读 `Y_MultipleAgentWorkflow/Router.md`：它包含必读起点、7 个业务根的业务路由表、
-   可被结构校验逐条解析的文档索引，以及全局并发资源清单。
-2. 按路由读对应业务根的 `Router.md`，再读其中的 Guide / Design。
+1. 先读 `Y_MultipleAgentWorkflow/Router.md`：由它定位工作方式、功能域路由和导航，
+   详细文档索引由对应功能域 Router 就近维护。
+2. 按路由读对应功能域 Router，再看 Guide 的文档内目录并读取相关章节；日志只定位最近一天或两天的相关条目，禁止整份载入。
 3. 需要修改文件、启动子 Agent 或使用会改变状态的工具**之前**，按
    `Y_MultipleAgentWorkflow/Workflow/Concurrency_Guide.md` 取得 WorkingAgent 租约；
    成功、失败或取消都要释放。

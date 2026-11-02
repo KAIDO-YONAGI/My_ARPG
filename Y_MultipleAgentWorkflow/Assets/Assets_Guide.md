@@ -2,7 +2,29 @@
 
 文档 ID：`ASSETS-GUIDE`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-11-02`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 当前实现](#2-当前实现)
+  - [2.1 总体分类与统计方法](#21-总体分类与统计方法)
+  - [2.2 配置类资产清单（33 个）](#22-配置类资产清单33-个)
+  - [2.3 对话资产的组织方式](#23-对话资产的组织方式)
+  - [2.4 技能资产的字段级契约](#24-技能资产的字段级契约)
+  - [2.5 GameSceneSO 资产（6 个）](#25-gamesceneso-资产6-个)
+  - [2.6 StreamingAssets 现状](#26-streamingassets-现状)
+  - [2.7 全部 GameSO 资产均为手工创建](#27-全部-gameso-资产均为手工创建)
+- [3. 约定与硬边界](#3-约定与硬边界)
+  - [3.1 目录与命名约定](#31-目录与命名约定)
+  - [3.2 GameSO 中配置与运行时事件的边界](#32-gameso-中配置与运行时事件的边界)
+  - [3.3 StreamingAssets 硬约束](#33-streamingassets-硬约束)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：本文件只对 GameSO 目录下的 ScriptableObject 资产契约负责，涵盖目录分布、数量、命名与手工创作流程，另对 StreamingAssets 目录的构建硬约束负责。各 SO 的运行时业务语义见 Gameplay 与 SceneFlow 各子域，事件通道的收发用法见 `EventChannels_Guide.md`，美术资源的导入设置不在本文件范围。
 
 ## 1. 触发线索
@@ -25,12 +47,12 @@
 
 ### 2.1 总体分类与统计方法
 
-GameSO 目录下共有 **59 个 ScriptableObject 资产**，分类依据是每个资产 `m_Script` 指向的脚本 GUID：
+GameSO 目录下共有 **63 个 ScriptableObject 资产**，分类依据是每个资产 `m_Script` 指向的脚本 GUID：
 
-- **配置/内容类：31 个**，覆盖 `ItemSO`、`QuestSO`、`DialogSO`、`RefuseDialogSO`、`CharacterSO`、`GameSceneSO`、`SkillSO`、`PlayerStatsSO`
-- **运行时事件类：28 个**，覆盖 12 个事件通道类，清单见 `EventChannels_Guide.md`
+- **配置/内容类：33 个**，覆盖 `ItemSO`、`QuestSO`、`DialogSO`、`RefuseDialogSO`、`CharacterSO`、`GameSceneSO`、`SkillSO`、`PlayerStatsSO`、`AudioConfigSO`
+- **运行时事件类：30 个**，覆盖 14 个事件通道类，清单见 `EventChannels_Guide.md`
 
-### 2.2 配置类资产清单（31 个）
+### 2.2 配置类资产清单（33 个）
 
 | 类 | 数量 | 代表资产 |
 |---|---|---|
@@ -39,7 +61,8 @@ GameSO 目录下共有 **59 个 ScriptableObject 资产**，分类依据是每�
 | `DialogSO` | 8 | `PurpleBobs Greeting` 等 |
 | `RefuseDialogSO` | 3 | `DefaultChat` 等 |
 | `CharacterSO` | 3 | `PurpleBob` 等 |
-| `GameSceneSO` | 5 | `MenuScene`、`Scene1`、`Scene2`、`TestScene`、`RetrySceneSO` |
+| `GameSceneSO` | 6 | `MenuScene`、`Scene1`、`Scene2`、`TestScene`、`RetrySceneSO`、`PersistentScene` |
+| `AudioConfigSO` | 1 | `Audio/AudioConfig`，音效与 BGM 的片段和权重，机制见 `Audio_Guide.md` |
 | `SkillSO` | 2 | `MaxHealthBoost`、`CombatUnlock` |
 | `PlayerStatsSO` | 1 | 玩家属性配置资产 |
 | `LocationSO` | **0** | 类定义存在，全工程无该类型资产 |
@@ -76,9 +99,9 @@ switch (skillName) {
 
 `skillName` 字符串是配置到行为的唯一关联键，资产文件名与它无关：`CombatUnlock` 资产的 `skillName` 是 `SwordSlash`，`MaxHealthBoost` 资产的 `skillName` 是 `MaxHealthBoost`。
 
-### 2.5 GameSceneSO 资产（5 个）
+### 2.5 GameSceneSO 资产（6 个）
 
-5 个场景资产是 `MenuScene`、`Scene1`、`Scene2`、`TestScene`、`RetrySceneSO`，`sceneType` 取 `SceneType` 的 `Location`、`Menu`、`Retry`。这套资产必须与编辑器 Build Settings 里的场景列表同时维护，加载语义与前置校验见 SceneFlow 域，本文件只声明资产是场景组列表的元素。
+6 个场景资产是 `MenuScene`、`Scene1`、`Scene2`、`TestScene`、`RetrySceneSO`、`PersistentScene`，`sceneType` 取 `SceneType` 的 `Location`、`Menu`、`Retry`。`PersistentScene` 由初始加载器单独登记为常驻层。这套资产与编辑器 Build Settings 的场景列表同时维护，加载语义与前置校验见 SceneFlow 域，本文件声明资产是加载列表的元素。
 
 ### 2.6 StreamingAssets 现状
 
@@ -88,7 +111,7 @@ StreamingAssets 目录下只有一个有效文件：`GameGuide` 指南文件，1
 
 ### 2.7 全部 GameSO 资产均为手工创建
 
-全工程共 21 处 `[CreateAssetMenu]`，覆盖 SO 与事件的全部类型。唯一的编辑器资产生成器是 `InputActionReferenceRebuilder`，它只重建输入系统的 `InputActionReference`，与 GameSO 无关。
+产品脚本共 24 处 `[CreateAssetMenu]`，覆盖 SO 与事件类型。编辑器资产生成器 `InputActionReferenceRebuilder` 重建输入系统的 `InputActionReference`。
 
 - 新增任一资产需要人工 Create、改名、拖引用；`ItemSO`、`QuestSO`、`SkillSO` 的 `CreateAssetMenu` 默认文件名分别是 `New Item`、`New Quest`、`NewSkill`。
 - `[CreateAssetMenu]` 的菜单分组：物品在 `GameLootSO/ItemSO`，任务在顶层 `QuestSO`，地点在顶层 `LocationSO`，角色与对话在 `Dialog` 下，技能在 `SkillTree/Skill`，事件在 `Events` 下，玩家数值在 `Data` 下，场景在 `GameSceneSO` 下。菜单树按类型分组，资产目录树按用途分组。
@@ -105,8 +128,8 @@ StreamingAssets 目录下只有一个有效文件：`GameGuide` 指南文件，1
 
 ### 3.2 GameSO 中配置与运行时事件的边界
 
-- Events 目录下的 28 个资产是**运行时事件通道**，只承载谁在听，不承载业务数据。事件字段是 C# event 委托链，未标注 `[SerializeField]`，因此不落盘，资产里看不到订阅者，Unity 也不序列化它们。
-- 其余 31 个是**配置/内容**，随资产落盘并进包。
+- Events 目录下的 30 个资产是**运行时事件通道**，只承载谁在听，不承载业务数据。事件字段是 C# event 委托链，未标注 `[SerializeField]`，因此不落盘，资产里看不到订阅者，Unity 也不序列化它们。
+- 其余 33 个是**配置/内容**，随资产落盘并进包。
 - 硬边界：运行时状态由服务层持有，SO 资产只落盘配置。`QuestSO.QuestObjective.currentAmount` 字段无代码读写，运行期进度由 `QuestManager` 的 `questProgress` 字典维护，源码注释已标注。
 
 ### 3.3 StreamingAssets 硬约束

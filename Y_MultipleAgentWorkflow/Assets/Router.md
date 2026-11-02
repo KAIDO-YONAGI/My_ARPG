@@ -2,13 +2,18 @@
 
 文档 ID：`BUS-ASSETS`
 状态：`Active`
-维护计数：`4/5`
-最后更新：`2026-11-01`
+维护计数：`0/5`
+最后更新：`2026-11-02`
+
+## 维护规则
+
+任务路由、权威文档或职责边界变化时更新本文，详细文档索引在所属功能域 Router 就近维护。证据记录在[开发日志](DeveloperLog.md)；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
 
 ## 任务线索
 
 | 线索 | 权威文档 |
 |---|---|
+| `音频` / `音效` / `BGM` / `AudioPlayerManager` / `AudioTrigger` / `FeedbackEventSO` | `Audio_Guide.md`、`EventChannels_Guide.md` |
 | `GameSO` / `ScriptableObject 资产` / `CreateAssetMenu` / `资产目录约定` / `资产命名` | `Assets_Guide.md §2.1`、`Assets_Guide.md §2.7`、`Assets_Guide.md §3.1` |
 | `ItemSO` / `QuestSO` / `DialogSO` / `RefuseDialogSO` / `CharacterSO` / `SkillSO` / `PlayerStatsSO` / `LocationSO` | `Assets_Guide.md §2.2`、`Assets_Guide.md §2.3` |
 | `GameSceneSO 资产` / `场景资产` / `sceneType` | `Assets_Guide.md §2.5`，加载语义归 SceneFlow 域 |
@@ -32,13 +37,19 @@
 - 本业务根的文档目录
 - GameSO 资产树
 - StreamingAssets 内容
+- `path:Assets/Scripts/Pipeline/Audio/`
+- `path:Assets/Scripts/Contracts/Audio/`
+- `path:Assets/Scripts/Pipeline/SO/Events/FeedbackEventSO.cs`
+- `path:Assets/GameSO/Audio/`
+- `path:Assets/Audio/`
 
 ## 能力边界
 
 **Active 能力**
 
 - 声明并维护 GameSO 资产树的 ScriptableObject 资产契约：目录分布、按类数量、命名约定与手工创作流程，见 `Assets_Guide.md`。
-- 声明并维护事件通道的资产侧契约：12 个通道类、28 个通道资产、订阅发布惯例与改名检查清单，见 `EventChannels_Guide.md`。
+- 声明并维护事件通道的资产侧契约：14 个通道类、30 个通道资产、订阅发布惯例与改名检查清单，见 `EventChannels_Guide.md`。
+- 音效请求、2D 与 3D 播放、音效对象池、BGM 淡变及音频配置由 `Audio_Guide.md` 维护。
 - 声明 StreamingAssets 内容的构建硬约束：文件名必须为 ASCII，在 Android 上它位于 APK 内、`System.IO` 无法直接读取，改完需复核包内条目。
 
 **不在本域范围，请转到对应 Router**

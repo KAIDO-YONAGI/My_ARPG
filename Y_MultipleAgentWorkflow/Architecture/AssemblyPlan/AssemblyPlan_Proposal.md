@@ -1,10 +1,14 @@
 # 程序集与热更规划 Proposal
 
+## 维护规则
+
+方案范围、证据或实施状态变化时更新本文及所属 Router，保持 Proposal 与现行能力的状态边界。证据记录在[开发日志](DeveloperLog.md)；维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
+
 > **本文件为 Proposal：以下全部内容均为未实施设计，不作为当前能力引用。**
 
 文档 ID：`ARCH-ASSEMBLY-PLAN`
 状态：`Proposal`
-最后更新：`2026-10-05`
+最后更新：`2026-11-02`
 权威范围：记录程序集拆分、热更接入、效果数据驱动、事件机制演进五项**未实施**设计的目标、理由、当前状态与前置依赖。已实现架构的事实见 `..\Composition\Composition_Guide.md` 与各业务域 Guide。
 
 ## 1. 触发线索
@@ -69,7 +73,7 @@
 ### 3.4 事件总线：维持不采用
 
 - **若实施的目标**：建立中心化 `EventBus`，所有事件通道集中定义。
-- **当前状态：未实施**。`EventBus` 类型未定义。现行机制是事件 SO：工程内共 **12 个事件类**，每类一个文件，全部直接继承 `ScriptableObject`、无公共基类；`public event` 声明共 **14 条**，其中 `ToggleCanvasEventSO` 承载 toggle 与 focus 两条通道、`ShopKeeperEventSO` 承载进入与离开两条通道，其余 10 类各 1 条。订阅惯例是 `OnEnable` 订阅、`OnDisable` 或 `OnDestroy` 退订，发布方调各类的 `RaiseXxx()`。
+- **当前状态：未实施**。`EventBus` 类型未定义。现行机制是事件 SO：工程内共 **14 个事件类**，每类一个文件，全部直接继承 `ScriptableObject`、无公共基类；`public event` 声明共 **16 条**，其中 `ToggleCanvasEventSO` 承载 toggle 与 focus 两条通道、`ShopKeeperEventSO` 承载进入与离开两条通道，其余 12 类各 1 条。场景组件通常在 `OnEnable` 订阅、`OnDisable` 退订，纯 C# Controller 在构造与 `Dispose` 中成对管理，缓存界面订阅随打开与关闭管理；发布方调用通道的发布方法。现行契约见 [事件通道指南](../../Assets/EventChannels_Guide.md)。
 
 ### 3.5 事件引用可视化插件
 
@@ -78,7 +82,7 @@
 - **前置依赖**：
   1. 零运行时代码改动，零包依赖；编辑器程序集天然不进构建。
   2. L2 的引用解析走 `AssetDatabase` 与 `PrefabUtility` API，覆盖 nested prefab 与 override 细节。
-  3. 事件资产规模：工程内共 **28 个** 事件资产，其中根目录 9、`ToggleCanvasEvents` 10、`VoidEvents` 6、`InventorySlotsStatsEvents` 3；引用点几十处。
+  3. 事件资产规模：工程内共 **30 个** 事件资产，其中根目录 11、`ToggleCanvasEvents` 10、`VoidEvents` 6、`InventorySlotsStatsEvents` 3；清单见 [事件通道指南](../../Assets/EventChannels_Guide.md)。
 
 ## 4. 约定与硬边界
 

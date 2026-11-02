@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   persistentScenes:
-  - {fileID: 11400000, guid: 7c55136055a6e324ba090da1c0385003, type: 2}
+  - {fileID: 11400000, guid: 24c71e44b8da48b5951a3e65971ce1fc, type: 2}
 --- !u!4 &2062852558
 Transform:
   m_ObjectHideFlags: 0

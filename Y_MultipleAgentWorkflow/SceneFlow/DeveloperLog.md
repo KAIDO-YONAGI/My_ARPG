@@ -1,7 +1,15 @@
 # SceneFlow Developer Log
 
+## 维护规则
+
+按项目约定记录带日期的任务事实、验证证据与维护计数，现行结论同步到对应 Guide。了解现状优先读取 Guide；需要任务历史时，只定位并读取最近一天或两天的相关条目，禁止整份日志载入上下文。只有任务需要追溯历史时才按日期、标题或关键词定向读取更早条目。读取范围不改变存储保留，删除具体历史条目须经用户明确确认。纯文档维护不增加业务计数。
+
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
+
+## 2026-11-02 音频常驻层与启动链路
+
+`InitialScene` 的 `persistentScenes` 改为引用新增 `PersistentScene.asset`，先登记并加载常驻层，再由常驻层 `SceneChanger.Start` 打开菜单。音频管理器位于常驻层 GlobalManagers，接收现有场景完成事件播放加载音效。证据为两个场景文件、常驻场景 SO 与 `AudioPlayerManager`；未进入 Play 模式或运行测试。维护计数 2/5 → 3/5。
 
 ## 2026-10-05 建立 SceneFlow 权威文档
 

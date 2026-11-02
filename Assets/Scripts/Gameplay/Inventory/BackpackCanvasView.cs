@@ -1,5 +1,4 @@
 using Contracts.Base;
-using Pipeline.SO;
 using UnityEngine;
 
 namespace Gameplay.Inventory

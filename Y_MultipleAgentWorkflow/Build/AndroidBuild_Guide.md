@@ -3,6 +3,32 @@
 文档 ID：`BUILD-ANDROID-GUIDE`
 状态：`Active`
 最后更新：`2026-10-05`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 当前实现](#2-当前实现)
+  - [2.1 唯一的 Android 工具链入口](#21-唯一的-android-工具链入口)
+  - [2.2 根因一：SDK 检测卡住——sdkmanager 与 Gradle 不继承 Windows 用户代理](#22-根因一sdk-检测卡住sdkmanager-与-gradle-不继承-windows-用户代理)
+  - [2.3 根因二：Release 构建在 AAR 解包阶段失败——非 ASCII StreamingAssets 名](#23-根因二release-构建在-aar-解包阶段失败非-ascii-streamingassets-名)
+  - [2.4 产物位置](#24-产物位置)
+  - [2.5 签名现状：Android Debug 证书](#25-签名现状android-debug-证书)
+  - [2.6 环境自检顺序](#26-环境自检顺序)
+  - [2.7 构建后自检](#27-构建后自检)
+- [3. 约定与硬边界](#3-约定与硬边界)
+  - [3.1 禁止用关闭 lintVital 来修复 AAR 报错](#31-禁止用关闭-lintvital-来修复-aar-报错)
+  - [3.2 包内目录名必须 ASCII](#32-包内目录名必须-ascii)
+  - [3.3 `-Action Install` 是机器级副作用，不是项目级操作](#33--action-install-是机器级副作用不是项目级操作)
+  - [3.4 `GradleManaged = False` 意味着 Gradle 代理属性来自脚本之外](#34-gradlemanaged--false-意味着-gradle-代理属性来自脚本之外)
+  - [3.5 Unity 已启动时用户环境变量不会注入既有进程](#35-unity-已启动时用户环境变量不会注入既有进程)
+  - [3.6 `CN=Android Debug` 的产物不得对外发布](#36-cnandroid-debug-的产物不得对外发布)
+  - [3.7 本域不改工程设置](#37-本域不改工程设置)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：只负责本工程 Windows 上 Android 构建的环境自检、两类已知故障的根因与幂等修复、构建产物位置与签名现状。Player/Project 配置项字典见 `ProjectConfig_Guide.md`，测试基线见 `TestBaseline_Guide.md`。
 
 ## 1. 触发线索

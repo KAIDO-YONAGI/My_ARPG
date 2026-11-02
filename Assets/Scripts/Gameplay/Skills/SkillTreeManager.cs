@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using Contracts.Base;
 using Contracts.State;
 using Gameplay.Player.Services;
-using Pipeline.SO;
-using UnityEngine;
 
 namespace Gameplay.Skills
 {

@@ -1,8 +1,33 @@
 # 测试基线与覆盖
 
-文档 ID：`BUILD-TESTBASELINE-GUIDE`
+文档 I:：`BUIL:-TESTBASELINE-GUI:E`
 状态：`Active`
 最后更新：`2026-11-01`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](:eveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 当前实现](#2-当前实现)
+  - [2.1 位置与框架](#21-位置与框架)
+  - [2.2 用例分布](#22-用例分布)
+  - [2.3 用例计数的口径](#23-用例计数的口径)
+  - [2.4 选型：测试落在不依赖 UnityEngine 的纯 C# 逻辑上](#24-选型测试落在不依赖-unityengine-的纯-c-逻辑上)
+  - [2.5 覆盖与零覆盖](#25-覆盖与零覆盖)
+  - [2.6 唯一的已记录执行方式](#26-唯一的已记录执行方式)
+  - [2.7 无 PlayMode 测试](#27-无-playmode-测试)
+- [3. 约定与硬边界](#3-约定与硬边界)
+  - [3.1 `Tests/Editor` 这个目录名是承重的](#31-testseditor-这个目录名是承重的)
+  - [3.2 新增 asmdef 会排除现有测试](#32-新增-asmdef-会排除现有测试)
+  - [3.3 不要用 I:E 用的 MSBuild 目标文件判断测试是否被排除](#33-不要用-ide-用的-msbuild-目标文件判断测试是否被排除)
+  - [3.4 退出码不是成功判据](#34-退出码不是成功判据)
+  - [3.5 测试数量](#35-测试数量)
+  - [3.6 同一工程不能同时开两个 Editor 实例](#36-同一工程不能同时开两个-editor-实例)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：只负责本工程自动化测试的现状事实——位置、框架、用例分布、覆盖与零覆盖域。逐条用例的断言内容归各业务域 Guide；测试执行命令见 `..\Workflow\Project_Validation_Guide.md`。本域只描述已落地的测试，不列测试计划。
 
 ## 1. 触发线索
@@ -23,13 +48,13 @@
 
 ### 2.1 位置与框架
 
-- 测试集中在 `Assets/Tests/Editor` 目录下，共 6 个文件，命名空间统一为 `Gameplay.Tests`。
+- 测试集中在 `Assets/Tests/Editor` 目录下，共 7 个文件，命名空间统一为 `Gameplay.Tests`。
 - 框架为 Unity Test Framework **1.4.6**；断言用 NUnit，`nunit.framework` 由扩展 NUnit 包提供。
 - **0 个 asmdef**。测试与编辑器侧的 `InputActionReferenceRebuilder` 一起被编译进预定义编辑器程序集 `Assembly-CSharp-Editor`，该程序集引用 `Assembly-CSharp`。
 
 ### 2.2 用例分布
 
-6 个文件，共 61 项用例：
+7 个文件，共 65 项用例：
 
 | 文件 | 用例数 | 被测对象 |
 |---|---|---|
@@ -37,12 +62,13 @@
 | `CanvasFocusStackTests` | 15 | `CanvasFocusStack`：开闭顺序、order 计算、ESC 行为 |
 | `AStarOpenHeapTests` | 6 | `AStarOpenHeap`：堆序、平局规则、重复入堆、随机输入排序 |
 | `ObjectPoolTests` | 5 | `ObjectPool<T>`：预热、Get/Return 回调、池内对象销毁后的选取 |
-| `PlayerStatsSOTests` | 2 | `PlayerStatsSO.CreateInitialData()`：模板拷贝语义 |
-| `UICacheRegressionTests` | 9 | 任务选择与关闭、快照版本确认与只读性、背包槽位地址、金币局部刷新、对话与任务的开关路由 |
-| **合计** | **61** | |
+| `PlayerStatsSOTests` | 2 | `PlayerStatsSO.CreateInitial:ata()`：模板拷贝语义 |
+| `UICacheRegressionTests` | 12 | 任务选择与关闭、快照版本确认与只读性、背包槽位地址、金币局部刷新、对话与任务的开关路由 |
+| `LootPoolingTests` | 1 | 掉落物对象池的预热与回收 |
+| **合计** | **65** | |
 
-- 特性统计：`[Test]` 59，`[TestCase]` 2，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
-- `[SetUp]` 与 `[TearDown]` 分布在 `ObjectPoolTests`、`PlayerStatsSOTests`、`PlayerStatsModelTests`、`UICacheRegressionTests`，`CanvasFocusStackTests` 亦有 `SetUp`。
+- 特性统计：`[Test]` 63，`[TestCase]` 2，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
+- `[SetUp]` 与 `[Tear:own]` 分布在 `ObjectPoolTests`、`PlayerStatsSOTests`、`PlayerStatsModelTests`、`UICacheRegressionTests`，`CanvasFocusStackTests` 亦有 `SetUp`。
 
 ### 2.3 用例计数的口径
 
@@ -61,8 +87,8 @@
 | `AStarOpenHeapTests` | 否 | 6 个用例只引入 `System`、`System.Collections.Generic` 与 `NUnit.Framework` |
 | `CanvasFocusStackTests` | 否 | 15 个用例只引入 `System.Collections.Generic`、`Contracts`、`Pipeline.UI.SystemCanvasManagers` 与 `NUnit.Framework` |
 | `PlayerStatsModelTests` | 是 | 24 个用例中 1 个用引擎 API：`LogAssert.Expect(LogType.Warning, ...)` |
-| `ObjectPoolTests` | 是 | 5 个用例构造 `GameObject` 与 `MonoBehaviour`，依赖 EditMode 下的 `Object.DestroyImmediate` |
-| `PlayerStatsSOTests` | 是 | 2 个用例用 `ScriptableObject.CreateInstance` 与 `Object.DestroyImmediate` |
+| `ObjectPoolTests` | 是 | 5 个用例构造 `GameObject` 与 `MonoBehaviour`，依赖 EditMode 下的 `Object.:estroyImmediate` |
+| `PlayerStatsSOTests` | 是 | 2 个用例用 `ScriptableObject.CreateInstance` 与 `Object.:estroyImmediate` |
 | `UICacheRegressionTests` | 是 | 临时组件与 SO 验证业务状态；读取实际预制体验证打开策略和关闭路由 |
 
 这套测试整体需要 Unity 才能运行。
@@ -97,9 +123,9 @@ headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：
 
 当前测试由预定义编辑器程序集编译；引入 asmdef 后必须显式引用 `UnityEngine.TestRunner`、`UnityEditor.TestRunner`、test-framework 与产品程序集。
 
-### 3.3 不要用 IDE 用的 MSBuild 目标文件判断测试是否被排除
+### 3.3 不要用 I:E 用的 MSBuild 目标文件判断测试是否被排除
 
-它只把测试源文件从 MSBuild/IDE 项目模型摘掉，注释明确 Unity 编译与 Test Runner 不受影响。后果：IDE 里没有补全、跳转与 Find Usages，但测试照跑。
+它只把测试源文件从 MSBuild/I:E 项目模型摘掉，注释明确 Unity 编译与 Test Runner 不受影响。后果：I:E 里没有补全、跳转与 Find Usages，但测试照跑。
 
 ### 3.4 退出码不是成功判据
 

@@ -2,7 +2,33 @@
 
 文档 ID：`ARCH-COMPOSITION-GUIDE`
 状态：`Active`
-最后更新：`2026-11-01`
+最后更新：`2026-11-02`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 当前实现](#2-当前实现)
+  - [2.1 单例基类与初始化钩子](#21-单例基类与初始化钩子)
+  - [2.2 单例清单与预算](#22-单例清单与预算)
+  - [2.3 初始化时序](#23-初始化时序)
+  - [2.4 全工程唯一的 DefaultExecutionOrder](#24-全工程唯一的-defaultexecutionorder)
+  - [2.5 SaveRegistry](#25-saveregistry)
+  - [2.6 UI 画布焦点栈契约](#26-ui-画布焦点栈契约)
+  - [2.7 预制体注册与闲置缓存](#27-预制体注册与闲置缓存)
+- [3. 约定与硬边界](#3-约定与硬边界)
+  - [3.1 单例初始化钩子内不做跨单例调用](#31-单例初始化钩子内不做跨单例调用)
+  - [3.2 派生类重写 `Awake` 时必须调 `base.Awake()`](#32-派生类重写-awake-时必须调-baseawake)
+  - [3.3 重写 `SaveableService.OnSingletonInitialized` 时必须调 `base`](#33-重写-saveableserviceonsingletoninitialized-时必须调-base)
+  - [3.4 `SaveRegistry.All` 遍历前必须拷贝，且不得在遍历中注册或注销](#34-saveregistryall-遍历前必须拷贝且不得在遍历中注册或注销)
+  - [3.5 `CanvasToToggle.Default` 不参与任何流程](#35-canvastotoggledefault-不参与任何流程)
+  - [3.6 画布要能被 UIManager 主动关闭，必须登记开关事件或缓存预制体](#36-画布要能被-uimanager-主动关闭必须登记开关事件或缓存预制体)
+  - [3.7 `EditorSettings` 的 Domain Reload 状态与静态状态必须成对](#37-editorsettings-的-domain-reload-状态与静态状态必须成对)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：场景实例如何被组合成全局服务图，以及这些服务在 Unity 生命周期里的初始化先后与竞态兜底方式。各业务域自身的数据流归 Gameplay 域与 SceneFlow 域，程序集拆分规划归 AssemblyPlan 域。
 
 ## 1. 触发线索
@@ -27,15 +53,16 @@
 
 `YSingleton<T>` 是 CRTP 基类：`Awake` 先做重复实例判定，命中则停用组件、`Destroy(this)` 后直接返回；合法实例写入 `Instance` 并调用钩子 `OnSingletonInitialized()`；`OnDestroy` 只在 `Instance == this` 时复位。`Instance` 只读、无惰性创建，适用于允许实例暂缺的路径；`RequiredInstance` 用于必需依赖，实例未注册时抛出带类型名的 `InvalidOperationException`。
 
-当前 18 个直接派生类都沿用基类 `Awake`，`base.Awake()` 链路完整。
+当前 20 个具体直接派生类都沿用基类 `Awake`，`base.Awake()` 链路完整。
 
 ### 2.2 单例清单与预算
 
-`YSingleton<T>` 的派生共 1 个抽象基类加 19 个具体单例：18 个直接继承，`StatsService` 经 `SaveableService` 间接继承。
+`YSingleton<T>` 的派生共 1 个抽象基类加 21 个具体单例：20 个直接继承，`StatsService` 经 `SaveableService` 间接继承。
 
 | 具体单例 | 职责 |
 |---|---|
 | `TimeManager` | `Time.timeScale` 与暂停引用计数 |
+| `AudioPlayerManager` | 音效请求、播放器池与背景音乐 |
 | `SceneDataForSave` | 场景 SO 列表，供读档定位场景 |
 | `SceneChanger` | 场景组加载/卸载与过渡 |
 | `ObjectsMapManager` | 位置登记表 |
@@ -49,13 +76,14 @@
 | `ItemHistoryManager` | 物品拾取累计 |
 | `VisitedHistoryManager` | 空类，无任何成员 |
 | `QuestManager` | 任务 |
+| `SkillTreeManager` | 技能树的持久状态 |
 | `ShopManager` | 商店 |
 | `SaveSystem` | 存档文件读写 |
 | `SaveDataManager` | 存档对象组装与分发 |
 | `PlayerLocator` | 玩家坐标查询 |
 | `StatsService` | 玩家数值，经 `SaveableService` 继承 |
 
-单例预算名单含 `StatsService`、`SaveDataManager`、`SaveSystem`、`UIManager`、`SceneChanger`、`TimeManager` 六个，其余 13 个具体单例在此名单之外。
+单例预算名单含 `StatsService`、`SaveDataManager`、`SaveSystem`、`UIManager`、`SceneChanger`、`TimeManager` 六个，其余 15 个具体单例在此名单之外。
 
 存档参与者分两类。`SaveableService` 派生类当前只有 `StatsService` 一个，占固定槽位，`GetDataID()` 返回 null。直接实现 `ISaveable` 的场景物体当前只有 `Loot` 一个，按 GUID 参与。
 
@@ -109,7 +137,7 @@
 
 ### 2.7 预制体注册与闲置缓存
 
-缓存归 `UICacheManager` 这个独立 MonoBehaviour 单例所有，`UIManager` 只持一个引用并转发开关请求。它是全工程唯一不经 `YSingleton` 的手写单例（`static Instance` 自管），因此不计入 §2.1 的 19 个具体单例。
+缓存归 `UICacheManager` 这个独立 MonoBehaviour 单例所有，`UIManager` 只持一个引用并转发开关请求。它是全工程唯一不经 `YSingleton` 的手写单例（`static Instance` 自管），因此不计入 §2.1 的 21 个具体单例。
 
 注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasViewBase` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。打开请求先在预制体或已有实例上执行只读的 `CanOpen`，通过后首次实例化，再由 `Open` 检查门槛并执行 `OnOpen`；门槛拒绝时不创建界面，也不会触发其 `Awake`。`CanOpen` 只检查条件，不执行副作用。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
 

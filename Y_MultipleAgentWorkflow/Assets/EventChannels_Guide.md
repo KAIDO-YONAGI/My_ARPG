@@ -2,7 +2,28 @@
 
 文档 ID：`ASSETS-EVENTCHANNELS-GUIDE`
 状态：`Active`
-最后更新：`2026-11-01`
+最后更新：`2026-11-02`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 当前实现](#2-当前实现)
+  - [2.1 清单：14 个通道类，30 个通道资产](#21-清单14-个通道类30-个通道资产)
+  - [2.2 类型契约](#22-类型契约)
+  - [2.3 事件资产的组织方式](#23-事件资产的组织方式)
+  - [2.4 订阅与发布惯例](#24-订阅与发布惯例)
+  - [2.5 ToggleCanvasEventSO 的内部契约](#25-togglecanvaseventso-的内部契约)
+  - [2.6 新增一个事件通道的标准动作](#26-新增一个事件通道的标准动作)
+- [3. 约定与硬边界](#3-约定与硬边界)
+  - [3.1 订阅必须随对象或打开状态成对管理](#31-订阅必须随对象或打开状态成对管理)
+  - [3.2 canvasToToggle 是隐式身份，必须唯一](#32-canvastotoggle-是隐式身份必须唯一)
+  - [3.3 新增与改名事件通道的检查清单](#33-新增与改名事件通道的检查清单)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：本文件只对事件通道这一资产的清单、类型契约、订阅与发布惯例、命名与接线检查清单负责。事件总线机制与 MVC 及服务层的边界属 Architecture 域，场景、存档、任务等业务语义属各自 Gameplay 域。
 
 ## 1. 触发线索
@@ -23,9 +44,9 @@
 
 ## 2. 当前实现
 
-### 2.1 清单：13 个通道类，29 个通道资产
+### 2.1 清单：14 个通道类，30 个通道资产
 
-13 个通道类集中在 Pipeline 层的 SO 事件目录：
+14 个通道类集中在 Pipeline 层的 SO 事件目录：
 
 | # | 类 | 对外事件 | 发布方法 | 资产数 |
 |---|---|---|---|---|
@@ -42,16 +63,17 @@
 | 11 | `PlayerDamagedEventSO` | `Action<int,Transform,float,float> PlayerDamaged` | `OnPlayerDamaged(...)` | 1 |
 | 12 | `EnemyDefeatedEventSO` | `Action<int,Transform> EnemyDefeated` | `OnEnemyDefeated(...)` | 1 |
 | 13 | `CanvasOpenedEventSO` | `Action<CanvasToToggle> CanvasOpened` | `RaiseCanvasOpened(...)` | 1 |
-| | **合计** | | | **29** |
+| 14 | `FeedbackEventSO` | `Action<AudioRequest> AudioRequested` | `RequestAudio(...)` | 1 |
+| | **合计** | | | **30** |
 
-13 个类里有 3 个是多实例：`ToggleCanvasEventSO` 占 10 个资产、`VoidEventSO` 占 6 个、`InventorySlotsStatsSO` 占 3 个，其余 10 个类各 1 个。
+14 个类里有 3 个是多实例：`ToggleCanvasEventSO` 占 10 个资产、`VoidEventSO` 占 6 个、`InventorySlotsStatsSO` 占 3 个，其余 11 个类各 1 个。
 
 ### 2.2 类型契约
 
-**13 个类每一个都直接继承 `ScriptableObject`，没有公共基类、没有公共接口**，`VoidEventSO`、`SceneLoadedEventSO`、`ShopKeeperEventSO`、`PlayerDamagedEventSO` 都写作 `: ScriptableObject`；`GuidSO` 是另一条无关的继承线，事件通道不使用它。
+**14 个类每一个都直接继承 `ScriptableObject`，没有公共基类、没有公共接口**，`VoidEventSO`、`SceneLoadedEventSO`、`ShopKeeperEventSO`、`PlayerDamagedEventSO` 都写作 `: ScriptableObject`；`GuidSO` 是另一条无关的继承线，事件通道不使用它。
 
 - 事件字段一律是 `public event Action<...>`，未标注 `[SerializeField]`，因此委托链不序列化，资产文件里只有 `m_Script` 与类内配置字段，看不到任何订阅者。
-- 泛型参数只引用 `ItemSO`、`QuestSO`、`GameSceneSO`、`Loot`、`ShopKeeper` 与 `Contracts` 里的枚举（`SaveType`、`QuestState`、`CanvasToToggle`）；通道类不引用任何 Manager、Controller 或 View。
+- 泛型参数引用 `ItemSO`、`QuestSO`、`GameSceneSO`、`Loot`、`ShopKeeper`、`Contracts` 的枚举，以及 `Contracts.Audio.AudioRequest`；通道类不引用任何 Manager、Controller 或 View。
 - 发布方法命名分两类：`ToggleCanvasEventSO`、`ShopKeeperEventSO`、`SceneLoadEventSO` 等用 `Raise*`；`VoidEventSO.OnEventRaised`、`LootEventSO.OnEventRaised`、`LoadQuestEventSO.OnLoadQuestEventRaised`、`PlayerDamagedEventSO.OnPlayerDamaged` 用 `On*Raised` 或 `On*`。新增通道时照抄同族命名。
 - 每个资产实例是独立通道：同一个类建两个资产就是两条互不相干的广播线，`VoidEventSO` 的 6 个资产各管一件事即此用法。
 
@@ -80,6 +102,7 @@ private void OnDisable() { sceneLoadEventSO.LoadRequestEvent -= OnAutoSave; ... 
 |---|---|
 | `SceneLoadEvent` | `SceneChanger` |
 | `SceneLoadedEvent` | `SceneChanger` |
+| `FeedbackEventSO` | `AudioTrigger` 或业务调用方发布，`AudioPlayerManager` 订阅；调用方式见 `Audio_Guide.md` |
 | ToggleCanvas 10 个 | `UIManager`，方法为 `RaiseToggleCanvasEvent`、`RaiseFocusEvent`，切场景时复位全部关闭 |
 | `DataSavedEvent` | `SaveDataManager` |
 | `LootEvent` | `Loot` |
@@ -94,7 +117,7 @@ private void OnDisable() { sceneLoadEventSO.LoadRequestEvent -= OnAutoSave; ... 
 
 ### 2.5 ToggleCanvasEventSO 的内部契约
 
-`ToggleCanvasEventSO` 是 13 个类里唯一带配置字段的，字段是 `public CanvasToToggle canvasToToggle`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
+`ToggleCanvasEventSO` 是 14 个类里唯一带配置字段的，字段是 `public CanvasToToggle canvasToToggle`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
 
 消费侧靠枚举匹配配对：
 

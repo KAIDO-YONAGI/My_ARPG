@@ -2,7 +2,35 @@
 
 文档 ID：`SCENE-FLOW-GUIDE`
 状态：`Active`
-最后更新：`2026-11-01`
+最后更新：`2026-11-02`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 当前实现](#2-当前实现)
+  - [2.1 唯一入口：先广播后执行](#21-唯一入口先广播后执行)
+  - [2.2 GameSceneSO 语义](#22-gamesceneso-语义)
+  - [2.3 组语义与加载顺序](#23-组语义与加载顺序)
+  - [2.4 常驻场景注册表](#24-常驻场景注册表)
+  - [2.5 常驻场景在初始场景中的声明](#25-常驻场景在初始场景中的声明)
+  - [2.6 加载完成后的启动内容](#26-加载完成后的启动内容)
+  - [2.7 存档键来源](#27-存档键来源)
+  - [2.8 切场触发点与重试](#28-切场触发点与重试)
+  - [2.9 构建场景列表与 Addressables 现状](#29-构建场景列表与-addressables-现状)
+- [3. 约定与硬边界](#3-约定与硬边界)
+  - [3.1 切场一律经 `RequestSceneLoad`](#31-切场一律经-requestsceneload)
+  - [3.2 场景必须进构建场景列表](#32-场景必须进构建场景列表)
+  - [3.3 常驻场景不进任何 `sceneToLoad` 或 `firstSceneToLoad` 组](#33-常驻场景不进任何-scenetoload-或-firstscenetoload-组)
+  - [3.4 `sceneName` 为空即静默跳过](#34-scenename-为空即静默跳过)
+  - [3.5 存档键取 `SaveKey`](#35-存档键取-savekey)
+  - [3.6 `SceneDataForSave.gameScenes` 必须覆盖所有可能写进场景键的 GameSceneSO](#36-scenedataforsavegamescenes-必须覆盖所有可能写进场景键的-gamesceneso)
+  - [3.7 重试链先回血再请求](#37-重试链先回血再请求)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：场景组加载管线，由场景切换脚本组、启动加载脚本 `InitialLoad` 与场景 SO 契约 `GameSceneSO` 组成，覆盖加载入口、场景组语义、常驻场景注册、存档键来源与构建场景列表依赖。存档读写与存档 schema 归 Data 域；UI 画布管理与事件通道定义归资产域与玩法域；Addressables 包的构建配置不在本域。
 
 - 场景管线代码：`SceneChanger`、`PersistentSceneRegistry`、`Teleport`、`SceneDataForSave`、`CameraPixelSnap`
@@ -38,7 +66,7 @@
 
 字段语义：`ID` 标识资产本身，不落盘、跨会话会变，注释明示它不能充当存档键；`sceneAsset` 只在编辑器下存在；`sceneName` 是运行时加载名；`sceneType` 取 `SceneType`；`initialPosition` 是出生点。`OnValidate` 在编辑器下用 `sceneAsset.name` 覆盖 `sceneName`。
 
-当前工程的 GameSceneSO 资产共 5 个：MenuScene、Scene1、Scene2、TestScene 与 RetrySceneSO，`sceneName` 分别为 StartingMenu、Scene1、Scene2、TestScene 与空。其中没有常驻场景类型的资产。
+当前工程的 GameSceneSO 资产共 6 个：MenuScene、Scene1、Scene2、TestScene、RetrySceneSO 与 PersistentScene。PersistentScene 供初始加载器登记并加载常驻层，内容场景组仍以菜单或关卡资产作为首项。
 
 ### 2.3 组语义与加载顺序
 
@@ -55,11 +83,13 @@
 
 ### 2.5 常驻场景在初始场景中的声明
 
-初始场景的唯一根对象是 `InitialLoad`，其 `persistentScenes` 只登记一条：菜单场景资产 MenuScene。`InitialLoad.Awake` 先注册常驻场景再起协程，加载时同样用 `Application.CanStreamedLevelBeLoaded` 校验，并跳过已经加载的场景。
+初始场景的唯一根对象是 `InitialLoad`，其 `persistentScenes` 登记 `Assets/GameSO/GameSceneSO/PersistentScene.asset`。`InitialLoad.Awake` 先注册常驻场景再起协程加载 PersistentScene，加载时用 `Application.CanStreamedLevelBeLoaded` 校验，并跳过已经加载的场景。常驻层就绪后由其中的 `SceneChanger.Start` 加载菜单。
 
 ### 2.6 加载完成后的启动内容
 
 `SceneChanger.Start()` 自调用 `RequestSceneLoad(firstSceneToLoad, Vector3.zero, false)`，调用点放在 Start 是为了让同批 `Awake` 与 `OnEnable` 的订阅方就绪。常驻场景里的 `SceneChanger` 配置 `firstSceneToLoad = [MenuScene]`，它的 `player` 与 `objectsToUnableWhileMenuOrReset` 都指向玩家根节点。
+
+常驻层的 `GlobalManagers/AudioPlayerManager` 在 `Start` 预热音效池并启动 BGM，订阅场景完成事件播放加载音效。音频请求、配置与对象池契约见 [音频系统 Guide](../Assets/Audio_Guide.md)。
 
 ### 2.7 存档键来源
 

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Contracts.Base;
 using Contracts.Enums;
-using Contracts.Interfaces;
 using Contracts.State;
 using Gameplay.Units.ShopKeeper;
 using Pipeline.SO;

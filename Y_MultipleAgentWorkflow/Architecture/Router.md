@@ -2,8 +2,12 @@
 
 文档 ID：`BUS-ARCHITECTURE`
 状态：`Active`
-维护计数：`2/5`
-最后更新：`2026-11-01`
+维护计数：`3/5`
+最后更新：`2026-11-02`
+
+## 维护规则
+
+任务路由、权威文档或职责边界变化时更新本文，详细文档索引在所属功能域 Router 就近维护。证据记录在[开发日志](DeveloperLog.md)；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
 
 ## 任务线索
 
@@ -38,7 +42,7 @@
 
 **Active**
 
-- `Composition\Composition_Guide.md`：单例清单与预算，共 19 个具体单例；初始化时序的三套手写解法；全工程唯一 `DefaultExecutionOrder(10000)` 的语义；`SaveRegistry` 登记处契约；UI 画布焦点栈契约。
+- `Composition\Composition_Guide.md`：单例清单与预算，共 21 个具体单例；初始化时序的三套手写解法；全工程唯一 `DefaultExecutionOrder(10000)` 的语义；`SaveRegistry` 登记处契约；UI 画布焦点栈契约。
 - `Layering\Layering_Guide.md`：三层目录判定标准；跨层依赖方向；MVCS 四层归属与命名空间。细节以该域 Router 与 Guide 为准，本文件不复制。
 - `Composition\Router.md`、`AssemblyPlan\Router.md`、`Layering\Router.md`：三个下级域的线索路由入口。
 

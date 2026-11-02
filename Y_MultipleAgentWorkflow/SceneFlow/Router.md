@@ -2,8 +2,12 @@
 
 文档 ID：`BUS-SCENEFLOW`
 状态：`Active`
-维护计数：`2/5`
-最后更新：`2026-11-01`
+维护计数：`3/5`
+最后更新：`2026-11-02`
+
+## 维护规则
+
+任务路由、权威文档或职责边界变化时更新本文，详细文档索引在所属功能域 Router 就近维护。证据记录在[开发日志](DeveloperLog.md)；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
 
 ## 任务线索
 
@@ -14,6 +18,7 @@
 | `场景组` / `Additive` / `firstSceneToLoad` / `sceneToLoad` / `Teleport` | `SceneFlow_Guide.md §2.3`、`SceneFlow_Guide.md §2.6`、`SceneFlow_Guide.md §2.8` |
 | `常驻场景` / `PersistentSceneRegistry` | `SceneFlow_Guide.md §2.4` |
 | 初始场景 / `InitialLoad` / `persistentScenes` | `SceneFlow_Guide.md §2.5` |
+| 常驻音频 / `AudioPlayerManager` / 加载音效 | `SceneFlow_Guide.md §2.6`、`../Assets/Audio_Guide.md` |
 | 构建场景列表 / `EditorBuildSettings` / 场景未入构建 | `SceneFlow_Guide.md §2.3`、`SceneFlow_Guide.md §2.9` |
 | `Addressables` / `AssetReference` | `SceneFlow_Guide.md §2.9` |
 | 加载并发 / 请求被忽略 / `isLoading` | `SceneFlow_Guide.md §2.1` |

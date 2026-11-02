@@ -3,7 +3,11 @@
 文档 ID：`BUS-ARCHITECTURE-ASSEMBLYPLAN`
 状态：`Active`
 维护计数：`0/5`
-最后更新：`2026-10-05`
+最后更新：`2026-11-02`
+
+## 维护规则
+
+任务路由、权威文档或职责边界变化时更新本文，详细文档索引在所属功能域 Router 就近维护。证据记录在[开发日志](DeveloperLog.md)；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
 
 ## 任务线索
 
@@ -14,7 +18,7 @@
 | `xLua` `热更` `LuaManager` `LuaScripts` `Addressables` 下发 | `AssemblyPlan_Proposal.md` §3.2 |
 | `效果数据驱动` `技能效果` `物品效果` `switch(skillName)` | `AssemblyPlan_Proposal.md` §3.3 |
 | `状态机基类` `PlayerState` `EnemyState` `NPCState` | `AssemblyPlan_Proposal.md` §3.3 前置依赖 |
-| `事件总线` `EventBus` `12 条通道` `维持不采用` | `AssemblyPlan_Proposal.md` §3.4 |
+| `事件总线` `EventBus` `事件通道` `维持不采用` | `AssemblyPlan_Proposal.md` §3.4 |
 | `事件引用可视化` `订阅链查看器` `接线图` `EventGraph` | `AssemblyPlan_Proposal.md` §3.5 |
 
 ## 下级导航

@@ -3,6 +3,33 @@
 文档 ID：`GP-UNITS-GUIDE`
 状态：`Active`
 最后更新：`2026-10-05`
+## 维护规则
+
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
+
+## 文档内目录
+
+- [1. 触发线索](#1-触发线索)
+- [2. 当前实现](#2-当前实现)
+  - [2.0 三个子域的脚本清单（本域没有统一基类）](#20-三个子域的脚本清单本域没有统一基类)
+  - [2.1 敌人状态机与追击（EnemyMovement）](#21-敌人状态机与追击enemymovement)
+  - [2.2 敌人攻击、血量与击退（EnemyCombat / EnemyHealth / EnemyKnockBack）](#22-敌人攻击血量与击退enemycombat--enemyhealth--enemyknockback)
+  - [2.3 NPC：互斥 enabled 切行为 + 触发切对话](#23-npc互斥-enabled-切行为--触发切对话)
+  - [2.4 店主：OnTriggerEnter2D 广播通道，ShopManager 订阅](#24-店主ontriggerenter2d-广播通道shopmanager-订阅)
+  - [2.5 移动约定：单位各自持 PathFollower，驱动同一组四个方法](#25-移动约定单位各自持-pathfollower驱动同一组四个方法)
+- [3. 约定与硬边界](#3-约定与硬边界)
+  - [3.1 `GetPosToGo` 返回 `Vector3.zero` 是「无路」的唯一信号](#31-getpostogo-返回-vector3zero-是无路的唯一信号)
+  - [3.2 到点必须调 `ArrivedPos()`，换目标必须先 `ResetPath()`](#32-到点必须调-arrivedpos换目标必须先-resetpath)
+  - [3.3 `GetThreshold()` 依赖 `AStarNodeManager` 已 Awake](#33-getthreshold-依赖-astarnodemanager-已-awake)
+  - [3.4 敌人被击退的数值来自玩家，方向来自攻击者](#34-敌人被击退的数值来自玩家方向来自攻击者)
+  - [3.5 `EnemyMovement` 的 KnockBack 态是全停态](#35-enemymovement-的-knockback-态是全停态)
+  - [3.6 NPC 行为组件出厂是 disabled 的](#36-npc-行为组件出厂是-disabled-的)
+  - [3.7 `NPCDialogTrigger` 在 Chat 期间把刚体设成 `isKinematic = true` 并写死 `velocity = 0`](#37-npcdialogtrigger-在-chat-期间把刚体设成-iskinematic--true-并写死-velocity--0)
+  - [3.8 店主与玩家的接口只有 `ShopKeeperEventSO` 一条](#38-店主与玩家的接口只有-shopkeepereventso-一条)
+  - [3.9 商品列表按场景实例覆写，落在场景实例上](#39-商品列表按场景实例覆写落在场景实例上)
+
+先读目录，再按任务读取相关章节，避免整份指南载入上下文。
+
 权威范围：本域只负责九个单位脚本的当前实现，即敌人 4 个、NPC 4 个、店主 1 个，以及它们通过 `PathFollower` 驱动移动、通过事件通道对外广播的接口；寻路算法本身归寻路模块，商店买卖与库存结算归 Gameplay.InventoryShop，对话推进规则归 Gameplay.Dialog，玩家数值规则归 Gameplay.PlayerStats。
 
 - 单位脚本：`EnemyMovement`、`EnemyCombat`、`EnemyHealth`、`EnemyKnockBack`、`NPCStateController`、`NPCWander`、`NPCPatrol`、`NPCDialogTrigger`、`ShopKeeper`
