@@ -80,50 +80,7 @@ Router、DeveloperLog，以及项目根的 `AGENTS.md` 与 `CLAUDE.md`。
 | 工程设置 | Unity 版本、构建场景列表、脚本后端等工程级配置 |
 | 构建与日志输出 | 已被 gitignore 的产物目录 |
 
-## 文档索引
-
-| 文档 ID | 路径 | 状态 |
-|---|---|---|
-| `ROOT-ROUTER` | `Router.md` | Active |
-| `RULES` | `RULES.md` | Active |
-| `ENTRY-AGENTS` | `..\AGENTS.md` | Active |
-| `ENTRY-CLAUDE` | `..\CLAUDE.md` | Active |
-| `WF-CONFIG-METHOD` | `Workflow_Configuration_Guide.md` | Active |
-| `WF-GUIDE` | `Workflow\Workflow_Guide.md` | Active |
-| `WF-ROUTER` | `Workflow\Router.md` | Active |
-| `WF-CONCURRENCY-GUIDE` | `Workflow\Concurrency_Guide.md` | Active |
-| `WF-PROJECT-VALIDATION` | `Workflow\Project_Validation_Guide.md` | Active |
-| `BUS-ARCHITECTURE` | `Architecture\Router.md` | Active |
-| `BUS-ARCHITECTURE-LAYERING` | `Architecture\Layering\Router.md` | Active |
-| `ARCH-LAYERING-GUIDE` | `Architecture\Layering\Layering_Guide.md` | Active |
-| `BUS-ARCHITECTURE-COMPOSITION` | `Architecture\Composition\Router.md` | Active |
-| `ARCH-COMPOSITION-GUIDE` | `Architecture\Composition\Composition_Guide.md` | Active |
-| `BUS-ARCHITECTURE-ASSEMBLYPLAN` | `Architecture\AssemblyPlan\Router.md` | Active |
-| `ARCH-ASSEMBLY-PLAN` | `Architecture\AssemblyPlan\AssemblyPlan_Proposal.md` | Proposal |
-| `BUS-GAMEPLAY` | `Gameplay\Router.md` | Active |
-| `BUS-GAMEPLAY-PLAYERSTATS` | `Gameplay\PlayerStats\Router.md` | Active |
-| `GP-PLAYERSTATS-GUIDE` | `Gameplay\PlayerStats\PlayerStats_Guide.md` | Active |
-| `BUS-GAMEPLAY-UNITS` | `Gameplay\Units\Router.md` | Active |
-| `GP-UNITS-GUIDE` | `Gameplay\Units\Units_Guide.md` | Active |
-| `BUS-GAMEPLAY-DIALOG` | `Gameplay\Dialog\Router.md` | Active |
-| `GP-DIALOG-GUIDE` | `Gameplay\Dialog\Dialog_Guide.md` | Active |
-| `BUS-GAMEPLAY-QUEST` | `Gameplay\Quest\Router.md` | Active |
-| `GP-QUEST-GUIDE` | `Gameplay\Quest\Quest_Guide.md` | Active |
-| `BUS-GAMEPLAY-INVENTORYSHOP` | `Gameplay\InventoryShop\Router.md` | Active |
-| `GP-INVENTORYSHOP-GUIDE` | `Gameplay\InventoryShop\InventoryShop_Guide.md` | Active |
-| `BUS-GAMEPLAY-SKILLS` | `Gameplay\Skills\Router.md` | Active |
-| `GP-SKILLS-GUIDE` | `Gameplay\Skills\Skills_Guide.md` | Active |
-| `BUS-SCENEFLOW` | `SceneFlow\Router.md` | Active |
-| `SCENE-FLOW-GUIDE` | `SceneFlow\SceneFlow_Guide.md` | Active |
-| `BUS-ASSETS` | `Assets\Router.md` | Active |
-| `ASSETS-GUIDE` | `Assets\Assets_Guide.md` | Active |
-| `ASSETS-EVENTCHANNELS-GUIDE` | `Assets\EventChannels_Guide.md` | Active |
-| `BUS-DATA` | `Data\Router.md` | Active |
-| `DATA-SAVEDATA-GUIDE` | `Data\SaveData_Guide.md` | Active |
-| `BUS-BUILD` | `Build\Router.md` | Active |
-| `BUILD-ANDROID-GUIDE` | `Build\AndroidBuild_Guide.md` | Active |
-| `BUILD-PROJECTCONFIG-GUIDE` | `Build\ProjectConfig_Guide.md` | Active |
-| `BUILD-TESTBASELINE-GUIDE` | `Build\TestBaseline_Guide.md` | Active |
+## 
 
 ## 参考资料
 
