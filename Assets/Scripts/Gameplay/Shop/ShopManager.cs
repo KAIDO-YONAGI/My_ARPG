@@ -20,7 +20,7 @@ namespace Gameplay.Shop
     /// 管理器不持有商品槽位或画布引用：买卖只发事件，显隐只请求界面缓存，
     /// 这样商店界面被缓存销毁后重新打开仍能恢复到当前分类。
     /// </remarks>
-    public class ShopManager : YSingleton<ShopManager>, IShopInteractable
+    public class ShopManager : YSingleton<ShopManager>
     {
         public sealed class State
         {
