@@ -28,7 +28,7 @@ namespace Pipeline.UI.Runtime
     /// 本组件挂在常驻场景的 RuntimeViews 下。它不直接处理输入，
     /// 输入由 UIManager 统一收集后再通过 <see cref="OpenCanvas"/> / <see cref="CloseCanvas"/> 驱动缓存。
     /// </remarks>
-    public sealed class UICacheManager : MonoBehaviour
+    public sealed class UICacheManager : YSingleton<UICacheManager>
     {
         [Header("界面注册表")]
         [Tooltip("每项登记一个界面预制体和它的场景挂载点；同一 CanvasToToggle 只能登记一次。")]
@@ -43,18 +43,15 @@ namespace Pipeline.UI.Runtime
 
         private UIViewInstanceCache cache;
 
-        /// <summary>当前场景中的缓存入口；场景切换时可能短暂为空。</summary>
-        public static UICacheManager Instance { get; private set; }
-
         /// <summary>已创建的界面实例数量（含正在显示的界面）。</summary>
         public int InstanceCount => cache?.InstanceCount ?? 0;
 
         /// <summary>当前闲置可复用的界面实例数量。</summary>
         public int IdleCount => cache?.IdleCount ?? 0;
 
-        private void Awake()
+            
+        protected override void OnSingletonInitialized()
         {
-            Instance = this;
             cache = new UIViewInstanceCache(
                 views,
                 transform,
@@ -64,7 +61,6 @@ namespace Pipeline.UI.Runtime
 
         private void OnEnable()
         {
-            Instance = this;
             cache.Connect();
         }
 
@@ -84,7 +80,6 @@ namespace Pipeline.UI.Runtime
         {
             cache?.Dispose();
             cache = null;
-            if (Instance == this) Instance = null;
         }
 
         /// <summary>取某个界面的开关事件；未注册时返回 null。</summary>
