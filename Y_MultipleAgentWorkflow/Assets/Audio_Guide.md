@@ -2,7 +2,7 @@
 
 文档 ID：`ASSETS-AUDIO-GUIDE`
 状态：`Active`
-最后更新：`2026-11-02`
+最后更新：`2026-11-07`
 
 ## 维护规则
 
@@ -82,6 +82,8 @@ AudioPlayerManager.RequiredInstance.StopBGM();
 `UnityEngine` 也声明 `AudioType`。同时引用两个命名空间的代码使用上述类型别名，保持编译时类型明确。
 
 ## 5. 配置与扩展
+
+`UIAudioManager.canvasAudioBindings` 按画布登记打开音效。收到 `CanvasOpenedEventSO` 后，只为已登记的画布发布音效请求；未登记的画布直接跳过，界面正常打开。
 
 `AudioConfigSO` 的音效与音乐条目分别按 `AudioType`、`BGMType` 匹配，同类型多个片段按权重随机选择；权重全零时取第一项。类型在配置中缺席时返回空片段，本次请求跳过播放。
 

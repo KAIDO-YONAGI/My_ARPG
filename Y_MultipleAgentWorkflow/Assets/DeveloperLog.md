@@ -7,6 +7,12 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 未登记画布的打开音效
+
+- `UIAudioManager.OnUIAudio` 使用 `TryGetValue` 查询画布映射；未登记的画布直接跳过，已登记的画布继续发布对应的二维音效请求。
+- 通过现有 Unity 编辑器重新编译，Console 无错误。在内存中创建临时事件通道与组件，通过 `CanvasOpenedEventSO` 检查全部 11 个画布枚举：未登记的 `Skills` 与 `Backpack` 不发布请求，已登记画布保留音效请求，退订后不再响应。临时对象已清理，验证结果位于 `Logs/ui-audio-verification.json`。
+- `Audio_Guide.md` 同步画布映射的缺项语义；Assets 维护计数为 `1/5`。
+
 ## 2026-11-02 事件通道计数核对
 
 - 核对 `Assets/Scripts/Pipeline/SO/Events` 为 14 个通道类、16 条 `public event`，`Assets/GameSO/Events` 为 30 个事件资产；修正 `EventChannels_Guide.md` §2.5 的类数。

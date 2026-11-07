@@ -49,7 +49,9 @@ namespace Pipeline.Audio
 
         private void OnUIAudio(CanvasToToggle canvas)
         {
-            feedbackEvent.RequestAudio(new AudioRequest(canvasAudioBindingDict[canvas]));
+            if (!canvasAudioBindingDict.TryGetValue(canvas, out AudioType audioType)) return;
+
+            feedbackEvent.RequestAudio(new AudioRequest(audioType));
         }
     }
 }
