@@ -1,5 +1,6 @@
 using System;
 using Contracts.Base;
+using Contracts.State;
 using Pipeline.SO;
 using TMPro;
 using UnityEngine;
@@ -38,6 +39,10 @@ namespace Gameplay.Dialog
         /// <summary>注册到按钮上的监听，销毁时按同一委托移除。</summary>
         private UnityAction[] optionListeners = Array.Empty<UnityAction>();
 
+        private VersionReader lineReader;
+        private VersionReader dialogReader;
+        private VersionReader choicesReader;
+
         private void Awake()
         {
             Debug.Assert(speakerPortrait != null, nameof(speakerPortrait), this);
@@ -72,31 +77,39 @@ namespace Gameplay.Dialog
         protected override void OnOpen()
         {
             DialogManager.RequiredInstance.OnCachedViewOpened();
-            RefreshIfDirty();
+            lineReader.Invalidate();
+            dialogReader.Invalidate();
+            choicesReader.Invalidate();
+            RefreshIfChanged();
         }
 
         private void Update()
         {
-            RefreshIfDirty();
+            RefreshIfChanged();
         }
 
         /// <summary>
-        /// 按脏标记刷新当前对话。管理器在显示一行前会把行号加一，
+        /// 按本视图记录的版本刷新对话。管理器在显示一行前会把行号加一，
         /// 所以这里取 <c>CurrentLineIndex - 1</c> 并夹到合法范围。
         /// </summary>
-        private void RefreshIfDirty()
+        private void RefreshIfChanged()
         {
             DialogManager manager = DialogManager.Instance;
             if (!IsOpen || manager == null) return;
 
             DialogManager.State state = manager.CurrentState;
-            if (!state.IsDirty) return;
+            ulong lineVersion = state.LineVersion;
+            ulong dialogVersion = state.DialogVersion;
+            ulong choicesVersion = state.ChoicesVersion;
+            if (!lineReader.NeedsRefresh(state, lineVersion) &&
+                !dialogReader.NeedsRefresh(state, dialogVersion) &&
+                !choicesReader.NeedsRefresh(state, choicesVersion)) return;
 
             DialogSO dialog = state.CurrentDialog;
             if (dialog == null || dialog.dialogLines == null || dialog.dialogLines.Length == 0)
             {
                 SetChoicesVisible(false);
-                state.ClearDirty();
+                RecordVersions(state, lineVersion, dialogVersion, choicesVersion);
                 return;
             }
 
@@ -118,7 +131,15 @@ namespace Gameplay.Dialog
                     optionTexts[i].text = dialog.nextDialogOptions[i].optionText;
             }
 
-            state.ClearDirty();
+            RecordVersions(state, lineVersion, dialogVersion, choicesVersion);
+        }
+
+        private void RecordVersions(DialogManager.State state, ulong lineVersion,
+            ulong dialogVersion, ulong choicesVersion)
+        {
+            lineReader.Record(state, lineVersion);
+            dialogReader.Record(state, dialogVersion);
+            choicesReader.Record(state, choicesVersion);
         }
 
         /// <summary>统一隐藏或显示所有选项按钮。</summary>

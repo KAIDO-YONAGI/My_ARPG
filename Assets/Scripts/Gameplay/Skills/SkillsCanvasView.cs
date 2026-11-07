@@ -1,4 +1,5 @@
 using Contracts.Base;
+using Contracts.State;
 using TMPro;
 using UnityEngine;
 
@@ -30,6 +31,8 @@ namespace Gameplay.Skills
         }
 
         private SkillTreeManager manager;
+        private VersionReader skillsReader;
+        private VersionReader pointsReader;
 
         /// <summary>
         /// 打开时绑定管理器、把状态路径根节点交给每个槽位，并立即刷新。
@@ -42,35 +45,38 @@ namespace Gameplay.Skills
                 slot.BindStateRoot(transform);
 
             SkillSlot.OnMaxSkillLevel += HandleSkillMaxed;
-            manager.CurrentState.MarkDirty();
-            RefreshIfDirty();
+            skillsReader.Invalidate();
+            pointsReader.Invalidate();
+            RefreshIfChanged();
         }
 
         private void Update()
         {
-            RefreshIfDirty();
+            RefreshIfChanged();
         }
 
-        /// <summary>按管理器脏标记刷新技能点文本和所有槽位。</summary>
-        private void RefreshIfDirty()
+        /// <summary>按本视图记录的版本分别刷新技能点文本和槽位。</summary>
+        private void RefreshIfChanged()
         {
             if (!IsOpen || manager == null) return;
 
             SkillTreeManager.State state = manager.CurrentState;
-            if (!state.AnyDirty) return;
+            ulong skillsVersion = state.SkillsVersion;
+            ulong pointsVersion = state.AbilityPointsVersion;
 
-            if (state.IsAbilityPointsDirty)
+            if (pointsReader.NeedsRefresh(state, pointsVersion))
             {
                 pointsText.text = "Skill Points: " + state.AbilityPointsValue;
+                pointsReader.Record(state, pointsVersion);
             }
 
-            if (state.IsSkillsDirty)
+            if (skillsReader.NeedsRefresh(state, skillsVersion))
             {
                 foreach (SkillSlot slot in slots)
                     slot.RefreshFromManager();
+                skillsReader.Record(state, skillsVersion);
             }
 
-            state.ClearDirty();
         }
 
         /// <summary>某个技能升满后，检查并解锁满足前置条件的其他技能。</summary>

@@ -1,4 +1,5 @@
 using TMPro;
+using Contracts.State;
 using UnityEngine;
 
 namespace Gameplay.Inventory
@@ -9,7 +10,7 @@ namespace Gameplay.Inventory
     /// </summary>
     /// <remarks>
     /// 快捷栏只显示管理器中的前若干个槽位（管理器把快捷栏排在背包之前）。
-    /// 首次 <c>Start</c> 把场景里配置的初始物品交给管理器，之后每帧按脏标记刷新。
+    /// 首次 <c>Start</c> 把场景里配置的初始物品交给管理器，之后每帧比较版本并按需刷新。
     /// </remarks>
     public sealed class HotbarCanvasView : MonoBehaviour
     {
@@ -19,6 +20,9 @@ namespace Gameplay.Inventory
 
         [Tooltip("金币数量文本；没有金币显示需求时可以留空。")]
         [SerializeField] private TMP_Text goldAmountText;
+
+        private VersionReader hotbarReader;
+        private VersionReader goldReader;
 
         private void Awake()
         {
@@ -36,28 +40,37 @@ namespace Gameplay.Inventory
                 // 快捷栏槽位在管理器里固定排在背包之前，先标记自己的地址。
                 hotbarSlots[i].ConfigureSlot(false, i);
             }
-            manager.InitializeHotbarState(hotbarSlots);
+            if (!manager.IsHotbarInitialized)
+            {
+                var initialSlots = new InventoryManager.InventorySlotState[hotbarSlots.Length];
+                for (int i = 0; i < initialSlots.Length; i++)
+                    initialSlots[i] = new InventoryManager.InventorySlotState(
+                        hotbarSlots[i].InitialItem, hotbarSlots[i].InitialQuantity);
+                manager.InitializeHotbarState(initialSlots);
+            }
 
-            manager.CurrentState.MarkHotbarDirty();
-            manager.CurrentState.MarkGoldDirty();
-            RefreshIfDirty();
+            hotbarReader.Invalidate();
+            goldReader.Invalidate();
+            RefreshIfChanged();
         }
 
         private void Update()
         {
-            RefreshIfDirty();
+            RefreshIfChanged();
         }
 
         /// <summary>
-        /// 分别按脏标记刷新快捷栏和金币，避免金币变化时遍历槽位。
+        /// 分别比较快捷栏和金币版本，避免金币变化时遍历槽位。
         /// </summary>
-        private void RefreshIfDirty()
+        private void RefreshIfChanged()
         {
             InventoryManager manager = InventoryManager.Instance;
             if (manager == null) return;
 
             InventoryManager.State state = manager.CurrentState;
-            if (state.IsHotbarDirty)
+            ulong hotbarVersion = state.HotbarVersion;
+            ulong goldVersion = state.GoldVersion;
+            if (hotbarReader.NeedsRefresh(state, hotbarVersion))
             {
                 int slotCount = hotbarSlots.Length;
                 for (int i = 0; i < slotCount; i++)
@@ -70,14 +83,14 @@ namespace Gameplay.Inventory
                     else
                         hotbarSlots[i].RestoreState(null, 0);
                 }
-                state.ClearHotbarDirty();
+                hotbarReader.Record(state, hotbarVersion);
             }
 
-            if (state.IsGoldDirty)
+            if (goldReader.NeedsRefresh(state, goldVersion))
             {
                 if (goldAmountText != null)
                     goldAmountText.text = state.GoldAmount.ToString();
-                state.ClearGoldDirty();
+                goldReader.Record(state, goldVersion);
             }
         }
     }

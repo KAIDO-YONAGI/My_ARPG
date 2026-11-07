@@ -21,14 +21,14 @@ namespace Gameplay.Dialog
     {
         public sealed class State
         {
-            /// <summary>当前已显示到第几行及其脏标记。</summary>
-            private DirtyValue<int> currentLineIndex;
+            /// <summary>当前已显示到第几行及其版本。</summary>
+            private VersionedValue<int> currentLineIndex;
 
-            /// <summary>当前对话资产及其脏标记。</summary>
-            private DirtyValue<DialogSO> currentDialog;
+            /// <summary>当前对话资产及其版本。</summary>
+            private VersionedValue<DialogSO> currentDialog;
 
-            /// <summary>是否正在显示选项及其脏标记。</summary>
-            private DirtyValue<bool> showingChoices;
+            /// <summary>是否正在显示选项及其版本。</summary>
+            private VersionedValue<bool> showingChoices;
 
             /// <summary>当前已显示到第几行。</summary>
             public int CurrentLineIndex => currentLineIndex.Value;
@@ -39,33 +39,18 @@ namespace Gameplay.Dialog
             /// <summary>是否正在显示选项。</summary>
             public bool ShowingChoices => showingChoices.Value;
 
-            /// <summary>任一对话字段是否需要刷新。</summary>
-            public bool IsDirty => currentLineIndex.IsDirty || currentDialog.IsDirty || showingChoices.IsDirty;
+            public ulong LineVersion => currentLineIndex.Version;
+            public ulong DialogVersion => currentDialog.Version;
+            public ulong ChoicesVersion => showingChoices.Version;
 
-            /// <summary>写入当前行号并置脏。</summary>
+            /// <summary>写入当前行号并推进版本。</summary>
             internal void SetCurrentLineIndex(int value) => currentLineIndex.Set(value);
 
-            /// <summary>写入当前对话并置脏。</summary>
+            /// <summary>写入当前对话并推进版本。</summary>
             internal void SetCurrentDialog(DialogSO value) => currentDialog.Set(value);
 
-            /// <summary>写入选项显隐并置脏。</summary>
+            /// <summary>写入选项显隐并推进版本。</summary>
             internal void SetShowingChoices(bool value) => showingChoices.Set(value);
-
-            /// <summary>把全部对话字段标记为待刷新。</summary>
-            internal void MarkAllDirty()
-            {
-                currentLineIndex.MarkDirty();
-                currentDialog.MarkDirty();
-                showingChoices.MarkDirty();
-            }
-
-            /// <summary>视图刷新完成后清除全部脏标记。</summary>
-            public void ClearDirty()
-            {
-                currentLineIndex.ClearMark();
-                currentDialog.ClearMark();
-                showingChoices.ClearMark();
-            }
         }
 
         [Header("接收事件")]
@@ -119,18 +104,16 @@ namespace Gameplay.Dialog
             CloseDialogCanvas();
         }
 
-        /// <summary>缓存界面打开后回调：标记对话画布已激活并刷新状态。</summary>
+        /// <summary>缓存界面打开后回调：标记对话画布已激活。</summary>
         public void OnCachedViewOpened()
         {
             isDialogActive = true;
-            MarkAllDialogFieldsDirty();
         }
 
-        /// <summary>缓存界面关闭后回调：清除激活标记并刷新状态。</summary>
+        /// <summary>缓存界面关闭后回调：清除激活标记。</summary>
         public void OnCachedViewClosed()
         {
             isDialogActive = false;
-            MarkAllDialogFieldsDirty();
         }
 
         /// <summary>兼容旧调用：收起选项按钮。</summary>
@@ -338,12 +321,6 @@ namespace Gameplay.Dialog
 
             state.SetCurrentLineIndex(state.CurrentLineIndex + 1);
             state.SetShowingChoices(false);
-        }
-
-        /// <summary>把对话状态的全部字段标记为待刷新。</summary>
-        private void MarkAllDialogFieldsDirty()
-        {
-            state.MarkAllDirty();
         }
 
         /// <summary>请求界面缓存打开对话画布；缓存缺失时返回 false。</summary>

@@ -1,4 +1,5 @@
 using Contracts.Base;
+using Contracts.State;
 using Pipeline.SO;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ namespace Gameplay.Shop
         [Header("商品槽位")]
         [Tooltip("商店里的商品槽位，顺序与当前分类的商品列表一致。")]
         [SerializeField] private ShopSlot[] slots;
+
+        private VersionReader itemsReader;
 
         private void Awake()
         {
@@ -37,25 +40,27 @@ namespace Gameplay.Shop
             ShopManager manager = ShopManager.RequiredInstance;
 
             manager.OnCachedViewOpened();
-            RefreshIfDirty();
+            itemsReader.Invalidate();
+            RefreshIfChanged();
         }
 
         private void Update()
         {
-            RefreshIfDirty();
+            RefreshIfChanged();
         }
 
         /// <summary>
-        /// 按脏标记刷新商品槽位。没有商品的槽位直接隐藏，
+        /// 按本视图记录的版本刷新商品槽位。没有商品的槽位直接隐藏，
         /// 避免切换分类后残留上一页的商品和点击目标。
         /// </summary>
-        private void RefreshIfDirty()
+        private void RefreshIfChanged()
         {
             ShopManager manager = ShopManager.Instance;
             if (!IsOpen || manager == null) return;
 
             ShopManager.State state = manager.CurrentState;
-            if (!state.IsItemsDirty) return;
+            ulong version = state.ItemsVersion;
+            if (!itemsReader.NeedsRefresh(state, version)) return;
 
             int slotCount = slots.Length;
             for (int i = 0; i < slotCount; i++)
@@ -67,7 +72,7 @@ namespace Gameplay.Shop
                     slots[i].Initialize(item, state.GetPrice(i));
             }
 
-            state.ClearItemsDirty();
+            itemsReader.Record(state, version);
         }
 
         /// <summary>关闭时通知管理器退出商店状态。</summary>

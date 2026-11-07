@@ -1,4 +1,5 @@
 using Contracts.Base;
+using Contracts.State;
 using UnityEngine;
 
 namespace Gameplay.Inventory
@@ -16,6 +17,8 @@ namespace Gameplay.Inventory
         [Header("背包槽位")]
         [Tooltip("背包网格里的槽位，顺序即管理器中的背包槽位顺序。")]
         [SerializeField] private InventorySlot[] slots;
+
+        private VersionReader backpackReader;
 
         private void Awake()
         {
@@ -36,25 +39,33 @@ namespace Gameplay.Inventory
                 // 每个新实例都要登记槽位地址，点击才能定位管理器中的背包数据。
                 slots[i].ConfigureSlot(true, i);
             }
-            manager.InitializeBackpackState(slots);
+            if (!manager.IsBackpackInitialized)
+            {
+                var initialSlots = new InventoryManager.InventorySlotState[slots.Length];
+                for (int i = 0; i < initialSlots.Length; i++)
+                    initialSlots[i] = new InventoryManager.InventorySlotState(
+                        slots[i].InitialItem, slots[i].InitialQuantity);
+                manager.InitializeBackpackState(initialSlots);
+            }
 
-            manager.CurrentState.MarkBackpackDirty();
-            RefreshIfDirty();
+            backpackReader.Invalidate();
+            RefreshIfChanged();
         }
 
         private void Update()
         {
-            RefreshIfDirty();
+            RefreshIfChanged();
         }
 
-        /// <summary>按管理器脏标记刷新背包槽位；槽位数量不足时多余的槽位清空。</summary>
-        private void RefreshIfDirty()
+        /// <summary>按本视图记录的版本刷新背包；槽位数量不足时多余的槽位清空。</summary>
+        private void RefreshIfChanged()
         {
             InventoryManager manager = InventoryManager.Instance;
             if (!IsOpen || manager == null) return;
 
             InventoryManager.State state = manager.CurrentState;
-            if (!state.IsBackpackDirty) return;
+            ulong version = state.BackpackVersion;
+            if (!backpackReader.NeedsRefresh(state, version)) return;
 
             int slotCount = slots.Length;
             for (int i = 0; i < slotCount; i++)
@@ -68,7 +79,7 @@ namespace Gameplay.Inventory
                     slots[i].RestoreState(null, 0);
             }
 
-            state.ClearBackpackDirty();
+            backpackReader.Record(state, version);
         }
     }
 }

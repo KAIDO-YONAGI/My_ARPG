@@ -4,8 +4,11 @@ using System.Reflection;
 using Contracts.Base;
 using Contracts.Enums;
 using Gameplay.Inventory;
+using Gameplay.Player.Models;
+using Gameplay.Player.Services;
 using Gameplay.Quest;
 using Gameplay.Shop;
+using Gameplay.Skills;
 using NUnit.Framework;
 using Pipeline.SO;
 using Pipeline.SO.Events;
@@ -20,7 +23,7 @@ using Object = UnityEngine.Object;
 namespace Gameplay.Tests
 {
     /// <summary>
-    /// 缓存界面的业务回归：任务选择与脏标记、背包槽位地址、快捷栏局部刷新。
+    /// 缓存界面的业务回归：独立版本读取、背包槽位地址、快捷栏局部刷新与技能命令。
     /// 临时对象只参与本次验证，结束后恢复原单例并销毁全部对象。
     /// </summary>
     public class UICacheRegressionTests
@@ -31,6 +34,8 @@ namespace Gameplay.Tests
         private QuestManager originalQuestManager;
         private InventoryManager originalInventoryManager;
         private UIManager originalUIManager;
+        private StatsService originalStatsService;
+        private SkillTreeManager originalSkillTreeManager;
         private QuestManager questManager;
         private InventoryManager inventoryManager;
 
@@ -40,6 +45,8 @@ namespace Gameplay.Tests
             originalQuestManager = QuestManager.Instance;
             originalInventoryManager = InventoryManager.Instance;
             originalUIManager = UIManager.Instance;
+            originalStatsService = StatsService.Instance;
+            originalSkillTreeManager = SkillTreeManager.Instance;
             questManager = CreateComponent<QuestManager>();
             inventoryManager = CreateComponent<InventoryManager>();
             SetSingleton(questManager);
@@ -55,6 +62,8 @@ namespace Gameplay.Tests
             SetSingleton(originalQuestManager);
             SetSingleton(originalInventoryManager);
             SetSingleton(originalUIManager);
+            SetSingleton(originalStatsService);
+            SetSingleton(originalSkillTreeManager);
         }
 
         [Test]
@@ -109,61 +118,66 @@ namespace Gameplay.Tests
 
             panel.HandleQuestClicked(second);
             panel.RefreshFromManager(questManager.CurrentState.CurrentQuest);
-            questManager.CurrentState.ClearDirty();
 
             Assert.AreEqual("任务二", title.text);
             Assert.AreEqual("说明二", description.text);
         }
 
         [Test]
-        public void QuestSelection_LeavesListClean()
+        public void QuestSelection_AdvancesSelectionVersionOnly()
         {
             QuestSO quest = CreateQuest("任务", "说明");
             LoadBoard(quest);
-            AcknowledgeQuestChanges();
+            ulong listVersion = questManager.CurrentState.BoardQuestsVersion;
+            ulong selectionVersion = questManager.CurrentState.CurrentQuestVersion;
 
             questManager.OpenQuest(quest);
 
-            Assert.IsTrue(questManager.CurrentState.IsCurrentQuestDirty);
-            Assert.IsFalse(questManager.CurrentState.IsBoardQuestsDirty,
+            Assert.AreNotEqual(selectionVersion, questManager.CurrentState.CurrentQuestVersion);
+            Assert.AreEqual(listVersion, questManager.CurrentState.BoardQuestsVersion,
                 "切换选择应只刷新详情，避免重建任务列表。");
         }
 
         [Test]
-        public void QuestCompletion_MarksListDirty()
+        public void QuestCompletion_AdvancesListVersion()
         {
             QuestSO quest = CreateQuest("任务", "说明");
             LoadBoard(quest);
-            AcknowledgeQuestChanges();
+            ulong listVersion = questManager.CurrentState.BoardQuestsVersion;
 
             questManager.QuestStateChanged(quest, QuestState.Completed);
 
-            Assert.IsTrue(questManager.CurrentState.IsBoardQuestsDirty,
+            Assert.AreNotEqual(listVersion, questManager.CurrentState.BoardQuestsVersion,
                 "完成任务需要刷新条目完成态和全部完成的提示。");
         }
 
         [Test]
-        public void QuestClose_WithoutViewClearsBoard_RepeatedCloseStaysClean()
+        public void QuestClose_WithoutViewClearsBoard_RepeatedCloseKeepsVersions()
         {
             LoadBoard(CreateQuest("任务", "说明"));
             LogAssert.Expect(LogType.Warning,
                 "任务板：UI 缓存不可用，无法通过界面关闭。");
             questManager.CloseQuestBoard();
             Assert.IsFalse(questManager.CanOpenBoard);
-            AcknowledgeQuestChanges();
+            var state = questManager.CurrentState;
+            ulong listVersion = state.BoardQuestsVersion;
+            ulong selectionVersion = state.CurrentQuestVersion;
+            ulong questStateVersion = state.CurrentQuestStateVersion;
 
             questManager.OnCachedViewClosed();
 
-            Assert.IsFalse(questManager.CurrentState.AnyDirty,
-                "缓存关闭回调与主动关闭共用清理，已经关闭时无需重复标脏。");
+            Assert.AreEqual(listVersion, state.BoardQuestsVersion);
+            Assert.AreEqual(selectionVersion, state.CurrentQuestVersion);
+            Assert.AreEqual(questStateVersion, state.CurrentQuestStateVersion,
+                "缓存关闭回调与主动关闭共用清理，已经关闭时无需重复推进版本。");
         }
 
         [Test]
         public void BackpackOpen_ConfiguresSlotAddresses()
         {
             var view = CreateComponent<BackpackCanvasView>();
-            var first = CreateComponent<InventorySlot>();
-            var second = CreateComponent<InventorySlot>();
+            var first = CreateInventorySlot();
+            var second = CreateInventorySlot();
             SetField(view, "slots", new[] { first, second });
 
             Invoke(view, "OnOpen");
@@ -175,23 +189,25 @@ namespace Gameplay.Tests
         }
 
         [Test]
-        public void GoldRefresh_PreservesCleanHotbarDisplay()
+        public void GoldRefresh_PreservesUnchangedHotbarDisplay()
         {
             var view = CreateComponent<HotbarCanvasView>();
-            var slot = CreateComponent<InventorySlot>();
+            var slot = CreateInventorySlot();
             var item = ScriptableObject.CreateInstance<ItemSO>();
             temporaryObjects.Add(item);
             inventoryManager.InitializeHotbarState(new[] { CreateInitialSlot(item, 1) });
             SetField(view, "hotbarSlots", new[] { slot });
-            Invoke(view, "RefreshIfDirty");
+            Invoke(view, "RefreshIfChanged");
 
             // 显示副本用不同数量充当探针：只更新金币时不应触碰干净的槽位。
             slot.RestoreState(item, 5);
             inventoryManager.UpdateGold(-10);
-            Invoke(view, "RefreshIfDirty");
+            ulong goldVersion = inventoryManager.CurrentState.GoldVersion;
+            Invoke(view, "RefreshIfChanged");
 
             Assert.AreEqual(5, slot.Quantity);
-            Assert.IsFalse(inventoryManager.CurrentState.IsGoldDirty);
+            Assert.AreEqual(goldVersion, inventoryManager.CurrentState.GoldVersion,
+                "视图读取不应修改管理器版本。");
         }
 
         [Test]
@@ -206,9 +222,145 @@ namespace Gameplay.Tests
             Assert.AreEqual(1, state.HotbarCount);
             Assert.AreEqual(item, state.GetHotbarSlot(0).item);
             Assert.AreEqual(1, state.GetHotbarSlot(0).quantity);
-            Assert.IsTrue(state.IsHotbarDirty);
+            Assert.Greater(state.HotbarVersion, 0UL);
             Assert.IsNull(typeof(InventoryManager.State).GetProperty("Hotbar"));
             Assert.IsNull(typeof(InventoryManager.State).GetProperty("Gold"));
+        }
+
+        [Test]
+        public void TwoHotbarViews_ObserveGoldChangesIndependently()
+        {
+            var first = CreateComponent<HotbarCanvasView>();
+            var second = CreateComponent<HotbarCanvasView>();
+            var firstText = CreateComponent<TextMeshProUGUI>();
+            var secondText = CreateComponent<TextMeshProUGUI>();
+            SetField(first, "hotbarSlots", System.Array.Empty<InventorySlot>());
+            SetField(second, "hotbarSlots", System.Array.Empty<InventorySlot>());
+            SetField(first, "goldAmountText", firstText);
+            SetField(second, "goldAmountText", secondText);
+            Invoke(first, "RefreshIfChanged");
+            Invoke(second, "RefreshIfChanged");
+
+            inventoryManager.UpdateGold(-10);
+            ulong version = inventoryManager.CurrentState.GoldVersion;
+            Invoke(first, "RefreshIfChanged");
+            Assert.AreEqual("10", firstText.text);
+            Assert.AreEqual("0", secondText.text);
+
+            Invoke(second, "RefreshIfChanged");
+            Assert.AreEqual("10", secondText.text);
+            Assert.AreEqual(version, inventoryManager.CurrentState.GoldVersion);
+        }
+
+        [Test]
+        public void BackpackReopen_RedrawsSameVersionWithoutResettingModel()
+        {
+            var item = ScriptableObject.CreateInstance<ItemSO>();
+            temporaryObjects.Add(item);
+            inventoryManager.InitializeBackpackState(new[] { CreateInitialSlot(item, 3) });
+            var view = CreateComponent<BackpackCanvasView>();
+            var slot = CreateInventorySlot();
+            SetField(view, "slots", new[] { slot });
+            typeof(CachedUIViewBase).GetProperty("IsOpen", InstanceFlags).SetValue(view, true);
+            Invoke(view, "OnOpen");
+            Assert.AreEqual(3, slot.Quantity);
+            ulong version = inventoryManager.CurrentState.BackpackVersion;
+
+            slot.RestoreState(item, 7);
+            Invoke(view, "RefreshIfChanged");
+            Assert.AreEqual(7, slot.Quantity, "同版本的常规检查应跳过绘制。");
+            Invoke(view, "OnOpen");
+
+            Assert.AreEqual(3, slot.Quantity, "重开必须重绘当前状态。");
+            Assert.AreEqual(version, inventoryManager.CurrentState.BackpackVersion);
+            Assert.AreEqual(3, inventoryManager.CurrentState.GetBackpackSlot(0).quantity);
+        }
+
+        [Test]
+        public void InventoryInitialization_CopiesValuesAndRunsOnce()
+        {
+            var item = ScriptableObject.CreateInstance<ItemSO>();
+            temporaryObjects.Add(item);
+            var initial = new[] { CreateInitialSlot(item, 2) };
+            inventoryManager.InitializeHotbarState(initial);
+            inventoryManager.InitializeBackpackState(initial);
+            ulong hotbarVersion = inventoryManager.CurrentState.HotbarVersion;
+            ulong backpackVersion = inventoryManager.CurrentState.BackpackVersion;
+
+            initial[0] = CreateInitialSlot(item, 99);
+            inventoryManager.InitializeHotbarState(initial);
+            inventoryManager.InitializeBackpackState(initial);
+
+            Assert.IsTrue(inventoryManager.IsHotbarInitialized);
+            Assert.IsTrue(inventoryManager.IsBackpackInitialized);
+            Assert.AreEqual(2, inventoryManager.CurrentState.GetHotbarSlot(0).quantity);
+            Assert.AreEqual(2, inventoryManager.CurrentState.GetBackpackSlot(0).quantity);
+            Assert.AreEqual(hotbarVersion, inventoryManager.CurrentState.HotbarVersion);
+            Assert.AreEqual(backpackVersion, inventoryManager.CurrentState.BackpackVersion);
+        }
+
+        [Test]
+        public void SkillUpgrade_UsesSavedLevelAndSpendsOnePointPerSuccess()
+        {
+            var manager = CreateSkillManager(2);
+            var initial = new SkillTreeManager.SkillState(0, true);
+
+            Assert.IsTrue(manager.TryUpgradeSkill("root/skill", 3, initial, out var first));
+            Assert.AreEqual(1, first.Level);
+            Assert.AreEqual(1, StatsService.RequiredInstance.Stats.SkillPoints);
+            Assert.AreEqual(1, manager.CurrentState.AbilityPointsValue);
+            Assert.IsTrue(manager.TryUpgradeSkill("root/skill", 3, initial, out var second));
+            Assert.AreEqual(2, second.Level, "重复命令使用管理器保存的等级。");
+            Assert.AreEqual(0, StatsService.RequiredInstance.Stats.SkillPoints);
+            Assert.AreEqual(2, manager.CurrentState.GetSkillState("root/skill", 0, false).Level);
+            ulong skillsVersion = manager.CurrentState.SkillsVersion;
+            ulong pointsVersion = manager.CurrentState.AbilityPointsVersion;
+
+            Assert.IsFalse(manager.TryUpgradeSkill("root/skill", 3, initial, out var rejected));
+            Assert.AreEqual(2, rejected.Level);
+            Assert.AreEqual(skillsVersion, manager.CurrentState.SkillsVersion);
+            Assert.AreEqual(pointsVersion, manager.CurrentState.AbilityPointsVersion);
+        }
+
+        [TestCase(0, true, 0, 3)]
+        [TestCase(2, false, 0, 3)]
+        [TestCase(2, true, 3, 3)]
+        public void SkillUpgrade_RejectedCommandKeepsStateAndPoints(
+            int points, bool unlocked, int level, int maxLevel)
+        {
+            var manager = CreateSkillManager(points);
+            manager.SaveSkillState("root/skill", level, unlocked);
+            ulong skillsVersion = manager.CurrentState.SkillsVersion;
+            ulong pointsVersion = manager.CurrentState.AbilityPointsVersion;
+
+            Assert.IsFalse(manager.TryUpgradeSkill("root/skill", maxLevel,
+                new SkillTreeManager.SkillState(0, true), out var result));
+
+            Assert.AreEqual(level, result.Level);
+            Assert.AreEqual(unlocked, result.IsUnlocked);
+            Assert.AreEqual(points, StatsService.RequiredInstance.Stats.SkillPoints);
+            Assert.AreEqual(skillsVersion, manager.CurrentState.SkillsVersion);
+            Assert.AreEqual(pointsVersion, manager.CurrentState.AbilityPointsVersion);
+        }
+
+        [Test]
+        public void SkillStateKey_ReusesCachedStringAndRebuildsWhenRootChanges()
+        {
+            var root = CreateComponent<Transform>();
+            var branch = CreateComponent<Transform>();
+            branch.SetParent(root);
+            var slot = CreateComponent<SkillSlot>();
+            slot.transform.SetParent(branch);
+            slot.BindStateRoot(root);
+            var keyMethod = typeof(SkillSlot).GetMethod("GetStateKey", InstanceFlags);
+            string first = (string)keyMethod.Invoke(slot, null);
+
+            slot.BindStateRoot(root);
+            Assert.AreSame(first, keyMethod.Invoke(slot, null));
+            slot.BindStateRoot(branch);
+            string rebound = (string)keyMethod.Invoke(slot, null);
+            Assert.AreNotEqual(first, rebound);
+            Assert.AreSame(rebound, keyMethod.Invoke(slot, null));
         }
 
         [TestCase("DialogCanvas")]
@@ -300,12 +452,6 @@ namespace Gameplay.Tests
             Invoke(questManager, "OnRefreshQuestState", new List<QuestSO>(quests));
         }
 
-        /// <summary>清掉任务管理器当前的脏标记，隔离后续断言。</summary>
-        private void AcknowledgeQuestChanges()
-        {
-            questManager.CurrentState.ClearDirty();
-        }
-
         private QuestSO CreateQuest(string title, string description)
         {
             var quest = ScriptableObject.CreateInstance<QuestSO>();
@@ -317,12 +463,32 @@ namespace Gameplay.Tests
             return quest;
         }
 
-        private InventorySlot CreateInitialSlot(ItemSO item, int quantity)
+        private static InventoryManager.InventorySlotState CreateInitialSlot(ItemSO item, int quantity)
         {
-            var slot = CreateComponent<InventorySlot>();
-            SetField(slot, "initialItem", item);
-            SetField(slot, "initialQuantity", quantity);
-            return slot;
+            return new InventoryManager.InventorySlotState(item, quantity);
+        }
+
+        private InventorySlot CreateInventorySlot()
+        {
+            // 从已接好控件的预制体创建，避免 AddComponent 立即触发 OnValidate 时引用未赋值。
+            var parent = CreateComponent<Transform>();
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/UI/Slots/InventorySlot.prefab");
+            return Object.Instantiate(prefab, parent).GetComponent<InventorySlot>();
+        }
+
+        private SkillTreeManager CreateSkillManager(int points)
+        {
+            var stats = CreateComponent<StatsService>();
+            SetField(stats, "model", new PlayerStatsModel(new PlayerStatsData
+            {
+                maxHealth = 8, currentHealth = 8, expToUpgrade = 10, expMultiplier = 1f,
+                skillPoints = points
+            }));
+            SetSingleton(stats);
+            var manager = CreateComponent<SkillTreeManager>();
+            SetSingleton(manager);
+            return manager;
         }
 
         /// <summary>停用临时对象，避免场景生命周期和事件订阅干扰定向调用。</summary>
@@ -331,7 +497,7 @@ namespace Gameplay.Tests
             var go = new GameObject(typeof(T).Name) { hideFlags = HideFlags.HideAndDontSave };
             temporaryObjects.Add(go);
             go.SetActive(false);
-            return go.AddComponent<T>();
+            return typeof(T) == typeof(Transform) ? (T)(Component)go.transform : go.AddComponent<T>();
         }
 
         private static void SetSingleton<T>(T instance) where T : MonoBehaviour

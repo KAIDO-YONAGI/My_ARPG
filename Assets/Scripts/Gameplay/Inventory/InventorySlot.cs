@@ -81,23 +81,24 @@ namespace Gameplay.Inventory
         public void OnPointerClick(PointerEventData eventData)
         {
             if (slotIndex < 0 || quantity <= 0) return;
+            var address = new InventoryManager.SlotAddress(isBackpackSlot, slotIndex);
 
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 if (ShopManager.Instance != null && ShopManager.Instance.IsShopOpen)
                 {
                     // 商店打开时左键表示出售：先记录槽位，商店再按物品报价扣减。
-                    InventoryManager.Instance.SetSlotBeenClicked(this);
+                    InventoryManager.Instance.SetSlotBeenClicked(address);
                     ShopManager.Instance.SellItem(itemSO);
                 }
                 else
                 {
-                    InventoryManager.Instance.UseItem(this);
+                    InventoryManager.Instance.UseItem(address);
                 }
             }
             else if (eventData.button == PointerEventData.InputButton.Right)
             {
-                InventoryManager.Instance.DropByClick(this);
+                InventoryManager.Instance.DropByClick(address);
             }
         }
 

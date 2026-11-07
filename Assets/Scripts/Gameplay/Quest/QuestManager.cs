@@ -22,14 +22,14 @@ namespace Gameplay.Quest
     {
         public sealed class State
         {
-            /// <summary>任务板任务列表及其脏标记。</summary>
-            internal DirtyValue<List<QuestSO>> boardQuests;
+            /// <summary>任务板任务列表及其版本。</summary>
+            internal VersionedValue<List<QuestSO>> boardQuests;
 
-            /// <summary>当前选中的任务及其脏标记。</summary>
-            private DirtyValue<QuestSO> currentQuest;
+            /// <summary>当前选中的任务及其版本。</summary>
+            private VersionedValue<QuestSO> currentQuest;
 
-            /// <summary>当前选中任务的状态及其脏标记。</summary>
-            private DirtyValue<QuestState> currentQuestState;
+            /// <summary>当前选中任务的状态及其版本。</summary>
+            private VersionedValue<QuestState> currentQuestState;
 
             /// <summary>任务板数据是否已经加载。</summary>
             public bool HasBoardData => boardQuests.Value != null;
@@ -47,47 +47,28 @@ namespace Gameplay.Quest
             /// <summary>当前选中任务的状态。</summary>
             public QuestState CurrentQuestState => currentQuestState.Value;
 
-            /// <summary>任务板列表是否需要刷新。</summary>
-            public bool IsBoardQuestsDirty => boardQuests.IsDirty;
+            /// <summary>任务板列表及其条目状态版本。</summary>
+            public ulong BoardQuestsVersion => boardQuests.Version;
 
-            /// <summary>当前选中任务是否需要刷新。</summary>
-            public bool IsCurrentQuestDirty => currentQuest.IsDirty;
+            /// <summary>当前选中任务版本。</summary>
+            public ulong CurrentQuestVersion => currentQuest.Version;
 
-            /// <summary>当前任务状态是否需要刷新。</summary>
-            public bool IsCurrentQuestStateDirty => currentQuestState.IsDirty;
+            /// <summary>当前任务状态版本。</summary>
+            public ulong CurrentQuestStateVersion => currentQuestState.Version;
 
-            /// <summary>任一任务字段是否需要刷新。</summary>
-            public bool AnyDirty => IsBoardQuestsDirty || IsCurrentQuestDirty || IsCurrentQuestStateDirty;
+            public State() => boardQuests = new VersionedValue<List<QuestSO>>(null);
 
-            public State() => boardQuests = new DirtyValue<List<QuestSO>>(null);
-
-            /// <summary>写入任务板列表并置脏。</summary>
+            /// <summary>写入任务板列表并推进版本。</summary>
             internal void SetBoardQuests(List<QuestSO> value) => boardQuests.Set(value);
 
-            /// <summary>写入当前任务并置脏。</summary>
+            /// <summary>写入当前任务并推进版本。</summary>
             internal void SetCurrentQuest(QuestSO value) => currentQuest.Set(value);
 
-            /// <summary>写入当前任务状态并置脏。</summary>
+            /// <summary>写入当前任务状态并推进版本。</summary>
             internal void SetCurrentQuestState(QuestState value) => currentQuestState.Set(value);
 
-            /// <summary>值未变但需要重画任务板列表时单独置脏。</summary>
-            internal void MarkBoardQuestsDirty() => boardQuests.MarkDirty();
-
-            /// <summary>把全部任务字段标记为待刷新。</summary>
-            internal void MarkAllDirty()
-            {
-                boardQuests.MarkDirty();
-                currentQuest.MarkDirty();
-                currentQuestState.MarkDirty();
-            }
-
-            /// <summary>视图刷新完成后清除全部脏标记。</summary>
-            public void ClearDirty()
-            {
-                boardQuests.ClearMark();
-                currentQuest.ClearMark();
-                currentQuestState.ClearMark();
-            }
+            /// <summary>任务条目内容修改后推进列表版本。</summary>
+            internal void TouchBoardQuests() => boardQuests.Touch();
         }
 
         [Header("接收事件")]
@@ -239,7 +220,6 @@ namespace Gameplay.Quest
                 state.SetCurrentQuestState(GetQuestStateFromProgress(state.CurrentQuest));
                 RefreshObjectiveProgress(state.CurrentQuest);
             }
-            state.MarkAllDirty();
         }
 
         /// <summary>缓存界面关闭后回调：清空任务板引用，避免继续操作已经关闭的界面。</summary>
@@ -340,7 +320,7 @@ namespace Gameplay.Quest
             RefreshObjectiveProgress(quest);
             // 选择任务只影响详情；状态实际变化才需要刷新列表中的完成态。
             if (stateChanged)
-                state.MarkBoardQuestsDirty();
+                state.TouchBoardQuests();
         }
 
         /// <summary>

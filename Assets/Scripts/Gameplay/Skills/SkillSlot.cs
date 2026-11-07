@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Gameplay.Player.Services;
 using Pipeline.SO;
 using TMPro;
 using UnityEngine;
@@ -40,19 +39,19 @@ namespace Gameplay.Skills
         public int CurrentLevel => currentLevel;
         public bool IsUnlocked => isUnlocked;
 
-        /// <summary>技能点被消耗时广播，参数是触发消耗的槽位。</summary>
-        public static event Action<SkillSlot> OnAbilityPointSpent;
-
         /// <summary>技能升满时广播，参数是升满的槽位。</summary>
         public static event Action<SkillSlot> OnMaxSkillLevel;
 
         /// <summary>状态键的根节点；由技能画布在打开时注入。</summary>
         private Transform stateRoot;
+        private string stateKey;
 
         /// <summary>注入状态键根节点，使槽位能生成稳定且不依赖查找的路径。</summary>
         public void BindStateRoot(Transform root)
         {
+            if (stateRoot == root && stateKey != null) return;
             stateRoot = root;
+            stateKey = BuildStateKey();
         }
 
         private void Awake()
@@ -118,23 +117,20 @@ namespace Gameplay.Skills
         }
 
         /// <summary>
-        /// 尝试升级：需要有点数、技能已解锁且未满级。升级后保存状态并广播技能点消耗；
-        /// 升到满级时再广播一次，供画布解锁后续技能。
+        /// 将升级请求交给管理器统一校验、扣点和保存，成功后读取结果刷新显示；
+        /// 升到满级时通知画布检查后续技能。
         /// </summary>
         public void TryUpgradeSkill()
         {
-            if (StatsService.Instance == null || StatsService.Instance.Stats.SkillPoints <= 0 ||
-                skillSO == null || !isUnlocked || currentLevel >= skillSO.maxLevel)
+            if (skillSO == null) return;
+            if (!SkillTreeManager.RequiredInstance.TryUpgradeSkill(GetStateKey(), skillSO.maxLevel,
+                    new SkillTreeManager.SkillState(currentLevel, isUnlocked), out var upgraded))
                 return;
 
-            currentLevel++;
-            SaveState();
-
-            OnAbilityPointSpent?.Invoke(this);
+            RestoreState(upgraded.Level, upgraded.IsUnlocked);
             if (currentLevel >= skillSO.maxLevel)
                 OnMaxSkillLevel?.Invoke(this);
 
-            UpdateUI();
         }
 
         /// <summary>解锁技能并保存状态；已经解锁时直接返回。</summary>
@@ -153,10 +149,16 @@ namespace Gameplay.Skills
         }
 
         /// <summary>
-        /// 生成技能状态的稳定键：从槽位向上走到画布根，记录每级名字与同级序号。
+        /// 读取已缓存的稳定键；首次读取或重新绑定画布根时构建。
         /// 根节点未注入时退回对象名，保证不会因为缺少引用而抛异常。
         /// </summary>
         private string GetStateKey()
+        {
+            return stateKey ??= BuildStateKey();
+        }
+
+        /// <summary>从槽位向上走到画布根，记录每级名字与同级序号。</summary>
+        private string BuildStateKey()
         {
             if (stateRoot == null) return name;
 

@@ -43,7 +43,7 @@ namespace Gameplay.Quest
                 Debug.Assert(questRewardsSlots[i] != null, $"{nameof(questRewardsSlots)}[{i}]", this);
         }
 
-        /// <summary>任务条目被点击：向管理器提交选择，由视图读取脏标记后刷新详情。</summary>
+        /// <summary>任务条目被点击：向管理器提交选择，由视图比较版本后刷新详情。</summary>
         public void HandleQuestClicked(QuestSO quest)
         {
             // currentQuest 记录已经绘制的任务；提前修改会让刷新误判为同一任务。

@@ -1,5 +1,6 @@
 using Contracts.Base;
 using Contracts.Enums;
+using Contracts.State;
 using Pipeline.SO;
 using UnityEngine;
 
@@ -7,11 +8,11 @@ namespace Gameplay.Quest
 {
     /// <summary>
     /// 任务面板的显示层。由 UI 缓存按需创建，打开时读取 <see cref="QuestManager"/> 的
-    /// 脏标记并刷新任务列表、任务详情和接取/放弃/完成按钮。
+    /// 数据版本并刷新任务列表、任务详情和接取/放弃/完成按钮。
     /// </summary>
     /// <remarks>
     /// 所有子控件都在 QuestCanvas 预制体里直接拖引用，运行时直接从这些引用读取，且不用
-    /// <c>GetComponent</c> 或按名字遍历层级；管理器与视图之间只通过只读状态和脏标记通信。
+    /// <c>GetComponent</c> 或按名字遍历层级；视图通过只读状态与版本判断需要绘制的部分。
     /// </remarks>
     public sealed class QuestCanvasView : CachedCanvasViewBase
     {
@@ -39,6 +40,10 @@ namespace Gameplay.Quest
         [Tooltip("没有任务时显示的提示文字区域。")]
         [SerializeField] private CanvasGroup promptCanvasGroup;
 
+        private VersionReader boardReader;
+        private VersionReader questReader;
+        private VersionReader questStateReader;
+
         private void Awake()
         {
             Debug.Assert(questLogPanel != null, nameof(questLogPanel), this);
@@ -63,29 +68,38 @@ namespace Gameplay.Quest
         protected override void OnOpen()
         {
             QuestManager.RequiredInstance.OnCachedViewOpened();
-            RefreshIfDirty();
+            boardReader.Invalidate();
+            questReader.Invalidate();
+            questStateReader.Invalidate();
+            RefreshIfChanged();
         }
 
         private void Update()
         {
-            RefreshIfDirty();
+            RefreshIfChanged();
         }
 
         /// <summary>
-        /// 按管理器的脏标记刷新界面。任务列表、详情和按钮显隐都从管理器状态推导，
+        /// 按本视图记录的版本刷新界面。任务列表、详情和按钮显隐都从管理器状态推导，
         /// 视图本身不保存任务进度，避免缓存销毁后状态丢失。
         /// </summary>
-        private void RefreshIfDirty()
+        private void RefreshIfChanged()
         {
             QuestManager manager = QuestManager.Instance;
             if (!IsOpen || manager == null) return;
 
             QuestManager.State state = manager.CurrentState;
-            if (!state.AnyDirty) return;
+            ulong boardVersion = state.BoardQuestsVersion;
+            ulong questVersion = state.CurrentQuestVersion;
+            ulong questStateVersion = state.CurrentQuestStateVersion;
+            bool boardChanged = boardReader.NeedsRefresh(state, boardVersion);
+            bool questChanged = questReader.NeedsRefresh(state, questVersion);
+            bool questStateChanged = questStateReader.NeedsRefresh(state, questStateVersion);
+            if (!boardChanged && !questChanged && !questStateChanged) return;
 
             int questCount = state.BoardQuestCount;
             // 列表或任务完成态变化时才填充条目，切换选择只刷新右侧详情。
-            if (state.IsBoardQuestsDirty)
+            if (boardChanged)
             {
                 int slotCount = questLogSlots.Length;
                 for (int i = 0; i < slotCount; i++)
@@ -108,11 +122,11 @@ namespace Gameplay.Quest
                 SetCanvasState(promptCanvasGroup, showNoQuests);
             }
 
-            if (state.IsBoardQuestsDirty || state.IsCurrentQuestDirty ||
-                state.IsCurrentQuestStateDirty)
-                RefreshDetails(manager, state.CurrentQuest, state.CurrentQuestState);
+            RefreshDetails(manager, state.CurrentQuest, state.CurrentQuestState);
 
-            state.ClearDirty();
+            boardReader.Record(state, boardVersion);
+            questReader.Record(state, questVersion);
+            questStateReader.Record(state, questStateVersion);
         }
 
         /// <summary>刷新选中任务的详情和操作按钮；同一任务只重绘目标进度。</summary>

@@ -29,8 +29,8 @@ namespace Gameplay.Shop
             /// <summary>商店界面是否打开。</summary>
             private bool isOpen;
 
-            /// <summary>当前分类的商品列表及其脏标记。</summary>
-            private DirtyValue<IReadOnlyList<ShopItems>> currentItems;
+            /// <summary>当前分类的商品列表及其版本。</summary>
+            private VersionedValue<IReadOnlyList<ShopItems>> currentItems;
 
             /// <summary>当前进入范围的店主。</summary>
             public ShopKeeper ActiveKeeper => activeKeeper;
@@ -38,8 +38,8 @@ namespace Gameplay.Shop
             /// <summary>商店界面是否打开。</summary>
             public bool IsOpen => isOpen;
 
-            /// <summary>商品列表是否需要刷新。</summary>
-            public bool IsItemsDirty => currentItems.IsDirty;
+            /// <summary>当前商品数据版本。</summary>
+            public ulong ItemsVersion => currentItems.Version;
 
             /// <summary>当前分类的商品数量。</summary>
             public int CurrentItemCount => currentItems.Value.Count;
@@ -54,15 +54,9 @@ namespace Gameplay.Shop
 
             public State()
             {
-                currentItems = new DirtyValue<IReadOnlyList<ShopItems>>(
-                    System.Array.Empty<ShopItems>(), true);
+                currentItems = new VersionedValue<IReadOnlyList<ShopItems>>(
+                    System.Array.Empty<ShopItems>());
             }
-
-            /// <summary>值未变但需要重画商品时单独置脏。</summary>
-            public void MarkItemsDirty() => currentItems.MarkDirty();
-
-            /// <summary>视图刷新完成后清除商品脏标记。</summary>
-            public void ClearItemsDirty() => currentItems.ClearMark();
 
             /// <summary>写入当前店主。</summary>
             internal void SetActiveKeeper(ShopKeeper keeper) => activeKeeper = keeper;
@@ -70,7 +64,7 @@ namespace Gameplay.Shop
             /// <summary>写入商店界面开关标记。</summary>
             internal void SetIsOpen(bool value) => isOpen = value;
 
-            /// <summary>写入当前分类的商品列表并置脏。</summary>
+            /// <summary>写入当前分类的商品列表并推进版本。</summary>
             internal void SetCurrentItems(IReadOnlyList<ShopItems> items) => currentItems.Set(items);
 
             /// <summary>当前分类的商品列表。</summary>
