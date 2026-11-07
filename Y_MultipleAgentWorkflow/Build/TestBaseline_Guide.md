@@ -2,7 +2,7 @@
 
 文档 I:：`BUIL:-TESTBASELINE-GUI:E`
 状态：`Active`
-最后更新：`2026-11-01`
+最后更新：`2026-11-07`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](:eveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
@@ -16,7 +16,7 @@
   - [2.3 用例计数的口径](#23-用例计数的口径)
   - [2.4 选型：测试落在不依赖 UnityEngine 的纯 C# 逻辑上](#24-选型测试落在不依赖-unityengine-的纯-c-逻辑上)
   - [2.5 覆盖与零覆盖](#25-覆盖与零覆盖)
-  - [2.6 唯一的已记录执行方式](#26-唯一的已记录执行方式)
+  - [2.6 执行方式与结果判定](#26-执行方式与结果判定)
   - [2.7 无 PlayMode 测试](#27-无-playmode-测试)
 - [3. 约定与硬边界](#3-约定与硬边界)
   - [3.1 `Tests/Editor` 这个目录名是承重的](#31-testseditor-这个目录名是承重的)
@@ -54,7 +54,7 @@
 
 ### 2.2 用例分布
 
-7 个文件，共 65 项用例：
+7 个文件，共 79 项用例：
 
 | 文件 | 用例数 | 被测对象 |
 |---|---|---|
@@ -62,23 +62,24 @@
 | `CanvasFocusStackTests` | 15 | `CanvasFocusStack`：开闭顺序、order 计算、ESC 行为 |
 | `AStarOpenHeapTests` | 6 | `AStarOpenHeap`：堆序、平局规则、重复入堆、随机输入排序 |
 | `ObjectPoolTests` | 5 | `ObjectPool<T>`：预热、Get/Return 回调、池内对象销毁后的选取 |
-| `PlayerStatsSOTests` | 2 | `PlayerStatsSO.CreateInitial:ata()`：模板拷贝语义 |
-| `UICacheRegressionTests` | 12 | 任务选择与关闭、快照版本确认与只读性、背包槽位地址、金币局部刷新、对话与任务的开关路由 |
+| `UICacheRegressionTests` | 20 | 任务版本与关闭、只读查询、背包初始化与重开、多视图金币刷新、技能升级命令与键缓存、缓存开关路由 |
+| `VersionedValueTests` | 8 | 默认版本、独立读取者、绘制期间更新、数据源切换、读取失效、集合原地发布、合并写入、版本读写分配 |
 | `LootPoolingTests` | 1 | 掉落物对象池的预热与回收 |
-| **合计** | **65** | |
+| **合计** | **79** | |
 
-- 特性统计：`[Test]` 63，`[TestCase]` 2，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
-- `[SetUp]` 与 `[Tear:own]` 分布在 `ObjectPoolTests`、`PlayerStatsSOTests`、`PlayerStatsModelTests`、`UICacheRegressionTests`，`CanvasFocusStackTests` 亦有 `SetUp`。
+- 特性统计：`[Test]` 74，`[TestCase]` 5，`[UnityTest]` 0，`[TestFixture]` 0，`[Category]` 0。
+- `[SetUp]` 与 `[TearDown]` 分布在 `ObjectPoolTests`、`PlayerStatsModelTests`、`UICacheRegressionTests`，`CanvasFocusStackTests` 亦有 `SetUp`。
 
 ### 2.3 用例计数的口径
 
 - 每个 `[Test]` 计一项，每个 `[TestCase]` 参数实例计一项；用例数按此口径汇总。
+- `Run All` 同时枚举依赖包的测试，XML 总数可能大于项目用例数；按程序集与 fixture 区分来源。
 
 ### 2.4 选型：测试落在不依赖 UnityEngine 的纯 C# 逻辑上
 
 - `AStarOpenHeap` 的说明写明它是“A* 开表（open list）用的二叉小顶堆，**不依赖 UnityEngine**”；对应测试只引入 `System`、`System.Collections.Generic` 与 `NUnit.Framework`。
 - `CanvasFocusStack` 的说明写明它是“**纯 C# 逻辑**……不依赖 MonoBehaviour 与 ToggleCanvasEventSO……**便于脱离 Unity 生命周期做单元测试**”；对应测试只引入 `System.Collections.Generic`、`Contracts`、`Pipeline.UI.SystemCanvasManagers` 与 `NUnit.Framework`，被测类型与 `CanvasToToggle` 都来自不含 UnityEngine 类型的程序集代码。
-- 命名空间改造后，测试侧引用的产品类型全部要显式 `using`：`CanvasFocusStackTests` 用 `using Contracts;`（`CanvasToToggle`）与 `using Pipeline.UI.SystemCanvasManagers;`（`CanvasFocusStack`）；`AStarOpenHeapTests` 用 `using Pipeline.Pathfinding;`；`ObjectPoolTests` 用 `using Pipeline;`（`IPoolable`）；`PlayerStatsSOTests` 用 `using Pipeline.SO;`（`PlayerStatsSO`）。漏写任何一条都是 `CS0246`，不会像全局命名空间时代那样静默可用。
+- 测试侧跨命名空间引用显式声明 `using`：焦点栈使用 `Contracts.Enums` 与 `Pipeline.UI.SystemCanvasManagers`，寻路使用 `Pipeline.Pathfinding`，对象池使用 `Pipeline`，版本读取使用 `Contracts.State`。
 
 各测试文件的引擎依赖：
 
@@ -88,22 +89,22 @@
 | `CanvasFocusStackTests` | 否 | 15 个用例只引入 `System.Collections.Generic`、`Contracts`、`Pipeline.UI.SystemCanvasManagers` 与 `NUnit.Framework` |
 | `PlayerStatsModelTests` | 是 | 24 个用例中 1 个用引擎 API：`LogAssert.Expect(LogType.Warning, ...)` |
 | `ObjectPoolTests` | 是 | 5 个用例构造 `GameObject` 与 `MonoBehaviour`，依赖 EditMode 下的 `Object.:estroyImmediate` |
-| `PlayerStatsSOTests` | 是 | 2 个用例用 `ScriptableObject.CreateInstance` 与 `Object.:estroyImmediate` |
 | `UICacheRegressionTests` | 是 | 临时组件与 SO 验证业务状态；读取实际预制体验证打开策略和关闭路由 |
+| `VersionedValueTests` | 否 | 直接构造状态值、列表与读取记录，测量版本读写的线程托管分配 |
 
 这套测试整体需要 Unity 才能运行。
 
 ### 2.5 覆盖与零覆盖
 
-有覆盖的对象包括 `PlayerStatsModel` / `StatsService`、`CanvasFocusStack`、`AStarOpenHeap`、`ObjectPool<T>`、`PlayerStatsSO`，以及任务视图字段刷新、快照过期确认、集合只读性、背包槽位、快捷栏局部刷新与缓存事件路由。
+有覆盖的对象包括 `PlayerStatsModel` / `StatsService`、`CanvasFocusStack`、`AStarOpenHeap`、`ObjectPool<T>`、`VersionedValue<T>`、`VersionReader`，以及任务字段刷新与版本、背包只读查询与初始化、多视图局部刷新、缓存事件路由和技能升级命令。
 
-缓存回归覆盖对话与任务预制体的开关策略、任务选择与关闭、背包槽位地址、快捷栏局部刷新。商店交易、完整对话流程、存档、场景编排与加载、技能、单位与 NPC 的业务路径依靠手工验证。
+缓存回归覆盖对话与任务预制体的开关策略、任务选择与重复关闭、背包槽位地址与同版本重开、两个金币视图独立刷新。技能回归覆盖成功扣点、拒绝升级保持状态和稳定键缓存。版本测试在预热后执行 10000 次读写与确认，要求线程托管分配为 0。商店交易、完整对话流程、存档、场景编排与加载、完整技能前置图、单位与 NPC 的业务路径依靠手工验证。
 
 改 `PlayerStatsModel`、`StatsService`、`ExperienceController` 之前先跑绿 `PlayerStatsModelTests`。
 
-### 2.6 唯一的已记录执行方式
+### 2.6 执行方式与结果判定
 
-headless EditMode 命令把 Editor 路径与工程路径写死；两个前提：**Unity 编辑器不能开着这个工程**，否则第二个实例起不来；**结果看 XML 根节点的 `result` 与失败计数，退出码不可靠**。
+工程已在编辑器中打开时，使用该实例内的 Test Runner 或 `TestRunnerApi` 运行 EditMode，并将结果导出为 XML。`ExecutionSettings.runSynchronously` 适用于当前的普通 NUnit 用例，结果由 `TestRunnerApi.SaveResultToFile` 保存。空闲工程也可使用 headless 命令；该方式要求本工程没有已打开的编辑器实例。成功判定使用 XML 根节点的 `result` 与失败计数。
 
 完整命令与环境检查清单见 `..\Workflow\Project_Validation_Guide.md` §3。
 

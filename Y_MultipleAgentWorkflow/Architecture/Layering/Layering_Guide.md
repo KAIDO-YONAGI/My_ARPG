@@ -28,7 +28,7 @@
 
 文档 I:：`ARCH-LAYERING-GUI:E`
 状态：`Active`
-最后更新：`2026-11-02`
+最后更新：`2026-11-07`
 权威范围：`Contracts`、`Pipeline`、`Gameplay` 三层目录的含义、跨层依赖方向、命名空间与程序集边界、唯一写入口与只读接口的判定标准。各玩法域的内部实现归对应玩法域的 Guide，存档格式与场景流程细节由各自文档负责。
 
 ## 1. 触发线索
@@ -55,19 +55,19 @@
 
 | 目录 | 文件数 | 含义 | 判定标准：新文件落到哪 |
 |---|---|---|---|
-| `Contracts` | 12 | 跨域共享的接口、基类、状态值与枚举 | 类型被两个以上域直接引用，且其中不含具体业务规则 |
-| `Pipeline` | 65 | 引擎级基建：场景切换、寻路、对象池、UI、音频、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
+| `Contracts` | 13 | 跨域共享的接口、基类、状态值与枚举 | 类型被两个以上域直接引用，且其中不含具体业务规则 |
+| `Pipeline` | 66 | 引擎级基建：场景切换、寻路、对象池、UI、音频、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
 | `Gameplay` | 62 | 玩法域，按 `Player` `Quest` `:ialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
 
-`Contracts` 按 `Base`、`Interfaces`、`State`、`Enums`、`Audio` 分目录，命名空间随目录划分。`MyEnums.cs` 提供玩法与场景共用枚举，音频的类型枚举与 `AudioRequest` 位于 `Contracts.Audio`。音频播放、池管理、配置和触发组件位于 `Pipeline.Audio`，请求通道位于 `Pipeline.SO.Events`，机制见 [音频系统 Guide](../../Assets/Audio_Guide.md)。缓存界面的基类为 `CachedUIViewBase` 与 `CachedCanvasViewBase`，值与脏标记的容器 `DirtyValue<T>` 归入状态目录。
+`Contracts` 按 `Base`、`Interfaces`、`State`、`Enums`、`Audio` 分目录，命名空间随目录划分。`MyEnums.cs` 提供玩法与场景共用枚举，音频的类型枚举与 `AudioRequest` 位于 `Contracts.Audio`。音频播放、池管理、配置和触发组件位于 `Pipeline.Audio`，请求通道位于 `Pipeline.SO.Events`，机制见 [音频系统 Guide](../../Assets/Audio_Guide.md)。缓存界面的基类为 `CachedUIViewBase` 与 `CachedCanvasViewBase`，状态目录提供值与版本容器 `VersionedValue<T>` 和单读取者绘制记录 `VersionReader`。
 
 ### 2.2 跨层依赖方向
 
 按 `using` 指令统计：
 
 - `Contracts` → `Gameplay`：**2 处**，`ISaveable` 与 `SaveableService` 各引一次 `Gameplay.Save`；`Contracts` → `Pipeline`：**4 处**，`CachedUIViewBase`、`CachedCanvasViewBase` 与 `ICanvasManager` 引事件类型，`ICanvasManager` 引系统画布管理器。
-- `Gameplay` → `Contracts`：**47 处**；`Gameplay` → `Pipeline`：**65 处**。
-- `Pipeline` → `Contracts`：**41 处**；`Pipeline` → `Gameplay`：**6 处**，分别是 `ContinueButton`、`LootEventSO`、`MobileAttackButton`、`PlayerStatsSO`、`SceneChanger`、`ShopKeeperEventSO` 各 1 处。
+- `Gameplay` → `Contracts`：**53 处**；`Gameplay` → `Pipeline`：**65 处**。
+- `Pipeline` → `Contracts`：**42 处**；`Pipeline` → `Gameplay`：**6 处**，分别是 `ContinueButton`、`LootEventSO`、`MobileAttackButton`、`PlayerStatsSO`、`SceneChanger`、`ShopKeeperEventSO` 各 1 处。
 
 方向口径：`Contracts` 被所有域引用是设计意图，`Contracts → Gameplay/Pipeline` 的 6 处算反向依赖；`Pipeline → Gameplay` 的 6 处同样算反向依赖。
 
@@ -86,7 +86,9 @@
 | Controller | `ExperienceController` `HealthController` `StatsCanvasController` `Player:amageController` | `Gameplay.Player.Controllers` | 前三个纯 C#，由 View 托管 `new`；`Player:amageController` 挂场景 |
 | View | `ExperiencePanelView` `HealthView` `StatsCanvasView` | `Gameplay.Player.Views` | MonoBehaviour，不挂单例；属性面板继承契约层的 `CachedUIViewBase` |
 
-另外五个域的"数据 / 界面"配对：`:ialogManager` → `:ialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`（常驻快捷栏另由 `HotbarCanvasView` 承担）、`SkillTreeManager` → `SkillsCanvasView`。视图统一继承 `Contracts.CachedCanvasViewBase`，由 `UICacheManager` 按预制体懒创建；管理器通过稳定的 `CurrentState` 对象提供字段或索引只读查询，状态集合不直接暴露。视图按脏标记按需读取并在绘制后通过 State 方法清理标记，不创建刷新快照或复制集合，二者之间没有控件级引用。
+另外五个域的"数据 / 界面"配对：`DialogManager` → `DialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`，常驻快捷栏由 `HotbarCanvasView` 承担，`SkillTreeManager` → `SkillsCanvasView`。缓存视图继承 `Contracts.Base.CachedCanvasViewBase`，由 `UICacheManager` 按预制体懒创建；管理器通过稳定的 `CurrentState` 对象提供字段、索引只读查询及分组版本。每个视图用自己的 `VersionReader` 比较数据源身份和版本，绘制成功后记录绘制前捕获的版本，打开时使本地记录失效。集合原地修改并推进版本，刷新直接查询持久数据。读取记录与状态容器均为 struct，轮询和确认只改已有字段。
+
+初始化与命令边界同样传递数据：背包视图提取 `InventorySlotState` 初始值，点击命令传递 `SlotAddress`；技能槽位传递技能键、等级上限与初始状态，由管理器命令校验、保存和扣点。前置槽位引用与满级事件留在技能视图侧。
 
 `Player` 相关产品代码文件 18 个，全部带命名空间，按层分布为 `Gameplay.Player` 7 个、`Gameplay.Player.Controllers` 4 个、`Gameplay.Player.Models` 3 个、`Gameplay.Player.Views` 3 个、`Gameplay.Player.Services` 1 个。`Arrow` `PlayerAnimationEventRelay` `PlayerBow` `PlayerCombat` `PlayerMovement` `ShiftEquipment` 这 6 个类型同样在 `Gameplay.Player` 里，移动、战斗、弓箭这条线是整体 Manager 形态。12 个带命名空间的类型中含 `PlayerLocator`，命名空间为 `Gameplay.Player`，是存档域专用的坐标查询单例，不归属上述四层。
 
@@ -105,7 +107,7 @@
 
 **命名空间按层与用途划分**：`Gameplay` 与 `Pipeline` 的命名空间等于文件相对 `Assets\Scripts\` 的目录路径，点号代替反斜杠，大小写原样保留，例如 `Gameplay\Units\Enemy\EnemyCombat.cs` 是 `Gameplay.Units.Enemy`，`Pipeline\SO\Events\VoidEventSO.cs` 是 `Pipeline.SO.Events`。`Contracts` 按用途分 `Base`、`Enums`、`Interfaces`、`State`、`Audio` 五个子目录，分别使用对应的子命名空间。
 
-31 个命名空间覆盖全部 140 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
+31 个命名空间覆盖全部 141 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
 
 | 层 | 命名空间 | 文件数 |
 |---|---|---|
@@ -113,7 +115,7 @@
 | | `Contracts.Audio` | 2 |
 | | `Contracts.Enums` | 1 |
 | | `Contracts.Interfaces` | 3 |
-| | `Contracts.State` | 2 |
+| | `Contracts.State` | 3 |
 | `Pipeline` | `Pipeline` | 3 |
 | | `Pipeline.Audio` | 5 |
 | | `Pipeline.Pathfinding` | 7 |
@@ -141,7 +143,7 @@
 | | `Gameplay.Units.NPC` | 4 |
 | | `Gameplay.Units.ShopKeeper` | 1 |
 
-- 合计 140 个产品代码文件；测试侧使用 `namespace Gameplay.Tests`。
+- 合计 141 个产品代码文件；测试侧使用 `namespace Gameplay.Tests`。
 - 全局命名空间只剩 1 个编辑器脚本 `Assets\Editor\InputActionReferenceRebuilder.cs`，它不在 `Assets\Scripts` 下，不受"跟随目录"规则约束。
 - 跨命名空间调用一律靠 `using`；同一命名空间内的类型直接可见。
 
@@ -153,7 +155,7 @@
 
 ### 2.7 边界测试
 
-编辑器侧测试共 7 个文件、合计 65 项用例：
+编辑器侧测试共 7 个文件、合计 79 项用例：
 
 | 文件 | 用例数 | 守的边界 |
 |---|---|---|
@@ -161,11 +163,11 @@
 | `CanvasFocusStackTests` | 15 | 纯 C# 焦点栈 `CanvasFocusStack` 的入栈出栈语义 |
 | `AStarOpenHeapTests` | 6 | 寻路的开放列表堆 |
 | `ObjectPoolTests` | 5 | 对象池 |
-| `PlayerStatsSOTests` | 2 | 配置资产的拷贝语义 |
 | `LootPoolingTests` | 1 | 掉落物对象池的预热与回收 |
-| `UICacheRegressionTests` | 12 | 缓存事件路由、任务选择与关闭、背包槽位地址、快捷栏局部刷新 |
+| `UICacheRegressionTests` | 20 | 缓存事件路由、任务版本、背包初始化与重开、多视图刷新、技能命令与键缓存 |
+| `VersionedValueTests` | 8 | 独立读取、源切换、绘制期间更新、集合原地发布、轮询分配 |
 
-这 7 个文件位于编辑器侧测试目录、无 asmdef，编译进默认程序集，与产品代码同程序集，可直接 `new` 内部类型并反射 `StatsService`。
+这 7 个文件位于编辑器侧测试目录、无 asmdef，编译进 `Assembly-CSharp-Editor` 并引用产品程序集 `Assembly-CSharp`；测试可直接构造公开纯 C# 类型，并通过反射注入临时服务。
 
 ## 3. 约定与硬边界
 

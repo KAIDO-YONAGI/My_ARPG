@@ -2,8 +2,8 @@
 
 文档 ID：`BUS-GAMEPLAY-SKILLS`
 状态：`Active`
-维护计数：`4/5`
-最后更新：`2026-11-01`
+维护计数：`0/5`
+最后更新：`2026-11-07`
 
 ## 维护规则
 
@@ -19,7 +19,7 @@
 | `升级技能` / `TryUpgradeSkill` / `maxLevel` | `Skills_Guide.md` |
 | `SkillSlot` / `MaxHealthBoost` / `CombatUnlock` / `技能没效果` | `Skills_Guide.md` |
 | `SkillSO` / 技能改名 / 技能资源 | `Skills_Guide.md` |
-| `OnAbilityPointSpent` / `OnMaxSkillLevel` / static 事件 | `Skills_Guide.md` |
+| `OnMaxSkillLevel` / static 事件 / 技能升级命令 | `Skills_Guide.md` |
 | `ToggleSkillsEvent` / `SkillsCanvasView` | `Skills_Guide.md` |
 
 ## 下级导航

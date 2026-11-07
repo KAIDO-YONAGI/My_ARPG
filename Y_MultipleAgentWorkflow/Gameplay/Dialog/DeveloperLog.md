@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 对话视图按自身版本记录刷新
+
+`DialogManager.State` 提供行、对话与选项三个版本，`DialogCanvasView` 捕获版本后直接读状态绘制，成功后只更新自己的读取记录。打开界面使本地记录失效，管理器的显隐回调只维护业务激活标志。共享版本读取测试及对话缓存开关回归通过；现有 Editor 内全套 EditMode 为 80/80，项目用例 79 项，证据为 `Logs/ui-version-editmode.xml`。维护计数 `0/5 → 1/5`。
+
 ## 2026-11-01 对话视图直接读取 State
 
 `DialogCanvasView` 从 `DialogManager.CurrentState` 读取当前行、对话与选项显隐，绘制后调用 `ClearDirty()`；不创建刷新快照。维护计数达到 `5/5`，复核实现并更新 Guide 后清零为 `0/5`。

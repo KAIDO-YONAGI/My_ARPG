@@ -2,7 +2,7 @@
 
 文档 I:：`WF-PROJECT-VALI:ATION`
 状态：`Active`
-最后更新：`2026-11-01`
+最后更新：`2026-11-07`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](:eveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](Workflow_Guide.md#维护规则)。
@@ -48,8 +48,8 @@
 
 按顺序确认，任一条不成立就停在当前层，不继续下层命令：
 
-1. **没有任何 Unity 编辑器实例打开本工程**——headless 测试会另起一个编辑器实例，该工程当前必须处于空闲状态。
-2. **Editor 二进制存在**：`::\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe`，版本与工程版本文件声明的 `2022.3.62f3c1` 一致。
+1. **确认本工程已有的 Unity 编辑器实例**：有实例时在该实例内运行 EditMode；headless 命令另起进程，要求工程当前没有编辑器实例。
+2. **Editor 二进制存在**：`D:\Unity\Editor\2022.3.62f3\Editor\Unity.exe`，版本与工程版本文件声明的 `2022.3.62f3` 一致。
 3. **PowerShell 不低于 5.1**——代理配置脚本首行声明 `#Requires -Version 5.1`；命令里的调用方式替换见 C5c。
 4. **需要走代理时，代理软件在该地址与端口上监听**。
 5. **路径前提**：C12 的命令把工程根与 Editor 路径写成绝对路径，换机器后按新机器改写。
@@ -61,7 +61,7 @@
 
 - 用途：确认打开与构建该工程所需的 Editor 版本。
 - 命令：`Get-Content .\ProjectSettings\ProjectVersion.txt`
-- 成功判定：输出 `m_EditorVersion: 2022.3.62f3c1`。
+- 成功判定：输出 `m_EditorVersion: 2022.3.62f3`。
 
 ### C2 定位 Editor 安装根目录
 
@@ -137,18 +137,19 @@
 
 ### C12 EditMode 测试
 
-- 用途：跑现有 65 个 EditMode 用例。
+- 用途：跑现有 79 个 EditMode 用例。Run All 还会枚举包内用例，结果按 fixture 区分来源。
 - 命令：
   ```powershell
-  & "::\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe" `
+  & "D:\Unity\Editor\2022.3.62f3\Editor\Unity.exe" `
     -runTests -batchmode `
-    -projectPath "::\Unity\Projects\My_ARPG" `
+    -projectPath "D:\Unity\Projects\My_ARPG" `
     -testPlatform EditMode `
-    -testResults "::\Unity\Projects\My_ARPG\Logs\test-editmode.xml" `
-    -logFile "::\Unity\Projects\My_ARPG\Logs\test-editmode.log"
+    -testResults "D:\Unity\Projects\My_ARPG\Logs\test-editmode.xml" `
+    -logFile "D:\Unity\Projects\My_ARPG\Logs\test-editmode.log"
   ```
 - 成功判定：以结果 XML 根节点的 `result` 与失败计数为准，不取退出码。
-- 前提：没有编辑器实例开着这个工程。
+- 命令前提：没有编辑器实例开着这个工程。
+- 已有编辑器实例时：在该实例内使用 Test Runner，或用 `TestRunnerApi.Execute(new ExecutionSettings(new Filter { testMode = TestMode.EditMode }) { runSynchronously = true })` 执行普通 NUnit 用例，在 `ICallbacks.RunFinished` 用 `TestRunnerApi.SaveResultToFile` 导出 XML。脚本刚修改时先确认导入和编译完成，再执行测试，保证运行的是当前代码。
 - 用例位置：EditMode 用例统一放在 `Assets\Tests\Editor\`，该目录的承重作用与新增用例的约定见 `..\Build\TestBaseline_Guide.md` §3.1。
 
 ## 4. 进程与产物处理

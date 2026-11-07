@@ -7,6 +7,13 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 技能升级使用数据命令并缓存状态键
+
+- `SkillTreeManager.TryUpgradeSkill` 接收技能键、等级上限与初始状态，优先读取已保存状态，统一校验解锁、上限与余额后保存等级并扣点。`SkillSlot` 读取命令结果更新显示；扣点静态事件及管理器对槽位类型的依赖已移除。
+- 技能和点数提供独立版本，画布分别记录已绘制版本；`OnMaxSkillLevel` 继续由画布订阅以推进前置解锁。状态键在首次读取或绑定不同根时构建，常规刷新复用字符串。
+- 回归验证成功升级、重复命令读取持久等级、无点/锁定/满级拒绝保持状态与版本，以及状态键缓存和根切换。全套 EditMode 80/80 通过，其中项目用例 79 项，证据为 `Logs/ui-version-editmode.xml`。
+- 维护计数达到 `5/5`，对照三份运行脚本复核升级命令、版本读取、状态键和事件生命周期，更新 Guide 与 Router 后清零为 `0/5`。
+
 ## 2026-11-01 技能面板直接查询 State
 
 `SkillsCanvasView` 通过 `CurrentState` 按键查询技能状态并读取技能点与脏标记，绘制后清理标记；不创建刷新快照。维护计数更新为 `3/5 -> 4/5`。

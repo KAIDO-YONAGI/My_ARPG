@@ -7,6 +7,13 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 版本读取与技能命令回归验证
+
+- 项目 EditMode 测试为 7 个文件、79 项：数值 24、焦点栈 15、寻路 6、对象池 5、掉落池 1、UI 回归 20、版本读取 8。按当前工作区清单维护测试基线。
+- 在已打开的 Unity 2022.3.62f3 实例内通过临时 Editor 入口调用 `TestRunnerApi`，普通 NUnit 用例同步执行，结果由 `SaveResultToFile` 导出。XML 根节点 `result=Passed`、`total=80`、`passed=80`、`failed=0`、`skipped=0`，其中另有 Addressables 包的 `TestStub.RequiredTest` 1 项。结果为 `Logs/ui-version-editmode.xml`，临时入口验证后移除。
+- 新覆盖包括独立读取者、绘制期间更新、同版本更换数据源、界面重开、一次初始化、技能命令拒绝与状态键缓存。版本读写分配测试在预热后执行 10000 次，分配为 0；该断言范围不包含 UI 文本绘制。
+- 项目验证指南登记现有 Editor 内执行方式，并以 `ProjectVersion.txt` 和实际 Editor 安装同步版本。维护计数 `3/5 → 4/5`。
+
 ## 2026-11-01 快照刷新回归覆盖增加
 
 `UICacheRegressionTests` 增加快照过期确认与集合只读性验证，金币只刷新金币文本的回归测试按无参刷新方法调用；EditMode 用例总数更新为 62。Unity Editor 编译测试程序集成功；测试未执行，因为该工程的 Editor 仍打开。Build 维护计数更新为 `2/5 -> 3/5`。

@@ -96,7 +96,7 @@ Unity 的 SDK 检测会调用 Editor 内置的 sdkmanager 执行 `--list`；Java
 
 照此顺序做，不要跳步。
 
-1. 读编辑器版本记录，确认 Editor 版本，本机为 `2022.3.62f3c1`。
+1. 读编辑器版本记录，确认 Editor 版本，本机为 `2022.3.62f3`。
 2. 从 Unity Hub 的次要安装路径记录读出 Editor 安装根目录；本机为 `D:\Unity\Editor`。
 3. 探测内置 sdkmanager，本机命中 1 条：cmdline-tools 6.0。探测不到时用 `-EditorRoot` 显式指定。
 4. 用 `-Action Status` 读出实际状态，不要照抄任何示例路径。

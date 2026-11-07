@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 任务状态提供分组版本
+
+列表、选择和当前状态分别提供版本，`QuestCanvasView` 以本地读取记录决定列表与详情绘制，绘制后保留捕获版本。回归验证选择保持列表版本、完成任务推进列表版本、重复关闭保持三个版本。现有 Unity 实例内 EditMode 全套 80/80 通过，项目用例 79 项，XML 为 `Logs/ui-version-editmode.xml`。维护计数 `0/5 → 1/5`。
+
 ## 2026-11-01 任务视图直接读取 State
 
 `QuestCanvasView` 通过任务数量与索引查询读取列表、当前任务和状态，绘制后清理 `State` 脏标记；不创建刷新快照或复制任务列表。维护计数达到 `5/5`，复核实现并更新 Guide 后清零为 `0/5`。

@@ -4,6 +4,10 @@
 
 按项目约定记录带日期的任务事实、验证证据与维护计数，现行结论同步到对应 Guide。了解现状优先读取 Guide；需要任务历史时，只定位并读取最近一天或两天的相关条目，禁止整份日志载入上下文。只有任务需要追溯历史时才按日期、标题或关键词定向读取更早条目。读取范围不改变存储保留，删除具体历史条目须经用户明确确认。纯文档维护不增加业务计数。
 
+## 2026-11-07 现有编辑器实例内运行测试
+
+`Project_Validation_Guide.md` 的 C12 登记 Test Runner 与 `TestRunnerApi` 的现有实例执行方式：先确认导入与编译完成，再执行普通 NUnit 用例，在结束回调导出 XML。实际运行结果为 `Logs/ui-version-editmode.xml`，80/80 通过，其中项目 79 项、Addressables 包 1 项。临时 Editor 入口已移除；headless 命令仍要求工程空闲。版本和路径按 `ProjectVersion.txt` 与本机实际安装同步。纯验证文档维护，计数不变。
+
 ## 2026-10-05：单元测试目录约定与根目录整理
 
 - 写入 `Project_Validation_Guide.md`（`WF-PROJECT-VALIDATION`）：C12 增加用例位置一条，指向 `..\Build\TestBaseline_Guide.md` §3.1；§1 线索表加入 `单元测试` / `新增用例`。

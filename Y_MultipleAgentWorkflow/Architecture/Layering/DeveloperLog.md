@@ -7,6 +7,12 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 状态版本与视图读取记录分离
+
+`Contracts.State.VersionedValue<T>` 保存值与 ulong 版本，`VersionReader` 作为每个视图的 struct 字段保存数据源身份、已绘制版本与首次读取标志。绘制前捕获版本、成功后记录，数据源替换和显式失效均触发刷新；集合原地修改通过 `Touch` 发布。
+
+背包初始化与点击传递槽位值和地址，技能升级传递键与数值，两个管理器的运行代码均不再引用槽位组件类型。`VersionedValueTests` 的 8 项用例通过，其中预热后 10000 次版本读写与记录的线程托管分配为 0。全部 EditMode 80/80 通过，其中项目 79 项；XML 为 `Logs/ui-version-editmode.xml`。按当前源码统计 141 个产品文件，Contracts/Pipeline/Gameplay 为 13/66/62，并同步依赖与测试表。维护计数 `1/5 → 2/5`。
+
 ## 2026-11-02 音频契约与管线分层
 
 音频枚举和请求放入 Contracts.Audio，播放器、配置与触发器放入 Pipeline.Audio，请求事件放入 Pipeline.SO.Events。播放器使用本工程的 Contracts.Base.YSingleton，核心代码不依赖原项目网络与角色输入。AudioType 使用类型别名明确区分 Contracts 与 UnityEngine 的同名枚举。

@@ -2,7 +2,7 @@
 
 文档 I:：`BUIL:-PROJECTCONFIG-GUI:E`
 状态：`Active`
-最后更新：`2026-10-05`
+最后更新：`2026-11-07`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](:eveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
@@ -46,7 +46,7 @@
 
 ### 2.1 Unity 版本
 
-编辑器版本记录为 `m_EditorVersion: 2022.3.62f3c1`、`m_EditorVersionWithRevision: 2022.3.62f3c1 (1623fc0bbb97)`。工程自述文档推荐用 Unity 2022.3.62f3c1 打开项目。
+编辑器版本记录为 `m_EditorVersion: 2022.3.62f3`、`m_EditorVersionWithRevision: 2022.3.62f3 (96770f904ca7)`。本机编辑器安装目录为 `D:\Unity\Editor\2022.3.62f3\Editor`。
 
 ### 2.2 包依赖
 
@@ -153,7 +153,7 @@
 
 ### 3.3 不要给测试加 asmdef 而不改引用
 
-当前 0 asmdef，现有 65 项用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
+当前 0 asmdef，现有 79 项用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
 
 ### 3.4 不要依赖仓库外依赖能解析
 

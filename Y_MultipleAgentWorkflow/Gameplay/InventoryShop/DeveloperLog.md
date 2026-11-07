@@ -7,6 +7,13 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 背包与商店使用独立版本读取
+
+- `InventoryManager.State` 为金币、快捷栏、背包提供独立版本，商品状态提供 `ItemsVersion`。视图各自保存 `VersionReader`，绘制后记录捕获版本，打开时使本地记录失效。
+- 初始化接收 `IReadOnlyList<InventorySlotState>`，视图仅在管理器首次初始化时提取值数组；点击传递 `SlotAddress`。管理器的初始化、使用、出售选择和丢弃入口均移除 UI 槽位参数。
+- 验证：`UICacheRegressionTests` 覆盖两个金币视图独立刷新、金币变化保持槽位、背包同版本重开、初始值复制与一次初始化。现有 Unity 2022.3.62f3 实例内的 EditMode 结果为 80/80 通过，其中项目用例 79 项；XML 为 `Logs/ui-version-editmode.xml`。
+- 维护计数：`3/5 → 4/5`。
+
 ## 2026-11-02 公共掉落池沿用独立 Loot 预制体
 
 - 结构：沿用 `Assets/Prefabs/Inventory/Loot.prefab`，其根对象包含 Animator、触发器、Loot 与存档标记，Sprite 子物体负责显示；实际物品由 `Initialize` 注入。
