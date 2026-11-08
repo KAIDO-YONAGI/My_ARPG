@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-07 事件与拉模型复查后的文档同步
+
+静态核对 `Assets/Scripts/Gameplay/Dialog/DialogManager.cs` 与 `DialogCanvasView.cs`，修正 Guide §2.1 中旧的直接绘制、动态注册选项监听和 `OnOptionSelected(DialogSO)` 描述，补充状态准备、开画布失败回滚、索引命令及强制结束兼容入口。同步 §3.7 的说话人空值分支和 Router 中已移除的 `ToggleCanvasEvent` 属性描述。仅修改文档，未运行 Unity 或测试；纯文档维护不增加业务计数，仍为 `1/5`。
+
 ## 2026-11-07 对话视图按自身版本记录刷新
 
 `DialogManager.State` 提供行、对话与选项三个版本，`DialogCanvasView` 捕获版本后直接读状态绘制，成功后只更新自己的读取记录。打开界面使本地记录失效，管理器的显隐回调只维护业务激活标志。共享版本读取测试及对话缓存开关回归通过；现有 Editor 内全套 EditMode 为 80/80，项目用例 79 项，证据为 `Logs/ui-version-editmode.xml`。维护计数 `0/5 → 1/5`。

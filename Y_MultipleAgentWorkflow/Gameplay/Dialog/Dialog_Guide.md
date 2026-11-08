@@ -23,7 +23,7 @@
   - [3.4 Refuse 判定读背包域写的物品史](#34-refuse-判定读背包域写的物品史)
   - [3.5 对话画布的开关请求由 NPC 触发器承接](#35-对话画布的开关请求由-npc-触发器承接)
   - [3.6 `ForeceEndDialog()` 只清状态与画布](#36-foreceenddialog-只清状态与画布)
-  - [3.7 `dialogLines\[i\].speaker` 无空值保护](#37-dialoglinesispeaker-无空值保护)
+  - [3.7 说话人为空时保留原立绘与名字](#37-说话人为空时保留原立绘与名字)
 
 先读目录，再按任务读取相关章节，避免整份指南载入上下文。
 
@@ -47,14 +47,14 @@
 
 `DialogManager : YSingleton<DialogManager>` 是唯一的会话驱动者，只持对话状态、不持 UI 引用；立绘、正文与选项按钮在 `DialogCanvasView`（预制体 `DialogCanvas.prefab`）。管理器通过稳定的 `CurrentState` 对象提供当前行、对话资产和选项显隐的只读查询，以及 `LineVersion`、`DialogVersion`、`ChoicesVersion`。视图用三个 `VersionReader` 比较数据源与版本，任一变化时直接读取字段绘制，成功后记录绘制前捕获的版本。打开界面时使本视图的读取记录失效，确保同版本也能重画。开与关的请求仍由 NPC 触发器承接，见 §2.5。
 
-- `StartDialog(DialogSO)`：先做空引用与条件判定，再 `SetDialogCanvas(true)`、`DisableButtons()`、记录 `currentDialog` 与 `currentLineIndex = 0`、调用 `ShowDialog()`。
-- `AdvanceDialog()`：三段式推进。台词未播完时 `ShowDialog()` 播下一句；台词播完且 `nextDialogOptions` 为空时 `EndDialog()`；台词有内容且 `currentLineIndex` 已到台词数末尾时 `ShowChoices()`。
-- `ShowDialog()`：逐句写立绘、名字与文本，末尾自增 `currentLineIndex`。
-- `ShowChoices()`：先 `InitializeButtons()` 控制按钮显隐并写选项文本，再逐个 `AddListener` 绑定 `nextDialogNode`。
-- `OnOptionSelected(DialogSO)`：目标非空时 `StartDialog(nextDialog)` 并 `DisableButtons()`，为空时 `EndDialog()`。
-- `EndDialog()`：`SetDialogCanvas(false)`、`DisableButtons()`、写历史，最后清空 `currentDialog` 与 `currentLineIndex`。
-- `ForeceEndDialog()`：只清状态并关闭画布标记，历史记录留给 `EndDialog()` 写。
-- 生命周期：`OnEnable` 与 `OnDisable` 订阅同一 `sceneLoadedEvent`；切场景时调用 `ForeceEndDialog()`；视图打开时 `OnCachedViewOpened()`、关闭时 `OnCachedViewClosed()`。
+- `StartDialog(DialogSO)`：先做空引用与条件判定，再设置当前对话、行号零和选项隐藏状态；通过 `UICacheManager.OpenCanvas` 请求打开，失败时清空当前对话，成功后调用 `ShowDialog()`。
+- `AdvanceDialog()`：没有活动对话或正在显示选项时返回；台词未播完时 `ShowDialog()` 推进下一句；台词播完且没有选项时 `EndDialog()`；否则 `ShowChoices()`。
+- `ShowDialog()`：校验台词与行号范围后，只推进 `CurrentLineIndex` 并隐藏选项；立绘、名字与正文由视图绘制。行号表示已推进的行数，视图用 `CurrentLineIndex - 1` 取得当前台词。
+- `ShowChoices()`：只设置 `ShowingChoices = true`；视图按状态控制按钮显隐与选项文本。按钮监听在视图 `Awake()` 中一次性注册，销毁时移除。
+- `SelectOption(int)`：只在选项状态且下标有效时生效；读取对应的 `nextDialogNode`，非空时 `StartDialog(nextDialog)`，为空时 `EndDialog()`。
+- `EndDialog()`：先记录角色与一次性对话历史，再请求关闭画布并清空当前对话、行号和选项状态。
+- `ForceEndDialog()`：请求关闭画布并清空状态，不写历史；旧拼写 `ForeceEndDialog()` 保留为转调入口。
+- 生命周期：`OnEnable` 与 `OnDisable` 配对订阅、退订 `sceneLoadedEvent`；切场景时调用 `ForceEndDialog()`；视图打开时 `OnCachedViewOpened()`、关闭时 `OnCachedViewClosed()`。
 
 ### 2.2 数据模型（对话树）
 
@@ -135,6 +135,6 @@
 
 切场景、离开 NPC 触发范围、收到关闭请求都走它，本次对话的历史记录只由 `EndDialog()` 写入。
 
-### 3.7 `dialogLines[i].speaker` 无空值保护
+### 3.7 说话人为空时保留原立绘与名字
 
-`ShowDialog()` 直接取 `characterPortrait` 与 `characterName`，漏配说话人会抛 `NullReferenceException`。
+`DialogCanvasView.RefreshIfChanged()` 仅在当前台词的 `speaker` 非空时更新立绘与名字；正文仍照常更新。漏配说话人时不会在此处解引用空对象，但立绘与名字会保留之前显示的内容。

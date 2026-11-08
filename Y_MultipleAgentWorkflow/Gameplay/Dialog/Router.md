@@ -38,4 +38,4 @@
 
 - 本域权威文档为 `Dialog_Guide.md`（ID `GP-DIALOG-GUIDE`），覆盖会话流程、对话树数据模型、Refuse 判定、历史记录的写入与读取、NPC 触发链、对话画布开关归属。
 - HistoryManager 子目录承载 `ConversationHistoryManager`、`ItemHistoryManager`、`VisitedHistoryManager` 三个管理器，未建立下级 Router，事实记在 `Dialog_Guide.md` 的 §2.4 与 §3。
-- 对话画布的开关请求由 NPC 触发器承接，`DialogManager.ToggleCanvasEvent` 返回 null；改动这一归属需同时核对 `Dialog_Guide.md` §2.5 与 `..\Units\Router.md`。
+- 对话开关输入由 NPC 触发器承接，`DialogManager` 准备状态后通过 `UICacheManager` 请求画布显隐，不再实现 `ICanvasManager`；改动这一归属需同时核对 `Dialog_Guide.md` §2.5 与 `..\Units\Router.md`。
