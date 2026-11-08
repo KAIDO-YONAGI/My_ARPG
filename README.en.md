@@ -22,25 +22,25 @@ Demo: [ARPG Demo Showcase](https://www.bilibili.com/video/BV1sCGH6iErJ/)
 
 ### Scenes and System Coordination
 
-Scene groups load additively, with shared systems kept in persistent scenes while level content changes as a group. Load-request and completion events let each system handle its state before and after a transition.
+Scene groups load additively, with level resources split by group and shared systems kept in persistent scenes, which keeps the work easy to divide. Load requests and completion events are broadcast during asynchronous loading, so each module handles its own state in the right order.
 
-ScriptableObjects configure dialogue, quests, items and skills. Event channels carry interactions such as quest rewards and UI toggles, reducing direct references between systems.
+Dialogue, quests, items, skills and audio are configured through ScriptableObjects, while rewards, UI toggles and sound requests travel over event channels to reduce direct references between systems. The audio manager lives in the persistent scene, with pooled sound players and crossfaded background music.
 
 ### Character Stats and Presentation
 
-Character stats follow an MVCS structure: the Model handles stat and leveling rules, the Service provides write operations and a read-only interface, and Controllers and Views handle presentation. Dialogue, quests, inventory, shops and skills manage gameplay state separately from views, retaining that state when panels close or are recreated.
+Character stats are organized in Model, View, Controller and Service layers: experience curves, stat clamping and leveling rules live in the Model, the Service is the single write entry point with a read-only interface, and Controllers and Views handle presentation. Dialogue, quests, inventory, shops and skills keep their gameplay state in their own systems, views draw from read-only queries, and that state survives panels closing or being recreated.
 
 ### Enemy and NPC Pathfinding
 
-Custom A* pathfinding separates grid construction, path search and path following for reuse by enemies and NPCs. It supports eight-direction movement, diagonal obstacle checks and replanning when targets move.
+Custom A* pathfinding separates grid construction, path search and path following for reuse by enemies and NPCs. It supports eight-direction movement and diagonal obstacle checks, samples obstacles in a straight line before adopting an optimized start point, replans by distance and cooldown when targets move, and advances through the path with a waypoint stack.
 
-The open list uses a binary min-heap, and search collections are reused to reduce allocations. Path following supports enemy pursuit, NPC patrol and wandering behaviors.
+The open list uses a binary min-heap, and search collections are reused across searches to reduce allocations. Path following supports enemy pursuit, NPC patrol and wandering behaviors.
 
 ### UI Interaction and Object Reuse
 
-Panels are created on demand, cached on close and evicted by LRU order or timeout. Dirty flags drive display updates, a focus stack manages window order, and panels support dragging.
+The UI scheduling framework maintains panel state with linked lists plus events and callbacks, handling player input and code-driven operations through one path. Panels are created at runtime and cached on close, with LRU eviction by close order and timeouts measured from the close moment. Views refresh by versioned dirty flags in a pull design: writes advance the version, and each view compares the version it rendered before redrawing. A focus stack manages window order, and panels support dragging.
 
-Arrows and loot use a generic object pool. EditMode tests cover character-stat rules, the pathfinding open list, object pooling, the UI focus stack and view caching.
+Arrows and loot use a generic object pool. EditMode tests cover stat rules, the pathfinding open list, object pooling, the UI focus stack, view caching and versioned values.
 
 ## Getting Started
 
