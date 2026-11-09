@@ -1,6 +1,6 @@
 # My_ARPG
 
-![Unity](https://img.shields.io/badge/Unity-2022.3.62f3c1-222222?logo=unity&logoColor=white) ![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white)
+![Unity](https://img.shields.io/badge/Unity-2022.3.62f3-222222?logo=unity&logoColor=white) ![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white)
 
 **简体中文** | [English](README.en.md)
 
