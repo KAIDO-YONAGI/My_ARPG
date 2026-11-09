@@ -47,7 +47,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         private List<CanvasInputBinding> inputBindings;
 
         [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
-        private List<CanvasType> mutexCanvases = new List<CanvasType>();
+        private List<CanvasType> mutexCanvases = new();
 
         // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
         private readonly CanvasFocusStack focusStack = new();
@@ -385,7 +385,7 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         private void ResetInputState()
         {
-            List<CanvasType> keys = new List<CanvasType>(inputState.Keys);
+            List<CanvasType> keys = new(inputState.Keys);
             foreach (CanvasType key in keys)
             {
                 inputState[key] = false;

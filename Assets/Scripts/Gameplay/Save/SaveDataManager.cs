@@ -31,7 +31,7 @@ namespace Gameplay.Save
 
         // 存档注册表位于 Contracts/SaveRegistry.cs，本类只做收集与分发。
 
-        private SaveData dataToSave = new SaveData();
+        private SaveData dataToSave = new();
         // 首次从主菜单进入游戏时不应写系统档，否则场景信息还没准备好。
         private SceneType lastSceneType = SceneType.Menu;
         private void OnEnable()

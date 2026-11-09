@@ -13,7 +13,7 @@ namespace Gameplay.Units.NPC
         private static readonly int IsWalking = Animator.StringToHash("isWalking");
 
         [Header("Patrol Rectangle Settings")]
-        [SerializeField] private Vector2 patrolSize = new Vector2(5f, 3f); // 矩形的长和宽
+        [SerializeField] private Vector2 patrolSize = new(5f, 3f); // 矩形的长和宽
         [SerializeField] private bool clockwise = true; // true为顺时针，false为逆时针
 
         [Header("Movement Settings")]

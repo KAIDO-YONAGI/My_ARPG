@@ -10,7 +10,7 @@ namespace Pipeline
     public class InitialLoad : MonoBehaviour
     {
         [Tooltip("启动时以叠加模式加载并持续保留的场景。")]
-        public List<GameSceneSO> persistentScenes = new List<GameSceneSO>();
+        public List<GameSceneSO> persistentScenes = new();
 
         private void Awake()
         {

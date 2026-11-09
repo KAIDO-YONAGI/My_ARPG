@@ -45,7 +45,7 @@ namespace Gameplay.Shop
             itemNameText.text = item.itemName;
             itemDescriptionText.text = item.itemDescription;
 
-            List<string> stats = new List<string>();
+            List<string> stats = new();
             if (item.currentHealth > 0) stats.Add("Health:" + item.currentHealth);
             if (item.maxHealth > 0) stats.Add("MaxHealth:" + item.maxHealth);
             if (item.damage > 0) stats.Add("Damage:" + item.damage);

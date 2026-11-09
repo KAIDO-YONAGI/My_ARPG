@@ -89,7 +89,7 @@ namespace Pipeline.Pathfinding
             marginX = Mathf.Clamp(marginX, -maxMargin, maxMargin);
             marginY = Mathf.Clamp(marginY, -maxMargin, maxMargin);
 
-            Vector3 optNode = new Vector3(worldPos.x + marginX, worldPos.y + marginY, 0);
+            Vector3 optNode = new(worldPos.x + marginX, worldPos.y + marginY, 0);
             (int x, int y) optCell = WorldToCell(optNode);
             if (nodeCellMap.TryGetValue(optCell, out AStarNode optCellNode)
                 && optCellNode.GetNodeType() != AStarNodeType.Obstacle)

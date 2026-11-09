@@ -58,7 +58,7 @@ namespace Pipeline.Pathfinding
             {
                 return null;
             }
-            AStarDetails startNode = new AStarDetails(startCell.x, startCell.y, endCell.x, endCell.y, null);
+            AStarDetails startNode = new(startCell.x, startCell.y, endCell.x, endCell.y, null);
             openDic.Add(startCell, startNode);
             heap.Push(startCell, startNode.GetCost(), startNode.GetDisToBeg());
 
@@ -109,7 +109,7 @@ namespace Pipeline.Pathfinding
         }
         private Stack<AStarDetails> RetracePath(AStarDetails endNode)
         {
-            Stack<AStarDetails> path = new Stack<AStarDetails>();
+            Stack<AStarDetails> path = new();
             AStarDetails current = endNode;
 
             while (current != null)
@@ -140,7 +140,7 @@ namespace Pipeline.Pathfinding
                     || neighbor.GetNodeType() != AStarNodeType.Walkable) continue;
                 if (!CanWalkDiagonally(cx, cy, dirX[i], dirY[i])) continue;
 
-                AStarDetails newNode = new AStarDetails(nx, ny, endPos.x, endPos.y, current);
+                AStarDetails newNode = new(nx, ny, endPos.x, endPos.y, current);
 
                 if (!openDic.TryGetValue(neighborPos, out AStarDetails existing))
                 {

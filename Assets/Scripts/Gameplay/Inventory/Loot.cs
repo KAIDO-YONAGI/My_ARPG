@@ -263,7 +263,7 @@ namespace Gameplay.Inventory
             // 位置只有偏离生成态才算「改动量」；没挪过就只记拾取态，
             // 读档时以场景摆放为准，设计师改过的摆放不会被旧档拖回去。
             bool moved = (transform.position - baselinePosition).sqrMagnitude > MovedEpsilonSqr;
-            LootStatus status = new LootStatus(transform.position, hasBeenPicked, moved);
+            LootStatus status = new(transform.position, hasBeenPicked, moved);
 
             if (data.lootsStatsDic.ContainsKey(dataId.ID))//有这个ID就改
             {

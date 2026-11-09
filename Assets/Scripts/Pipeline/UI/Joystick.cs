@@ -58,7 +58,7 @@ namespace Pipeline.UI
         public void OnDrag(PointerEventData eventData)
         {
             Vector2 position = RectTransformUtility.WorldToScreenPoint(null, backgroundRect.position);
-            Vector2 radius = new Vector2(backgroundRect.rect.width / 2, backgroundRect.rect.height / 2);
+            Vector2 radius = new(backgroundRect.rect.width / 2, backgroundRect.rect.height / 2);
             inputVector = (eventData.position - position) / radius;
 
             if (inputVector.magnitude > 1f)

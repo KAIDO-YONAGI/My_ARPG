@@ -162,11 +162,11 @@ namespace Gameplay.Skills
         {
             if (stateRoot == null) return name;
 
-            Stack<string> parts = new Stack<string>();
+            Stack<string> parts = new();
             for (Transform current = transform; current != null && current != stateRoot; current = current.parent)
                 parts.Push($"{current.name}[{current.GetSiblingIndex()}]");
 
-            StringBuilder key = new StringBuilder();
+            StringBuilder key = new();
             while (parts.Count > 0)
             {
                 if (key.Length > 0) key.Append('/');

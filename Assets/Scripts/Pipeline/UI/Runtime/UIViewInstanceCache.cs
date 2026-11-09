@@ -110,7 +110,7 @@ namespace Pipeline.UI.Runtime
                     continue;
                 }
 
-                Entry entry = new Entry
+                Entry entry = new()
                 {
                     Prefab = prefab,
                     Anchor = binding.anchor,
