@@ -24,18 +24,42 @@ namespace Pipeline.UI.Runtime
     /// </remarks>
     public sealed class UIViewInstanceCache : IDisposable
     {
-        /// <summary>单个界面的注册信息与运行期引用。</summary>
+        /// <summary>单个界面的注册信息、运行期引用与事件回调。</summary>
         private sealed class Entry
         {
+            private readonly UIViewInstanceCache cache;
+
+            public Entry(UIViewInstanceCache cache)
+            {
+                this.cache = cache;
+            }
+
             public CachedUIViewBase Prefab;
             public GameObject Anchor;
             public CachedUIViewBase View;
             public ToggleCanvasEventSO ToggleEvent;
-            public Action<bool> Toggle;
-            public Action Focus;
-            public Action Closed;
             public LinkedListNode<Entry> IdleNode;
             public float ClosedAt;
+
+            /// <summary>开关事件回调：按状态打开或关闭本界面。</summary>
+            public void HandleToggle(bool state)
+            {
+                // 对话和任务由业务入口准备数据后打开；ESC、互斥和切场仍统一走关闭事件。
+                if (!state || Prefab.OpenOnToggleEvent)
+                    cache.SetOpen(this, state);
+            }
+
+            /// <summary>焦点事件回调：刷新本界面的排序。</summary>
+            public void HandleFocus()
+            {
+                View?.RefreshOrder();
+            }
+
+            /// <summary>界面关闭回调：交给缓存放入闲置队列。</summary>
+            public void HandleClosed()
+            {
+                cache.OnClosed(this);
+            }
         }
 
         private readonly Dictionary<CanvasType, Entry> entries = new();
@@ -110,20 +134,12 @@ namespace Pipeline.UI.Runtime
                     continue;
                 }
 
-                Entry entry = new()
+                Entry entry = new(this)
                 {
                     Prefab = prefab,
                     Anchor = binding.anchor,
                     ToggleEvent = prefab.ToggleEvent
                 };
-                // 对话和任务由业务入口准备数据后打开；ESC、互斥和切场仍统一走关闭事件。
-                entry.Toggle = state =>
-                {
-                    if (!state || entry.Prefab.OpenOnToggleEvent)
-                        SetOpen(entry, state);
-                };
-                entry.Focus = () => entry.View?.RefreshOrder();
-                entry.Closed = () => OnClosed(entry);
                 entries.Add(id, entry);
             }
         }
@@ -147,8 +163,8 @@ namespace Pipeline.UI.Runtime
             connected = true;
             foreach (Entry entry in entries.Values)
             {
-                entry.ToggleEvent.toggleCanvasEvent += entry.Toggle;
-                entry.ToggleEvent.focusEvent += entry.Focus;
+                entry.ToggleEvent.toggleCanvasEvent += entry.HandleToggle;
+                entry.ToggleEvent.focusEvent += entry.HandleFocus;
             }
         }
 
@@ -159,8 +175,8 @@ namespace Pipeline.UI.Runtime
             connected = false;
             foreach (Entry entry in entries.Values)
             {
-                entry.ToggleEvent.toggleCanvasEvent -= entry.Toggle;
-                entry.ToggleEvent.focusEvent -= entry.Focus;
+                entry.ToggleEvent.toggleCanvasEvent -= entry.HandleToggle;
+                entry.ToggleEvent.focusEvent -= entry.HandleFocus;
             }
         }
 
@@ -228,7 +244,7 @@ namespace Pipeline.UI.Runtime
                     // 直接建在挂载点下并立即停用，等 Open 时再激活，避免半初始化的界面参与布局。
                     entry.View = Object.Instantiate(entry.Prefab, entry.Anchor.transform, false);
                     entry.View.gameObject.SetActive(false);
-                    entry.View.Closed += entry.Closed;
+                    entry.View.Closed += entry.HandleClosed;
                 }
 
                 if (!entry.View.Open())
@@ -280,7 +296,7 @@ namespace Pipeline.UI.Runtime
             RemoveIdle(entry);
             if (entry.View == null) return;
             entry.View.BeforeCacheDestroy();
-            entry.View.Closed -= entry.Closed;
+            entry.View.Closed -= entry.HandleClosed;
             Object.Destroy(entry.View.gameObject);
             entry.View = null;
         }
