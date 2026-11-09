@@ -25,7 +25,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         [Serializable]
         public class CanvasInputBinding
         {
-            [Tooltip("要切换的画布。")] public CanvasToToggle canvas;
+            [Tooltip("要切换的画布。")] public CanvasType canvas;
 
             [Tooltip("触发切换的输入动作。")] public InputActionReference action;
         }
@@ -43,26 +43,26 @@ namespace Pipeline.UI.SystemCanvasManagers
 
         [SerializeField]
         [Tooltip(
-            "配置通过按键进入通用切换流程的画布。每项将一个 CanvasToToggle 映射到 InputActionReference；GameOver、SaveLoad 等没有按键的画布可以不配置，仍可通过 RequestCanvasToggle 处理外部请求。")]
+            "配置通过按键进入通用切换流程的画布。每项将一个 CanvasType 映射到 InputActionReference；GameOver、SaveLoad 等没有按键的画布可以不配置，仍可通过 RequestCanvasToggle 处理外部请求。")]
         private List<CanvasInputBinding> inputBindings;
 
         [Tooltip("互斥面板列表：列在此处的面板互相互斥——任一打开时自动关闭其它已打开的互斥面板；未列出的可与任意面板共存")] [SerializeField]
-        private List<CanvasToToggle> mutexCanvases = new List<CanvasToToggle>();
+        private List<CanvasType> mutexCanvases = new List<CanvasType>();
 
         // 画布焦点栈：纯 C# 逻辑（open-order 链表、focus、sortingOrder 计算）。
         private readonly CanvasFocusStack focusStack = new();
 
         // 各画布上报的阻塞声明（ReportCanvasState 时登记）
-        private readonly Dictionary<CanvasToToggle, bool> canvasBlocksInput = new();
-        private readonly Dictionary<CanvasToToggle, bool> canvasCloseOnEscape = new();
+        private readonly Dictionary<CanvasType, bool> canvasBlocksInput = new();
+        private readonly Dictionary<CanvasType, bool> canvasCloseOnEscape = new();
 
         // 外部（代码/按键）输入合并到这里
-        private readonly Dictionary<CanvasToToggle, bool> inputState = new();
+        private readonly Dictionary<CanvasType, bool> inputState = new();
 
         protected override void OnSingletonInitialized()
         {
             //用枚举类初始化inputState
-            foreach (CanvasToToggle canvas in Enum.GetValues(typeof(CanvasToToggle)))
+            foreach (CanvasType canvas in Enum.GetValues(typeof(CanvasType)))
             {
                 inputState[canvas] = false;
             }
@@ -113,7 +113,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         }
 
         /// <summary>拖拽类控件把焦点请求转给焦点栈，由焦点栈统一重排层级。</summary>
-        public void HandleFocus(CanvasToToggle canvas)
+        public void HandleFocus(CanvasType canvas)
         {
             focusStack.HandleFocus(canvas);
         }
@@ -123,7 +123,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// 有按键绑定的画布按 inputBindings 顺序处理；没有按键绑定的画布也会在
         /// ToggleCanvas 的外部请求分支中被消费。
         /// </summary>
-        public void RequestCanvasToggle(CanvasToToggle canvas)
+        public void RequestCanvasToggle(CanvasType canvas)
         {
             if (!inputState.ContainsKey(canvas))
             {
@@ -136,7 +136,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// <summary>
         /// 直接关闭指定画布，不依赖 inputBindings，也不受 ESC 关闭规则限制。
         /// </summary>
-        public void RequestCanvasClose(CanvasToToggle canvas)
+        public void RequestCanvasClose(CanvasType canvas)
         {
             focusStack.RequestClose(canvas);
         }
@@ -146,7 +146,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// 外部上报一律走这里；跳过的初始 false 上报无副作用（焦点栈默认全关）。
         /// </summary>
         public static void Report(
-            CanvasToToggle canvas,
+            CanvasType canvas,
             bool state,
             bool closeOnEscape = true,
             bool blocksGlobalInput = false)
@@ -160,12 +160,12 @@ namespace Pipeline.UI.SystemCanvasManagers
         // 状态回调：画布报告真实的开启或关闭状态；互斥由本组件的 mutexCanvases 列表解析，阻塞声明由面板传入。
         // 仅由静态 Report 调用，保证 Instance 判空集中在唯一一处。
         private void ReportCanvasState(
-            CanvasToToggle canvas,
+            CanvasType canvas,
             bool state,
             bool closeOnEscape = true,
             bool blocksGlobalInput = false)
         {
-            if (canvas == CanvasToToggle.Default)
+            if (canvas == CanvasType.Default)
             {
                 return;
             }
@@ -184,21 +184,21 @@ namespace Pipeline.UI.SystemCanvasManagers
                 canvasOpenedEvent.RaiseCanvasOpened(canvas);
         }
 
-        public bool IsCanvasFocused(CanvasToToggle canvas)
+        public bool IsCanvasFocused(CanvasType canvas)
         {
             return focusStack.IsFocused(canvas);
         }
 
         // 根据 open-order 链表计算排序优先级（转发给焦点栈）。被 ICanvasManager.RefreshCanvaOrder 调用。
-        public int GetCanvasOrder(CanvasToToggle canvas, bool state)
+        public int GetCanvasOrder(CanvasType canvas, bool state)
         {
             return focusStack.GetCanvasOrder(canvas, state);
         }
 
-        private void CloseOtherMutexCanvases(CanvasToToggle opening)
+        private void CloseOtherMutexCanvases(CanvasType opening)
         {
             // 遍历副本：RequestClose 会经由面板回调修改焦点栈。
-            foreach (CanvasToToggle openCanvas in focusStack.GetOpenCanvases())
+            foreach (CanvasType openCanvas in focusStack.GetOpenCanvases())
             {
                 // 仅关闭可关闭面板：对“仅上报面板”发出无效关闭会导致焦点栈与真实显隐状态错位。
                 if (openCanvas != opening && IsMutexCanvas(openCanvas) && IsClosableCanvas(openCanvas))
@@ -209,20 +209,20 @@ namespace Pipeline.UI.SystemCanvasManagers
         }
 
         // 是否为互斥面板：列在 mutexCanvases 里即参与互斥，未列出则可与任意面板共存。
-        private bool IsMutexCanvas(CanvasToToggle canvas)
+        private bool IsMutexCanvas(CanvasType canvas)
         {
             return mutexCanvases != null && mutexCanvases.Contains(canvas);
         }
 
         // 优先查预制体注册表，再查场景画布列表；开关、焦点与可关闭判定共用此入口。
-        private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas)
+        private ToggleCanvasEventSO FindToggleEvent(CanvasType canvas)
         {
             ToggleCanvasEventSO cachedEvent = UICacheManager.Instance.GetToggleEvent(canvas);
             if (cachedEvent != null) return cachedEvent;
 
             foreach (ToggleCanvasEventSO eventSO in toggleCanvasEvents)
             {
-                if (eventSO != null && eventSO.canvasToToggle == canvas)
+                if (eventSO != null && eventSO.canvasType == canvas)
                     return eventSO;
             }
 
@@ -230,7 +230,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         }
 
         // 任一注册表中有对应开关事件，即可由 UIManager 主动控制。
-        private bool IsClosableCanvas(CanvasToToggle canvas)
+        private bool IsClosableCanvas(CanvasType canvas)
         {
             return FindToggleEvent(canvas) != null;
         }
@@ -238,7 +238,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         // 是否有"阻塞全局输入"的画布处于打开状态（按焦点栈开放列表推导，避免计数漂移）。
         private bool IsGlobalInputBlocked()
         {
-            foreach (CanvasToToggle openCanvas in focusStack.GetOpenCanvases())
+            foreach (CanvasType openCanvas in focusStack.GetOpenCanvases())
             {
                 if (canvasBlocksInput.TryGetValue(openCanvas, out bool blocks) && blocks)
                 {
@@ -289,14 +289,14 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// </summary>
         private bool HandleEscapeRequest()
         {
-            if (!inputState[CanvasToToggle.ESC])
+            if (!inputState[CanvasType.ESC])
             {
                 return false;
             }
 
-            CanvasToToggle top = focusStack.LastOpenCanvas;
+            CanvasType top = focusStack.LastOpenCanvas;
             bool canCloseTop =
-                top != CanvasToToggle.Default &&
+                top != CanvasType.Default &&
                 IsClosableCanvas(top) &&
                 (!canvasCloseOnEscape.TryGetValue(top, out bool closeOnEscape) || closeOnEscape);
 
@@ -320,19 +320,19 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// </summary>
         private void HandleCanvasToggleRequest()
         {
-            CanvasToToggle requested = FindRequestedCanvas();
-            if (requested != CanvasToToggle.Default)
+            CanvasType requested = FindRequestedCanvas();
+            if (requested != CanvasType.Default)
             {
                 focusStack.ApplyFocusChange(requested);
             }
         }
 
-        private CanvasToToggle FindRequestedCanvas()
+        private CanvasType FindRequestedCanvas()
         {
             // 有按键绑定的画布保持 Inspector 列表顺序，保证多个输入同帧触发时行为稳定。
             foreach (CanvasInputBinding binding in inputBindings)
             {
-                if (binding.canvas == CanvasToToggle.ESC)
+                if (binding.canvas == CanvasType.ESC)
                 {
                     continue;
                 }
@@ -344,9 +344,9 @@ namespace Pipeline.UI.SystemCanvasManagers
             }
 
             // 外部请求不要求存在 inputBinding；按枚举顺序消费未绑定画布的第一个请求。
-            foreach (CanvasToToggle canvas in Enum.GetValues(typeof(CanvasToToggle)))
+            foreach (CanvasType canvas in Enum.GetValues(typeof(CanvasType)))
             {
-                if (canvas == CanvasToToggle.ESC || HasInputBinding(canvas))
+                if (canvas == CanvasType.ESC || HasInputBinding(canvas))
                 {
                     continue;
                 }
@@ -357,10 +357,10 @@ namespace Pipeline.UI.SystemCanvasManagers
                 }
             }
 
-            return CanvasToToggle.Default;
+            return CanvasType.Default;
         }
 
-        private bool HasInputBinding(CanvasToToggle canvas)
+        private bool HasInputBinding(CanvasType canvas)
         {
             foreach (CanvasInputBinding binding in inputBindings)
             {
@@ -373,20 +373,20 @@ namespace Pipeline.UI.SystemCanvasManagers
             return false;
         }
 
-        private void RaiseCanvasEvent(CanvasToToggle target, bool state)
+        private void RaiseCanvasEvent(CanvasType target, bool state)
         {
             FindToggleEvent(target)?.RaiseToggleCanvasEvent(state);
         }
 
-        private void RaiseFocusEvent(CanvasToToggle target)
+        private void RaiseFocusEvent(CanvasType target)
         {
             FindToggleEvent(target)?.RaiseFocusEvent();
         }
 
         private void ResetInputState()
         {
-            List<CanvasToToggle> keys = new List<CanvasToToggle>(inputState.Keys);
-            foreach (CanvasToToggle key in keys)
+            List<CanvasType> keys = new List<CanvasType>(inputState.Keys);
+            foreach (CanvasType key in keys)
             {
                 inputState[key] = false;
             }
@@ -396,7 +396,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         {
             focusStack.Clear();
 
-            foreach (CanvasToToggle canvas in Enum.GetValues(typeof(CanvasToToggle)))
+            foreach (CanvasType canvas in Enum.GetValues(typeof(CanvasType)))
             {
                 FindToggleEvent(canvas)?.RaiseToggleCanvasEvent(false);
             }

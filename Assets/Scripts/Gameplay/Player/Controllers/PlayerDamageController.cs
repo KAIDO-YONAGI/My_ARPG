@@ -42,7 +42,7 @@ namespace Gameplay.Player.Controllers
             if (StatsService.Instance.Stats.CurrentHealth <= 0)
             {
                 // GameOver 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈与阻塞体系。
-                UIManager.Instance.RequestCanvasToggle(CanvasToToggle.GameOver);
+                UIManager.Instance.RequestCanvasToggle(CanvasType.GameOver);
 
                 if (playerRoot != null)
                     playerRoot.SetActive(false);

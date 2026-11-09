@@ -47,7 +47,7 @@ namespace Pipeline.UI.SystemCanvasManagers
                 TimeManager.Instance.ResumeGame();
             }
 
-            ((ICanvasManager)this).SetCanvaState(ESCGroup, CanvasToToggle.ESC, state);
+            ((ICanvasManager)this).SetCanvaState(ESCGroup, CanvasType.ESC, state);
         }
     }
 }

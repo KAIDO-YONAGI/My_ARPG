@@ -16,8 +16,8 @@ namespace Contracts.Base
     public class CachedCanvasViewBase : CachedUIViewBase
     {
         [Header("画布身份")]
-        [Tooltip("该画布在 CanvasToToggle 中的身份，必须与开关事件上的枚举一致。")]
-        [SerializeField] private CanvasToToggle canvasId;
+        [Tooltip("该画布在 CanvasType 中的身份，必须与开关事件上的枚举一致。")]
+        [SerializeField] private CanvasType canvasId;
 
         [Tooltip("显隐请求使用的开关事件；缓存启动时按它订阅。")]
         [SerializeField] private ToggleCanvasEventSO toggleEvent;
@@ -40,7 +40,7 @@ namespace Contracts.Base
         [SerializeField] private bool blocksGlobalInput;
 
         public override ToggleCanvasEventSO ToggleEvent => toggleEvent;
-        public override CanvasToToggle CanvasId => canvasId;
+        public override CanvasType CanvasId => canvasId;
         public override bool OpenOnToggleEvent => openOnToggleEvent;
         public override bool CloseOnEscape => closeOnEscape;
         public override bool BlocksGlobalInput => blocksGlobalInput;

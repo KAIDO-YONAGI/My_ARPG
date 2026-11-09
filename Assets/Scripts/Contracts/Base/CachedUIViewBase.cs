@@ -25,8 +25,8 @@ namespace Contracts.Base
         SceneLoadedEventSO ICanvasManager.SceneLoadedEvent => null;
 
         /// <summary>界面身份。默认取开关事件上的枚举，预制体也可以单独覆写。</summary>
-        public virtual CanvasToToggle CanvasId =>
-            ToggleEvent != null ? ToggleEvent.canvasToToggle : CanvasToToggle.Default;
+        public virtual CanvasType CanvasId =>
+            ToggleEvent != null ? ToggleEvent.canvasType : CanvasType.Default;
 
         /// <summary>是否由开关事件直接打开；需要先准备业务数据的界面交给管理器打开，关闭请求始终响应。</summary>
         public virtual bool OpenOnToggleEvent => true;

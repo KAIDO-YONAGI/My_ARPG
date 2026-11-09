@@ -9,7 +9,7 @@ namespace Pipeline.UI
     {
         [SerializeField] private RectTransform dragTarget;
         [SerializeField] private CanvasGroup canvasGroup;
-        [SerializeField] private CanvasToToggle dragCanvasType;
+        [SerializeField] private CanvasType dragCanvasType;
         private Vector2 offset;
         private Vector2 originPosition;
         private bool wasVisible;

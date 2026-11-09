@@ -175,7 +175,7 @@ namespace Gameplay.Quest
                 return;
             }
 
-            cache.OpenCanvas(CanvasToToggle.Quest);
+            cache.OpenCanvas(CanvasType.Quest);
         }
 
         /// <summary>关闭任务板并清空当前选择；下次打开需要重新加载任务板数据。</summary>
@@ -185,7 +185,7 @@ namespace Gameplay.Quest
             if (cache == null)
                 Debug.LogWarning("任务板：UI 缓存不可用，无法通过界面关闭。");
             else
-                cache.CloseCanvas(CanvasToToggle.Quest);
+                cache.CloseCanvas(CanvasType.Quest);
             // 没有已打开的视图时也要清理已装载的数据；关闭回调已清理时会直接返回。
             OnCachedViewClosed();
         }

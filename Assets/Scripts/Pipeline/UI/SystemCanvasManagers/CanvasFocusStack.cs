@@ -17,32 +17,32 @@ namespace Pipeline.UI.SystemCanvasManagers
         private const int OrderStep = 10; // 相邻打开画布之间的 order 差值
 
         //用来合并外部（代码调用）输入
-        private readonly LinkedList<CanvasToToggle> canvasOpenOrder = new();
+        private readonly LinkedList<CanvasType> canvasOpenOrder = new();
 
         //用来存已打开画布的链表，顺序访问，并可经枚举定位后任意删除节点
-        private CanvasToToggle currentFocusCanvas = CanvasToToggle.Default;
+        private CanvasType currentFocusCanvas = CanvasType.Default;
 
         private bool isAnyCanvasOpen;
 
         /// <summary>请求真正开/关某画布（对应原 UIManager.RaiseCanvasEvent）。</summary>
-        public Action<CanvasToToggle, bool> OnCanvasToggleRequested;
+        public Action<CanvasType, bool> OnCanvasToggleRequested;
 
         /// <summary>请求刷新某画布的 sortingOrder（对应原 UIManager.RaiseFocusEvent）。</summary>
-        public Action<CanvasToToggle> OnFocusRefreshRequested;
+        public Action<CanvasType> OnFocusRefreshRequested;
 
         public bool IsAnyCanvasOpen => isAnyCanvasOpen;
 
-        public CanvasToToggle CurrentFocus => currentFocusCanvas;
+        public CanvasType CurrentFocus => currentFocusCanvas;
 
-        public CanvasToToggle LastOpenCanvas =>
+        public CanvasType LastOpenCanvas =>
             canvasOpenOrder.Last != null
                 ? canvasOpenOrder.Last.Value
-                : CanvasToToggle.Default;
+                : CanvasType.Default;
 
         /// <summary>拖拽/外部 focus 调整入口（对应原 UIManager.HandleFocus）。</summary>
-        public void HandleFocus(CanvasToToggle canvas)
+        public void HandleFocus(CanvasType canvas)
         {
-            if (canvas == CanvasToToggle.Default ||
+            if (canvas == CanvasType.Default ||
                 canvas == currentFocusCanvas && IsCanvasOpen(canvas))
                 return;
 
@@ -50,9 +50,9 @@ namespace Pipeline.UI.SystemCanvasManagers
         }
 
         /// <summary>外部请求关闭某画布（对应原 UIManager.RequestCanvasClose）。</summary>
-        public void RequestClose(CanvasToToggle canvas)
+        public void RequestClose(CanvasType canvas)
         {
-            if (canvas == CanvasToToggle.Default || !IsCanvasOpen(canvas))
+            if (canvas == CanvasType.Default || !IsCanvasOpen(canvas))
             {
                 return;
             }
@@ -66,7 +66,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         {
             if (!isAnyCanvasOpen)
             {
-                RaiseCanvasEvent(CanvasToToggle.ESC, true);
+                RaiseCanvasEvent(CanvasType.ESC, true);
                 return;
             }
 
@@ -75,7 +75,7 @@ namespace Pipeline.UI.SystemCanvasManagers
                 return;
             }
 
-            CanvasToToggle canvasToClose = canvasOpenOrder.Last.Value;
+            CanvasType canvasToClose = canvasOpenOrder.Last.Value;
             RaiseCanvasEvent(canvasToClose, false);
             RefreshFocusAfterClose(canvasToClose);
         }
@@ -83,13 +83,13 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// <summary>无面板打开时直接唤起 ESC 菜单（栈顶不可 ESC 关闭时的 ESC 分支）。</summary>
         public void HandleESCOrOpen()
         {
-            RaiseCanvasEvent(CanvasToToggle.ESC, true);
+            RaiseCanvasEvent(CanvasType.ESC, true);
         }
 
         /// <summary>状态回调，画布报告的真实开启/关闭状态（对应原 UIManager.ReportCanvasState）。</summary>
-        public void ReportState(CanvasToToggle canvas, bool state)
+        public void ReportState(CanvasType canvas, bool state)
         {
-            if (canvas == CanvasToToggle.Default)
+            if (canvas == CanvasType.Default)
             {
                 return;
             }
@@ -100,16 +100,16 @@ namespace Pipeline.UI.SystemCanvasManagers
             isAnyCanvasOpen = canvasOpenOrder.Count > 0;
         }
 
-        public bool IsFocused(CanvasToToggle canvas)
+        public bool IsFocused(CanvasType canvas)
         {
             return currentFocusCanvas == canvas;
         }
 
         /// <summary>请求把某画布提到焦点（对应原 UIManager.ApplyFocusChange）。</summary>
-        public void ApplyFocusChange(CanvasToToggle target)
+        public void ApplyFocusChange(CanvasType target)
         {
             bool wasTargetOpen = IsCanvasOpen(target);
-            CanvasToToggle previousFocus = currentFocusCanvas;
+            CanvasType previousFocus = currentFocusCanvas;
             currentFocusCanvas = target; //标记当前focus，作为画布组设置优先、默认order的依据
 
             if (!wasTargetOpen)
@@ -126,7 +126,7 @@ namespace Pipeline.UI.SystemCanvasManagers
             }
         }
 
-        private void RefreshFocusAfterClose(CanvasToToggle closedCanvas)
+        private void RefreshFocusAfterClose(CanvasType closedCanvas)
         {
             if (currentFocusCanvas != closedCanvas)
             {
@@ -137,7 +137,7 @@ namespace Pipeline.UI.SystemCanvasManagers
             currentFocusCanvas = LastOpenCanvas;
         }
 
-        private void UpdateCanvasOpenOrder(CanvasToToggle canvas, bool state)
+        private void UpdateCanvasOpenOrder(CanvasType canvas, bool state)
         {
             RemoveCanvasNode(canvas); //没有就不删，有的话删掉再加，确保链表的末尾那个始终是在最上层的
 
@@ -148,7 +148,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         }
 
         // 根据 open-order 链表计算排序优先级：顶层（链表末尾）最高，向下按链表顺序递减
-        public int GetCanvasOrder(CanvasToToggle canvas, bool state)
+        public int GetCanvasOrder(CanvasType canvas, bool state)
         {
             if (!state) return DefaultOrder;
 
@@ -159,10 +159,10 @@ namespace Pipeline.UI.SystemCanvasManagers
             return Math.Max(DefaultOrder, FocusOrder - stepsFromTop * OrderStep);
         }
 
-        private int GetOpenOrderIndex(CanvasToToggle canvas)
+        private int GetOpenOrderIndex(CanvasType canvas)
         {
             int index = 0;
-            LinkedListNode<CanvasToToggle> currentNode = canvasOpenOrder.First;
+            LinkedListNode<CanvasType> currentNode = canvasOpenOrder.First;
             while (currentNode != null)
             {
                 if (currentNode.Value == canvas) return index;
@@ -175,15 +175,15 @@ namespace Pipeline.UI.SystemCanvasManagers
         // 链表顺序变化（打开/关闭/提升）后，通知所有已打开画布按新顺序刷新 order
         private void RefreshAllCanvasOrders()
         {
-            foreach (CanvasToToggle canvas in canvasOpenOrder)
+            foreach (CanvasType canvas in canvasOpenOrder)
             {
                 OnFocusRefreshRequested?.Invoke(canvas);
             }
         }
 
-        public bool IsCanvasOpen(CanvasToToggle canvas)
+        public bool IsCanvasOpen(CanvasType canvas)
         {
-            LinkedListNode<CanvasToToggle> currentNode = canvasOpenOrder.First;
+            LinkedListNode<CanvasType> currentNode = canvasOpenOrder.First;
 
             while (currentNode != null)
             {
@@ -199,18 +199,18 @@ namespace Pipeline.UI.SystemCanvasManagers
         }
 
         /// <summary>当前已打开画布的快照（副本），供互斥关闭等遍历使用。</summary>
-        public List<CanvasToToggle> GetOpenCanvases()
+        public List<CanvasType> GetOpenCanvases()
         {
-            return new List<CanvasToToggle>(canvasOpenOrder);
+            return new List<CanvasType>(canvasOpenOrder);
         }
 
-        private void RemoveCanvasNode(CanvasToToggle canvas)
+        private void RemoveCanvasNode(CanvasType canvas)
         {
-            LinkedListNode<CanvasToToggle> currentNode = canvasOpenOrder.First;
+            LinkedListNode<CanvasType> currentNode = canvasOpenOrder.First;
 
             while (currentNode != null)
             {
-                LinkedListNode<CanvasToToggle> nextNode = currentNode.Next;
+                LinkedListNode<CanvasType> nextNode = currentNode.Next;
 
                 if (currentNode.Value == canvas)
                 {
@@ -223,7 +223,7 @@ namespace Pipeline.UI.SystemCanvasManagers
             }
         }
 
-        private void RaiseCanvasEvent(CanvasToToggle target, bool state)
+        private void RaiseCanvasEvent(CanvasType target, bool state)
         {
             OnCanvasToggleRequested?.Invoke(target, state);
         }
@@ -231,7 +231,7 @@ namespace Pipeline.UI.SystemCanvasManagers
         /// <summary>清空栈状态（对应原 UIManager.ResetCanvas 的纯状态部分；事件广播由宿主负责）。</summary>
         public void Clear()
         {
-            currentFocusCanvas = CanvasToToggle.Default;
+            currentFocusCanvas = CanvasType.Default;
             isAnyCanvasOpen = false;
             canvasOpenOrder.Clear();
         }

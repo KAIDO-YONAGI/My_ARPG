@@ -167,7 +167,7 @@ namespace Gameplay.Shop
                 return;
             }
 
-            cache.OpenCanvas(CanvasToToggle.Shop);
+            cache.OpenCanvas(CanvasType.Shop);
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Gameplay.Shop
             if (state.IsOpen)
             {
                 if (UIManager.Instance != null)
-                    UIManager.Instance.RequestCanvasClose(CanvasToToggle.Shop);
+                    UIManager.Instance.RequestCanvasClose(CanvasType.Shop);
                 else
                     CloseShopCanvas();
             }
@@ -285,7 +285,7 @@ namespace Gameplay.Shop
                 return;
             }
 
-            cache.CloseCanvas(CanvasToToggle.Shop);
+            cache.CloseCanvas(CanvasType.Shop);
         }
     }
 

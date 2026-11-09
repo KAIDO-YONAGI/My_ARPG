@@ -53,7 +53,7 @@ namespace Pipeline.UI.SystemCanvasManagers
                 TimeManager.Instance.ResumeGame();
             }
 
-            ((ICanvasManager)this).SetCanvaState(gameOverGroup, CanvasToToggle.GameOver, state);
+            ((ICanvasManager)this).SetCanvaState(gameOverGroup, CanvasType.GameOver, state);
         }
     }
 }

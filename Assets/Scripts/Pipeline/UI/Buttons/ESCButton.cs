@@ -8,7 +8,7 @@ namespace Pipeline.UI.Buttons
     public class ESCButton : MonoBehaviour
     {
         [SerializeField] private Button escButton;
-        [SerializeField] private CanvasToToggle canvasToESC;
+        [SerializeField] private CanvasType canvasToESC;
         private void OnEnable() {
             escButton.onClick.AddListener(OnESC);
         }

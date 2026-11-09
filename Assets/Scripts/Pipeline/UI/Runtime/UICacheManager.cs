@@ -31,7 +31,7 @@ namespace Pipeline.UI.Runtime
     public sealed class UICacheManager : YSingleton<UICacheManager>
     {
         [Header("界面注册表")]
-        [Tooltip("每项登记一个界面预制体和它的场景挂载点；同一 CanvasToToggle 只能登记一次。")]
+        [Tooltip("每项登记一个界面预制体和它的场景挂载点；同一 CanvasType 只能登记一次。")]
         [SerializeField] private List<CachedViewBinding> views = new();
 
         [Header("缓存策略")]
@@ -83,31 +83,31 @@ namespace Pipeline.UI.Runtime
         }
 
         /// <summary>取某个界面的开关事件；未注册时返回 null。</summary>
-        public ToggleCanvasEventSO GetToggleEvent(CanvasToToggle canvas)
+        public ToggleCanvasEventSO GetToggleEvent(CanvasType canvas)
         {
             return cache?.GetToggleEvent(canvas);
         }
 
         /// <summary>取某个界面的预制体资产；未注册时返回 null。</summary>
-        public CachedUIViewBase GetPrefab(CanvasToToggle canvas)
+        public CachedUIViewBase GetPrefab(CanvasType canvas)
         {
             return cache?.GetPrefab(canvas);
         }
 
         /// <summary>按代码打开界面；缓存尚未创建时返回 false。</summary>
-        public bool OpenCanvas(CanvasToToggle canvas)
+        public bool OpenCanvas(CanvasType canvas)
         {
             return cache != null && cache.OpenCanvas(canvas);
         }
 
         /// <summary>按代码关闭界面；界面本来没开时静默返回。</summary>
-        public void CloseCanvas(CanvasToToggle canvas)
+        public void CloseCanvas(CanvasType canvas)
         {
             cache?.CloseCanvas(canvas);
         }
 
         /// <summary>查询界面是否处于打开状态。</summary>
-        public bool IsCanvasOpen(CanvasToToggle canvas)
+        public bool IsCanvasOpen(CanvasType canvas)
         {
             return cache != null && cache.IsCanvasOpen(canvas);
         }

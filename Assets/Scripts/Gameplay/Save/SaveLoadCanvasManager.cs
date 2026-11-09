@@ -84,7 +84,7 @@ namespace Gameplay.Save
         private void OnSceneLoaded(GameSceneSO _)
         {
             isPanelOpen = false;
-            ((ICanvasManager)this).SetCanvaInactive(saveCanvasGroup, CanvasToToggle.SaveLoad);
+            ((ICanvasManager)this).SetCanvaInactive(saveCanvasGroup, CanvasType.SaveLoad);
         }
 
 
@@ -109,7 +109,7 @@ namespace Gameplay.Save
         private void OnFocus()
         {
             if (!isPanelOpen) return;
-            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasToToggle.SaveLoad, true);
+            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasType.SaveLoad, true);
         }
         string[] files;
         private void LoadInfoToSaveList()
@@ -197,14 +197,14 @@ namespace Gameplay.Save
         public void OpenPanel()
         {
             isPanelOpen = true;
-            ((ICanvasManager)this).ToggleCanvas(saveCanvasGroup, canvas, CanvasToToggle.SaveLoad, true);
-            UIManager.Instance.HandleFocus(CanvasToToggle.SaveLoad);//非键盘按键唤起的画布，直接手动focus
+            ((ICanvasManager)this).ToggleCanvas(saveCanvasGroup, canvas, CanvasType.SaveLoad, true);
+            UIManager.Instance.HandleFocus(CanvasType.SaveLoad);//非键盘按键唤起的画布，直接手动focus
         }
 
         public void ClosePanel()
         {
             isPanelOpen = false;
-            ((ICanvasManager)this).ToggleCanvas(saveCanvasGroup, canvas, CanvasToToggle.SaveLoad, false);
+            ((ICanvasManager)this).ToggleCanvas(saveCanvasGroup, canvas, CanvasType.SaveLoad, false);
         }
     }
 }

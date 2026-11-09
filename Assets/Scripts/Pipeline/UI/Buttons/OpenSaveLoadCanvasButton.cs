@@ -14,7 +14,7 @@ namespace Pipeline.UI.Buttons
                 () =>
                 {
                     // SaveLoad 不配置按键，通过统一 RequestCanvasToggle 请求分支进入焦点栈体系。
-                    UIManager.Instance.RequestCanvasToggle(CanvasToToggle.SaveLoad);
+                    UIManager.Instance.RequestCanvasToggle(CanvasType.SaveLoad);
                 }
             );
         }

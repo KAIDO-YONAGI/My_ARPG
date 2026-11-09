@@ -15,7 +15,7 @@ namespace Pipeline.Audio
         [Serializable]
         public class CanvasAudioBinding
         {
-            [Tooltip("打开时需要播放音效的画布。")] public CanvasToToggle canvas;
+            [Tooltip("打开时需要播放音效的画布。")] public CanvasType canvas;
 
             [Tooltip("该画布打开时播放的音效类型，片段由 AudioConfigSO 按类型选取。")]
             public AudioType audioType;
@@ -27,7 +27,7 @@ namespace Pipeline.Audio
         [Tooltip("画布组与音频的打开关系：每个画布登记一条，未登记的画布打开时不播放音效。")] [SerializeField]
         private List<CanvasAudioBinding> canvasAudioBindings = new();
 
-        private Dictionary<CanvasToToggle, AudioType> canvasAudioBindingDict;
+        private Dictionary<CanvasType, AudioType> canvasAudioBindingDict;
 
         private void Awake()
         {
@@ -47,7 +47,7 @@ namespace Pipeline.Audio
             canvasOpenedEvent.CanvasOpened -= OnUIAudio;
         }
 
-        private void OnUIAudio(CanvasToToggle canvas)
+        private void OnUIAudio(CanvasType canvas)
         {
             if (!canvasAudioBindingDict.TryGetValue(canvas, out AudioType audioType)) return;
 

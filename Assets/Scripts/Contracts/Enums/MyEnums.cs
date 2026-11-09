@@ -53,7 +53,7 @@ namespace Contracts.Enums
         Completed
     }
 
-    public enum CanvasToToggle //显示优先级系统和画布唤起系统共用
+    public enum CanvasType //显示优先级系统和画布唤起系统共用
     {
         ESC,
         GameOver,

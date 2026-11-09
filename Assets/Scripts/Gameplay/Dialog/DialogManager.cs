@@ -333,7 +333,7 @@ namespace Gameplay.Dialog
                 return false;
             }
 
-            return cache.OpenCanvas(CanvasToToggle.Dialog);
+            return cache.OpenCanvas(CanvasType.Dialog);
         }
 
         /// <summary>请求界面缓存关闭对话画布；缓存缺失时只记录警告。</summary>
@@ -346,7 +346,7 @@ namespace Gameplay.Dialog
                 return;
             }
 
-            cache.CloseCanvas(CanvasToToggle.Dialog);
+            cache.CloseCanvas(CanvasType.Dialog);
         }
     }
 }

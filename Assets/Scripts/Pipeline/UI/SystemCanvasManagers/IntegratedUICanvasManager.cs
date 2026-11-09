@@ -12,7 +12,7 @@ namespace Pipeline.UI.SystemCanvasManagers
 {
     public class IntegratedUICanvasManager : YSingleton<IntegratedUICanvasManager>,ICanvasManager
     {
-        [SerializeField] private List<CanvasToToggle> canvasToToggle;//用枚举类来指定需要切换的画布组
+        [SerializeField] private List<CanvasType> canvasToToggle;//用枚举类来指定需要切换的画布组
         [SerializeField] private CanvasGroup UICanvasPanel;
         [SerializeField] private Canvas canvas;
         [SerializeField] private Button toggleMenuButton;
@@ -67,11 +67,11 @@ namespace Pipeline.UI.SystemCanvasManagers
         private void OnFocus()
         {
             if (!isMenuOpen) return;
-            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasToToggle.Integrated, true);
+            ((ICanvasManager)this).RefreshCanvaOrder(canvas, CanvasType.Integrated, true);
         }
         private void OnToggleIntegratedCanvas(bool state)
         {
-            ((ICanvasManager)this).SetCanvaState(UICanvasPanel, CanvasToToggle.Integrated, state);
+            ((ICanvasManager)this).SetCanvaState(UICanvasPanel, CanvasType.Integrated, state);
 
             isMenuOpen = state;
 
@@ -85,7 +85,7 @@ namespace Pipeline.UI.SystemCanvasManagers
             if (pageNumText != null)
                 pageNumText.text = "1";
             isMenuOpen = state;
-            ((ICanvasManager)this).SetCanvaState(UICanvasPanel, CanvasToToggle.Integrated, isMenuOpen);
+            ((ICanvasManager)this).SetCanvaState(UICanvasPanel, CanvasType.Integrated, isMenuOpen);
             if (isMenuOpen) ShiftPage(0);
         }
         private void OnClickMenuToggleButton()
@@ -139,24 +139,24 @@ namespace Pipeline.UI.SystemCanvasManagers
             for (int i = startNum, count = 0; i < canvasNum && count < buttonsEachPage; i++, count++)
             {
                 int pageButtonNum = i % buttonsEachPage;
-                CanvasToToggle canvasToToggle = this.canvasToToggle[i];
+                CanvasType canvasType = this.canvasToToggle[i];
                 Button button = integratedButtons[pageButtonNum];
                 if (button == null) continue;
 
                 if (integratedButtonTexts != null && pageButtonNum < integratedButtonTexts.Length
                                                   && integratedButtonTexts[pageButtonNum] != null)
                 {
-                    integratedButtonTexts[pageButtonNum].text = canvasToToggle.ToString();
+                    integratedButtonTexts[pageButtonNum].text = canvasType.ToString();
                 }
 
                 button.gameObject.SetActive(true);
-                button.onClick.AddListener(() => OnIntegratedButtonClick(canvasToToggle));
+                button.onClick.AddListener(() => OnIntegratedButtonClick(canvasType));
 
             }
         }
-        private void OnIntegratedButtonClick(CanvasToToggle canvasToToggle)
+        private void OnIntegratedButtonClick(CanvasType canvasType)
         {
-            UIManager.Instance.RequestCanvasToggle(canvasToToggle);
+            UIManager.Instance.RequestCanvasToggle(canvasType);
         }
     }
 }

@@ -37,16 +37,16 @@ namespace Contracts.Interfaces
         /// </summary>
         /// <param name="canvasGroup">控制画布显隐和交互的 CanvasGroup。</param>
         /// <param name="canvas">需要更新 sortingOrder 的 Canvas。</param>
-        /// <param name="canvasToToggle">画布对应的逻辑类型。</param>
+        /// <param name="canvasType">画布对应的逻辑类型。</param>
         /// <param name="state">true 表示打开，false 表示关闭。</param>
         public void ToggleCanvas(
             CanvasGroup canvasGroup,
             Canvas canvas,
-            CanvasToToggle canvasToToggle,
+            CanvasType canvasType,
             bool state)
         {
-            SetCanvaState(canvasGroup, canvasToToggle, state);
-            RefreshCanvaOrder(canvas, canvasToToggle, state);
+            SetCanvaState(canvasGroup, canvasType, state);
+            RefreshCanvaOrder(canvas, canvasType, state);
         }
 
         /// <summary>
@@ -54,23 +54,23 @@ namespace Contracts.Interfaces
         /// 该方法会同步通知 <see cref="UIManager"/> 更新焦点栈、ESC 关闭规则和全局输入阻塞状态。
         /// </summary>
         /// <param name="canva">控制画布显隐和交互的 CanvasGroup。</param>
-        /// <param name="canvasToToggle">画布对应的逻辑类型。</param>
+        /// <param name="canvasType">画布对应的逻辑类型。</param>
         void SetCanvaInactive(
             CanvasGroup canva,
-            CanvasToToggle canvasToToggle)
+            CanvasType canvasType)
         {
-            SetCanvaState(canva, canvasToToggle, false);
+            SetCanvaState(canva, canvasType, false);
         }
 
         /// <summary>
         /// 设置 CanvasGroup 的显示、交互和射线拦截状态，并向 UIManager 上报真实状态。
         /// </summary>
         /// <param name="canva">需要修改的 CanvasGroup。</param>
-        /// <param name="canvasToToggle">画布对应的逻辑类型。</param>
+        /// <param name="canvasType">画布对应的逻辑类型。</param>
         /// <param name="state">true 表示显示并允许交互，false 表示隐藏且禁用交互。</param>
         void SetCanvaState(
             CanvasGroup canva,
-            CanvasToToggle canvasToToggle,
+            CanvasType canvasType,
             bool state)
         {
             if (canva != null)
@@ -80,7 +80,7 @@ namespace Contracts.Interfaces
                 canva.interactable = state;
             }
 
-            UIManager.Report(canvasToToggle, state, CloseOnEscape, BlocksGlobalInput);
+            UIManager.Report(canvasType, state, CloseOnEscape, BlocksGlobalInput);
         }
 
         /// <summary>
@@ -88,16 +88,16 @@ namespace Contracts.Interfaces
         /// 打开的画布按照 UIManager 维护的打开顺序获得层级，关闭时恢复默认层级。
         /// </summary>
         /// <param name="canvas">需要设置 sortingOrder 的 Canvas。</param>
-        /// <param name="canvasToToggle">画布对应的逻辑类型。</param>
+        /// <param name="canvasType">画布对应的逻辑类型。</param>
         /// <param name="state">true 表示按焦点栈计算层级，false 表示恢复默认层级。</param>
         void RefreshCanvaOrder(
             Canvas canvas,
-            CanvasToToggle canvasToToggle,
+            CanvasType canvasType,
             bool state)
         {
             int order = UIManager.Instance != null
                 //按 open-order 链表顺序分配降序排序优先级，顶层（链表末尾）最高
-                ? UIManager.Instance.GetCanvasOrder(canvasToToggle, state)
+                ? UIManager.Instance.GetCanvasOrder(canvasType, state)
                 : UIManager.DefaultOrder;
             if (canvas == null)
             {

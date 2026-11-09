@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 namespace Pipeline.UI.Runtime
 {
     /// <summary>
-    /// 界面实例缓存：按 <see cref="CanvasToToggle"/> 懒创建界面，关闭后保留实例，
+    /// 界面实例缓存：按 <see cref="CanvasType"/> 懒创建界面，关闭后保留实例，
     /// 超出容量或闲置超时再销毁，避免每次开面板都重新实例化整棵 UI。
     /// </summary>
     /// <remarks>
@@ -38,7 +38,7 @@ namespace Pipeline.UI.Runtime
             public float ClosedAt;
         }
 
-        private readonly Dictionary<CanvasToToggle, Entry> entries = new();
+        private readonly Dictionary<CanvasType, Entry> entries = new();
         private readonly LinkedList<Entry> idle = new();
         private readonly Transform owner;
         private readonly int maxIdleViews;
@@ -83,8 +83,8 @@ namespace Pipeline.UI.Runtime
             {
                 CachedUIViewBase prefab = binding?.prefab;
                 if (prefab == null || binding.anchor == null ||
-                    prefab.CanvasId == CanvasToToggle.Default || prefab.ToggleEvent == null ||
-                    prefab.ToggleEvent.canvasToToggle != prefab.CanvasId)
+                    prefab.CanvasId == CanvasType.Default || prefab.ToggleEvent == null ||
+                    prefab.ToggleEvent.canvasType != prefab.CanvasId)
                 {
 #if UNITY_EDITOR
                     Debug.LogError("UI 缓存注册失败：Prefab、Anchor 或匹配的开关事件缺失，或使用了 Default ID.", prefab);
@@ -101,7 +101,7 @@ namespace Pipeline.UI.Runtime
                     continue;
                 }
 
-                CanvasToToggle id = prefab.CanvasId;
+                CanvasType id = prefab.CanvasId;
                 if (entries.ContainsKey(id))
                 {
 #if UNITY_EDITOR
@@ -129,13 +129,13 @@ namespace Pipeline.UI.Runtime
         }
 
         /// <summary>按界面 ID 取开关事件，供 UIManager 统一分发按键、ESC 和外部请求。</summary>
-        public ToggleCanvasEventSO GetToggleEvent(CanvasToToggle id)
+        public ToggleCanvasEventSO GetToggleEvent(CanvasType id)
         {
             return entries.TryGetValue(id, out Entry entry) ? entry.ToggleEvent : null;
         }
 
         /// <summary>按界面 ID 取注册的预制体，供需要读取预制体初始数据的业务使用。</summary>
-        public CachedUIViewBase GetPrefab(CanvasToToggle id)
+        public CachedUIViewBase GetPrefab(CanvasType id)
         {
             return entries.TryGetValue(id, out Entry entry) ? entry.Prefab : null;
         }
@@ -165,21 +165,21 @@ namespace Pipeline.UI.Runtime
         }
 
         /// <summary>按代码请求打开界面；界面未注册时返回 false。</summary>
-        public bool OpenCanvas(CanvasToToggle id)
+        public bool OpenCanvas(CanvasType id)
         {
             if (!entries.TryGetValue(id, out Entry entry)) return false;
             return SetOpen(entry, true);
         }
 
         /// <summary>按代码请求关闭界面；界面未注册或本来没开时静默返回。</summary>
-        public void CloseCanvas(CanvasToToggle id)
+        public void CloseCanvas(CanvasType id)
         {
             if (entries.TryGetValue(id, out Entry entry))
                 SetOpen(entry, false);
         }
 
         /// <summary>查询界面是否处于打开状态；实例尚未创建时视为关闭。</summary>
-        public bool IsCanvasOpen(CanvasToToggle id)
+        public bool IsCanvasOpen(CanvasType id)
         {
             return entries.TryGetValue(id, out Entry entry) &&
                    entry.View != null && entry.View.IsOpen;

@@ -15,7 +15,7 @@ namespace Pipeline.SO.Events
         /// 与 toggleCanvasEvent 分离，避免复用 open 语义来传达置顶/降级。
         /// </summary>
         public event Action focusEvent;
-        public CanvasToToggle canvasToToggle;
+        public CanvasType canvasType;
         public void RaiseToggleCanvasEvent(bool state)
         {
             toggleCanvasEvent?.Invoke(state);

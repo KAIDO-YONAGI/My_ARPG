@@ -99,7 +99,7 @@ namespace Gameplay.Player.Views
                 return;
             }
 
-            manager.RequestCanvasClose(CanvasToToggle.Stats);
+            manager.RequestCanvasClose(CanvasType.Stats);
         }
 
         /// <summary>把当前属性画到面板：statTexts[0] 是伤害，statTexts[1] 是速度。</summary>
