@@ -29,7 +29,7 @@
 
 先读目录，再按任务读取相关章节，避免整份指南载入上下文。
 
-权威范围：只负责本工程 Windows 上 Android 构建的环境自检、两类已知故障的根因与幂等修复、构建产物位置与签名现状。Player/Project 配置项字典见 `ProjectConfig_Guide.md`，测试基线见 `TestBaseline_Guide.md`。
+权威范围：只负责本工程 Windows 上 Android 构建的环境自检、两类已知故障的根因与幂等修复、构建产物位置与签名现状。Player/Project 配置项字典见 `ProjectConfig_Guide.md`。
 
 ## 1. 触发线索
 

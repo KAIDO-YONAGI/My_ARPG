@@ -19,7 +19,6 @@
   - [2.5 事件广播边界](#25-事件广播边界)
   - [2.6 PlayerStatsSO 作为初始值模板（拷贝语义）](#26-playerstatsso-作为初始值模板拷贝语义)
   - [2.7 存档边界](#27-存档边界)
-  - [2.8 26 个 EditMode 规格](#28-26-个-editmode-规格)
   - [2.9 所有写这一域的调用方](#29-所有写这一域的调用方)
   - [2.10 属性面板的预制体与缓存](#210-属性面板的预制体与缓存)
 - [3. 约定与硬边界](#3-约定与硬边界)
@@ -46,7 +45,6 @@
 | `StatsService` `Stats` `IPlayerStatsReadOnly` `只读视图` | §2.1、§2.2、§3.5 |
 | `PlayerStatsSO` `初始值` `模板` | §2.6、§3.3 |
 | `playerStatsData` `读档` `存档数值` `坏档` | §2.7、§3.8 |
-| `26 个测试` `EditMode` `回归网` | §2.8 |
 | `属性面板缓存` `StatsCanvasView` `StatsCanvasController` | §2.10 |
 
 ## 2. 当前实现
@@ -144,14 +142,6 @@ expToUpgrade = Mathf.Max(1, expToUpgrade + step)  // 下限仍受 MinExpToUpgrad
 - `OnAutoLoad` 在场景加载完成时跳过 `GetDataID()` 返回 null 的服务，`StatsService` 属此类，其 `SaveableService` 返回 null。
 - `SaveSystem.IsLoadableSaveFile` 要求 `save.data.playerStatsData != null`，坏档回退。
 - 序列化用 Newtonsoft `JsonConvert`，因此 `PlayerStatsData` 的字段名就是 JSON 键。
-
-### 2.8 26 个 EditMode 规格
-
-测试集没有 asmdef，全部落 `Assembly-CSharp-Editor`。
-
-- `PlayerStatsModelTests` 有 24 个 `[Test]`。断言覆盖：钳制与事件隔离；`ExpChanged` 契约；只读接口与 Service 边界，其中一条用反射断言 `Stats` 的静态类型是 `IPlayerStatsReadOnly` 且 `Model` 属性不存在；曲线与上限；拷贝语义与阈值持久化。另有 `LoadFrom_ReplacesStateAndFiresBothEvents` 一条。
-- `PlayerStatsSOTests` 有 2 个 `[Test]`，只断言 `CreateInitialData()` 反映配置值且返回拷贝。
-- 合计 26 个。
 
 ### 2.9 所有写这一域的调用方
 

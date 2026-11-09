@@ -1,11 +1,11 @@
 # 项目配置与构建输入
 
-文档 I:：`BUIL:-PROJECTCONFIG-GUI:E`
+文档 ID：`BUILD-PROJECTCONFIG-GUIDE`
 状态：`Active`
 最后更新：`2026-11-07`
 ## 维护规则
 
-本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](:eveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
 
 ## 文档内目录
 
@@ -21,14 +21,11 @@
 - [3. 约定与硬边界](#3-约定与硬边界)
   - [3.1 改播放器设置资产会静默改变构建产物契约](#31-改播放器设置资产会静默改变构建产物契约)
   - [3.2 场景顺序是有语义的，不能重排](#32-场景顺序是有语义的不能重排)
-  - [3.3 不要给测试加 asmdef 而不改引用](#33-不要给测试加-asmdef-而不改引用)
-  - [3.4 不要依赖仓库外依赖能解析](#34-不要依赖仓库外依赖能解析)
-  - [3.5 I:E 用的 MSBuild 目标文件只影响 I:E，不影响 Unity](#35-ide-用的-msbuild-目标文件只影响-ide不影响-unity)
-  - [3.6 包清单与锁定清单必须一起改](#36-包清单与锁定清单必须一起改)
+  - [3.3 不要依赖仓库外依赖能解析](#33-不要依赖仓库外依赖能解析)
+  - [3.4 包清单与锁定清单必须一起改](#34-包清单与锁定清单必须一起改)
 
 先读目录，再按任务读取相关章节，避免整份指南载入上下文。
 
-权威范围：只负责“重现阶段一份可构建工程所需的最小事实”——Unity 版本、包依赖、构建场景列表与顺序、Player/Build 配置项原值、程序集结构。Android 排障见 `AndroidBuild_Guide.md`，测试内容见 `TestBaseline_Guide.md`。
 
 ## 1. 触发线索
 
@@ -75,8 +72,7 @@
 ### 2.3 程序集结构：0 个 asmdef
 
 - 工程内无 asmdef —— 产品代码全部落在预定义程序集里。
-- 编辑器程序集名为 `Assembly-CSharp-Editor`，`Compile Include` 收录 6 个测试文件与编辑器侧的 `InputActionReferenceRebuilder`，并 `ProjectReference` 到 `Assembly-CSharp`；两者都引用 `nunit.framework`，由扩展 NUnit 包提供。
-- 相关约定见 §3.3 与 `TestBaseline_Guide.md`。
+- 编辑器程序集名为 `Assembly-CSharp-Editor`，收录编辑器侧的 `InputActionReferenceRebuilder`，并 `ProjectReference` 到 `Assembly-CSharp`。
 
 ### 2.4 构建场景列表与顺序
 
@@ -114,32 +110,32 @@
 | `stripEngineCode` | `1` |
 | `useCustomMainManifest` … `useCustomProguardFile` 共 8 项 | 全 `0` |
 | `AndroidTargetArchitectures` | `2` |
-| `AndroidTarget:evices` | `0` |
+| `AndroidTargetDevices` | `0` |
 | `AndroidBuildApkPerCpuArchitecture` | `0` |
 | `androidUseCustomKeystore` | `0` |
 | `AndroidKeystoreName` / `AndroidKeyaliasName` | 空 |
-| `AndroidMinifyRelease` / `AndroidMinify:ebug` | `0` / `0` |
+| `AndroidMinifyRelease` / `AndroidMinifyDebug` | `0` / `0` |
 | `scriptingBackend.Android` | `1` |
 | `apiCompatibilityLevel` | `6` |
 | `apiCompatibilityLevelPerPlatform` | `{}` |
 | `activeInputHandler` | `1` |
 
-另：`clonedFromGUI:`、`templatePackageId` 记为 2: 模板包 7.0.4、`template:efaultScene` 指向 `SampleScene`；`SampleScene` 不在场景列表内，磁盘上也不存在。
+另：`clonedFromGUI:`、`templatePackageId` 记为 2D 模板包 7.0.4、`templateDefaultScene` 指向 `SampleScene`；`SampleScene` 不在场景列表内，磁盘上也不存在。
 
-`scripting:efineSymbols` 为空表，`apiCompatibilityLevelPerPlatform` 为空表，`additionalIl2CppArgs` 为空。
+`scriptingDefineSymbols` 为空表，`apiCompatibilityLevelPerPlatform` 为空表，`additionalIl2CppArgs` 为空。
 
 ### 2.6 Addressables：已安装、无运行时代码调用
 
-- 配置资产齐全：Addressables 设置资产、内置数据组、`Scenes` 组、4 个 :ataBuilder、Android / WebGL / Windows 三个平台的内容状态记录。
-- 产品代码里对 Addressables 的引用只有 2 条注释：`GameSceneSO` 的注释说明它的 GUI: 取值与 Addressables 方案的 `sceneReference.AssetGUI:` 完全一致；`Save:ata` 的注释说明存的是 `GameSceneSO.SaveKey`，即 Addressables 资产 GUI:。没有任何代码调用 Addressables 运行时 API。
+- 配置资产齐全：Addressables 设置资产、内置数据组、`Scenes` 组、4 个 DataBuilder、Android / WebGL / Windows 三个平台的内容状态记录。
+- 产品代码里对 Addressables 的引用只有 2 条注释：`GameSceneSO` 的注释说明它的 GUI: 取值与 Addressables 方案的 `sceneReference.AssetGUI:` 完全一致；`SaveData` 的注释说明存的是 `GameSceneSO.SaveKey`，即 Addressables 资产 GUI:。没有任何代码调用 Addressables 运行时 API。
 
 ### 2.7 编辑器行为设置
 
 编辑器设置资产：
 
 - `m_SerializationMode: 2` —— 资产序列化为文本。
-- `m_EnterPlayModeOptionsEnabled: 0` —— **:omain Reload 处于开启状态**，`m_EnterPlayModeOptions: 3` 当前不生效。
-- static 状态纪律按 :omain Reload 开启的情形理解。
+- `m_EnterPlayModeOptionsEnabled: 0` —— **Domain Reload 处于开启状态**，`m_EnterPlayModeOptions: 3` 当前不生效。
+- static 状态纪律按 Domain Reload 开启的情形理解。
 
 ## 3. 约定与硬边界
 
@@ -151,18 +147,12 @@
 
 `InitialScene` 必须是索引 0，它是构建入口；`TestScene` 保持末位，不参与正式流程。`SceneChanger` 与 `InitialLoad` 依赖场景在构建场景列表内，并用 `Application.CanStreamedLevelBeLoaded` 预检，缺失场景会被 `LogError` 跳过。
 
-### 3.3 不要给测试加 asmdef 而不改引用
-
-当前 0 asmdef，现有 79 项用例靠 `Tests/Editor` 这一目录名落进预定义编辑器程序集 `Assembly-CSharp-Editor`。引入 asmdef 后这些文件会改换程序集，需要显式引用 test-framework 与产品程序集，否则编译或枚举失败。详见 `TestBaseline_Guide.md`。
-
-### 3.4 不要依赖仓库外依赖能解析
+### 3.3 不要依赖仓库外依赖能解析
 
 包清单里的 `file:` 依赖指向仓库外且被忽略规则排除的目录。全新克隆上编辑器会报包解析失败。
 
-### 3.5 I:E 用的 MSBuild 目标文件只影响 I:E，不影响 Unity
 
-它把测试源文件从 MSBuild 项目模型移除，文件内注释明确“Unity 自己的编译、以及 Unity Test Runner 完全不受影响”。后果：I:E 里测试文件没有补全与跳转，但能编译能跑；**I:E 里搜不到不等于测试被排除**。
 
-### 3.6 包清单与锁定清单必须一起改
+### 3.4 包清单与锁定清单必须一起改
 
 只改包清单会让两者不一致，Unity 会在下次解析时重写锁定清单。

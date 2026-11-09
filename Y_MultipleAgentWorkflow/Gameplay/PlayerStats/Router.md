@@ -39,8 +39,6 @@
 - 玩家数值视图代码
 - `PlayerStatsSO` 配置类型
 - 玩家数值配置资产
-- 模型 EditMode 测试
-- 配置 EditMode 测试
 - 本域文档
 
 ## 能力边界
@@ -49,5 +47,4 @@
 
 - 权威文档 `PlayerStats_Guide.md` 是本域当前实现的事实基线，覆盖 `PlayerStatsModel`、`PlayerStatsData`、`IPlayerStatsReadOnly`、`StatsService`、`PlayerStatsSO`，三个显示 Controller 与四个跨域写入调用点。
 - 本域是全项目玩家数值写操作的唯一汇聚点：对外写入口是 `StatsService` 的 6 个转发方法与 `Respawn()`。
-- 只读视图 `IPlayerStatsReadOnly` 锁定对外读面，`PlayerStatsModelTests` 用反射断言 `StatsService` 上不存在 `Model` 属性。
-- 26 个 EditMode 规格构成本域回归网：`PlayerStatsModelTests` 24 个，`PlayerStatsSOTests` 2 个。
+- 只读视图 `IPlayerStatsReadOnly` 锁定对外读面，`StatsService` 上不存在 `Model` 属性。

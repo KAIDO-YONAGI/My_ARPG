@@ -60,7 +60,7 @@
 
 玩家数值线采用轻量 MVCS，而不是把每个动作继续细分成更多层：
 
-- `PlayerStatsModel` 是纯 C# 的状态与规则实现，只由 `StatsService` 私有持有；它仍可在 EditMode 测试中直接 `new`。
+- `PlayerStatsModel` 是纯 C# 的状态与规则实现，只由 `StatsService` 私有持有；它仍可直接 `new`。
 - `StatsService` 是 Unity 单例、存档身份和外部写入口，同时保留跨场景的 `Respawn()` 业务。
 - `IPlayerStatsReadOnly` 只暴露查询与事件，业务类不再拿到具体 Model，也不能绕过 Service 修改数值。
 - Service 的转发方法只负责边界，不复制 Model 的规则；因此不会形成两套实现。
@@ -159,7 +159,6 @@ SkillSystemModel（纯C#）：per-skill 等级/解锁、前置依赖图、规则
 3. `SkillService : YSingleton`（域数据入口，符合单例预算），持 Model，暴露 `TryUpgrade/CanUnlock`。
 4. `SkillSlot` 瘦成纯显示 + 点击转发；`SkillTreeManager` 拆成 View（面板基建+点数文本）+ 纯 C# Controller（订阅模型事件推显示）；`SkillManager` 解体，效果分发进 `SkillEffectApplier`（修 D2）。
 5. `TryUpgrade` 原子完成"校验点数 + 扣减 + 升级"（修 D3）。
-6. 建立 `SkillSystemModel` 的 EditMode 回归网：升级、前置解锁、满级守卫、点数不足拒绝。
 
 **动工前待拍板**：
 
@@ -173,52 +172,8 @@ SkillSystemModel（纯C#）：per-skill 等级/解锁、前置依赖图、规则
 
 ---
 
-## 3. 测试现状
+## 3. 单例与执行序现状
 
-### 3.1 现有用例
+工程里 21 个具体类直接继承 `YSingleton<T>`，另有抽象基类 `SaveableService<TSelf>`——`StatsService` 经它间接继承；基类在 `Assets/Scripts/Contracts/Base/YSingleton.cs`。符合单例预算的数据入口与全局基建：`StatsService`、`SaveDataManager`、`SaveSystem`、`UIManager`、`SceneChanger`、`TimeManager`。玩家数值域只有两个单例：`StatsService` 与 `PlayerLocator`。
 
-`Assets/Tests/Editor/` 下 5 个文件，命名空间 `Gameplay.Tests`，共 52 个用例：
-
-| 文件 | 用例数 | 覆盖 |
-| --- | --- | --- |
-| `PlayerStatsModelTests.cs` | 24 | 钳制规则、事件广播、经验曲线、等级上限、拷贝语义、`ExpChanged`、只读接口与 Service 边界 |
-| `CanvasFocusStackTests.cs` | 15 | Canvas 焦点栈的开闭顺序、order 计算、ESC 行为 |
-| `AStarOpenHeapTests.cs` | 6 | A* 开表的 F 升序出堆、F 相同时偏好更大 G、同格重复入堆、清空后可复用、随机输入有序性、交错出入堆恒取最小 |
-| `ObjectPoolTests.cs` | 5 | 对象池的预热注册、Get/Return 回调、池内对象销毁后的选取 |
-| `PlayerStatsSOTests.cs` | 2 | 模板的拷贝语义 |
-
-上表是本工程自己的用例，全部在 `Assets/Tests/Editor/` 下。这里不写 Test Runner 的总条目数：Addressables 包自带测试程序集，其条目数随包版本变化（当前包内 `[Test]` 达数百条），会随包升级漂移，不适合作为本工程基线。工程里 0 个 asmdef，产品代码全在预定义程序集 `Assembly-CSharp` 里；5 个测试文件均无 `[UnityTest]`、无 PlayMode 测试。
-
-`PlayerStatsModelTests` 是玩家数值这条线的回归网：改 `PlayerStatsModel`、`StatsService`、`ExperienceController` 之前先跑绿。
-
-### 3.2 建议先落地的测试
-
-| 编号 | 内容 | 层 |
-| --- | --- | --- |
-| T1 | 存档往返：掉落物的位置与拾取状态只记改动量 | 一 |
-| T2 | 场景接线检查：事件 SO、`ShopSlot.shopRef`、掉落物 ID、`GameSceneSO.sceneName` | 二 |
-| T3 | D1 复现：出售经验道具时金币照加、道具不移除 | 一 |
-| T4 | 任务面板只读回归：打开任务面板不改变任务进度 | 一 / 二 |
-| T5 | PlayMode 发烟：进场景、注册的掉落物数等于场景里的数量、存档往返 | 三 |
-| T6 | 技能模型规则：升级/前置解锁/满级守卫/点数不足拒绝（随技能域动工建立） | 一 |
-
-### 3.3 本机命令行跑 EditMode
-
-```powershell
-& "D:\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe" `
-  -runTests -batchmode `
-  -projectPath "D:\Unity\Projects\My_ARPG" `
-  -testPlatform EditMode `
-  -testResults "D:\Unity\Projects\My_ARPG\Logs\test-editmode.xml" `
-  -logFile      "D:\Unity\Projects\My_ARPG\Logs\test-editmode.log"
-```
-
-前提是 Unity 编辑器没有开着这个工程，否则第二个实例起不来；结果看 XML 根节点的 `result` 与失败计数，退出码不可靠。Play 流程实际写盘的存档目录是 `%USERPROFILE%\AppData\LocalLow\YONAGI\My_ARPG`。
-
----
-
-## 4. 单例与执行序现状
-
-工程里 18 个具体类直接继承 `YSingleton<T>`，另有抽象基类 `SaveableService<TSelf>`——`StatsService` 经它间接继承；基类在 `Assets/Scripts/Contracts/YSingleton.cs`。符合单例预算的数据入口与全局基建：`StatsService`、`SaveDataManager`、`SaveSystem`、`UIManager`、`SceneChanger`、`TimeManager`。玩家数值域只有两个单例：`StatsService` 与 `PlayerLocator`。
-
-初始化时序三层解法的工程载体：静态注册表 `Contracts/SaveRegistry.cs`（`ResetStatics` 清空，`Clear` 供局间复位）；CRTP 基类 `Contracts/SaveableService.cs`（注册/注销/存档身份一体，子类只实现 `SaveData/LoadData`）；显式入口 `SceneChanger.RequestSceneLoad`（先广播后执行，不自订阅）。全工程的执行序属性只剩 `Pipeline/Scene/CameraPixelSnap.cs` 的 10000，语义是末帧像素修正，属于管线收尾而非时序依赖。
+初始化时序三层解法的工程载体：静态注册表 `Contracts/State/SaveRegistry.cs`（`ResetStatics` 清空，`Clear` 供局间复位）；CRTP 基类 `Contracts/Base/SaveableService.cs`（注册/注销/存档身份一体，子类只实现 `SaveData/LoadData`）；显式入口 `SceneChanger.RequestSceneLoad`（先广播后执行，不自订阅）。全工程的执行序属性只剩 `Pipeline/Scene/CameraPixelSnap.cs` 的 10000，语义是末帧像素修正，属于管线收尾而非时序依赖。

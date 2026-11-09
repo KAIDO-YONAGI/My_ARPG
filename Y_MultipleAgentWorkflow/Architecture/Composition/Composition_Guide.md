@@ -133,7 +133,7 @@
 
 反向依赖有两处，都在默认实现里直读单例：`SetCanvaState` 末行调静态入口 `UIManager.Report(...)`，该入口集中判空，未注册时静默跳过；`RefreshCanvaOrder` 直读 `UIManager.Instance`，`Instance` 为 null 时静默退化为 `UIManager.DefaultOrder`。`UIManager` 为此保留常量转发与 `GetCanvasOrder` 转发，接口引用保持不变。
 
-`CanvasFocusStack` 是把上述状态机从 `UIManager` 拆出的纯 C# 类，与 `MonoBehaviour` 生命周期解耦，也独立于 `ToggleCanvasEventSO`，全部外部动作经两个回调委托 `OnCanvasToggleRequested` 与 `OnFocusRefreshRequested`，宿主在 `OnSingletonInitialized` 里接线。`CanvasFocusStackTests` 因此在 EditMode 里可以直接 `new` 出实例断言，覆盖开闭顺序、order 计算、ESC 行为与互斥快照。
+`CanvasFocusStack` 是把上述状态机从 `UIManager` 拆出的纯 C# 类，与 `MonoBehaviour` 生命周期解耦，也独立于 `ToggleCanvasEventSO`，全部外部动作经两个回调委托 `OnCanvasToggleRequested` 与 `OnFocusRefreshRequested`，宿主在 `OnSingletonInitialized` 里接线。纯 C# 使它与编辑器生命周期无关，可直接 `new` 出实例。
 
 ### 2.7 预制体注册与闲置缓存
 

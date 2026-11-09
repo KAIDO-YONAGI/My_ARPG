@@ -54,7 +54,7 @@ Android 构建通过 Unity Hub 安装对应编辑器的 Android Build Support、
 
 - [Android 构建与排障](UnityAndroidBuildGuide.md)：环境确认、SDK 与 Gradle 代理配置、Release 构建资源名问题。
 - [项目配置指南](../Y_MultipleAgentWorkflow/Build/ProjectConfig_Guide.md)：依赖、构建场景与 Player Settings。
-- [测试说明](../Y_MultipleAgentWorkflow/Build/TestBaseline_Guide.md) 与 [项目验证命令](../Y_MultipleAgentWorkflow/Workflow/Project_Validation_Guide.md)：EditMode 测试与验证入口。
+- [项目验证命令](../Y_MultipleAgentWorkflow/Workflow/Project_Validation_Guide.md)：构建与产物检查入口。
 
 ## 开发参考
 

@@ -2,7 +2,7 @@
 
 ## 维护规则
 
-本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](:eveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
+本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
 
 ## 文档内目录
 
@@ -14,19 +14,18 @@
   - [2.4 唯一写入口与只读接口的约定](#24-唯一写入口与只读接口的约定)
   - [2.5 命名空间分布](#25-命名空间分布)
   - [2.6 单例基类与写入口](#26-单例基类与写入口)
-  - [2.7 边界测试](#27-边界测试)
 - [3. 约定与硬边界](#3-约定与硬边界)
   - [3.1 0 个 asmdef ⇒ 全工程一个程序集](#31-0-个-asmdef--全工程一个程序集)
   - [3.2 命名空间按目录分配，重名只在同一命名空间内冲突](#32-命名空间按目录分配重名只在同一命名空间内冲突)
   - [3.3 `SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`](#33-saveableservice-子类重写-onsingletoninitialized-必须调-base)
   - [3.4 `Contracts` 不得反向 using `Gameplay` 或 `Pipeline`](#34-contracts-不得反向-using-gameplay-或-pipeline)
   - [3.5 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法](#35-statsserviceinstancestats-是只读视图接口上不带写方法)
-  - [3.6 改 `PlayerStats:ata` 的字段名等于坏档](#36-改-playerstatsata-的字段名等于坏档)
+  - [3.6 改 `PlayerStatsData` 的字段名等于坏档](#36-改-playerstatsata-的字段名等于坏档)
   - [3.7 纯 C# 层不得引用 `MonoBehaviour` 生命周期](#37-纯-c-层不得引用-monobehaviour-生命周期)
 
 先读目录，再按任务读取相关章节，避免整份指南载入上下文。
 
-文档 I:：`ARCH-LAYERING-GUI:E`
+文档 ID：`ARCH-LAYERING-GUIDE`
 状态：`Active`
 最后更新：`2026-11-07`
 权威范围：`Contracts`、`Pipeline`、`Gameplay` 三层目录的含义、跨层依赖方向、命名空间与程序集边界、唯一写入口与只读接口的判定标准。各玩法域的内部实现归对应玩法域的 Guide，存档格式与场景流程细节由各自文档负责。
@@ -45,7 +44,6 @@
 | `MVCS` `Model` `View` `Controller` `Service` | 本文 §2.3 |
 | `唯一写入口` `只读接口` `StatsService` | 本文 §2.4、§3.5 |
 | `YSingleton` `单例基类` | 本文 §2.6 |
-| `测试` `[Test]` `回归网` | 本文 §2.7 |
 
 ## 2. 当前实现
 
@@ -57,7 +55,7 @@
 |---|---|---|---|
 | `Contracts` | 13 | 跨域共享的接口、基类、状态值与枚举 | 类型被两个以上域直接引用，且其中不含具体业务规则 |
 | `Pipeline` | 66 | 引擎级基建：场景切换、寻路、对象池、UI、音频、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
-| `Gameplay` | 62 | 玩法域，按 `Player` `Quest` `:ialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
+| `Gameplay` | 62 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
 
 `Contracts` 按 `Base`、`Interfaces`、`State`、`Enums`、`Audio` 分目录，命名空间随目录划分。`MyEnums.cs` 提供玩法与场景共用枚举，音频的类型枚举与 `AudioRequest` 位于 `Contracts.Audio`。音频播放、池管理、配置和触发组件位于 `Pipeline.Audio`，请求通道位于 `Pipeline.SO.Events`，机制见 [音频系统 Guide](../../Assets/Audio_Guide.md)。缓存界面的基类为 `CachedUIViewBase` 与 `CachedCanvasViewBase`，状态目录提供值与版本容器 `VersionedValue<T>` 和单读取者绘制记录 `VersionReader`。
 
@@ -81,9 +79,9 @@
 
 | 层 | 类型 | 命名空间 | 形态与实例化方式 |
 |---|---|---|---|
-| Model | `PlayerStatsModel` `IPlayerStatsReadOnly` `PlayerStats:ata` | `Gameplay.Player.Models` | 纯 C#，`new PlayerStatsModel(PlayerStats:ata)` |
+| Model | `PlayerStatsModel` `IPlayerStatsReadOnly` `PlayerStatsData` | `Gameplay.Player.Models` | 纯 C#，`new PlayerStatsModel(PlayerStatsData)` |
 | Service | `StatsService` | `Gameplay.Player.Services` | `SaveableService<StatsService>` 单例 |
-| Controller | `ExperienceController` `HealthController` `StatsCanvasController` `Player:amageController` | `Gameplay.Player.Controllers` | 前三个纯 C#，由 View 托管 `new`；`Player:amageController` 挂场景 |
+| Controller | `ExperienceController` `HealthController` `StatsCanvasController` `PlayerDamageController` | `Gameplay.Player.Controllers` | 前三个纯 C#，由 View 托管 `new`；`PlayerDamageController` 挂场景 |
 | View | `ExperiencePanelView` `HealthView` `StatsCanvasView` | `Gameplay.Player.Views` | MonoBehaviour，不挂单例；属性面板继承契约层的 `CachedUIViewBase` |
 
 另外五个域的"数据 / 界面"配对：`DialogManager` → `DialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`，常驻快捷栏由 `HotbarCanvasView` 承担，`SkillTreeManager` → `SkillsCanvasView`。缓存视图继承 `Contracts.Base.CachedCanvasViewBase`，由 `UICacheManager` 按预制体懒创建；管理器通过稳定的 `CurrentState` 对象提供字段、索引只读查询及分组版本。每个视图用自己的 `VersionReader` 比较数据源身份和版本，绘制成功后记录绘制前捕获的版本，打开时使本地记录失效。集合原地修改并推进版本，刷新直接查询持久数据。读取记录与状态容器均为 struct，轮询和确认只改已有字段。
@@ -97,11 +95,11 @@
 判定标准：
 
 1. **外部读**：只经 `StatsService.Instance.Stats`，静态类型是 `IPlayerStatsReadOnly`。该接口暴露 4 个事件与 15 个只读属性，成员集合里没有写方法。
-2. **外部写**：只经 `StatsService` 的 6 个转发命令 `UpdateMaxHealth` `UpdateHealth` `UpdateSpeed` `Update:amage` `UpdateSkillPoints` `AddExperience`，每个命令都是单行转发到 Model；另有第 7 个公开入口 `Respawn()`，守卫 `if (model.CurrentHealth <= 0)` 位于 Service 内部，构成规则只在 Model 的公开例外。
+2. **外部写**：只经 `StatsService` 的 6 个转发命令 `UpdateMaxHealth` `UpdateHealth` `UpdateSpeed` `UpdateDamage` `UpdateSkillPoints` `AddExperience`，每个命令都是单行转发到 Model；另有第 7 个公开入口 `Respawn()`，守卫 `if (model.CurrentHealth <= 0)` 位于 Service 内部，构成规则只在 Model 的公开例外。
 3. **规则只在 Model**：钳制、经验结算、事件广播都在 `PlayerStatsModel` 的写方法内部。Service 逐条转发，自身不复制规则；`Respawn` 的守卫是 Service 独有的服务层规则。
-4. **Model 保持在 Service 内部**：`StatsService` 的 `model` 字段是 private，`GetStats` 与 `LoadStats` 也是 private。测试断言 `StatsService` 有 `Stats` 属性，且其公开成员里没有 `Model` 属性。
+4. **Model 保持在 Service 内部**：`StatsService` 的 `model` 字段是 private，`GetStats` 与 `LoadStats` 也是 private。对外只暴露 `Stats` 属性，公开成员里没有 `Model` 属性。
 
-`Save:ata.playerStats:ata` 字段类型是具体的 `PlayerStats:ata`，存档域直接持有 Model 的传输格式。
+`SaveData.playerStatsData` 字段类型是具体的 `PlayerStatsData`，存档域直接持有 Model 的传输格式。
 
 ### 2.5 命名空间分布
 
@@ -126,8 +124,8 @@
 | | `Pipeline.UI.Buttons` | 6 |
 | | `Pipeline.UI.SystemCanvasManagers` | 6 |
 | | `Pipeline.UI.Runtime` | 2 |
-| `Gameplay` | `Gameplay.:ialog` | 2 |
-| | `Gameplay.:ialog.HistoryManager` | 3 |
+| `Gameplay` | `Gameplay.Dialog` | 2 |
+| | `Gameplay.Dialog.HistoryManager` | 3 |
 | | `Gameplay.Grid` | 2 |
 | | `Gameplay.Inventory` | 6 |
 | | `Gameplay.Player` | 7 |
@@ -143,31 +141,15 @@
 | | `Gameplay.Units.NPC` | 4 |
 | | `Gameplay.Units.ShopKeeper` | 1 |
 
-- 合计 141 个产品代码文件；测试侧使用 `namespace Gameplay.Tests`。
+- 合计 141 个产品代码文件。
 - 全局命名空间只剩 1 个编辑器脚本 `Assets\Editor\InputActionReferenceRebuilder.cs`，它不在 `Assets\Scripts` 下，不受"跟随目录"规则约束。
 - 跨命名空间调用一律靠 `using`；同一命名空间内的类型直接可见。
 
 ### 2.6 单例基类与写入口
 
-`YSingleton<T>` 提供 `Instance` 与 `RequiredInstance` 只读访问、重复实例自毁、`On:estroy` 复位。工程里 20 个具体类直接继承它，加一个抽象中间层 `SaveableService<TSelf>`，`StatsService` 通过该中间层继承。
+`YSingleton<T>` 提供 `Instance` 与 `RequiredInstance` 只读访问、重复实例自毁、`OnDestroy` 复位。工程里 20 个具体类直接继承它，加一个抽象中间层 `SaveableService<TSelf>`，`StatsService` 通过该中间层继承。
 
-`SaveableService` 是单例与存档身份的合并基类：继承即自动注册进 `SaveRegistry`、销毁自动注销、`Get:ataI:()` 固定返回 `null` 表示走固定槽位存档。`StatsService` 是它当前唯一的子类，也是唯一写入口这条约定的落地处。
-
-### 2.7 边界测试
-
-编辑器侧测试共 7 个文件、合计 79 项用例：
-
-| 文件 | 用例数 | 守的边界 |
-|---|---|---|
-| `PlayerStatsModelTests` | 24 | Model 规则、事件语义、拷贝语义、`StatsService` 不暴露 Model |
-| `CanvasFocusStackTests` | 15 | 纯 C# 焦点栈 `CanvasFocusStack` 的入栈出栈语义 |
-| `AStarOpenHeapTests` | 6 | 寻路的开放列表堆 |
-| `ObjectPoolTests` | 5 | 对象池 |
-| `LootPoolingTests` | 1 | 掉落物对象池的预热与回收 |
-| `UICacheRegressionTests` | 20 | 缓存事件路由、任务版本、背包初始化与重开、多视图刷新、技能命令与键缓存 |
-| `VersionedValueTests` | 8 | 独立读取、源切换、绘制期间更新、集合原地发布、轮询分配 |
-
-这 7 个文件位于编辑器侧测试目录、无 asmdef，编译进 `Assembly-CSharp-Editor` 并引用产品程序集 `Assembly-CSharp`；测试可直接构造公开纯 C# 类型，并通过反射注入临时服务。
+`SaveableService` 是单例与存档身份的合并基类：继承即自动注册进 `SaveRegistry`、销毁自动注销、`GetDataI:()` 固定返回 `null` 表示走固定槽位存档。`StatsService` 是它当前唯一的子类，也是唯一写入口这条约定的落地处。
 
 ## 3. 约定与硬边界
 
@@ -189,21 +171,21 @@
 
 契约层被所有域引用，反向依赖会形成环。**当前违反 6 处**，分布在 5 个文件：
 
-- `ISaveable`、`SaveableService` → `using Gameplay.Save;`：签名用到 `Save:ata` 与 `Save:efinition`，这两个类型住在 `Gameplay\Save\`。
+- `ISaveable`、`SaveableService` → `using Gameplay.Save;`：签名用到 `SaveData` 与 `SaveDefinition`，这两个类型住在 `Gameplay\Save\`。
 - `CachedUIViewBase` → `using Pipeline.SO.Events;`：抽象属性返回 `ToggleCanvasEventSO`。
 - `CachedCanvasViewBase` → `using Pipeline.SO.Events;`：属性返回 `ToggleCanvasEventSO`。
 - `ICanvasManager` → `using Pipeline.SO.Events;` 与 `using Pipeline.UI.SystemCanvasManagers;`：接口属性返回 `ToggleCanvasEventSO`、`SceneLoadedEventSO`，默认实现调 `UIManager`。
 
-命名空间让依赖显式化，环因此可见。本条按待偿债务对待，收口方向有两条：把契约层实际依赖的类型下沉进 `Contracts`，或让契约层改用不依赖具体类型的抽象（事件基类、`ISave:ata` 之类的接口）。
+命名空间让依赖显式化，环因此可见。本条按待偿债务对待，收口方向有两条：把契约层实际依赖的类型下沉进 `Contracts`，或让契约层改用不依赖具体类型的抽象（事件基类、`ISaveData` 之类的接口）。
 
 ### 3.5 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法
 
-测试断言 `StatsService` 不暴露具体 Model。
+对外只暴露 `Stats` 一个入口，`IPlayerStatsReadOnly` 上没有写方法。
 
-### 3.6 改 `PlayerStats:ata` 的字段名等于坏档
+### 3.6 改 `PlayerStatsData` 的字段名等于坏档
 
 字段名就是存档 JSON 键；类名可以改，字段名不可以。
 
 ### 3.7 纯 C# 层不得引用 `MonoBehaviour` 生命周期
 
-包括 `PlayerStatsModel`、三个显示侧 Controller 与 `CanvasFocusStack`；EditMode 测试依赖这条。
+包括 `PlayerStatsModel`、三个显示侧 Controller 与 `CanvasFocusStack`。

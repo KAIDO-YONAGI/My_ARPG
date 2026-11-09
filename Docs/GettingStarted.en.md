@@ -56,7 +56,7 @@ The following detailed guides are in Chinese:
 
 - [Android build troubleshooting](UnityAndroidBuildGuide.md): environment checks, SDK and Gradle proxy setup, and resource naming issues in Release builds.
 - [Project configuration](../Y_MultipleAgentWorkflow/Build/ProjectConfig_Guide.md): dependencies, build scenes and Player Settings.
-- [Test guide](../Y_MultipleAgentWorkflow/Build/TestBaseline_Guide.md) and [validation commands](../Y_MultipleAgentWorkflow/Workflow/Project_Validation_Guide.md): EditMode tests and verification entry points.
+- [Project validation](../Y_MultipleAgentWorkflow/Workflow/Project_Validation_Guide.md) and [validation commands](../Y_MultipleAgentWorkflow/Workflow/Project_Validation_Guide.md): EditMode tests and verification entry points.
 
 ## Development References
 

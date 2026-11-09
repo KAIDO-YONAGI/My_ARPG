@@ -40,7 +40,7 @@ The open list uses a binary min-heap, and search collections are reused across s
 
 The UI scheduling framework maintains panel state with linked lists plus events and callbacks, handling player input and code-driven operations through one path. Panels are created at runtime and cached on close, with LRU eviction by close order and timeouts measured from the close moment. Views refresh by versioned dirty flags in a pull design: writes advance the version, and each view compares the version it rendered before redrawing. A focus stack manages window order, and panels support dragging.
 
-Arrows and loot use a generic object pool. EditMode tests cover stat rules, the pathfinding open list, object pooling, the UI focus stack, view caching and versioned values.
+Arrows and loot use a generic object pool.
 
 ## Getting Started
 
