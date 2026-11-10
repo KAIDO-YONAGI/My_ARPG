@@ -104,3 +104,6 @@ Assets/StreamingAssets/aa/
 # 文档库的 Build 业务域与 Unity 构建产物目录同名，显式收回以纳入版本控制
 !Y_MultipleAgentWorkflow/Build/
 !Y_MultipleAgentWorkflow/Build/**
+
+# ========== 方案草稿（个人参考，不入库） ==========
+/Docs/Plans/
