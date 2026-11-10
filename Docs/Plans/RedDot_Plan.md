@@ -1,299 +1,242 @@
-# 红点框架方案：树形计数红点与接入规范
+# 红点与待办引导方案：红点树、逐项导航与属性变化提醒
 
 状态：`草稿（未实施）`
-最后更新：`2026-10-19`
-文档性质：方案草稿，存放在非权威参考区 `Docs/Plans/`，**不属于** `Y_MultipleAgentWorkflow/` 的权威文档；未落地前不参与该工作流的路由与维护计数。
-适用范围：红点的**节点模型、父子汇总语义、变更广播、视图接入规范、测试与验收**。红点的业务条件语义（什么算未读、什么算可领）归各自玩法域；画布开关、焦点栈与层级排序归 Architecture 与 Assets 域；邮件的下发与过期规则归邮件域。工程内目前尚无任何红点实现。
-引用约定：文中 `Xxx_Guide` 与 `Xxx_Guide §n` 均指 `Y_MultipleAgentWorkflow/` 下的权威文档。
+最后更新：`2026-11-10`
 
-## 1. 触发线索
+文档性质：方案草稿，存放在参考区 `Docs/Plans/`；落地前不参与 `Y_MultipleAgentWorkflow/` 的权威路由与维护计数。
+
+适用范围：业务待办的红点表达、父子汇总、`~` 键逐项打开画布、技能升级后的属性查看提醒、聚合面板接入与验收。事务成立和完成的条件由各玩法域定义，画布生命周期、焦点与排序沿用现有 UI 基建。
+
+引用约定：文中 Guide 均指 `Y_MultipleAgentWorkflow/` 下的对应权威文档。
+
+## 1. 产品目标与触发线索
+
+红点承担类似《文明六》待处理事务提示的作用：程序根据玩家状态找出当前值得处理的事务，通过入口红点提示，玩家按 `~` 键逐个打开对应画布组，例如 Skills、Quest、Stats。每次按键只定位一个画布组，事务处理后由业务状态更新红点。
+
+聚合面板形成一棵可见的红点树：OpenMenu 按钮右上角显示总红点，展开后 Skills、Quest、Stats 等画布入口各自显示分支红点。总红点覆盖全部分页中的分支，菜单收起时仍可见。
+
+典型流程：获得技能点 → Skills 与 OpenMenu 亮点 → 按 `~` 打开 Skills → 升级技能并实际提升属性 → Stats 与 OpenMenu 亮点 → 再按 `~` 定位后续待办 → Stats 展示新属性后确认已查看。Skills 在仍有可升级项时继续亮点，Quest 在仍有可交付任务时继续亮点。
 
 | 线索 | 指向 |
 |---|---|
-| `红点`、`角标`、`badge`、`未读` | §2 现状、§3 设计 |
-| `红点树`、`父子汇总`、`计数` | §3.3 拓扑、§3.4 语义 |
-| `新增红点`、`接入红点`、`RedDotKey` | §3.3、§6.1 |
-| `红点不显示`、`红点不消失`、`翻页后丢了` | §3.6 三个坑 |
-| `要不要存档`、`已读`、`跨档` | §4.5 |
-| `为什么不用 SO 事件通道` | §3.7 |
-| `面试怎么讲`、`为什么这么设计` | §7 |
+| `文明六`、`待办`、`程序化引导`、`~` | §3.1、§3.6 |
+| `红点树`、`OpenMenu`、`聚合面板` | §3.2、§3.5 |
+| `技能升级`、`Stats 红点`、`属性提升` | §3.7、§4.3 |
+| `节点计数`、`广播`、`新增红点` | §3.3、§3.4、§6 |
+| `存档`、`已读`、`跨档` | §4.6 |
+| `测试`、`验收` | §5 |
 
-## 2. 现状取证
+## 2. 当前实现与接入依据
 
-### 2.1 红点：全仓 0 处
-
-对 `Assets/Scripts`、`Assets/Editor`、`Assets/Tests` 全量检索 `RedDot|RedPoint|Badge|Unread|Notice`，命中 **0**。工程内不存在任何角标组件、红点服务或通知数据。
-
-所以本域不是「接一套已有框架」，而是**新建**。但落点与宿主全部现成，见 §2.2。
-
-### 2.2 可直接复用的既有事实
-
-| 事实 | 证据 | 对本方案的意义 |
+| 当前事实 | 证据位置 | 方案约束 |
 |---|---|---|
-| 关键单例全部在常驻场景 | `UIManager`、`QuestManager`、`IntegratedUICanvasManager`、`StatsService`、`SkillTreeManager` 的脚本 GUID 在 `Assets/Scenes/GameScene/PersistentScene.unity` 中命中 | 红点服务与视图常驻，**无需处理跨场景生命周期** |
-| 枚举即身份是既有惯例 | `MyEnums.CanvasToToggle`（`Assets/Scripts/Contracts/MyEnums.cs:56-72`），`UIManager.FindToggleEvent` 按值匹配（`UIManager.cs:185-194`） | `RedDotKey` 用枚举而非字符串，与既有做法一致 |
-| 纯 C# 逻辑层有先例与测试范式 | `CanvasFocusStack` 为纯 C#，配 `CanvasFocusStackTests`（15 例） | 红点树做成纯 C#，可同样拿 EditMode 测试 |
-| 事件驱动刷新是既有风格 | `StatsService.Stats` 暴露 4 个事件（`IPlayerStatsReadOnly.cs`），`SkillSlot` 用静态事件 | 红点变更走 C# 事件，不引入新机制 |
-| 集成面板是分页按钮网格 | `IntegratedUICanvasManager.InitiatePage`（`IntegratedUICanvasManager.cs:121-149`），`integratedButtons[i]` 对应 `canvasToToggle[startNum + i]` | 红点的天然落点，父子层级天然对应页面→按钮 |
-| 单例基类与存档身份 | `YSingleton<T>`（`YSingleton.cs`）、`SaveableService<TSelf>` | 服务继承前者；需要存档时继承后者 |
+| 产品脚本与编辑器脚本内没有红点相关实现 | 检索 `Assets/Scripts`、`Assets/Editor` 中的 `RedDot/RedPoint/Badge/Unread/Notice` | 新建红点基建与条件源 |
+| 画布身份采用 `Contracts.Enums.CanvasType` | `Assets/Scripts/Contracts/Enums/MyEnums.cs` | 红点 Key 与画布身份分开，导航显式映射到 `CanvasType` |
+| 业务状态由管理器保存，六个业务画布通过缓存按需创建和淘汰 | `Architecture/Composition/Composition_Guide.md §2.6、§2.7` | 条件源与待办状态独立于 View，画布关闭和淘汰不影响提示 |
+| 聚合面板采用分页按钮复用 | `Assets/Scripts/Pipeline/UI/SystemCanvasManagers/IntegratedUICanvasManager.cs` 的 `InitiatePage` | 每次分页重新绑定红点 Key；仅重新启用按钮不足以保证绑定正确 |
+| UIManager 统一处理输入阻塞、ESC、画布请求与焦点栈 | `Assets/Scripts/Pipeline/UI/SystemCanvasManagers/UIManager.cs` 的 `ToggleCanvas`、`HandleEscapeRequest`、`RequestCanvasToggle` | 待办导航接入同一处理路径，沿用输入阻塞与焦点规则 |
+| 技能升级命令校验解锁态、等级上限与技能点，保存等级并扣点 | `Assets/Scripts/Gameplay/Skills/SkillTreeManager.cs` 的 `TryUpgradeSkill` | 待办资格与升级命令一致；该命令自身没有属性提升写入，属性提醒以实际数值变化为依据 |
+| 技能点写入没有独立变更事件 | `Assets/Scripts/Gameplay/Player/Models/PlayerStatsModel.cs` 的 `UpdateSkillPoints`、`IPlayerStatsReadOnly.cs` | 补专有事件，覆盖发放、扣点和读档后的同步 |
+| Quest 的界面数据与任务进度分离，关闭界面会清空当前任务板与选择 | `Assets/Scripts/Gameplay/Quest/QuestManager.cs` 的 `OnOpenQuestBoard`、`OnCachedViewClosed`、`QuestStateChanged` | 条件源读取持续保存的任务进度；导航准备任务板上下文后再打开 |
+| Stats 打开时主动刷新，当前绘制伤害与速度 | `Assets/Scripts/Gameplay/Player/Views/StatsCanvasView.cs` 的 `OnOpen`、`Assets/Scripts/Gameplay/Player/Controllers/StatsCanvasController.cs` 的 `Refresh` | 已查看确认发生在成功绘制之后；提醒涉及的属性必须能在目标面板中展示 |
 
 ## 3. 设计
 
-### 3.1 数据流
+### 3.1 条件、红点与导航的数据流
 
+```text
+技能点 / 技能可升级状态 ──→ Skills 条件源 ──┐
+任务进度 ───────────────→ Quest 条件源 ───┼→ RedDotService → 红点树 → OpenMenu 与分支视图
+技能效果结算后的属性差异 ──→ Stats 条件源 ───┘        │
+                                                   ↓
+~ 按键 → 待办导航器 → 选择有效画布与业务上下文 → UIManager / 业务打开入口
+                                                   │
+                    完成事务或成功展示并确认 ←───────┘
 ```
-Gameplay（条件源）              Pipeline/RedDot（基建）             UI（落点）
-─────────────────              ──────────────────────             ──────────
-SkillPointRedDot ──┐           RedDotService (YSingleton)         RedDotView ×N
-QuestRedDot      ──┼ SetCount → RedDotTree（纯 C#，父级求和）→ 事件 → 显隐 + 数字
-MailRedDot(阶段4) ─┘           RedDotConfigSO（父子登记，启动期自检）
+
+条件源写业务叶子，父节点自动汇总。待办导航器从有提示且可定位的事务中选择目标；红点变化只更新提示，弹出画布由玩家按键触发。
+
+### 3.2 红点树与画布映射
+
+```text
+OpenMenu                         总入口，挂在 OpenMenu 按钮右上角
+├─ Skills                       聚合面板中的 Skills 入口
+│  └─ SkillUpgradeable          当前可消费技能点的升级机会
+├─ Quest                        聚合面板中的 Quest 入口
+│  └─ QuestClaimable            当前可交付任务
+├─ Stats                        聚合面板中的 Stats 入口
+│  └─ StatsChangedUnread        属性提升后尚未查看的结果
+└─ Mail                         邮件域接入时登记
+   ├─ MailUnread
+   └─ MailClaimable
 ```
 
-单向：条件源只写**叶子**计数；框架负责向上汇总；视图只读，不回写。
+`RedDotKey` 放在 Contracts 层，命名空间采用 `Contracts.Enums`。父子关系由 `RedDotConfigSO` 登记，分支节点通过导航配置映射到 `CanvasType.Skills`、`CanvasType.Quest`、`CanvasType.Stats`。
 
-### 3.2 类型清单
+OpenMenu 表示所有已登记分支的汇总，聚合面板页码只决定当前显示哪些按钮。父节点与业务叶子的关系独立于 Transform 层级和分页布局。同一分支的多个叶子定位到同一画布时合并为一个导航目标。
 
-**新增 5 个**（目录 `Assets/Scripts/Pipeline/RedDot/`）
+### 3.3 计数与清除语义
 
-| 文件 | 职责 | 是否依赖 MonoBehaviour |
+叶子存非负计数，父节点 `Count = Σ children.Count`，`IsOn = Count > 0`。业务只写叶子，父节点不接受业务直接置数。
+
+| 叶子 | 成立条件与计数 | 消失条件 |
 |---|---|---|
-| `RedDotNode.cs` | `Key`、`SelfCount`、`Children`、`Parent`、`Count`、`IsOn` | 否 |
-| `RedDotTree.cs` | 注册、置数、向上重算、产出**去重后的**变更列表 | 否 |
-| `RedDotService.cs` | `YSingleton`；`SetCount` / `GetCount` / `IsOn` / `event Changed` | 是（单例宿主） |
-| `RedDotView.cs` | `[SerializeField] RedDotKey key; GameObject dot; TMP_Text countText;` | 是 |
-| `RedDotConfigSO.cs` | `List<{ RedDotKey key, RedDotKey parent }>`；启动期建树 + 自检 | 否（资产） |
+| `SkillUpgradeable` | 技能点足够，且至少存在已解锁、未满级的可升级项；满足时计数取当前可用技能点 | 点数不足或没有符合升级条件的技能 |
+| `QuestClaimable` | 状态为 `IsToComplete` 的任务数量 | 对应任务交付或业务状态改变 |
+| `StatsChangedUnread` | 技能升级实际提升可展示的属性，产生尚未展示确认的变化时置 1 | Stats 成功绘制对应变化并确认已查看 |
 
-**改动 4 处**
+技能的初始状态、等级上限和升级资格需要在视图关闭时仍可查询。当前初始配置和前置关系位于技能槽位上，接入阶段向技能域提供独立于 View 实例的只读升级资格数据，并与升级命令共用判断口径。
 
-| 位置 | 改动 | 阶段 |
-|---|---|---|
-| `Assets/Scripts/Contracts/MyEnums.cs` | 追加 `enum RedDotKey` | 1 |
-| `Assets/Scripts/Gameplay/Player/Models/PlayerStatsModel.cs:129` | 补发 `SkillPointsChanged` | 2 |
-| `Assets/Scripts/Gameplay/Player/Models/IPlayerStatsReadOnly.cs` | 追加 `event Action SkillPointsChanged` | 2 |
-| `Assets/Scripts/Gameplay/Quest/QuestManager.cs:242` | 方法末尾广播 `QuestStateChangedEvent` | 3 |
+默认表现为纯圆点，计数大于 1 时仍显示圆点；条目需要数量时可配置数字。OpenMenu 汇总混合了技能点、任务与未查看提醒，默认显示有无，数值不解释为独立事务总数。`~` 每次选择一个画布组，与节点计数分开。
 
-### 3.3 `RedDotKey` 与父子拓扑
+### 3.4 框架类型与传播
 
-```csharp
-namespace MyEnums
-{
-    public enum RedDotKey
-    {
-        Mail,          // 父：未读 + 可领 求和
-        MailUnread,    // 子：未读数
-        MailClaimable, // 子：可领取数
+| 类型 | 职责 |
+|---|---|
+| `RedDotNode` / `RedDotTree` | 纯 C# 节点、注册、置数、向上汇总与结构校验 |
+| `RedDotService` | 常驻宿主；提供叶子置数、查询与统一变更事件 |
+| `RedDotConfigSO` | 节点父子关系；校验 Key 唯一、父节点存在、无环 |
+| `RedDotView` | 绑定 Key、显示圆点或数量，启用和重绑时读取当前状态 |
+| `PendingActionNavigator` | 纯 C# 选择逻辑；目标去重、稳定排序、循环游标与失效跳过 |
+| `PendingActionController` | 接收待办按键，调用玩法上下文准备与统一画布打开流程 |
+| `PendingActionConfigSO` | 分支与画布映射、导航顺序和对应业务处理器登记 |
+| 各业务条件源 | 查询业务状态、更新叶子；Stats 条件源另维护展示确认状态 |
 
-        SkillPoints,   // 叶：可分配技能点 > 0
-        QuestClaimable,// 叶：存在可交付任务
-    }
-}
-```
+树与通用导航逻辑位于 `Assets/Scripts/Pipeline/RedDot/`；画布请求适配位于 Pipeline UI；技能、任务、属性条件源归对应 Gameplay 域。业务事务的资格与上下文准备通过契约接入，通用导航器只处理目标和资格结果。
 
-放在 `Contracts` 层的理由是对齐 `Layering_Guide §2.1` 的准入标准：**被两个以上域直接引用，且不含具体业务规则**——Gameplay 侧写条件、Pipeline 侧写视图，两个域都要引用它。
+同值置数不广播。一次更新先完成受影响链路的重算，再广播最终变化；批量置数先汇总再去重，同一节点每批最多广播一次。广播用统一 C# 事件携带 Key 与计数，画布开关继续沿用现有事件与缓存流程。
 
-父子关系**不进代码**，进 `RedDotConfigSO`，理由是照抄 `UIManager.toggleCanvasEvents` 的登记方式（`UIManager.cs:15-18`）：新增红点不改代码，且启动期能做结构自检。
+### 3.5 聚合面板与视图生命周期
 
-### 3.4 计数语义：为什么是 `int` 不是 `bool`
+1. OpenMenu 按钮右上角绑定根节点；圆点跟随常驻按钮，菜单内容收起时仍可显示。
+2. 聚合面板中的每个画布按钮绑定对应分支，如 Skills、Quest、Stats。
+3. `InitiatePage` 复用按钮时，先解除旧绑定，再按本页 `CanvasType` 映射新 Key 并立即刷新，随后展示按钮。
+4. View 的启用、关闭、销毁与重绑保持订阅成对；再次启用主动读取服务状态。
+5. 按钮点击只请求打开，技能和任务红点依据事务结果更新。Stats 的查看确认由属性展示回执触发。
+6. 分页按钮清空 `onClick` 监听不会影响红点订阅；业务画布被缓存淘汰后，常驻条件源继续维护状态。
 
-红点最常见的形态是「有/无」，但真实需求里必然出现「3 封未读」「12 件可领」。计数天然覆盖布尔（`Count > 0`），而布尔无法反向表达计数。所以节点存 `int SelfCount`，`IsOn => Count > 0`，父节点 `Count = SelfCount + Σ children.Count`。
+### 3.6 `~` 键逐项引导
 
-视图层由此得到两种表现：只有圆点（当 `Count == 1` 且配置为不显示数字），或圆点 + 数字。**这一条是后面邮件双层红点的前提**——父节点 `Mail` 要显示"未读 + 可领"的合计。
+待办按键绑定到波浪号所在的反引号实体键，在 Input System 中使用 `<Keyboard>/backquote`，不要求按 Shift；通过 `InputActionReference` 接入并支持改键。该动作是“处理下一项待办”，由导航器动态选目标，不固定映射一个画布。
 
-### 3.5 变更传播与去重
+导航规则：
 
-```csharp
-// 伪代码：只广播"汇总值真的变了"的节点
-void SetCount(RedDotKey key, int count)
-{
-    var node = nodes[key];
-    if (node.SelfCount == count) return;        // 同值不入队
-    node.SelfCount = count;
+1. 每次按下读取最新资格，收集亮点且业务上下文可准备的分支，按画布去重。
+2. 默认顺序为 Skills → Quest → Stats，配置决定稳定顺序；已有游标时从上一成功目标之后继续，末尾循环到开头。
+3. 每次只定位一个目标。选择后重新校验资格，失效目标在本次选择中跳过；一轮遍历最多检查每个候选一次。
+4. 目标关闭时打开，已打开时聚焦。目标已在焦点时保持显示，避免现有 Toggle 语义将其关闭。UIManager 增加明确的打开或聚焦请求语义，并沿用焦点栈、排序和互斥处理。
+5. 成功打开或聚焦后推进游标；打开失败保留业务待办，不确认已处理。一次按键最多产生一次画布切换。
+6. 仍有待办的分支会在下一轮再次访问。技能点剩余时允许先去 Quest 或 Stats，避免停留在同一个分支。
+7. 同画布多条任务先打开该画布并定位一条可处理事务；画布内部展示其余事务。聚合父节点只负责显示汇总，不作为额外待办进入队列。
+8. 没有有效目标时不产生打开请求。全局输入阻塞和文本输入期间不执行待办导航；ESC 与普通画布输入的同帧优先级由 UIManager 统一裁决，受阻按键不延迟到下一帧执行。
 
-    for (var n = node; n != null; n = n.Parent)
-    {
-        int before = n.CachedCount;
-        n.CachedCount = Recalc(n);
-        if (before == n.CachedCount) break;      // 父级没变，更上层必然没变
-        changed.Add((n.Key, n.CachedCount));
-    }
-    foreach (var (k, c) in changed) Changed?.Invoke(k, c);
-}
-```
+Quest 导航先由任务域准备可交付任务所属的任务列表和当前选择，再打开 Quest 并定位该任务。进度中的可交付状态与能否在当前位置完成交付分别由任务域判断；当前无法处理的目标保留红点，在快捷引导中跳过。任务板界面关闭后清空的上下文由导航重新准备。
 
-三点设计意图：
+### 3.7 技能升级后的 Stats 提醒
 
-1. **同值短路**：条件源经常在每帧或每次事件里重复写同一个值，不短路会让 UI 每秒刷新几十次。
-2. **向上提前终止**：父级汇总未变时，更上层不可能变，避免无意义的全链重算。
-3. **广播与计算分离**：先算完再统一广播，避免订阅者在重算中途读到中间态。
+属性提醒表示“属性提升结果尚未查看”。在技能升级成功并完成效果结算后，对比结算前后目标属性；实际提升才推进属性变化版本，并将 `StatsChangedUnread` 置 1。失败、重复刷新和仅改变技能等级而没有提升属性的操作保持原状态。
 
-### 3.6 视图接入规范与三个已验证的坑
+提示字段与 Stats 可展示字段一致。当前 Stats 绘制伤害与速度；接入其他提升项时同步扩展属性面板及对应刷新通知，保证玩家能在提示目标里看到变化。当前血量、经验等日常变化不作为本条技能升级提醒的条件。
 
-红点挂在 `IntegratedUICanvasManager` 的分页按钮上（`canvasToToggle` 列表加入新面板即自动出现按钮）。三个坑都来自实测代码，不是推测：
+Stats 条件源维护变化版本与已展示确认版本。打开 Stats 后，视图读取数值和版本，成功刷新后回报本次实际展示的版本；面板打开期间的后续刷新采用同一回执。已确认版本追上当前变化版本时熄灭红点，刷新期间发生的新变化保留提醒。
 
-| 坑 | 证据 | 规范 |
-|---|---|---|
-| **分页会反复 `SetActive`** | `IntegratedUICanvasManager.cs:128` 每次 `InitiatePage` 先 `button.gameObject.SetActive(false)`；红点作为子节点会跟着 `OnDisable/OnEnable` | `RedDotView.OnEnable` 必须**先向服务重读一次**当前值，不能只用缓存的事件值 |
-| **`onClick` 会被清空** | 同文件 `:129` `button.onClick.RemoveAllListeners()` | 禁止用「点击清红点」实现；红点只由条件源驱动熄灭 |
-| **Key 重复静默失效** | `UIManager.FindToggleEvent` 取列表中第一个匹配项（`:185-194`），同值后者的广播永远收不到 | `RedDotConfigSO` 启动期校验 Key 唯一、父节点存在、无环；重复直接 `LogError` |
-
-### 3.7 为什么广播不走 SO 事件通道（一次刻意的偏离）
-
-工程有成熟的 SO 事件通道惯例：12 个通道类、28 个资产，规则见 `Assets/EventChannels_Guide.md`（即 `Y_MultipleAgentWorkflow/Assets/EventChannels_Guide.md`）。本方案**仍然不新增通道资产**，理由：
-
-- SO 通道的组织方式是「一个资产 = 一条语义独立的广播线」（`VoidEventSO` 6 个资产各管一件事）。红点则是「单通道 + 多 Key」的稀疏广播，照搬会变成「每加一个红点建一个资产」。
-- SO 通道的核心价值是**让跨场景/跨预制体的接线在 Inspector 里可见**。红点的条件源、服务、视图全部常驻 `PersistentScene`，不存在这个需求。
-- 代价：失去 Inspector 可读的事件接线。缓解手段是 `RedDotConfigSO` 把「有哪些 Key」变成可视资产。
-
-这是一个有理由的偏离，不是疏忽——面试被问到时按此回答。
+多次升级合并为一个 Stats 提醒。技能点消耗完后 Skills 可以熄灭，Stats 继续提示；打开失败、仅点击入口、缓存重建和后台数据刷新都不产生查看确认。Stats 已打开且已展示最新提升时直接确认，无需关闭重开。
 
 ## 4. 落地步骤
 
-### 4.1 阶段 1：框架骨架（不接任何业务）
+### 4.1 阶段 1：红点树与聚合入口
 
-1. 写 `RedDotNode` / `RedDotTree`（纯 C#）、`RedDotService`、`RedDotView`、`RedDotConfigSO`。
-2. `MyEnums.RedDotKey` 先只放 `SkillPoints` / `QuestClaimable` 两个叶子。
-3. `PersistentScene` 挂 `RedDotService`，配一个 `RedDotConfigSO` 资产。
-4. 写 `Assets/Tests/Editor/RedDotTreeTests.cs`。
-5. 验证：`RedDotService` 在 Play 模式下 `SetCount` 能打出广播日志；测试全绿。
+1. 建立 Contracts 红点 Key、纯 C# 红点树、服务、配置与 View。
+2. 登记 OpenMenu → Skills / Quest / Stats → 业务叶子，完成结构校验。
+3. 接入 OpenMenu 右上角总红点和聚合面板分支红点，补充分页重绑。
+4. 用独立测试验证汇总、去重、重绑与生命周期；调试条件源验证入口联动。
 
-**本阶段零业务接线，可独立交付。**
+### 4.2 阶段 2：技能待办
 
-### 4.2 阶段 2：技能点试点（含一处必须动的契约）
+1. 在 `IPlayerStatsReadOnly` 增加独立技能点变化事件，模型在实际变化及读档同步时通知，保留 `StatsChanged` 的现有属性语义。
+2. 在技能域提供独立于画布实例的初始配置与可升级资格查询，共用解锁、等级上限和点数校验；初始化、扣点、解锁和读档完成后重算。
+3. 常驻技能条件源同时关注点数与资格变化，写入 `SkillUpgradeable`。
+4. 验证有点可升时亮点、点数用尽时熄灭、全部满级时熄灭，以及技能画布关闭和被淘汰期间的状态正确性。
 
-**条件**：`StatsService.Instance.Stats.SkillPoints > 0`。
+### 4.3 阶段 3：属性变化与展示确认
 
-**拦路点（已核实，不能绕过）**：`UpdateSkillPoints` 目前**故意不广播任何事件**——`PlayerStatsModel.cs:128` 注释写明「技能点变化不触发事件，界面由 SkillTreeManager 刷新」，且 `PlayerStatsModelTests.cs:145` 的 `UpdateSkillPoints_AccumulatesWithoutEvents` 明确断言 `statsChangedCount == 0`。
+1. 以技能效果完成结算为边界提供实际属性差异通知；技能等级升级与数值效果接入之间明确完成时点。
+2. 常驻属性条件源维护变化版本、已展示确认版本与 `StatsChangedUnread`。
+3. Stats 在打开首刷及可见期间刷新成功后确认实际展示版本。
+4. 验证升级 → Skills 状态重算 → Stats 亮点 → 展示提升 → Stats 熄灭的链路，覆盖连续升级和刷新期间再次变化。
 
-因此**不能**给 `StatsChanged` 补广播：`StatsChanged` 的语义是「攻/防/速面板数值变化」，订阅方是 `StatsCanvasController`（`:19`），复用会让语义失真，并且打红既有测试。
+### 4.4 阶段 4：任务待办与 `~` 导航
 
-**正确做法**：新增**专有事件**。
+1. 任务域在任务进度实际变化后通知条件源，提供持续保存的可交付任务查询，计数覆盖界面关闭期间的任务。
+2. 提供任务目标上下文准备和可处理资格查询，导航打开后定位对应可交付任务。
+3. 建立纯 C# 导航器、导航配置与输入控制器；配置 Skills → Quest → Stats 的默认顺序。
+4. UIManager 接入打开或聚焦语义和待办输入仲裁，沿用全局阻塞、ESC、互斥、排序与界面缓存。
+5. 验证每次按键只显示一个目标、循环跳转、状态失效跳过、目标已打开时聚焦，以及处理结果引发新待办的联动。
 
-1. `IPlayerStatsReadOnly` 加 `event Action SkillPointsChanged;`
-2. `PlayerStatsModel.UpdateSkillPoints` 由表达式体改为语句体，末尾 `SkillPointsChanged?.Invoke();`
-3. 测试改名 `UpdateSkillPoints_FireSkillPointsChangedOnly`，断言新事件计数 == 2、`statsChangedCount == 0`（保持原语义不被污染）。
-4. 新增 `Assets/Scripts/Gameplay/Skills/SkillPointRedDot.cs`：订阅 `Stats.SkillPointsChanged`，写入 `RedDotService.SetCount(RedDotKey.SkillPoints, points > 0 ? points : 0)`，挂 `PersistentScene`。
-5. 在集成面板 Skills 按钮下加圆点节点，挂 `RedDotView`，`key = SkillPoints`。
+### 4.5 扩展接入：邮件
 
-**已知分层瑕疵（本轮不改，记录备查）**：升级发放技能点的规则挂在视图层——`SkillTreeManager.cs:36` 订阅 `LevelUp` 后调 `UpdateAbilityPoints`。因 `SkillTreeManager` 与 `StatsService` 同在常驻场景，当前不会漏发；但这是「规则在视图」的味道，日后若技能树改成按需加载就会漏发。改它属独立任务，不在本阶段范围。
+邮件域接入时登记 Mail 分支及 `MailUnread`、`MailClaimable` 叶子，总入口自动汇总。邮件导航登记画布与业务打开处理器，沿用同一套候选选择。
 
-### 4.3 阶段 3：任务试点
+邮件下发、版本、领取、过期与已读落盘由邮件域定义。远端 JSON、文件清单与累计在线时间的计时能力作为邮件域依赖单独落实，红点只消费其结果。
 
-**条件**：存在 `questState == QuestState.IsToComplete` 的任务。
+沿用邮件接入约定：JSON 使用独立 `mailVersion` 与远端文件清单；过期按存档累计在线时长判定，累计时长由独立计时能力提供，现有 `TimeManager` 负责暂停与恢复。新增存档字段保持旧档可读取，已有字段名保留为原 JSON 键。
 
-**有利事实**：所有状态迁移都收敛在 `QuestManager.QuestStateChanged`（`QuestManager.cs:242`），调用点仅 4 处（`:59`、`:127`、`:131`、`:174`）。因此只需在方法末尾广播一次：
+### 4.6 存档与局间复位
 
-```csharp
-public event Action<QuestSO, MyEnums.QuestState> QuestStateChangedEvent;
-// QuestStateChanged 末尾：
-QuestStateChangedEvent?.Invoke(quest, currentQuestState);
-```
+| 状态 | 策略 |
+|---|---|
+| 技能可升级、任务可交付 | 由业务状态重算；只读业务完成恢复后的状态 |
+| Stats 变化版本和查看确认 | 首期按本次游戏会话维护；新游戏与读档完成时用恢复后的属性重建已确认基线 |
+| 红点父级汇总和导航游标 | 运行期维护，重建或切档时复位 |
+| 邮件等跨会话已读标记 | 由业务域持久化原始已读状态，红点服务从业务结果重算 |
 
-新增 `Assets/Scripts/Gameplay/Quest/QuestRedDot.cs`：订阅该事件，遍历 `questProgress` 重算「是否存在可交付」，写入 `RedDotKey.QuestClaimable`。
+读档恢复不当作一次技能效果提升。恢复期间暂停条件发布，完成后统一初始化并重算，避免残留上一存档的 Stats 提醒或导航目标。普通画布关闭、缓存淘汰和场景切换保持本会话提醒，具体可打开资格按当前业务上下文重算。
 
-注意：`questProgress` 不落盘（`SaveData` 只有 3 个字段，见 `SaveData.cs`），所以任务红点天然是运行时态，读档后归零，这符合预期。
-
-### 4.4 阶段 4：邮件双层红点（下一阶段，依赖热更的 JSON 下发）
-
-只写约定，实现归邮件域：
-
-- 叶子：`MailUnread`、`MailClaimable`；父节点 `Mail` 由树自动求和。
-- 邮件 JSON 使用独立的 `mailVersion` 与远端文件清单，由邮件域约定目录和下载接口。
-- 过期按**存档累计在线时长**判定，不用 `DateTime.UtcNow`：本工程存档是本地 JSON，无可信服务器时间，用设备时间可被直接改写绕过。累计时长需要新增 `PlayTimeTracker`——现有 `TimeManager`（`Assets/Scripts/Pipeline/TimeManager.cs`）只有引用计数的 `PauseGame/ResumeGame`，没有累计计时。
-- `SaveData` 新增字段是向后兼容的（旧档缺字段反序列化为 `null`）；**已有字段名不可改**（`Layering_Guide §3.6`：字段名就是存档 JSON 键）。
-
-### 4.5 存档策略：派生条件不存，已读才存
-
-| 类型 | 例子 | 是否落盘 | 理由 |
-|---|---|---|---|
-| 派生条件 | 技能点 > 0、任务可交付 | 否 | 由运行时状态唯一推导，落盘反而会产生「存档与状态不一致」 |
-| 已读标记 | 新物品「已点开过」 | 是 | 无法从状态推导 |
-
-需要落盘时用 `SaveableService<TSelf>` 子类（`Layering_Guide §2.6`），并且**重写 `OnSingletonInitialized` 必须调 `base()`**，否则会被 `SaveRegistry` 静默跳过（`§3.3`）。
+需要落盘的业务状态遵循 `SaveableService<TSelf>` 与 `SaveRegistry` 契约，重写初始化钩子时调用基类。
 
 ## 5. 验收与测试
 
-### 5.1 EditMode 测试（`Assets/Tests/Editor/RedDotTreeTests.cs`）
+### 5.1 自动验证
 
 | 用例 | 断言 |
 |---|---|
-| 叶子置数广播 | `SetCount(leaf, 3)` → 收到 1 次 `Changed`，`Count == 3` |
-| 同值短路 | 连续两次 `SetCount(leaf, 3)` → 只广播 1 次 |
-| 父级求和 | 两个子节点 2 + 3 → 父 `Count == 5` |
-| 父级只广播一次 | 同时改两个子节点 → 父节点只广播 1 次 |
-| 归零熄灭 | 子节点全部置 0 → 父 `IsOn == false` |
-| 冲突登记 | 重复 Key 注册 → 抛错或返回失败（不许静默覆盖） |
-| 环检测 | A→B→A → 注册失败 |
+| 叶子置数与父级汇总 | 子节点计数向 Skills / Quest / Stats 及 OpenMenu 逐级传播 |
+| 同值与批量去重 | 同值不广播，同批最终变化的每个节点只广播一次 |
+| 结构校验 | 重复 Key、缺父节点和环登记失败 |
+| 分页复用 | 同一按钮从 Skills 换绑 Quest 后只显示 Quest 状态，旧事件不污染 |
+| 导航顺序与去重 | 多叶子映射同画布只产生一个目标，逐次按配置顺序循环 |
+| 导航状态变化 | 候选失效能跳过，新事务能进入下一次选择，无候选不发请求 |
+| 技能资格 | 点数、解锁和等级上限与升级命令结果一致 |
+| Stats 提醒 | 实际提升置位，失败与无提升不置位，多次提升合并 |
+| 展示确认 | 只清除已展示版本，新变化不会被旧回执清除 |
+| 会话与读档 | 读档建立基线，重算派生条件，清除旧游标与旧档提醒 |
 
-对标 `CanvasFocusStackTests` 的粒度（15 例）：**纯 C# 层必须有独立测试**，这是 `Layering_Guide §3.7` 的直接推论。
+红点树与导航选择采用纯 C# 测试。画布打开或聚焦、输入阻塞、业务上下文准备与展示确认使用集成验证覆盖。
 
 ### 5.2 手工验收
 
-1. 技能点 > 0 → 集成面板 Skills 按钮亮；花完 → 灭。
-2. 任务转 `IsToComplete` → Quest 按钮亮；交付 → 灭。
-3. **翻页来回切两次**，红点状态不丢（验 §3.6 第一个坑）。
-4. 打开面板再关闭、切场景再回来，红点仍正确（验 `OnEnable` 重读）。
-5. 存档 → 读档，派生红点按新状态重算，不残留。
+1. 获得可用于升级的技能点，Skills 与 OpenMenu 同时亮点；只打开 Skills 保留提示，点数用尽或全部满级后熄灭。
+2. 任务达到可交付状态，Quest 与 OpenMenu 亮点；打开后仍亮，交付后按剩余任务重算。
+3. 同时存在 Skills、Quest 和 Stats 待办，连续按 `~` 按顺序逐个定位，每次最多切换一个画布。
+4. Skills 仍有待办时继续按 `~` 可以到 Quest、Stats，走完一轮再返回 Skills；目标已打开时进入焦点并保持显示。
+5. 技能升级实际提升属性后 Stats 亮点；技能点耗尽时 Skills 熄灭，Stats 提醒持续到新属性成功展示。
+6. Stats 已打开时发生提升，刷新成功后确认；刷新期间再次提升，旧回执保留新的提醒。
+7. 收起聚合面板，OpenMenu 总红点仍可见；切换分页，按钮提示跟随实际画布身份，总红点包含其他页的待办。
+8. 关闭并淘汰 Skills、Quest、Stats 画布后触发事务，红点仍正确；重开恢复最新状态，任务能准备上下文并定位。
+9. 输入阻塞和文本输入期间按 `~` 不打开画布；同帧 ESC 按统一规则处理；无待办时没有打开请求。
+10. 读档后按恢复状态重算，属性读档不生成提升提醒，旧档目标和旧回执不影响当前存档。
 
-## 6. 约定与硬边界
+## 6. 接入约定与边界
 
-### 6.1 Key 唯一，且枚举插在 `Default` 之前
+- 新增提示：增加 Contracts Key、登记树关系、由业务条件源写叶子、视图绑定对应分支。参与快捷引导时再登记画布、顺序与业务上下文处理器。
+- `CanvasType.Default` 表示无画布，不参加导航。Key、画布映射与处理器在启动时统一校验。
+- 条件源与确认状态由常驻业务组件持有。视图只负责显示和回报实际展示的版本。
+- 待办选择使用稳定配置顺序与循环游标；数值权重排序、提醒动画与账号同步作为独立扩展。
+- 业务条件由玩法域定义；通用框架负责树、计数、传播、候选选择与视图绑定，画布状态由现有 UI 基建管理。
+- 纯 C# 树和选择器独立测试；`RedDotConfigSO` 作为 ScriptableObject 用配置加载与结构校验验证。
 
-`MyEnums.cs:70-71` 的注释已规定新画布枚举必须加在 `Default` 之前。`RedDotKey` 若与其他枚举共用同名成员同样会编译失败——全局命名空间是共用的（`Layering_Guide §3.2`），新类型重名会在无关文件报错。
+## 7. 方案讲解口径
 
-### 6.2 视图不得用 `onClick` 清红点
+这套方案把待办状态投影成红点树：OpenMenu 汇总所有画布分支，业务条件源维护叶子，玩家按 `~` 按稳定顺序逐个定位当前可处理的画布。技能升级带来的属性提升生成独立的 Stats 提醒，实际展示后确认已查看。界面缓存只管理 View，提示状态和导航资格由常驻业务组件维护。
 
-见 §3.6 第二条。红点是**状态的投影**，不是可手动清除的标记。
-
-### 6.3 纯 C# 层不得引用 MonoBehaviour 生命周期
-
-`RedDotNode` / `RedDotTree` / `RedDotConfigSO` 必须可在 `new` 之后直接测试（`Layering_Guide §3.7`）。把 `Update` 驱动的轮询塞进树里会同时破坏可测性与性能。
-
-### 6.4 订阅必须成对
-
-视图 `OnEnable +=` / `OnDisable -=`，与 `EventChannels_Guide §3.1` 一致。`RedDotService` 是常驻单例，视图销毁后退订才是唯一防止悬挂委托的手段。
-
-### 6.5 本域不定义业务条件
-
-「技能点 > 0 算红点」是技能域的规则，「有可交付任务算红点」是任务域的规则。本域只提供表达能力与视图规范，避免红点框架变成第二个业务逻辑中心。
-
-## 7. 面试讲解稿
-
-### 7.1 30 秒版本
-
-> 自研了一套树形红点：节点存的是**计数**而不是布尔，父节点自动汇总子节点；条件源只写自己那一个叶子，UI 只读节点值，两边靠一次**去重的变更广播**连接。特点是任何系统按枚举 Key 接入、不用改框架代码；框架本身是纯 C#，可以脱离 Unity 做单元测试。
-
-### 7.2 五个关键取舍
-
-| 取舍 | 常见做法 | 本方案 | 为什么 | 代价 |
-|---|---|---|---|---|
-| 计数 vs 布尔 | `bool hasNew` | `int` 计数 | 邮件要显示「3 封未读」，商店要显示「12 件可领」；布尔无法升级为计数 | 视图要处理数字格式化 |
-| 树形 vs 扁平 | 每个入口各自算 | 父子树 + 自动汇总 | 红点天然层级（入口→面板→条目）。扁平化会把「汇总」推给每个条件源，耦合爆炸 | 需要一份父子登记 + 启动期自检 |
-| 枚举 Key vs 字符串 | `"mail_unread"` | `MyEnums.RedDotKey` | 字符串打错不报错、运行期静默失效；枚举能编译期兜住，还能被自检遍历 | 新增 Key 要改代码（换来的是安全） |
-| C# 事件 vs SO 通道 | 复用工程 28 个 SO 资产 | 专用 C# 事件 | 红点是单通道多 Key 的稀疏广播；SO 资产适合「一资产一语义」，且其价值（跨场景可视化接线）在常驻场景里不存在 | 失去 Inspector 可读性，用 `RedDotConfigSO` 部分补回 |
-| 广播去重 vs 直接刷新 | 每次置位都 `Refresh()` | 汇总值不变则不广播，向上提前终止 | 条件源常在每帧/每事件重复写同值，不去重会打爆 UI | 多一层缓存值，需要维护一致性 |
-
-### 7.3 常见追问
-
-**Q：红点要不要存档？**
-A：分两类。派生条件（技能点>0、有任务可交付）不存，它是状态的函数，存了必然出现「存档说亮、状态说灭」；「已读」这类无法推导的才存，而且要明确存档级还是账号级——本工程单机存档，选存档级。
-
-**Q：红点会不会泄漏内存？**
-A：服务的生命周期与场景同长，泄漏只可能来自视图。所以规范是 `OnEnable/OnDisable` 成对订阅，这也是工程 SO 通道既有的规则（`EventChannels_Guide §3.1`）。
-
-**Q：为什么不用 `UnityEvent`？**
-A：`UnityEvent` 走反射/序列化，性能与调用顺序不可控，且不能被纯 C# 测试直接验证。用 `Action` 委托 + 纯 C# 树，测试里 `new` 出来就能断言。
-
-**Q：翻页/重建 UI 后红点为什么会丢？**
-A：这是本工程实测到的坑——集成面板每次翻页会把按钮 `SetActive(false)` 再启用，红点作为子节点会经历 `Disable/Enable`。如果只在事件里更新，那次 `Disable` 之后就再也没人通知它。所以规定 `OnEnable` 必须主动向服务重读一次当前值。
-
-**Q：条件源怎么知道该写哪一层？**
-A：永远只写叶子。父节点由框架算。这条如果破了，红点就会变成「多人抢着算同一个数」，是这类系统最常见的腐化方式。
-
-**Q：新增一个红点要改几处？**
-A：加一个枚举成员 + 在 `RedDotConfigSO` 里登记父子关系 + 条件源写一行 `SetCount` + UI 挂一个 `RedDotView`。**框架代码零改动**——这是判断这套设计是否成功的标准。
-
-### 7.4 不能吹的部分（诚实边界）
-
-- 目前是 **Proposal**，代码尚未落地。对外只说「设计并规划了」，不要说「实现了」，除非阶段 1 与阶段 2 各自留下验证证据。
-- 没有做「红点排序/优先级」「红点动画」「跨端账号同步」，这些都不在范围内。
-- 没有做性能压测。节点规模在数十级时不构成瓶颈；上千节点需要另议（届时可加脏标记 + 分帧广播）。
+方案状态以本文开头为准；实现、运行验证与性能结论以对应落地证据为依据。
