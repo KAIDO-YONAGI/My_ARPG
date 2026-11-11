@@ -50,7 +50,7 @@ namespace Gameplay.Skills
             RefreshIfChanged();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             RefreshIfChanged();
         }

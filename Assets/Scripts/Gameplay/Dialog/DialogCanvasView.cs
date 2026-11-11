@@ -83,7 +83,7 @@ namespace Gameplay.Dialog
             RefreshIfChanged();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             RefreshIfChanged();
         }

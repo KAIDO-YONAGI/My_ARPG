@@ -44,7 +44,7 @@ namespace Gameplay.Shop
             RefreshIfChanged();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             RefreshIfChanged();
         }

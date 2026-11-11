@@ -10,7 +10,8 @@ namespace Gameplay.Inventory
     /// </summary>
     /// <remarks>
     /// 快捷栏只显示管理器中的前若干个槽位（管理器把快捷栏排在背包之前）。
-    /// 首次 <c>Start</c> 把场景里配置的初始物品交给管理器，之后每帧比较版本并按需刷新。
+    /// 首次 <c>Start</c> 把场景里配置的初始物品交给管理器，之后在每帧 <c>LateUpdate</c>
+    /// 中比较版本并按需刷新。
     /// </remarks>
     public sealed class HotbarCanvasView : MonoBehaviour
     {
@@ -54,7 +55,7 @@ namespace Gameplay.Inventory
             RefreshIfChanged();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             RefreshIfChanged();
         }

@@ -1,6 +1,7 @@
 namespace Contracts.State
 {
     /// <summary>单个读取者的绘制记录；首次读取、数据源切换和版本变化均需要刷新。</summary>
+    /// <remarks>界面层的轮询放在 <c>LateUpdate</c>，使本帧 <c>Update</c> 内完成的写入在当帧绘制。</remarks>
     public struct VersionReader
     {
         private object source;

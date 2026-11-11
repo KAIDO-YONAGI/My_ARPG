@@ -52,7 +52,7 @@ namespace Gameplay.Inventory
             RefreshIfChanged();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             RefreshIfChanged();
         }

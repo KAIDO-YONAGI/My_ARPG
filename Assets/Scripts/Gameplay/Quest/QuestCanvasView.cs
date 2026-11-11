@@ -74,7 +74,7 @@ namespace Gameplay.Quest
             RefreshIfChanged();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             RefreshIfChanged();
         }

@@ -76,7 +76,7 @@ namespace Pipeline.UI.Runtime
             cache?.Disconnect();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             cache?.Dispose();
             cache = null;
