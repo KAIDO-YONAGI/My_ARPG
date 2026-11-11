@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-11 画布开关事件资产迁移字段名
+
+`Assets/GameSO/Events/ToggleCanvasEvents` 下 9 个事件资产把旧序列化键 `canvasToToggle` 改为 `canvasType`，值不变：GameOver 1、Stats 2、Skills 3、Dialog 4、Quest 5、Shop 6、Integrated 7、Backpack 8、SaveLoad 9。`ToggleESCEvent` 没有该字段，反序列化默认值 0 仍是 ESC，未改。11 月 9 日的字段改名没有迁移资产，Unity 按字段名反序列化，旧键被忽略、`canvasType` 回落到 0，`UICacheManager` 注册校验 `prefab.ToggleEvent.canvasType != prefab.CanvasId` 全部失败，五个缓存画布无法注册。同步 `EventChannels_Guide` 的 §2.1、§2.5 与 §3.2、`Assets_Guide` §3.1、`Composition_Guide` §2.7 与 §3.5、`Dialog_Guide` §2.5 中的旧字段名与旧枚举名。验证：静态核对 9 个资产的键与值与 `CanvasType` 枚举一致；`Assets` 内除 `IntegratedUICanvasManager.canvasToToggle` 列表字段外已无旧键；未在 Unity 内重进 Play 确认注册恢复。Assets 维护计数 `1/5 -> 2/5`。
+
 ## 2026-11-07 未登记画布的打开音效
 
 - `UIAudioManager.OnUIAudio` 使用 `TryGetValue` 查询画布映射；未登记的画布直接跳过，已登记的画布继续发布对应的二维音效请求。

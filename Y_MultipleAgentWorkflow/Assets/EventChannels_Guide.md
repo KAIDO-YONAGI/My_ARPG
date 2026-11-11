@@ -2,7 +2,7 @@
 
 文档 ID：`ASSETS-EVENTCHANNELS-GUIDE`
 状态：`Active`
-最后更新：`2026-11-02`
+最后更新：`2026-11-11`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
@@ -19,7 +19,7 @@
   - [2.6 新增一个事件通道的标准动作](#26-新增一个事件通道的标准动作)
 - [3. 约定与硬边界](#3-约定与硬边界)
   - [3.1 订阅必须随对象或打开状态成对管理](#31-订阅必须随对象或打开状态成对管理)
-  - [3.2 canvasToToggle 是隐式身份，必须唯一](#32-canvastotoggle-是隐式身份必须唯一)
+  - [3.2 canvasType 是隐式身份，必须唯一](#32-canvastype-是隐式身份必须唯一)
   - [3.3 新增与改名事件通道的检查清单](#33-新增与改名事件通道的检查清单)
 
 先读目录，再按任务读取相关章节，避免整份指南载入上下文。
@@ -34,7 +34,7 @@
 | `新增事件` / `新建通道` | §2.6 新增标准动作、§3.3 检查清单 |
 | `改名事件` / `重命名事件资产` | §3.3 检查清单 |
 | `VoidEventSO` / `OnEventRaised` | §2.1 清单、§2.2 类型契约 |
-| `ToggleCanvasEventSO` / `canvasToToggle` | §2.5 内部契约、§3.2 canvasToToggle 必须唯一 |
+| `ToggleCanvasEventSO` / `canvasType` | §2.5 内部契约、§3.2 canvasType 必须唯一 |
 | `SceneLoadedEvent` / `SceneLoadEvent` | §2.1 清单、§2.4 发布点 |
 | `订阅` / `OnEnable +=` / `OnDisable -=` | §2.4 订阅与发布惯例、§3.1 订阅必须成对 |
 | `Raise` / `OnEventRaised` / `发布` | §2.2 发布方法命名、§2.4 发布惯例 |
@@ -62,7 +62,7 @@
 | 10 | `ShopKeeperEventSO` | `Action<ShopKeeper> ShopKeeperEntered / Exited` | `RaiseShopKeeperEntered/Exited(...)` | 1 |
 | 11 | `PlayerDamagedEventSO` | `Action<int,Transform,float,float> PlayerDamaged` | `OnPlayerDamaged(...)` | 1 |
 | 12 | `EnemyDefeatedEventSO` | `Action<int,Transform> EnemyDefeated` | `OnEnemyDefeated(...)` | 1 |
-| 13 | `CanvasOpenedEventSO` | `Action<CanvasToToggle> CanvasOpened` | `RaiseCanvasOpened(...)` | 1 |
+| 13 | `CanvasOpenedEventSO` | `Action<CanvasType> CanvasOpened` | `RaiseCanvasOpened(...)` | 1 |
 | 14 | `FeedbackEventSO` | `Action<AudioRequest> AudioRequested` | `RequestAudio(...)` | 1 |
 | | **合计** | | | **30** |
 
@@ -117,26 +117,26 @@ private void OnDisable() { sceneLoadEventSO.LoadRequestEvent -= OnAutoSave; ... 
 
 ### 2.5 ToggleCanvasEventSO 的内部契约
 
-`ToggleCanvasEventSO` 是 14 个类里唯一带配置字段的，字段是 `public CanvasToToggle canvasToToggle`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
+`ToggleCanvasEventSO` 是 14 个类里唯一带配置字段的，字段是 `public CanvasType canvasType`。它同时持有两条事件：`toggleCanvasEvent` 负责显隐，`focusEvent` 只调排序优先级，源码注释说明二者分离，用独立事件传达置顶与降级。
 
 消费侧靠枚举匹配配对：
 
 ```csharp
 // UIManager 的枚举匹配查找
-private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
+private ToggleCanvasEventSO FindToggleEvent(CanvasType canvas) {
     var cachedEvent = viewCache?.GetToggleEvent(canvas);
     if (cachedEvent != null) return cachedEvent;
     foreach (var eventSO in toggleCanvasEvents)
-        if (eventSO != null && eventSO.canvasToToggle == canvas) return eventSO;   // 取第一个匹配
+        if (eventSO != null && eventSO.canvasType == canvas) return eventSO;   // 取第一个匹配
     return null;
 }
 ```
 
 `UICacheManager.views` 与 `UIManager.toggleCanvasEvents` 共同提供枚举到事件的登记。缓存注册表优先，`toggleCanvasEvents` 随后；`IsClosableCanvas` 使用同一查找。属性面板与技能、商店、对话、任务、背包六块界面登记在 `views`；其余画布登记在 `toggleCanvasEvents`。
 
-10 个 toggle 资产映射到 **10 个互不重复**的 `CanvasToToggle` 值。`CanvasToToggle` 共 11 个成员，唯一无资产的是 `Default`。
+10 个 toggle 资产映射到 **10 个互不重复**的 `CanvasType` 值。`CanvasType` 共 11 个成员，唯一无资产的是 `Default`。
 
-| 资产 | `canvasToToggle` |
+| 资产 | `canvasType` |
 |---|---|
 | `ToggleESCEvent` | 字段缺失，反序列化为 `0` = `ESC` |
 | `ToggleGameOverEvent` | 1 `GameOver` |
@@ -154,7 +154,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 1. 新建类时把它放在事件通道目录，`[CreateAssetMenu(menuName = "Events/<类名>")]`，包一层 `public event Action<...>` 加一个发布方法，照抄同族命名风格，见 §2.2。
 2. 在 Events 目录或多实例子目录右键 `Create > Events > ...` 建资产，随即改名；默认文件名是类名，`VoidEventSO` 必须补语义前缀。
 3. 发布方用 `[SerializeField]` 拖该资产；订阅方在 `OnEnable` 与 `OnDisable` 成对 `+=` 与 `-=`；两侧都拖到同一个资产，见 §3.3。
-4. 画布开关通道要给资产设 `canvasToToggle`。场景画布将事件登记进 `UIManager.toggleCanvasEvents`；缓存界面把带该事件的 `Contracts.CachedCanvasViewBase` 预制体登记进 `UICacheManager.views`。
+4. 画布开关通道要给资产设 `canvasType`。场景画布将事件登记进 `UIManager.toggleCanvasEvents`；缓存界面把带该事件的 `Contracts.CachedCanvasViewBase` 预制体登记进 `UICacheManager.views`。
 
 ## 3. 约定与硬边界
 
@@ -164,7 +164,7 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 
 另一套机制是静态事件：`SkillSlot` 用的是 `public static event`，由 `SkillTreeManager` 成对订阅，静态事件跨场景存活。新增 SO 通道订阅时照抄 SO 通道的成对写法。
 
-### 3.2 canvasToToggle 是隐式身份，必须唯一
+### 3.2 canvasType 是隐式身份，必须唯一
 
 同一个 ID 只对应一份事件资产和显示实例。旧列表取第一个匹配项，缓存注册表拒绝重复 ID；两处同时出现时缓存定义优先。当前 10 个资产值互不重复。新增画布先在 `Default` 之前增加枚举成员，再创建事件资产，最后登记到事件列表或预制体列表。
 
@@ -178,8 +178,8 @@ private ToggleCanvasEventSO FindToggleEvent(CanvasToToggle canvas) {
 | 2 | 发布方：`[SerializeField]` 拖了该资产 | 按该资产 GUID 检索场景、预制体与资产 |
 | 3 | 订阅与退订成对 | 按 §2.4 核对组件、Controller、缓存 View 和服务的生命周期 |
 | 4 | 场景与预制体里的资产引用 | 按 GUID 计数，改名后引用数不应为 0 |
-| 5 | toggle 通道：`canvasToToggle` 值唯一，且已登记事件或缓存预制体 | `CanvasToToggle` 与 `UIManager` |
+| 5 | toggle 通道：`canvasType` 值唯一，且已登记事件或缓存预制体 | `CanvasType` 与 `UIManager` |
 | 6 | 常驻场景内管理器持有的通道 | 确认它是常驻场景 `PersistentScene` 里的对象 |
 | 7 | 改完后按 GUID 复算引用数，确认与改前一致 | 对全部场景、预制体与资产做 GUID 匹配计数 |
 
-字段改名会让 Inspector 引用变空：Unity 按字段名反序列化，编译能过、运行时无广播。
+字段改名会让旧键被静默忽略、值回落到默认：Unity 按字段名反序列化，编译能过、运行时无广播或画布身份错位。迁移要么给字段加 `[FormerlySerializedAs("旧名")]`，要么同步改资产 YAML 的键名。

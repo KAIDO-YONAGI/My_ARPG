@@ -70,7 +70,8 @@
 
 ### 2.3 组语义与加载顺序
 
-- 卸载段先等 `fadeDuration`，再按倒序遍历 `currentScenes` 逐一 `UnloadSceneAsync`，跳过常驻场景，随后 `currentScenes.Clear()`。
+- `OnLoadRequestEvent` 完成输入与时间控制、触发过渡动画后，启动总协程 `ChangeScenesRoutine`。总协程先等待 `UnloadCurrentScenes()` 整段结束，再等待 `LoadScenesRoutine(...)`，卸载与加载的先后关系由这两个等待点统一管理。
+- 卸载段按倒序遍历 `currentScenes`，逐一等待 `UnloadSceneAsync`，保留注册的常驻场景。遍历结束后执行 `WaitForSecondsRealtime`，再清空当前场景组记录；过渡等待位于卸载之后。
 - 加载段按列表正序逐个用 `Application.CanStreamedLevelBeLoaded` 校验，失败只 `LogError` 并 `continue`，整组不中断；`sceneType == Menu` 时调 `SetObjects(false)`，`Location` 时调 `SetObjects(true)`。等待异步加载完成后按 `sceneName` 取得场景，确认有效且已加载再加入 `currentScenes`。
 - `firstLoaded` 取组内第一个成功加载的场景，作为完成事件的参数；对应的场景实例保存到 `loadedScene`，供 `GetCurrentScene()` 回读。`currentScenes[0]` 是 `GetCurrentGameScene()` 的返回值。
 - `sceneLoadedEvent` 广播前已更新场景组与主场景引用，订阅方通过查询接口读取当前场景。

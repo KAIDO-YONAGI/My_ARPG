@@ -2,7 +2,7 @@
 
 文档 ID：`ARCH-COMPOSITION-GUIDE`
 状态：`Active`
-最后更新：`2026-11-02`
+最后更新：`2026-11-11`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
@@ -23,7 +23,7 @@
   - [3.2 派生类重写 `Awake` 时必须调 `base.Awake()`](#32-派生类重写-awake-时必须调-baseawake)
   - [3.3 重写 `SaveableService.OnSingletonInitialized` 时必须调 `base`](#33-重写-saveableserviceonsingletoninitialized-时必须调-base)
   - [3.4 `SaveRegistry.All` 遍历前必须拷贝，且不得在遍历中注册或注销](#34-saveregistryall-遍历前必须拷贝且不得在遍历中注册或注销)
-  - [3.5 `CanvasToToggle.Default` 不参与任何流程](#35-canvastotoggledefault-不参与任何流程)
+  - [3.5 `CanvasType.Default` 不参与任何流程](#35-canvastypedefault-不参与任何流程)
   - [3.6 画布要能被 UIManager 主动关闭，必须登记开关事件或缓存预制体](#36-画布要能被-uimanager-主动关闭必须登记开关事件或缓存预制体)
   - [3.7 `EditorSettings` 的 Domain Reload 状态与静态状态必须成对](#37-editorsettings-的-domain-reload-状态与静态状态必须成对)
 
@@ -139,7 +139,7 @@
 
 缓存归 `UICacheManager` 这个独立 MonoBehaviour 单例所有，`UIManager` 只持一个引用并转发开关请求。它是全工程唯一不经 `YSingleton` 的手写单例（`static Instance` 自管），因此不计入 §2.1 的 21 个具体单例。
 
-注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasViewBase` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasToToggle`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。打开请求先在预制体或已有实例上执行只读的 `CanOpen`，通过后首次实例化，再由 `Open` 检查门槛并执行 `OnOpen`；门槛拒绝时不创建界面，也不会触发其 `Awake`。`CanOpen` 只检查条件，不执行副作用。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
+注册方式是 `views` 列表里的 `CachedViewBinding { prefab, anchor }`：`prefab` 是继承 `Contracts.CachedCanvasViewBase` 的界面预制体，`anchor` 是常驻场景里的空挂点，实例以该挂点为父节点创建。界面 ID 取预制体上 `ToggleEvent.canvasType`，构造时校验它与 `CanvasId` 一致、非 `Default`、不重复，任一不成立就报错跳过。打开请求先在预制体或已有实例上执行只读的 `CanOpen`，通过后首次实例化，再由 `Open` 检查门槛并执行 `OnOpen`；门槛拒绝时不创建界面，也不会触发其 `Awake`。`CanOpen` 只检查条件，不执行副作用。场景内自带的画布走 `toggleCanvasEvents`，事件查找先查缓存注册表，再查这份列表。
 
 `UIViewInstanceCache` 持有开关与焦点事件订阅，因此界面尚未创建或已停用时仍能接收请求。`OpenOnToggleEvent` 决定打开请求是否直接交给缓存；对话与任务由业务入口先准备数据，再调用 `OpenCanvas`。关闭请求始终由缓存处理，ESC 与互斥沿用同一路径。缓存只负责注册、实例创建、事件订阅与闲置淘汰；`CachedUIViewBase` 在打开和关闭生命周期中调用 `ICanvasManager` 更新显隐、焦点状态与排序，焦点刷新事件也由视图基类处理。
 
@@ -167,7 +167,7 @@ View 在 `OnOpen` 读取管理器状态并首刷，在 `OnClose` 释放打开期
 
 现存调用点统一写作 `SaveRegistry.All.ToList()`。
 
-### 3.5 `CanvasToToggle.Default` 不参与任何流程
+### 3.5 `CanvasType.Default` 不参与任何流程
 
 它无索引，语义为默认界面，同时是 ESC 判断依据；`UIManager.ReportCanvasState` 与 `CanvasFocusStack.ReportState` 都直接 return。新枚举成员必须加在 `Default` 之前，加在后面会静默丢失画布能力。
 

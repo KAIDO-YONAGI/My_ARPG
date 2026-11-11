@@ -2,7 +2,7 @@
 
 文档 ID：`ASSETS-GUIDE`
 状态：`Active`
-最后更新：`2026-11-02`
+最后更新：`2026-11-11`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
@@ -122,7 +122,7 @@ StreamingAssets 目录下只有一个有效文件：`GameGuide` 指南文件，1
 ### 3.1 目录与命名约定
 
 - **目录**：GameSO 目录下按用途分目录。事件通道统一放在 Events 目录，再分 `VoidEvents`、`ToggleCanvasEvents`、`InventorySlotsStatsEvents`。
-- **配置资产命名跟随类名或语义名**：`CharacterSO` 放在以角色名命名的文件夹根部；`ToggleCanvasEvents` 下的资产命名为 `Toggle<枚举后缀>Event`，与 `CanvasToToggle` 的成员一一对应，见 `EventChannels_Guide.md` §2.3。
+- **配置资产命名跟随类名或语义名**：`CharacterSO` 放在以角色名命名的文件夹根部；`ToggleCanvasEvents` 下的资产命名为 `Toggle<枚举后缀>Event`，与 `CanvasType` 的成员一一对应，见 `EventChannels_Guide.md` §2.3。
 - **`VoidEventSO` 资产必须带语义前缀**：该规则写在 `VoidEventSO` 的源码注释里，要求资产名含语义前缀，例如 `SlashActionFinishedEventSO`，并禁止再创建无语义的资产名。
 - **`GuidSO` 派生类不要手动改 `guid`**：`OnValidate` 只在为空时补发，手动清空会在下次 Inspector 校验时换成新值。
 

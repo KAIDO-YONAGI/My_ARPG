@@ -2,7 +2,7 @@
 
 文档 ID：`GP-DIALOG-GUIDE`
 状态：`Active`
-最后更新：`2026-11-07`
+最后更新：`2026-11-11`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
@@ -107,7 +107,7 @@
 
 `NPCDialogTrigger` 承接 UIManager 的对话开关请求：订阅 `toggleDialogEvent`，收到开启只置 `openDialogRequested`，收到关闭直接 `ForeceEndDialog()`。`Update()` 中，存在开启请求且对话未激活时才 `StartDialog(dialogSO)`；对话进行中且 `advanceDialogAction.WasPressedThisFrame()` 时 `AdvanceDialog()`。`OnDisable` 同样 `ForeceEndDialog()`。
 
-资产与接线：`ToggleDialogEvent` 事件资产的 `canvasToToggle` 为 4，对应 `CanvasToToggle` 里 Dialog 的取值；该资产登记在常驻场景 UIManager 的 `toggleCanvasEvents` 列表里，并有 canvas 4 的输入绑定。界面实体在 `Assets/Prefabs/UI/Runtime/DialogCanvas.prefab`，配了 4 个选项按钮与 4 个选项文本，作为缓存界面登记在 `UICacheManager.views`；`DialogManager` 组件只挂状态与事件。场景内 `NPCDialogTrigger` 的入口对话引用：Scene1 的两个触发器分别用 `PurpleBobPickMushroom` 与 `PurpleBobs Greeting`，Scene2 的一个触发器用 `PurpleBobs Greeting`。
+资产与接线：`ToggleDialogEvent` 事件资产的 `canvasType` 为 4，对应 `CanvasType` 里 Dialog 的取值；该资产登记在常驻场景 UIManager 的 `toggleCanvasEvents` 列表里，并有 canvas 4 的输入绑定。界面实体在 `Assets/Prefabs/UI/Runtime/DialogCanvas.prefab`，配了 4 个选项按钮与 4 个选项文本，作为缓存界面登记在 `UICacheManager.views`；`DialogManager` 组件只挂状态与事件。场景内 `NPCDialogTrigger` 的入口对话引用：Scene1 的两个触发器分别用 `PurpleBobPickMushroom` 与 `PurpleBobs Greeting`，Scene2 的一个触发器用 `PurpleBobs Greeting`。
 
 ## 3. 约定与硬边界
 
