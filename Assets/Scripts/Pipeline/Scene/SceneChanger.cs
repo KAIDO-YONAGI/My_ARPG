@@ -24,8 +24,8 @@ namespace Pipeline.Scene
 
         [SerializeField] private float fadeDuration = 1f;
 
-        [Tooltip("启动时自动加载的初始场景组。按列表顺序以 Additive 模式加载，通常配置为菜单场景组。")]
-        [SerializeField] private List<GameSceneSO> firstSceneToLoad = new();
+        [Tooltip("启动时自动加载的初始场景组。按列表顺序以 Additive 模式加载，通常配置为菜单场景组。")] [SerializeField]
+        private List<GameSceneSO> firstSceneToLoad = new();
 
         [SerializeField] private GameObject player;
         [SerializeField] private CanvasGroup fadeCanva;
@@ -46,7 +46,7 @@ namespace Pipeline.Scene
 
         private bool isInitialScene = true;
 
-        /// <summary>加载进行中标记：请求→淡入→卸载→加载→完成的整个窗口内为 true，防止双请求竞态。</summary>
+        /// <summary>切换执行期间保持置位，覆盖过渡、卸载、加载和完成处理，防止重复启动切换流程。</summary>
         private bool isLoading;
 
         /// <summary>
@@ -132,7 +132,8 @@ namespace Pipeline.Scene
         }
 
         /// <summary>
-        /// 加载请求的执行段，由 RequestSceneLoad 在广播完成后调用
+        /// 加载请求的执行段，由 RequestSceneLoad 在广播完成后调用。
+        /// 检查请求后锁定切换状态、暂停操作，并启动切场总协程。
         /// </summary>
         /// <param name="scenes">目标场景组</param>
         /// <param name="newPosition">玩家新位置</param>
@@ -168,7 +169,24 @@ namespace Pipeline.Scene
                 PlayLoadingAnimation("FadeIn");
             }
 
-            StartCoroutine(UnloadCurrentScenes(scenes, targetPosition, isToFade)); //卸载当前场景组
+            StartCoroutine(ChangeScenesRoutine(scenes, targetPosition, isToFade));
+        }
+
+        /// <summary>
+        /// 切场总流程：等待旧场景退出，再加载目标场景组。
+        /// 每次 yield return 都等待整个子协程结束，包含子协程内部的跨帧等待。
+        /// </summary>
+        /// <param name="targetScenes">目标场景组</param>
+        /// <param name="targetPosition">目标场景组加载后的玩家位置</param>
+        /// <param name="targetFade">是否在加载完成时播放淡出动画</param>
+        private IEnumerator ChangeScenesRoutine(
+            List<GameSceneSO> targetScenes,
+            Vector3 targetPosition,
+            bool targetFade)
+        {
+            yield return UnloadCurrentScenes();
+            yield return LoadScenesRoutine(
+                targetScenes, targetPosition, targetFade);
         }
 
         /// <summary>场景组的默认出生点：取首个有效场景 SO 的初始位置。</summary>
@@ -179,23 +197,17 @@ namespace Pipeline.Scene
                 if (scene != null)
                     return scene.initialPosition;
             }
+
             return Vector3.zero;
         }
 
         /// <summary>
-        /// 卸载当前场景组协程
-        /// 等待淡入动画完成后卸载旧内容场景组，然后按顺序加载新场景组
+        /// 卸载当前内容场景组，保留注册的常驻场景。
+        /// 逐个等待异步卸载完成，随后执行真实时间等待并清空当前场景组记录。
         /// </summary>
-        /// <param name="targetScenes">要加载的目标场景组</param>
-        /// <param name="targetPosition">玩家在目标场景组中的位置</param>
-        /// <param name="targetFade">是否播放过渡动画</param>
-        private IEnumerator UnloadCurrentScenes(
-            List<GameSceneSO> targetScenes,
-            Vector3 targetPosition,
-            bool targetFade)
+        private IEnumerator UnloadCurrentScenes()
         {
-            yield return new WaitForSecondsRealtime(fadeDuration);
-
+            float time = Time.realtimeSinceStartup;
             for (int i = currentScenes.Count - 1; i >= 0; i--)
             {
                 GameSceneSO scene = currentScenes[i];
@@ -216,15 +228,19 @@ namespace Pipeline.Scene
                     yield return SceneManager.UnloadSceneAsync(loaded);
             }
 
+            float subTime = Time.realtimeSinceStartup - time;
+
+            yield return new WaitForSecondsRealtime(fadeDuration - subTime > 0 ? fadeDuration - subTime : 0);
             currentScenes.Clear();
-            yield return LoadScenesRoutine(targetScenes, targetPosition, targetFade);
         }
 
         /// <summary>
-        /// 按列表顺序以 Additive 模式加载场景组，全部完成后调用 OnLoadCompleted。
-        /// 禁止裸调用：必须经 RequestSceneLoad 入口先广播订阅方再执行，
-        /// 否则订阅者收不到切换通知。
+        /// 由切场总流程在卸载协程结束后调用，按列表顺序以 Additive 模式加载场景组。
+        /// 每个场景加载完成后登记引用，整组处理结束后设置玩家位置并进入完成阶段。
         /// </summary>
+        /// <param name="targetScenes">按加载顺序排列的目标场景组</param>
+        /// <param name="targetPosition">场景组加载后的玩家位置</param>
+        /// <param name="targetFade">是否在加载完成时播放淡出动画</param>
         private IEnumerator LoadScenesRoutine(
             List<GameSceneSO> targetScenes,
             Vector3 targetPosition,
@@ -270,8 +286,10 @@ namespace Pipeline.Scene
                     firstLoaded = scene;
                     loadedScene = loaded;
                 }
+
                 currentScenes.Add(scene);
             }
+
             SetPlayerPostion(targetPosition);
             OnLoadCompleted(firstLoaded, targetFade);
         }
