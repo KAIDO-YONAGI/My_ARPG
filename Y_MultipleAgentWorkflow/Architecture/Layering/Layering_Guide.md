@@ -84,7 +84,7 @@
 | Controller | `ExperienceController` `HealthController` `StatsCanvasController` `PlayerDamageController` | `Gameplay.Player.Controllers` | 前三个纯 C#，由 View 托管 `new`；`PlayerDamageController` 挂场景 |
 | View | `ExperiencePanelView` `HealthView` `StatsCanvasView` | `Gameplay.Player.Views` | MonoBehaviour，不挂单例；属性面板继承契约层的 `CachedUIViewBase` |
 
-另外五个域的"数据 / 界面"配对：`DialogManager` → `DialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`，常驻快捷栏由 `HotbarCanvasView` 承担，`SkillTreeManager` → `SkillsCanvasView`。缓存视图继承 `Contracts.Base.CachedCanvasViewBase`，由 `UICacheManager` 按预制体懒创建；管理器通过稳定的 `CurrentState` 对象提供字段、索引只读查询及分组版本。每个视图用自己的 `VersionReader` 比较数据源身份和版本，绘制成功后记录绘制前捕获的版本，打开时使本地记录失效。集合原地修改并推进版本，刷新直接查询持久数据。读取记录与状态容器均为 struct，轮询和确认只改已有字段。
+另外五个域的"数据 / 界面"配对：`DialogManager` → `DialogCanvasView`、`QuestManager` → `QuestCanvasView`、`ShopManager` → `ShopCanvasView`、`InventoryManager` → `BackpackCanvasView`，常驻快捷栏由 `HotbarCanvasView` 承担，`SkillTreeManager` → `SkillsCanvasView`。缓存视图继承 `Contracts.Base.CachedCanvasViewBase`，由 `UICacheManager` 按预制体懒创建；管理器通过稳定的 `CurrentState` 对象提供字段、索引只读查询及分组版本。每个视图用自己的 `VersionReader` 比较数据源身份和版本，绘制成功后记录绘制前捕获的版本，打开时使本地记录失效。轮询放在每帧 `LateUpdate`，本帧 `Update` 内完成的写入当帧绘制。集合原地修改并推进版本，刷新直接查询持久数据。读取记录与状态容器均为 struct，轮询和确认只改已有字段。
 
 初始化与命令边界同样传递数据：背包视图提取 `InventorySlotState` 初始值，点击命令传递 `SlotAddress`；技能槽位传递技能键、等级上限与初始状态，由管理器命令校验、保存和扣点。前置槽位引用与满级事件留在技能视图侧。
 

@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-11 视图版本轮询定在 LateUpdate
+
+五个缓存画布视图与常驻 `HotbarCanvasView` 的每帧版本轮询从 `Update` 移到 `LateUpdate`，打开界面时的立即刷新不变。Layering Guide 补充：视图在每帧 `LateUpdate` 轮询版本，本帧 `Update` 内完成的写入在当帧绘制；`Contracts.State.VersionReader` 的注释同步该时机。以 Editor 自带的 Roslyn 对 `Assembly-CSharp` 全量 141 个脚本编译，0 错误，输出 `Logs/_verify/csc-output.txt`；未进入 Play 模式。维护计数 `2/5 -> 3/5`。
+
 ## 2026-11-07 状态版本与视图读取记录分离
 
 `Contracts.State.VersionedValue<T>` 保存值与 ulong 版本，`VersionReader` 作为每个视图的 struct 字段保存数据源身份、已绘制版本与首次读取标志。绘制前捕获版本、成功后记录，数据源替换和显式失效均触发刷新；集合原地修改通过 `Touch` 发布。

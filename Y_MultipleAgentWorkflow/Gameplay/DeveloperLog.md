@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-11 玩法视图版本轮询迁到 LateUpdate
+
+六个视图的每帧 `RefreshIfChanged` 从 `Update` 移到 `LateUpdate`：`DialogCanvasView`、`QuestCanvasView`、`ShopCanvasView`、`BackpackCanvasView`、`SkillsCanvasView` 与常驻 `HotbarCanvasView`；打开界面时的立即刷新保持不变。所有 `Update` 执行完才轮询版本，本帧 `Update` 内完成的写入当帧绘制，渲染前完成刷新；晚于该视图 `LateUpdate` 的写入留到下一帧。`VersionReader` 的注释补充轮询时机。Unity 批处理启动被本机许可客户端阻断（退出码 199），改用 Editor 自带的 Roslyn 对 `Assembly-CSharp` 全量 141 个脚本编译，0 错误，产物与输出在 `Logs/_verify/`；未进入 Play 模式。维护计数 `1/5 -> 2/5`。
+
 ## 2026-11-01 缓存画布基类命名统一
 
 五个玩法画布视图改继承 `CachedCanvasViewBase`，属性面板 `StatsCanvasView` 改继承 `CachedUIViewBase`。更新玩家属性、背包商店和事件通道指南中的当前类型名。UI 缓存生命周期回归通过；全量 EditMode 的三条背包槽位 `OnValidate` 空引用失败与本次修改无关。维护计数更新为 `0/5 -> 1/5`。
