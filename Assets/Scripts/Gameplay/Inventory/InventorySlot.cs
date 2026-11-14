@@ -14,25 +14,18 @@ namespace Gameplay.Inventory
     /// <remarks>
     /// 物品与数量是管理器状态的显示副本，运行期只由管理器通过
     /// <see cref="RestoreState"/> 写入；槽位本身不决定堆叠、使用或出售规则。
-    /// 预制体上的初始物品只在第一次初始化管理器状态时读取。
+    /// 槽位不保存初始物品，槽位内容由管理器的配置决定。
     /// </remarks>
     public class InventorySlot : MonoBehaviour, IPointerClickHandler
     {
-        [Header("初始配置")]
-        [Tooltip("预制体上的初始物品；只在首次初始化管理器状态时读取。")]
-        [SerializeField] private ItemSO itemSO;
-
-        [Tooltip("预制体上的初始数量；只在首次初始化管理器状态时读取。")]
-        [SerializeField] private int quantity;
-
         [Header("控件")]
         [SerializeField] private Image itemImage;
         [SerializeField] private TMP_Text quantityText;
 
+        private ItemSO itemSO;
+        private int quantity;
         private int slotIndex = -1;
         private bool isBackpackSlot;
-        private ItemSO initialItem;
-        private int initialQuantity;
 
         /// <summary>当前显示的物品；空槽位为 null。</summary>
         public ItemSO ItemSO => itemSO;
@@ -41,12 +34,6 @@ namespace Gameplay.Inventory
         public int Quantity => quantity;
 
         public bool IsEmpty => itemSO == null;
-
-        /// <summary>预制体上配置的初始物品；必须在第一次 <see cref="RestoreState"/> 前读取。</summary>
-        public ItemSO InitialItem => initialItem;
-
-        /// <summary>预制体上配置的初始数量。</summary>
-        public int InitialQuantity => initialQuantity;
 
         /// <summary>槽位在所属列表中的下标；<c>-1</c> 表示尚未配置。</summary>
         public int SlotIndex => slotIndex;
@@ -58,18 +45,9 @@ namespace Gameplay.Inventory
         {
             Debug.Assert(itemImage != null, nameof(itemImage), this);
             Debug.Assert(quantityText != null, nameof(quantityText), this);
-
-            // 先保存预制体上的初始值，后面的 RestoreState 会覆盖 itemSO/quantity。
-            initialItem = itemSO;
-            initialQuantity = quantity;
         }
 
         private void OnEnable()
-        {
-            UpdateUI();
-        }
-
-        private void OnValidate()
         {
             UpdateUI();
         }

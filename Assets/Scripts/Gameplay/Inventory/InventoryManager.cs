@@ -19,26 +19,12 @@ namespace Gameplay.Inventory
     /// </summary>
     /// <remarks>
     /// 管理器不持有 UI 控件引用，也不在运行时遍历预制体。
-    /// 快捷栏和背包的初始物品由各自视图在首次打开时通过 <c>Initialize*State</c> 传入，
+    /// 快捷栏与背包的初始槽位来自 <see cref="InventoryConfigSO"/>，在常驻场景加载时复制成运行态，
     /// 之后所有增删改都只改这里的状态列表。
     /// </remarks>
     public class InventoryManager : YSingleton<InventoryManager>
     {
         private static readonly int IsPicked = Animator.StringToHash("isPicked");
-
-        /// <summary>一个槽位的运行期状态：物品与数量。</summary>
-        [System.Serializable]
-        public struct InventorySlotState
-        {
-            public ItemSO item;
-            public int quantity;
-
-            public InventorySlotState(ItemSO item, int quantity)
-            {
-                this.item = item;
-                this.quantity = quantity;
-            }
-        }
 
         /// <summary>槽位地址：区分快捷栏/背包，避免两个列表的下标混用。</summary>
         public readonly struct SlotAddress
@@ -107,11 +93,13 @@ namespace Gameplay.Inventory
             }
         }
 
-        private bool hasHotbarState;
-        private bool hasBackpackState;
         private SlotAddress? selectedSlot;
         private bool hasSelectedSlot;
         private readonly State state = new();
+
+        [Header("数据配置")]
+        [Tooltip("快捷栏与背包的初始槽位；常驻场景加载时复制成运行态。")]
+        [SerializeField] private InventoryConfigSO inventoryConfig;
 
         [Header("场景引用")]
         [Tooltip("使用物品时执行效果的组件。")]
@@ -144,9 +132,6 @@ namespace Gameplay.Inventory
         /// <summary>背包运行状态，供视图读取。</summary>
         public State CurrentState => state;
 
-        public bool IsHotbarInitialized => hasHotbarState;
-        public bool IsBackpackInitialized => hasBackpackState;
-
         /// <summary>创建掉落物对象池。</summary>
         private void Start()
         {
@@ -155,9 +140,14 @@ namespace Gameplay.Inventory
 
         protected override void OnSingletonInitialized()
         {
+            Debug.Assert(inventoryConfig != null, nameof(inventoryConfig), this);
             Debug.Assert(lootEvent != null, nameof(lootEvent), this);
             Debug.Assert(ShoppingRequest != null, nameof(ShoppingRequest), this);
             Debug.Assert(QuestRewardRequest != null, nameof(QuestRewardRequest), this);
+
+            // 槽位在常驻场景加载时一次建立，早于任何画布实例化。
+            state.Hotbar.Set(new List<InventorySlotState>(inventoryConfig.HotbarSlots));
+            state.Backpack.Set(new List<InventorySlotState>(inventoryConfig.BackpackSlots));
         }
 
         private void OnEnable()
@@ -172,42 +162,6 @@ namespace Gameplay.Inventory
             lootEvent.LootEvent -= OnItemLootedHandler;
             ShoppingRequest.InventoryUpdateRequestEvent -= HandleShopping;
             QuestRewardRequest.InventoryUpdateRequestEvent -= HandleQuestReward;
-        }
-
-        /// <summary>
-        /// 用快捷栏视图的初始配置建立槽位状态。只在第一次调用时生效，
-        /// 之后重复打开界面不会把玩家已经获得的物品重置回初始值。
-        /// </summary>
-        public void InitializeHotbarState(IReadOnlyList<InventorySlotState> initialSlots)
-        {
-            if (hasHotbarState) return;
-
-            List<InventorySlotState> slots = state.Hotbar.Value;
-            slots.Clear();
-            if (initialSlots != null)
-                for (int i = 0; i < initialSlots.Count; i++)
-                    slots.Add(initialSlots[i]);
-
-            hasHotbarState = true;
-            state.Hotbar.Set(slots);
-        }
-
-        /// <summary>
-        /// 用背包视图的初始配置建立槽位状态。只在第一次调用时生效，
-        /// 后续背包界面被缓存销毁再重建也不会覆盖运行期数据。
-        /// </summary>
-        public void InitializeBackpackState(IReadOnlyList<InventorySlotState> initialSlots)
-        {
-            if (hasBackpackState) return;
-
-            List<InventorySlotState> slots = state.Backpack.Value;
-            slots.Clear();
-            if (initialSlots != null)
-                for (int i = 0; i < initialSlots.Count; i++)
-                    slots.Add(initialSlots[i]);
-
-            hasBackpackState = true;
-            state.Backpack.Set(slots);
         }
 
         /// <summary>读取指定槽位的物品与数量；下标越界时返回 false。</summary>

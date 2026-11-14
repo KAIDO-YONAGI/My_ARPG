@@ -10,8 +10,7 @@ namespace Gameplay.Inventory
     /// </summary>
     /// <remarks>
     /// 快捷栏只显示管理器中的前若干个槽位（管理器把快捷栏排在背包之前）。
-    /// 首次 <c>Start</c> 把场景里配置的初始物品交给管理器，之后在每帧 <c>LateUpdate</c>
-    /// 中比较版本并按需刷新。
+    /// 启动时登记槽位地址，之后在每帧 <c>LateUpdate</c> 中比较版本并按需刷新。
     /// </remarks>
     public sealed class HotbarCanvasView : MonoBehaviour
     {
@@ -41,14 +40,8 @@ namespace Gameplay.Inventory
                 // 快捷栏槽位在管理器里固定排在背包之前，先标记自己的地址。
                 hotbarSlots[i].ConfigureSlot(false, i);
             }
-            if (!manager.IsHotbarInitialized)
-            {
-                var initialSlots = new InventoryManager.InventorySlotState[hotbarSlots.Length];
-                for (int i = 0; i < initialSlots.Length; i++)
-                    initialSlots[i] = new InventoryManager.InventorySlotState(
-                        hotbarSlots[i].InitialItem, hotbarSlots[i].InitialQuantity);
-                manager.InitializeHotbarState(initialSlots);
-            }
+            Debug.Assert(manager.CurrentState.HotbarCount == hotbarSlots.Length,
+                "快捷栏控件数量与管理器槽位数不一致。", this);
 
             hotbarReader.Invalidate();
             goldReader.Invalidate();
@@ -78,7 +71,7 @@ namespace Gameplay.Inventory
                 {
                     if (i < state.HotbarCount)
                     {
-                        InventoryManager.InventorySlotState slot = state.GetHotbarSlot(i);
+                        InventorySlotState slot = state.GetHotbarSlot(i);
                         hotbarSlots[i].RestoreState(slot.item, slot.quantity);
                     }
                     else

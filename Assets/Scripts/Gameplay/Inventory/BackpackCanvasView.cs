@@ -10,7 +10,7 @@ namespace Gameplay.Inventory
     /// </summary>
     /// <remarks>
     /// 背包数据由管理器按“快捷栏在前、背包在后”的顺序保存，视图只负责把状态画到槽位上。
-    /// 首次打开时把预制体里配置的初始物品交给管理器，此后管理器以内存中的槽位状态为准，预制体只提供初始值。
+    /// 槽位内容在常驻场景加载时由配置建立，打开界面只登记地址并刷新显示。
     /// </remarks>
     public sealed class BackpackCanvasView : CachedCanvasViewBase
     {
@@ -27,10 +27,7 @@ namespace Gameplay.Inventory
                 Debug.Assert(slots[i] != null, $"{nameof(slots)}[{i}]", this);
         }
 
-        /// <summary>
-        /// 打开时先登记预制体上的初始物品，再刷新显示。
-        /// 管理器只在第一次调用时接收初始槽位，后续打开不会重置玩家已经获得的物品。
-        /// </summary>
+        /// <summary>打开时登记槽位地址，再刷新显示。</summary>
         protected override void OnOpen()
         {
             InventoryManager manager = InventoryManager.RequiredInstance;
@@ -39,14 +36,8 @@ namespace Gameplay.Inventory
                 // 每个新实例都要登记槽位地址，点击才能定位管理器中的背包数据。
                 slots[i].ConfigureSlot(true, i);
             }
-            if (!manager.IsBackpackInitialized)
-            {
-                var initialSlots = new InventoryManager.InventorySlotState[slots.Length];
-                for (int i = 0; i < initialSlots.Length; i++)
-                    initialSlots[i] = new InventoryManager.InventorySlotState(
-                        slots[i].InitialItem, slots[i].InitialQuantity);
-                manager.InitializeBackpackState(initialSlots);
-            }
+            Debug.Assert(manager.CurrentState.BackpackCount == slots.Length,
+                "背包控件数量与管理器槽位数不一致。", this);
 
             backpackReader.Invalidate();
             RefreshIfChanged();
@@ -72,7 +63,7 @@ namespace Gameplay.Inventory
             {
                 if (i < state.BackpackCount)
                 {
-                    InventoryManager.InventorySlotState slot = state.GetBackpackSlot(i);
+                    InventorySlotState slot = state.GetBackpackSlot(i);
                     slots[i].RestoreState(slot.item, slot.quantity);
                 }
                 else
