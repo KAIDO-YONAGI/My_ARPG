@@ -2,7 +2,7 @@
 
 文档 ID：`ASSETS-REDDOT-GUIDE`  
 状态：`Active`  
-最后更新：`2026-11-14`
+最后更新：`2026-11-15`
 
 ## 维护规则
 
@@ -15,7 +15,7 @@
 - [3. Skills 调用链](#3-skills-调用链)
 - [4. Quest 调用链](#4-quest-调用链)
 - [5. Stats 调用链](#5-stats-调用链)
-- [6. Image 与预制体引用链](#6-image-与预制体引用链)
+- [6. RedDotView 与预制体引用链](#6-reddotview-与预制体引用链)
 - [7. 待办导航与画布调用链](#7-待办导航与画布调用链)
 - [8. 生命周期与行为边界](#8-生命周期与行为边界)
 
@@ -32,10 +32,10 @@ RedDotManager.Root
 
 | 持有者 | 数据与引用 | 作用 |
 |---|---|---|
-| `RedDotNodeBase` | Count、Parent、单个 Image，Image 通过 BoundImage 只读暴露 | 保存计数、父关系与当前表现 |
+| `RedDotNodeBase` | Count、Parent、单个 RedDotView，RedDotView 通过 BoundView 只读暴露 | 保存计数、父关系与当前表现 |
 | `RedDotBranchNode` | `List<RedDotNodeBase> children`，通过 Children 只读访问 | 汇总直接子节点；根与画布分支共用本类型 |
 | `RedDotLeafBase` | `CountChanged` 事件 | 变化时携带自身引用通知 Manager |
-| `RedDotManager` | root、rootImage、canvasBranches、canvasGates、canvasImages | 保存根与表现，以及 CanvasType 到分支、可用性回调、Image 的映射 |
+| `RedDotManager` | root、rootView、canvasBranches、canvasGates、canvasViews | 保存根与表现，以及 CanvasType 到分支、可用性回调、RedDotView 的映射 |
 | `RedDotManager` | navigationOrder、lastNavigatedCanvas、pendingCanvas、pendingFrame | 保存导航顺序、成功游标与待确认请求 |
 | `SkillTreeManager` | `Dictionary<string, SkillRedDotLeaf> redDotLeaves` | 以槽位稳定路径关联技能状态与叶子 |
 | `QuestManager` | trackedQuests、questProgress、`Dictionary<QuestSO, QuestRedDotLeaf> questRedDotLeaves` | 已接取集合、任务进度与任务叶子索引 |
@@ -43,11 +43,11 @@ RedDotManager.Root
 
 通用节点与 Manager 位于 `Pipeline.UI.RedDot`，具体叶子属于 `Gameplay.Skills`、`Gameplay.Quest`、`Gameplay.Player`。Manager 通过基类、CanvasType 与可用性回调连接业务。
 
-计数为非负整数。业务叶子使用 0 或 1，分支等于直接子节点计数之和。Count 大于零时启用 Image。
+计数为非负整数。业务叶子使用 0 或 1，分支等于直接子节点计数之和。Count 大于零时启用红点视图。
 
 ## 2. 初始化与计数传播
 
-RedDotManager 的 `OnSingletonInitialized` 创建根节点，`OnEnable` 启用导航输入，`OnDisable` 停用输入。画布分支由 `RegisterCanvas` 或 `AddLeaf` 经 `EnsureCanvasBranch` 按需建立，并挂到根下；此前登记的画布 Image 在分支建立时补绑。
+RedDotManager 的 `OnSingletonInitialized` 创建根节点，`OnEnable` 启用导航输入，`OnDisable` 停用输入。画布分支由 `RegisterCanvas` 或 `AddLeaf` 经 `EnsureCanvasBranch` 按需建立，并挂到根下；此前登记的画布视图在分支建立时补绑。
 
 Skills 在 Start 与 LateUpdate 尝试读取技能预制体并建立叶子；Quest 在 OnEnable、Start 与 LateUpdate 尝试红点初始化；StatsRedDotTracker 在 OnEnable、Start 与 LateUpdate 尝试取得数值源、订阅事件并建立叶子。初始化标记阻止重复建立，LateUpdate 的这些入口用于依赖就绪重试。
 
@@ -58,7 +58,7 @@ Skills 在 Start 与 LateUpdate 尝试读取技能预制体并建立叶子；Que
 → RedDotLeafBase.SetCount
 → RedDotNodeBase.ApplyCount
   → 拒绝负数；同值返回
-  → 写 Count → RefreshImage → Image.enabled
+  → 写 Count → RefreshView → RedDotView 显隐
 → CountChanged(this)
 → RedDotManager.OnLeafCountChanged
 → RecalculateFrom(leaf.Parent)
@@ -67,7 +67,7 @@ Skills 在 Start 与 LateUpdate 尝试读取技能预制体并建立叶子；Que
   → 直到根节点
 ```
 
-`AddLeaf` 校验叶子尚未挂接且 CanvasType 有效，调用 ApplyInitialCount，订阅 CountChanged，挂接父分支并重算父链。`RemoveLeaf` 退订事件、摘除叶子、清空 Parent、解除叶子 Image 绑定并隐藏图片，再重算原父链。分支的 Attach 与 Detach 同时维护 children 与 Parent。
+`AddLeaf` 校验叶子尚未挂接且 CanvasType 有效，调用 ApplyInitialCount，订阅 CountChanged，挂接父分支并重算父链。`RemoveLeaf` 退订事件、摘除叶子、清空 Parent、解除叶子视图绑定并隐藏红点，再重算原父链。分支的 Attach 与 Detach 同时维护 children 与 Parent。
 
 证据：`Assets/Scripts/Pipeline/UI/RedDot/RedDotManager.cs:151、169、231`；`RedDotLeafBase.cs:19`；`RedDotNodeBase.cs:57`；`RedDotBranchNode.cs:20`。
 
@@ -183,14 +183,14 @@ StatsCanvasView.OnOpen
 
 证据：`Assets/Scripts/Gameplay/Player/StatsRedDotTracker.cs:77、93、122、135`；`Controllers/StatsCanvasController.cs:22、36`；`Views/StatsCanvasView.cs:67`；`Models/PlayerStatsModel.cs:75、120、126`。
 
-## 6. Image 与预制体引用链
+## 6. RedDotView 与预制体引用链
 
-红点表现来自按钮、槽位中的嵌套预制体，随所属界面整体创建。节点绑定现有 Image 引用。
+红点表现统一由 `Assets/Prefabs/UI/RedDot.prefab` 提供：预制体根节点上的 RedDotView 持有同一节点上的 Image，节点绑定 RedDotView 组件，不直接操作图片。
 
 ```text
 ToggleMenuButton / IntegratedMenuButton / SkillButton / QuestSlot 预制体
 → 嵌套 RedDot.prefab
-→ Unity UI Image
+→ RedDotView（同节点 Image）
 → Assets/Sprites/UI/Icons/RedDot.png
 ```
 
@@ -198,17 +198,17 @@ ToggleMenuButton / IntegratedMenuButton / SkillButton / QuestSlot 预制体
 
 | 表现位置 | 序列化引用与运行时绑定 |
 |---|---|
-| OpenMenu | PersistentScene 的 IntegratedUICanvasManager.toggleMenuRedDot → ToggleMenuButton 的 Image；Start → BindRootImage |
-| 聚合面板入口 | integratedButtonRedDots → IntegratedMenuButton 的 Image；InitiatePage → BindPageRedDots → BindCanvasImage |
-| 技能槽位 | UICacheManager 注册 SkillsCanvas → SkillButton → SkillSlot.redDotImage；SkillsCanvasView.OnOpen → GetRedDotLeaf(StateKey) → BindImage |
-| 任务槽位 | UICacheManager 注册 QuestCanvas → QuestSlot → QuestLogSlot.redDotImage；QuestCanvasView.RefreshIfChanged → BindSlotRedDot → GetRedDotLeaf(quest) → BindImage |
+| OpenMenu | PersistentScene 的 IntegratedUICanvasManager.toggleMenuRedDotView → ToggleMenuButton 的 RedDotView；Start → BindRootView |
+| 聚合面板入口 | integratedButtonRedDotViews → IntegratedMenuButton 的 RedDotView；InitiatePage → BindPageRedDots → BindCanvasView |
+| 技能槽位 | UICacheManager 注册 SkillsCanvas → SkillButton → SkillSlot.redDotView；SkillsCanvasView.OnOpen → GetRedDotLeaf(StateKey) → BindView |
+| 任务槽位 | UICacheManager 注册 QuestCanvas → QuestSlot → QuestLogSlot.redDotView；QuestCanvasView.RefreshIfChanged → BindSlotRedDot → GetRedDotLeaf(quest) → BindView |
 | Stats | StatsRedDotTracker 持有叶子，聚合面板 Stats 入口显示分支红点 |
 
-每个节点仅保存一个 Image。BindImage 替换当前引用并刷新；相同引用直接返回。UnbindImage 只在参数与当前引用一致时清空引用。图片的隐藏由 Manager 的解绑/移除入口或所属界面的显隐生命周期处理。
+每个节点仅保存一个 RedDotView。BindView 替换当前引用并刷新；相同引用直接返回。UnbindView 只在参数与当前引用一致时清空引用。红点的隐藏由 Manager 的解绑/移除入口或所属界面的显隐生命周期处理。
 
-聚合分页先 `UnbindPageRedDots → UnbindCanvasImage`，再绑定本页。canvasImages 保存分支尚未建立时收到的 Image，EnsureCanvasBranch 建立后补绑。Skills 关闭逐槽解绑；Quest 复用旧槽、空槽与关闭时解除对应绑定。
+聚合分页先 `UnbindPageRedDots → UnbindCanvasView`，再绑定本页。canvasViews 保存分支尚未建立时收到的 RedDotView，EnsureCanvasBranch 建立后补绑。Skills 关闭逐槽解绑；Quest 复用旧槽、空槽与关闭时解除对应绑定。
 
-证据：`Assets/Scripts/Pipeline/UI/SystemCanvasManagers/IntegratedUICanvasManager.cs:59、186、206`；`Assets/Scripts/Gameplay/Skills/SkillsCanvasView.cs:43、106`；`Assets/Scripts/Gameplay/Quest/QuestCanvasView.cs:88、142、151、165、204`；预制体引用位于 `Assets/Prefabs/UI/Buttons/`、`Slots/QuestSlot.prefab` 与 `RedDot.prefab`。
+证据：`Assets/Scripts/Pipeline/UI/SystemCanvasManagers/IntegratedUICanvasManager.cs:75、218、239`；`Assets/Scripts/Gameplay/Skills/SkillsCanvasView.cs:60、124`；`Assets/Scripts/Gameplay/Quest/QuestCanvasView.cs:152、163、166`；预制体引用位于 `Assets/Prefabs/UI/Buttons/`、`Slots/QuestSlot.prefab` 与 `RedDot.prefab`。
 
 ## 7. 待办导航与画布调用链
 
@@ -242,8 +242,8 @@ Stats 与 Skills 沿缓存开关事件进入 `UIViewInstanceCache.Entry.HandleTo
 
 | 对象或入口 | 当前行为 |
 |---|---|
-| SkillsCanvasView 关闭 | 解绑技能 Image、退订满级事件，技能叶子保留 |
-| QuestCanvasView 关闭 | 解绑任务 Image、清空显示上下文，trackedQuests、进度与叶子保留 |
+| SkillsCanvasView 关闭 | 解绑技能红点视图、退订满级事件，技能叶子保留 |
+| QuestCanvasView 关闭 | 解绑任务红点视图、清空显示上下文，trackedQuests、进度与叶子保留 |
 | StatsCanvasView 关闭 | Dispose Controller，退订其 StatsChanged，Tracker 继续跟踪 |
 | SkillTreeManager 停用 | 退订 SkillsChanged 与 LevelUp，叶子保留 |
 | QuestManager 停用 | 退订任务与历史通知，叶子保留 |

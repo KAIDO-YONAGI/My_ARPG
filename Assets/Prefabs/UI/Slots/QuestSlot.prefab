@@ -364,7 +364,7 @@ MonoBehaviour:
   questNameText: {fileID: 3889295075709108755}
   questLevelText: {fileID: 7936412175284837910}
   slotCanvas: {fileID: 6857904263809971714}
-  redDotImage: {fileID: 6984574603392801773}
+  redDotView: {fileID: 3852163674052973876}
   questLogPanel: {fileID: 0}
   currentQuest: {fileID: 0}
 --- !u!114 &3427144831810185516
@@ -532,15 +532,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c3b1afb2632926478b907910cf74ec5, type: 3}
---- !u!114 &6984574603392801773 stripped
+--- !u!114 &3852163674052973876 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5859471247888426003, guid: 9c3b1afb2632926478b907910cf74ec5, type: 3}
+  m_CorrespondingSourceObject: {fileID: 345253132779334346, guid: 9c3b1afb2632926478b907910cf74ec5, type: 3}
   m_PrefabInstance: {fileID: 3584644948218118142}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: 053a222fb5fb06247833227e4290651e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &7484974308160653566 stripped

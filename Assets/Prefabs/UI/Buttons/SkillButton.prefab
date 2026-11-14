@@ -140,7 +140,7 @@ MonoBehaviour:
   skillIcon: {fileID: 1462314673124919228}
   skillLevelText: {fileID: 633725963589213450}
   skillButton: {fileID: 6138520807076617419}
-  redDotImage: {fileID: 6156130724001127528}
+  redDotView: {fileID: 69079763759829681}
   prerequisiteSlots: []
   currentLevel: 0
   isUnlocked: 0
@@ -526,19 +526,19 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c3b1afb2632926478b907910cf74ec5, type: 3}
+--- !u!114 &69079763759829681 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 345253132779334346, guid: 9c3b1afb2632926478b907910cf74ec5, type: 3}
+  m_PrefabInstance: {fileID: 306242889119545467}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 053a222fb5fb06247833227e4290651e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &5935517429547569019 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6224203312420828928, guid: 9c3b1afb2632926478b907910cf74ec5, type: 3}
   m_PrefabInstance: {fileID: 306242889119545467}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6156130724001127528 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5859471247888426003, guid: 9c3b1afb2632926478b907910cf74ec5, type: 3}
-  m_PrefabInstance: {fileID: 306242889119545467}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
