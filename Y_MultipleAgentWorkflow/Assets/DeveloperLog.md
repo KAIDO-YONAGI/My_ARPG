@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-14 待办红点文档建立
+
+按 `Pipeline.UI.RedDot` 的四个类型、三个业务叶子与预制体、输入资产建立 `RedDot_Guide.md`，登记到 Assets Router 的任务线索、并发资源与能力边界。分层说明更新为 32 个命名空间、149 个产品代码文件与实测跨层 using；组合契约的单例清单补 `RedDotManager`、`StatsRedDotTracker` 与 `UICacheManager`，计 24 个具体单例。验证：Roslyn 对 `Assets` 全量编译 0 错误；红点树与导航的实际表现未在 Play 模式确认。Assets 维护计数 `2/5 -> 3/5`。
+
 ## 2026-11-11 画布开关事件资产迁移字段名
 
 `Assets/GameSO/Events/ToggleCanvasEvents` 下 9 个事件资产把旧序列化键 `canvasToToggle` 改为 `canvasType`，值不变：GameOver 1、Stats 2、Skills 3、Dialog 4、Quest 5、Shop 6、Integrated 7、Backpack 8、SaveLoad 9。`ToggleESCEvent` 没有该字段，反序列化默认值 0 仍是 ESC，未改。11 月 9 日的字段改名没有迁移资产，Unity 按字段名反序列化，旧键被忽略、`canvasType` 回落到 0，`UICacheManager` 注册校验 `prefab.ToggleEvent.canvasType != prefab.CanvasId` 全部失败，五个缓存画布无法注册。同步 `EventChannels_Guide` 的 §2.1、§2.5 与 §3.2、`Assets_Guide` §3.1、`Composition_Guide` §2.7 与 §3.5、`Dialog_Guide` §2.5 中的旧字段名与旧枚举名。验证：静态核对 9 个资产的键与值与 `CanvasType` 枚举一致；`Assets` 内除 `IntegratedUICanvasManager.canvasToToggle` 列表字段外已无旧键；未在 Unity 内重进 Play 确认注册恢复。Assets 维护计数 `1/5 -> 2/5`。

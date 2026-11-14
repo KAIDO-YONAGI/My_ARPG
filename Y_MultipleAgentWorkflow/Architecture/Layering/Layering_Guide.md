@@ -54,8 +54,8 @@
 | 目录 | 文件数 | 含义 | 判定标准：新文件落到哪 |
 |---|---|---|---|
 | `Contracts` | 13 | 跨域共享的接口、基类、状态值与枚举 | 类型被两个以上域直接引用，且其中不含具体业务规则 |
-| `Pipeline` | 66 | 引擎级基建：场景切换、寻路、对象池、UI、音频、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
-| `Gameplay` | 62 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
+| `Pipeline` | 70 | 引擎级基建：场景切换、寻路、对象池、UI、音频、SO 配置与事件通道 | 与具体玩法无关，换一个游戏也成立 |
+| `Gameplay` | 66 | 玩法域，按 `Player` `Quest` `Dialog` `Inventory` `Shop` `Skills` `Units` `Save` `Grid` 九个目录平铺 | 带玩法语义，换一套规则就得改 |
 
 `Contracts` 按 `Base`、`Interfaces`、`State`、`Enums`、`Audio` 分目录，命名空间随目录划分。`MyEnums.cs` 提供玩法与场景共用枚举，音频的类型枚举与 `AudioRequest` 位于 `Contracts.Audio`。音频播放、池管理、配置和触发组件位于 `Pipeline.Audio`，请求通道位于 `Pipeline.SO.Events`，机制见 [音频系统 Guide](../../Assets/Audio_Guide.md)。缓存界面的基类为 `CachedUIViewBase` 与 `CachedCanvasViewBase`，状态目录提供值与版本容器 `VersionedValue<T>` 和单读取者绘制记录 `VersionReader`。
 
@@ -64,8 +64,8 @@
 按 `using` 指令统计：
 
 - `Contracts` → `Gameplay`：**2 处**，`ISaveable` 与 `SaveableService` 各引一次 `Gameplay.Save`；`Contracts` → `Pipeline`：**4 处**，`CachedUIViewBase`、`CachedCanvasViewBase` 与 `ICanvasManager` 引事件类型，`ICanvasManager` 引系统画布管理器。
-- `Gameplay` → `Contracts`：**53 处**；`Gameplay` → `Pipeline`：**65 处**。
-- `Pipeline` → `Contracts`：**42 处**；`Pipeline` → `Gameplay`：**6 处**，分别是 `ContinueButton`、`LootEventSO`、`MobileAttackButton`、`PlayerStatsSO`、`SceneChanger`、`ShopKeeperEventSO` 各 1 处。
+- `Gameplay` → `Contracts`：**56 处**；`Gameplay` → `Pipeline`：**74 处**。
+- `Pipeline` → `Contracts`：**44 处**；`Pipeline` → `Gameplay`：**6 处**，分别是 `ContinueButton`、`LootEventSO`、`MobileAttackButton`、`PlayerStatsSO`、`SceneChanger`、`ShopKeeperEventSO` 各 1 处。
 
 方向口径：`Contracts` 被所有域引用是设计意图，`Contracts → Gameplay/Pipeline` 的 6 处算反向依赖；`Pipeline → Gameplay` 的 6 处同样算反向依赖。
 
@@ -105,7 +105,7 @@
 
 **命名空间按层与用途划分**：`Gameplay` 与 `Pipeline` 的命名空间等于文件相对 `Assets\Scripts\` 的目录路径，点号代替反斜杠，大小写原样保留，例如 `Gameplay\Units\Enemy\EnemyCombat.cs` 是 `Gameplay.Units.Enemy`，`Pipeline\SO\Events\VoidEventSO.cs` 是 `Pipeline.SO.Events`。`Contracts` 按用途分 `Base`、`Enums`、`Interfaces`、`State`、`Audio` 五个子目录，分别使用对应的子命名空间。
 
-31 个命名空间覆盖全部 141 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
+32 个命名空间覆盖全部 149 个产品代码文件，**全局命名空间里已经没有任何产品代码**：
 
 | 层 | 命名空间 | 文件数 |
 |---|---|---|
@@ -122,26 +122,27 @@
 | | `Pipeline.SO.Events` | 14 |
 | | `Pipeline.UI` | 6 |
 | | `Pipeline.UI.Buttons` | 6 |
+| | `Pipeline.UI.RedDot` | 4 |
 | | `Pipeline.UI.SystemCanvasManagers` | 6 |
 | | `Pipeline.UI.Runtime` | 2 |
 | `Gameplay` | `Gameplay.Dialog` | 2 |
 | | `Gameplay.Dialog.HistoryManager` | 3 |
 | | `Gameplay.Grid` | 2 |
 | | `Gameplay.Inventory` | 6 |
-| | `Gameplay.Player` | 7 |
+| | `Gameplay.Player` | 9 |
 | | `Gameplay.Player.Controllers` | 4 |
 | | `Gameplay.Player.Models` | 3 |
 | | `Gameplay.Player.Services` | 1 |
 | | `Gameplay.Player.Views` | 3 |
-| | `Gameplay.Quest` | 7 |
+| | `Gameplay.Quest` | 8 |
 | | `Gameplay.Save` | 6 |
 | | `Gameplay.Shop` | 6 |
-| | `Gameplay.Skills` | 3 |
+| | `Gameplay.Skills` | 4 |
 | | `Gameplay.Units.Enemy` | 4 |
 | | `Gameplay.Units.NPC` | 4 |
 | | `Gameplay.Units.ShopKeeper` | 1 |
 
-- 合计 141 个产品代码文件。
+- 合计 149 个产品代码文件。
 - 全局命名空间只剩 1 个编辑器脚本 `Assets\Editor\InputActionReferenceRebuilder.cs`，它不在 `Assets\Scripts` 下，不受"跟随目录"规则约束。
 - 跨命名空间调用一律靠 `using`；同一命名空间内的类型直接可见。
 
@@ -159,7 +160,7 @@
 
 ### 3.2 命名空间按目录分配，重名只在同一命名空间内冲突
 
-产品代码全部在命名空间内，标识符分属 31 个命名空间。同名类型分处两个命名空间即不冲突，编译失败点落在该命名空间对应的目录。全局池只有 1 个编辑器脚本。
+产品代码全部在命名空间内，标识符分属 32 个命名空间。同名类型分处两个命名空间即不冲突，编译失败点落在该命名空间对应的目录。全局池只有 1 个编辑器脚本。
 
 代价是引用变长：跨目录引用都要写 `using`，漏写报 `CS0246`。新增文件的命名空间与所在目录一致，否则该类型在其目录内不可见，挪动目录时还会多出一次改名。
 

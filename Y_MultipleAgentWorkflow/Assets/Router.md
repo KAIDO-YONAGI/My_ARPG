@@ -2,8 +2,8 @@
 
 文档 ID：`BUS-ASSETS`
 状态：`Active`
-维护计数：`2/5`
-最后更新：`2026-11-11`
+维护计数：`3/5`
+最后更新：`2026-11-14`
 
 ## 维护规则
 
@@ -24,6 +24,7 @@
 | `事件不生效` / `接线断了` / `Inspector 没拖` / `改名事件资产` | `EventChannels_Guide.md §3.3` 检查清单 |
 | `canvasType` / `toggleCanvasEvents` / `cachedViewPrefabs` | `EventChannels_Guide.md §2.5`、`EventChannels_Guide.md §3.2` |
 | `InventorySlotsStatsSO` | `EventChannels_Guide.md §2.1`、`EventChannels_Guide.md §2.3` |
+| `红点` / `待办` / `RedDotManager` / `RedDotLeafBase` / `待办导航` / `反引号` | `RedDot_Guide.md` |
 
 ## 下级导航
 
@@ -37,6 +38,10 @@
 - 本业务根的文档目录
 - GameSO 资产树
 - StreamingAssets 内容
+- `path:Assets/Scripts/Pipeline/UI/RedDot/`
+- `path:Assets/Scripts/Gameplay/Player/StatsRedDotLeaf.cs`、`StatsRedDotTracker.cs`
+- `path:Assets/Prefabs/UI/RedDot.prefab`
+- `path:Assets/Settings/Input/ActionRefs/UI_RedDotNavigate.asset`
 - `path:Assets/Scripts/Pipeline/Audio/`
 - `path:Assets/Scripts/Contracts/Audio/`
 - `path:Assets/Scripts/Pipeline/SO/Events/FeedbackEventSO.cs`
@@ -50,6 +55,7 @@
 - 声明并维护 GameSO 资产树的 ScriptableObject 资产契约：目录分布、按类数量、命名约定与手工创作流程，见 `Assets_Guide.md`。
 - 声明并维护事件通道的资产侧契约：14 个通道类、30 个通道资产、订阅发布惯例与改名检查清单，见 `EventChannels_Guide.md`。
 - 音效请求、2D 与 3D 播放、音效对象池、BGM 淡变及音频配置由 `Audio_Guide.md` 维护。
+- 待办红点的树结构、表现绑定、待办导航与三个业务叶子由 `RedDot_Guide.md` 维护。
 - 声明 StreamingAssets 内容的构建硬约束：文件名必须为 ASCII，在 Android 上它位于 APK 内、`System.IO` 无法直接读取，改完需复核包内条目。
 
 **不在本域范围，请转到对应 Router**

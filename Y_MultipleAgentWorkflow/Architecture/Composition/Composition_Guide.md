@@ -57,7 +57,7 @@
 
 ### 2.2 单例清单与预算
 
-`YSingleton<T>` 的派生共 1 个抽象基类加 21 个具体单例：20 个直接继承，`StatsService` 经 `SaveableService` 间接继承。
+`YSingleton<T>` 的派生共 1 个抽象基类加 24 个具体单例：23 个直接继承，`StatsService` 经 `SaveableService` 间接继承。
 
 | 具体单例 | 职责 |
 |---|---|
@@ -70,6 +70,8 @@
 | `AStarNodeManager` | 网格节点构建 |
 | `UIManager` | 画布焦点、输入、层级 |
 | `IntegratedUICanvasManager` | 集成面板 `ICanvasManager` |
+| `UICacheManager` | 界面实例缓存、注册表与闲置淘汰 |
+| `RedDotManager` | 待办红点树与待办导航 |
 | `InventoryManager` | 背包与快捷栏 |
 | `DialogManager` | 对话推进 |
 | `ConversationHistoryManager` | 已对话角色与对话记录集合 |
@@ -81,9 +83,10 @@
 | `SaveSystem` | 存档文件读写 |
 | `SaveDataManager` | 存档对象组装与分发 |
 | `PlayerLocator` | 玩家坐标查询 |
+| `StatsRedDotTracker` | 属性画布的未查看提升跟踪 |
 | `StatsService` | 玩家数值，经 `SaveableService` 继承 |
 
-单例预算名单含 `StatsService`、`SaveDataManager`、`SaveSystem`、`UIManager`、`SceneChanger`、`TimeManager` 六个，其余 15 个具体单例在此名单之外。
+单例预算名单含 `StatsService`、`SaveDataManager`、`SaveSystem`、`UIManager`、`SceneChanger`、`TimeManager` 六个，其余 18 个具体单例在此名单之外。
 
 存档参与者分两类。`SaveableService` 派生类当前只有 `StatsService` 一个，占固定槽位，`GetDataID()` 返回 null。直接实现 `ISaveable` 的场景物体当前只有 `Loot` 一个，按 GUID 参与。
 

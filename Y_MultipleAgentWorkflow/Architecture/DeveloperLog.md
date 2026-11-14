@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-14 红点系统纳入分层与单例清单
+
+`Pipeline.UI.RedDot` 纳入管线层，三个业务叶子分属 `Gameplay.Player`、`Gameplay.Quest` 与 `Gameplay.Skills`。Layering Guide 更新为 32 个命名空间、149 个产品代码文件、Contracts 13 与 Pipeline 70、Gameplay 66，跨层 using 按实测改为 Gameplay→Contracts 56、Gameplay→Pipeline 74、Pipeline→Contracts 44；Composition Guide 的单例清单补三项，计 24 个具体单例。验证：Roslyn 全量编译 0 错误。维护计数 `2/5 -> 3/5`。
+
 ## 2026-11-02 音频系统组合与分层
 
 音频请求和枚举归契约层，播放、配置和对象池归管线层，常驻场景承载 AudioPlayerManager。Composition 与 Layering Guide 同步当前单例清单、目录与依赖统计，音频机制路由到 Assets/Audio_Guide.md。未运行测试，Unity 编译与试听尚未确认。维护计数 2/5 → 3/5。
