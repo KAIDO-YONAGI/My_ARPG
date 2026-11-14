@@ -2,8 +2,8 @@
 
 文档 ID：`BUS-GAMEPLAY-QUEST`
 状态：`Active`
-维护计数：`1/5`
-最后更新：`2026-11-07`
+维护计数：`2/5`
+最后更新：`2026-11-14`
 
 ## 维护规则
 
@@ -19,6 +19,7 @@
 | `任务奖励`、`发奖`、`QuestRewardRequest` | `Quest_Guide.md` |
 | `任务板`、`QuestBoardManager`、`范围触发`、`questsOnBoard` | `Quest_Guide.md` |
 | `任务面板`、`QuestLogPanel`、`QuestLogSlot`、`画布` | `Quest_Guide.md` |
+| `追踪视图`、`已接取任务`、`OpenQuestTracker`、`非范围触发`、`AnyBoardInRange` | `Quest_Guide.md` |
 | `IsToComplete`、`Completed`、`任务面板只读` | `Quest_Guide.md` |
 
 ## 下级导航
@@ -37,6 +38,7 @@
 
 **Active 能力**
 
-- 本域权威文档为 `Quest_Guide.md`（ID `GP-QUEST-GUIDE`），覆盖状态机与面板显隐、进度存储与重算、奖励通道、任务板与任务面板分层。
+- 本域权威文档为 `Quest_Guide.md`（ID `GP-QUEST-GUIDE`），覆盖状态机与画布显隐、进度存储与重算、奖励通道、任务板与任务画布分层、已接取任务追踪视图。
 - 任务奖励只经 `InventorySlotsStatsSO` 的事件通道交付，`QuestManager` 不持背包引用；改动接收侧须同时核对 `..\InventoryShop\Router.md`。
 - 任务进度只存在 `QuestManager` 的内存字典里，未接入存档；资产上的 `QuestObjective.currentAmount` 是零读写字段，进度来源只看内存字典。
+- 已接取任务列表只存在 `QuestManager` 的内存里，与进度一样未接入存档；非任务板范围触发画布时它只用于显示进度，不提供接取、放弃、完成操作。
