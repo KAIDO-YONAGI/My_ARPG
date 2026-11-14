@@ -16,7 +16,7 @@ namespace Gameplay.Skills
     /// <remarks>
     /// 槽位是 SkillsCanvas 预制体里的嵌套预制体。状态键以画布根为基准生成，
     /// 根节点由 <see cref="SkillsCanvasView"/> 在打开时通过 <see cref="BindStateRoot"/> 注入，
-    /// 状态路径以画布根为基准。
+    /// 状态路径以画布根为基准；红点叶子按同一路径索引。
     /// </remarks>
     public class SkillSlot : MonoBehaviour
     {
@@ -27,6 +27,10 @@ namespace Gameplay.Skills
         [SerializeField] private Image skillIcon;
         [SerializeField] private TMP_Text skillLevelText;
         public Button skillButton;
+
+        [Header("红点")]
+        [Tooltip("技能可升级时显示的槽位红点，由技能画布打开时绑定。")]
+        [SerializeField] private Image redDotImage;
 
         [Header("前置技能")]
         [FormerlySerializedAs("preRiquriedForSkillUnlock_List")]
@@ -39,6 +43,9 @@ namespace Gameplay.Skills
         public int CurrentLevel => currentLevel;
         public bool IsUnlocked => isUnlocked;
 
+        /// <summary>槽位红点表现图片，由技能画布按状态键绑定到红点叶子。</summary>
+        public Image RedDotImage => redDotImage;
+
         /// <summary>技能升满时广播，参数是升满的槽位。</summary>
         public static event Action<SkillSlot> OnMaxSkillLevel;
 
@@ -46,12 +53,16 @@ namespace Gameplay.Skills
         private Transform stateRoot;
         private string stateKey;
 
+        /// <summary>本槽位缓存的状态键；首次读取时按当前根节点构建。</summary>
+        public string StateKey => GetStateKey();
+
         /// <summary>注入状态键根节点，使槽位能生成稳定且不依赖查找的路径。</summary>
         public void BindStateRoot(Transform root)
         {
             if (stateRoot == root && stateKey != null) return;
+
             stateRoot = root;
-            stateKey = BuildStateKey();
+            stateKey = BuildStateKey(transform, stateRoot);
         }
 
         private void Awake()
@@ -59,6 +70,7 @@ namespace Gameplay.Skills
             Debug.Assert(skillIcon != null, nameof(skillIcon), this);
             Debug.Assert(skillLevelText != null, nameof(skillLevelText), this);
             Debug.Assert(skillButton != null, nameof(skillButton), this);
+            Debug.Assert(redDotImage != null, nameof(redDotImage), this);
         }
 
         private void OnValidate()
@@ -154,16 +166,19 @@ namespace Gameplay.Skills
         /// </summary>
         private string GetStateKey()
         {
-            return stateKey ??= BuildStateKey();
+            return stateKey ??= BuildStateKey(transform, stateRoot);
         }
 
-        /// <summary>从槽位向上走到画布根，记录每级名字与同级序号。</summary>
-        private string BuildStateKey()
+        /// <summary>
+        /// 从槽位向上走到画布根，记录每级名字与同级序号并拼成路径。
+        /// 画布根未注入时退回槽位对象名。
+        /// </summary>
+        public static string BuildStateKey(Transform slot, Transform root)
         {
-            if (stateRoot == null) return name;
+            if (root == null) return slot.name;
 
             Stack<string> parts = new();
-            for (Transform current = transform; current != null && current != stateRoot; current = current.parent)
+            for (Transform current = slot; current != null && current != root; current = current.parent)
                 parts.Push($"{current.name}[{current.GetSiblingIndex()}]");
 
             StringBuilder key = new();

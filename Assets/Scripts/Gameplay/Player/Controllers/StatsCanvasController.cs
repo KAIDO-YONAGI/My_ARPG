@@ -6,7 +6,8 @@ namespace Gameplay.Player.Controllers
 {
     /// <summary>
     /// 属性面板的控制器，纯 C# 类，由 <see cref="StatsCanvasView"/> 创建并托管。
-    /// 订阅 <see cref="IPlayerStatsReadOnly.StatsChanged"/>，把当前伤害和速度推给视图。
+    /// 订阅 <see cref="IPlayerStatsReadOnly.StatsChanged"/>，把当前伤害和速度推给视图，
+    /// 绘制完成后再确认属性红点已经查看。
     /// </summary>
     /// <remarks>
     /// 控制器只在界面打开期间存活；保存构造时实际订阅的只读模型，
@@ -31,10 +32,15 @@ namespace Gameplay.Player.Controllers
             stats.StatsChanged -= Refresh;
         }
 
-        /// <summary>把最新伤害和速度推给面板。</summary>
+        /// <summary>把最新伤害和速度推给面板，绘制完成后确认属性红点已查看。</summary>
         public void Refresh()
         {
             view.SetStats(stats.Damage, stats.Speed);
+
+            // 面板已经显示最新数值，此刻才清除红点；追踪器尚未挂载时跳过。
+            StatsRedDotTracker tracker = StatsRedDotTracker.Instance;
+            if (tracker != null)
+                tracker.ConfirmDisplayed();
         }
     }
 }

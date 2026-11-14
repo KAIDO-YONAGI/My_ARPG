@@ -5,6 +5,7 @@ using Contracts.State;
 using Gameplay.Dialog.HistoryManager;
 using Pipeline.SO;
 using Pipeline.SO.Events;
+using Pipeline.UI.RedDot;
 using Pipeline.UI.Runtime;
 using UnityEngine;
 
@@ -104,6 +105,12 @@ namespace Gameplay.Quest
         private bool listeningToQuestToggle;
         private bool canvasIsActive;
 
+        // 已接取任务的红点叶子，与 trackedQuests 一一对应。
+        private readonly Dictionary<QuestSO, QuestRedDotLeaf> questRedDotLeaves = new();
+        private bool redDotInitialized;
+        private bool listeningToItemHistory;
+        private bool listeningToConversationHistory;
+
         /// <summary>任务运行状态，供视图读取。</summary>
         public State CurrentState => state;
 
@@ -146,6 +153,7 @@ namespace Gameplay.Quest
             questOptionsEventSO.questOptionsEvent += OnQuestOptionChosen;
             sceneLoadedEvent.SceneLoadedEvent += OnSceneLoaded;
             TrySubscribeQuestToggle();
+            TrySubscribeHistoryNotifications();
         }
 
         private void OnDisable()
@@ -155,6 +163,7 @@ namespace Gameplay.Quest
             questOptionsEventSO.questOptionsEvent -= OnQuestOptionChosen;
             sceneLoadedEvent.SceneLoadedEvent -= OnSceneLoaded;
             UnsubscribeQuestToggle();
+            UnsubscribeHistoryNotifications();
         }
 
         private void Start()
@@ -162,6 +171,16 @@ namespace Gameplay.Quest
             // OnEnable 可能早于 UICacheManager 的 Awake，Start 再补一次订阅。
             TrySubscribeQuestToggle();
             Debug.Assert(listeningToQuestToggle, "任务画布开关事件未登记到 UICacheManager。", this);
+
+            // 历史记录器与红点管理器都是常驻单例，Awake 顺序不保证，这里再补一次。
+            TrySubscribeHistoryNotifications();
+            TryInitializeQuestRedDot();
+        }
+
+        private void LateUpdate()
+        {
+            // 红点管理器可能晚于本管理器初始化，就绪前每帧补试一次。
+            TryInitializeQuestRedDot();
         }
 
         /// <summary>订阅任务画布开关；缓存服务未就绪时直接返回，由 Start 补试。</summary>
@@ -189,6 +208,91 @@ namespace Gameplay.Quest
 
             if (questToggleEvent != null)
                 questToggleEvent.toggleCanvasEvent -= OnToggleQuestCanvas;
+        }
+
+        /// <summary>订阅物品与角色历史通知；单例尚未就绪时跳过，由 Start 再补一次。</summary>
+        private void TrySubscribeHistoryNotifications()
+        {
+            if (!listeningToItemHistory)
+            {
+                ItemHistoryManager itemHistory = ItemHistoryManager.Instance;
+                if (itemHistory != null)
+                {
+                    itemHistory.ItemQuantityChanged += OnItemQuantityChanged;
+                    listeningToItemHistory = true;
+                }
+            }
+
+            if (!listeningToConversationHistory)
+            {
+                ConversationHistoryManager conversationHistory = ConversationHistoryManager.Instance;
+                if (conversationHistory != null)
+                {
+                    conversationHistory.CharacterTalkedChanged += OnCharacterTalkedChanged;
+                    listeningToConversationHistory = true;
+                }
+            }
+        }
+
+        /// <summary>退订历史通知；历史管理器已销毁时退订无效，订阅随其实例销毁一并失效。</summary>
+        private void UnsubscribeHistoryNotifications()
+        {
+            if (listeningToItemHistory)
+            {
+                ItemHistoryManager itemHistory = ItemHistoryManager.Instance;
+                if (itemHistory != null)
+                    itemHistory.ItemQuantityChanged -= OnItemQuantityChanged;
+                listeningToItemHistory = false;
+            }
+
+            if (listeningToConversationHistory)
+            {
+                ConversationHistoryManager conversationHistory = ConversationHistoryManager.Instance;
+                if (conversationHistory != null)
+                    conversationHistory.CharacterTalkedChanged -= OnCharacterTalkedChanged;
+                listeningToConversationHistory = false;
+            }
+        }
+
+        /// <summary>物品累计数量变化：重算已接取任务的目标进度并刷新红点。</summary>
+        private void OnItemQuantityChanged(ItemSO _)
+        {
+            RefreshTrackedQuestRedDots();
+        }
+
+        /// <summary>角色对话记录变化：重算已接取任务的目标进度并刷新红点。</summary>
+        private void OnCharacterTalkedChanged(CharacterSO _)
+        {
+            RefreshTrackedQuestRedDots();
+        }
+
+        /// <summary>按历史记录重算已接取任务的全部目标，再刷新对应叶子。</summary>
+        private void RefreshTrackedQuestRedDots()
+        {
+            for (int i = 0; i < trackedQuests.Count; i++)
+                RefreshObjectiveProgress(trackedQuests[i]);
+
+            for (int i = 0; i < trackedQuests.Count; i++)
+                RefreshRedDotLeaf(trackedQuests[i]);
+        }
+
+        /// <summary>红点管理器就绪后登记任务画布可用性回调，并为已接取任务补齐叶子。</summary>
+        private void TryInitializeQuestRedDot()
+        {
+            if (redDotInitialized) return;
+
+            RedDotManager redDot = RedDotManager.Instance;
+            if (redDot == null) return;
+
+            redDot.RegisterCanvas(CanvasType.Quest, IsQuestCanvasAvailable);
+            redDotInitialized = true;
+            SyncRedDotLeaves();
+        }
+
+        /// <summary>任务画布可唤起的条件：任务板覆盖玩家，或存在已接取任务。</summary>
+        private bool IsQuestCanvasAvailable()
+        {
+            return QuestBoardManager.AnyBoardInRange || trackedQuests.Count > 0;
         }
 
         /// <summary>切换场景时关闭任务画布，避免旧场景的界面跨场景残留。</summary>
@@ -239,6 +343,7 @@ namespace Gameplay.Quest
             foreach (QuestSO quest in trackedQuests)
                 RefreshObjectiveProgress(quest);
 
+            SyncRedDotLeaves();
             OpenQuestCanvas();
         }
 
@@ -337,6 +442,8 @@ namespace Gameplay.Quest
                         QuestStateChanged(quest, QuestState.IsToComplete);
                 }
             }
+
+            SyncRedDotLeaves();
         }
 
         /// <summary>向背包系统发放任务奖励；奖励内容由任务配置决定。</summary>
@@ -405,6 +512,7 @@ namespace Gameplay.Quest
                 RaiseRewardEvent(quest);
 
             RefreshObjectiveProgress(quest);
+            RefreshRedDotLeaf(quest);
             // 选择任务只影响详情；状态实际变化才需要刷新列表中的完成态。
             if (stateChanged)
                 state.TouchDisplayQuests();
@@ -412,7 +520,7 @@ namespace Gameplay.Quest
 
         /// <summary>
         /// 维护已接取任务列表：接取与待提交进入列表，放弃与完成移出。
-        /// 追踪视图正在显示时同步推进显示列表版本。
+        /// 列表变化时同步建立或移除红点叶子；追踪视图正在显示时推进显示列表版本。
         /// </summary>
         private void UpdateTrackedQuests(QuestSO quest, QuestState nextState)
         {
@@ -434,8 +542,76 @@ namespace Gameplay.Quest
                     break;
             }
 
-            if (changed && state.IsTrackerMode)
+            if (!changed) return;
+
+            if (nextState == QuestState.Decline || nextState == QuestState.Completed)
+                RemoveQuestRedDotLeaf(quest);
+            else
+                AddQuestRedDotLeaf(quest);
+
+            if (state.IsTrackerMode)
                 state.TouchDisplayQuests();
+        }
+
+        /// <summary>
+        /// 为任务建立红点叶子并按当前进度写入初始计数；已有叶子或红点管理器未就绪时跳过。
+        /// </summary>
+        private void AddQuestRedDotLeaf(QuestSO quest)
+        {
+            if (quest == null || questRedDotLeaves.ContainsKey(quest)) return;
+
+            RedDotManager redDot = RedDotManager.Instance;
+            if (redDot == null) return;
+
+            // 接取时目标可能已经满足，先按当前进度重算再取初始计数。
+            RefreshObjectiveProgress(quest);
+            QuestRedDotLeaf leaf = new(quest);
+            int initialCount = IsQuestCompletable(quest) ? 1 : 0;
+            if (!redDot.AddLeaf(CanvasType.Quest, leaf, initialCount)) return;
+
+            questRedDotLeaves.Add(quest, leaf);
+        }
+
+        /// <summary>任务移出已接取列表时移除红点叶子。</summary>
+        private void RemoveQuestRedDotLeaf(QuestSO quest)
+        {
+            if (quest == null) return;
+            if (!questRedDotLeaves.TryGetValue(quest, out QuestRedDotLeaf leaf)) return;
+
+            RedDotManager redDot = RedDotManager.Instance;
+            if (redDot != null)
+                redDot.RemoveLeaf(leaf);
+
+            questRedDotLeaves.Remove(quest);
+        }
+
+        /// <summary>重算单个任务叶子的可交付计数；任务没有叶子时返回。</summary>
+        private void RefreshRedDotLeaf(QuestSO quest)
+        {
+            if (quest == null) return;
+            if (!questRedDotLeaves.TryGetValue(quest, out QuestRedDotLeaf leaf)) return;
+
+            leaf.Refresh(this);
+        }
+
+        /// <summary>为已接取任务补齐缺失的叶子，并按当前进度重算全部叶子。</summary>
+        private void SyncRedDotLeaves()
+        {
+            if (RedDotManager.Instance == null) return;
+
+            for (int i = 0; i < trackedQuests.Count; i++)
+                AddQuestRedDotLeaf(trackedQuests[i]);
+
+            for (int i = 0; i < trackedQuests.Count; i++)
+                RefreshRedDotLeaf(trackedQuests[i]);
+        }
+
+        /// <summary>读取任务的红点叶子；任务没有叶子时返回 null。</summary>
+        public QuestRedDotLeaf GetRedDotLeaf(QuestSO quest)
+        {
+            if (quest == null) return null;
+
+            return questRedDotLeaves.TryGetValue(quest, out QuestRedDotLeaf leaf) ? leaf : null;
         }
 
         /// <summary>
@@ -498,6 +674,14 @@ namespace Gameplay.Quest
                     return false;
             }
             return true;
+        }
+
+        /// <summary>判断任务是否可交付：在已接取列表内且所有目标都已完成。</summary>
+        public bool IsQuestCompletable(QuestSO quest)
+        {
+            if (quest == null || !trackedQuests.Contains(quest)) return false;
+
+            return IsQuestObjDone(quest);
         }
 
         /// <summary>判断任务的所有目标是否都已完成；已完成任务直接返回 true。</summary>

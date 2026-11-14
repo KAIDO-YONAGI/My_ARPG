@@ -4,6 +4,7 @@ using Contracts.Enums;
 using Contracts.Interfaces;
 using Pipeline.SO;
 using Pipeline.SO.Events;
+using Pipeline.UI.RedDot;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,15 @@ namespace Pipeline.UI.SystemCanvasManagers
         [SerializeField] private TMP_Text toggleMenuText;
         [SerializeField] private Button[] integratedButtons;
         [SerializeField] private TMP_Text[] integratedButtonTexts;
+
+        [Tooltip("OpenMenu 按钮上的根红点表现。")]
+        [SerializeField]
+        private Image toggleMenuRedDot;
+
+        [Tooltip("分页按钮各自的红点表现，顺序与 integratedButtons 一致。")]
+        [SerializeField]
+        private Image[] integratedButtonRedDots;
+
         [SerializeField] private ToggleCanvasEventSO toggleIntegratedCanvasEventSO;
         [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
         public ToggleCanvasEventSO ToggleCanvasEvent => toggleIntegratedCanvasEventSO;
@@ -30,6 +40,9 @@ namespace Pipeline.UI.SystemCanvasManagers
         private int currentPageNum = 0;
         private int buttonsEachPage;//用来模拟初始化多页的Panel
         private bool isMenuOpen = false;
+
+        // 当前页已绑定红点的画布；翻页前按这份记录解绑，避免旧页面板残留引用。
+        private readonly List<CanvasType> boundRedDotCanvases = new();
 
         protected override void OnSingletonInitialized()
         {
@@ -41,6 +54,16 @@ namespace Pipeline.UI.SystemCanvasManagers
             prevPageButton.onClick.AddListener(OnClickPrevButton);
 
             InitiateUICanvasPanel(false);
+        }
+
+        private void Start()
+        {
+            // 红点管理器与本组件同在常驻场景，Awake 顺序不保证，因此在 Start 绑定一次。
+            RedDotManager redDot = RedDotManager.Instance;
+            if (redDot == null) return;
+
+            redDot.BindRootImage(toggleMenuRedDot);
+            redDot.SetNavigationOrder(canvasToToggle);
         }
         private void OnEnable()
         {
@@ -153,6 +176,50 @@ namespace Pipeline.UI.SystemCanvasManagers
                 button.onClick.AddListener(() => OnIntegratedButtonClick(canvasType));
 
             }
+
+            BindPageRedDots(startNum, canvasNum);
+        }
+
+        /// <summary>
+        /// 分页复用按钮时先解绑旧分支，再绑定当前页画布分支；没有分支的按钮隐藏红点。
+        /// </summary>
+        private void BindPageRedDots(int startNum, int canvasNum)
+        {
+            UnbindPageRedDots();
+
+            RedDotManager redDot = RedDotManager.Instance;
+            if (redDot == null) return;
+
+            for (int i = startNum, buttonNum = 0;
+                 i < canvasNum && buttonNum < integratedButtons.Length;
+                 i++, buttonNum++)
+            {
+                Image redDotImage = GetButtonRedDotImage(buttonNum);
+                if (redDotImage == null) continue;
+
+                CanvasType canvasType = canvasToToggle[i];
+                redDot.BindCanvasImage(canvasType, redDotImage);
+                boundRedDotCanvases.Add(canvasType);
+            }
+        }
+
+        private void UnbindPageRedDots()
+        {
+            RedDotManager redDot = RedDotManager.Instance;
+            if (redDot != null)
+            {
+                foreach (CanvasType canvas in boundRedDotCanvases)
+                    redDot.UnbindCanvasImage(canvas);
+            }
+
+            boundRedDotCanvases.Clear();
+        }
+
+        private Image GetButtonRedDotImage(int buttonNum)
+        {
+            if (integratedButtonRedDots == null || buttonNum >= integratedButtonRedDots.Length) return null;
+
+            return integratedButtonRedDots[buttonNum];
         }
         private void OnIntegratedButtonClick(CanvasType canvasType)
         {

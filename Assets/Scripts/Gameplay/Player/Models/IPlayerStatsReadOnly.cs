@@ -12,6 +12,7 @@ namespace Gameplay.Player.Models
         event Action StatsChanged;
         event Action<int> LevelUp;
         event Action ExpChanged;
+        event Action StatsLoaded;
 
         int Damage { get; }
         float WeaponRange { get; }

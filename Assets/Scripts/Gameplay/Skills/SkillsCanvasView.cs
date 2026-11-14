@@ -12,6 +12,7 @@ namespace Gameplay.Skills
     /// <remarks>
     /// 技能等级与解锁状态保存在管理器里，视图关闭后不保留业务数据；
     /// 重新打开时槽位会向管理器重新拉取状态，因此缓存销毁和重建不会重置技能。
+    /// 槽位红点由管理器按状态键建立，本视图只在开关时绑定和解绑表现图片。
     /// </remarks>
     public sealed class SkillsCanvasView : CachedCanvasViewBase
     {
@@ -36,13 +37,22 @@ namespace Gameplay.Skills
 
         /// <summary>
         /// 打开时绑定管理器、把状态路径根节点交给每个槽位，并立即刷新。
-        /// 状态路径以画布根为基准，槽位以画布根为基准解析状态路径。
+        /// 状态路径以画布根为基准，槽位以画布根为基准解析状态路径；
+        /// 随后按槽位状态键取红点叶子并绑定槽位红点图片。
         /// </summary>
         protected override void OnOpen()
         {
             manager = SkillTreeManager.RequiredInstance;
             foreach (SkillSlot slot in slots)
                 slot.BindStateRoot(transform);
+
+            foreach (SkillSlot slot in slots)
+            {
+                SkillRedDotLeaf leaf = manager.GetRedDotLeaf(slot.StateKey);
+                if (leaf == null) continue;
+
+                leaf.BindImage(slot.RedDotImage);
+            }
 
             SkillSlot.OnMaxSkillLevel += HandleSkillMaxed;
             skillsReader.Invalidate();
@@ -89,9 +99,23 @@ namespace Gameplay.Skills
             }
         }
 
-        /// <summary>关闭时退订静态事件并断开管理器；槽位和文本引用保留给下次打开复用。</summary>
+        /// <summary>
+        /// 关闭时退订静态事件、按槽位状态键解绑红点表现并断开管理器；
+        /// 槽位和文本引用保留给下次打开复用。
+        /// </summary>
         protected override void OnClose()
         {
+            if (manager != null)
+            {
+                foreach (SkillSlot slot in slots)
+                {
+                    SkillRedDotLeaf leaf = manager.GetRedDotLeaf(slot.StateKey);
+                    if (leaf == null) continue;
+
+                    leaf.UnbindImage(slot.RedDotImage);
+                }
+            }
+
             SkillSlot.OnMaxSkillLevel -= HandleSkillMaxed;
             manager = null;
         }

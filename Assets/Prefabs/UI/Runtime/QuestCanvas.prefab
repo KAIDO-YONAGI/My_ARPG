@@ -483,7 +483,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2510512139868574242}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -1747,7 +1747,7 @@ PrefabInstance:
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
@@ -1863,7 +1863,7 @@ PrefabInstance:
     - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_Name
       value: QuestSlot (3)
@@ -2093,7 +2093,7 @@ PrefabInstance:
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
@@ -2209,7 +2209,7 @@ PrefabInstance:
     - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_Name
       value: QuestSlot (2)
@@ -2575,6 +2575,42 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6197136914082562540}
     m_Modifications:
+    - target: {fileID: 3700410625481439906, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_text
       value: Pick And Chat
@@ -2582,7 +2618,7 @@ PrefabInstance:
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
@@ -2605,7 +2641,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 203.95001
+      value: 178.95001
       objectReference: {fileID: 0}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_SizeDelta.y
@@ -2613,7 +2649,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 548.025
+      value: 510.52502
       objectReference: {fileID: 0}
     - target: {fileID: 5148013866632673393, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2633,7 +2669,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMin.x
@@ -2641,15 +2677,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 700
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 120
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2681,11 +2717,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 384.8949
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -60
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6028258154524758271, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2699,6 +2735,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6984574603392801773, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_text
       value: Lv.0
@@ -2706,14 +2746,14 @@ PrefabInstance:
     - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_Name
       value: QuestSlot
       objectReference: {fileID: 0}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9152946969081604717, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2725,7 +2765,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9152946969081604717, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 396.05002
+      value: 371.05002
       objectReference: {fileID: 0}
     - target: {fileID: 9152946969081604717, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_SizeDelta.y
@@ -2733,13 +2773,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9152946969081604717, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 248.02501
+      value: 235.52501
       objectReference: {fileID: 0}
     - target: {fileID: 9152946969081604717, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -60
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4736408316785942452, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -3227,7 +3268,7 @@ PrefabInstance:
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
@@ -3343,7 +3384,7 @@ PrefabInstance:
     - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_Name
       value: QuestSlot (4)
@@ -4490,6 +4531,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6197136914082562540}
     m_Modifications:
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 69.630005
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777313076433447345, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0
+      objectReference: {fileID: 0}
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_text
       value: Shopping
@@ -4497,7 +4570,7 @@ PrefabInstance:
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
@@ -4621,7 +4694,7 @@ PrefabInstance:
     - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_Name
       value: QuestSlot (1)
@@ -4851,7 +4924,7 @@ PrefabInstance:
     - target: {fileID: 3889295075709108755, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: b7c2501b6d0819944938c0f803465a89, type: 2}
     - target: {fileID: 4724368167983436214, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: questLogUI
       value: 
@@ -4967,7 +5040,7 @@ PrefabInstance:
     - target: {fileID: 7936412175284837910, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
     - target: {fileID: 8263330321890586448, guid: ac90f926d0d8c0c4aa24f377beb2306f, type: 3}
       propertyPath: m_Name
       value: QuestSlot (5)

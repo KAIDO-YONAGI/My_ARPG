@@ -24,6 +24,8 @@ namespace Gameplay.Player.Models
         /// <summary>当前经验、升级阈值或等级变化时触发。AddExp 结算完成后与 LoadFrom 读档完成后都会触发。
         /// ExperienceController 订阅它刷新经验条。</summary>
         public event Action ExpChanged;
+        /// <summary>读档替换运行时数值并完成阈值修复后触发一次，此时模型已经处于恢复后的状态。</summary>
+        public event Action StatsLoaded;
 
         public const int MinExpToUpgrade = 1;
         public const int ExpStepLevels = 10;
@@ -68,6 +70,7 @@ namespace Gameplay.Player.Models
         /// 读档：用存档数据整体替换运行时状态，并通知界面刷新。
         /// 阈值是累加得到的状态，读档时直接采用存档值，不从等级重算；
         /// 低于下限的坏档值由 <see cref="RepairExpThreshold"/> 兜底。
+        /// 事件顺序固定为 StatsLoaded → HealthChanged → StatsChanged → ExpChanged。
         /// </summary>
         public void LoadFrom(PlayerStatsData source)
         {
@@ -76,6 +79,7 @@ namespace Gameplay.Player.Models
             data = source.Clone();
             RepairExpThreshold();
 
+            StatsLoaded?.Invoke(); // 数值已就位，旁路先同步基线，后续变化事件按新值比较
             HealthChanged?.Invoke();
             StatsChanged?.Invoke();
             ExpChanged?.Invoke(); // 读档换了经验/等级，经验条必须跟着刷

@@ -273,6 +273,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "RedDotNavigate",
+                    "type": "Button",
+                    "id": "3f6a1c52-8d2e-4b7a-9c14-5b0d2e8f4a61",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -372,6 +381,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "OpenGuide",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c0000001-0000-0000-0000-000000000031",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardMouse",
+                    "action": "RedDotNavigate",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -1,0 +1,71 @@
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Pipeline.UI.RedDot
+{
+    /// <summary>
+    /// 红点树节点的共同基类。持有计数、父分支与当前绑定的表现图片，
+    /// 负责计数写入与表现刷新；树结构关系由 <see cref="RedDotManager"/> 维护。
+    /// </summary>
+    /// <remarks>
+    /// 计数只通过受保护入口写入，派生叶子与分支各自决定计数来源。
+    /// 表现按 <see cref="Image.enabled"/> 开关，宿主对象的启停仍由原 UI 生命周期控制。
+    /// </remarks>
+    public abstract class RedDotNodeBase
+    {
+        private Image image;
+
+        /// <summary>当前计数，对外只读。</summary>
+        public int Count { get; private set; }
+
+        /// <summary>所属父分支，对外只读；根节点为 null。</summary>
+        public RedDotBranchNode Parent { get; internal set; }
+
+        /// <summary>当前绑定的表现图片；未绑定时为 null。</summary>
+        public Image BoundImage => image;
+
+        /// <summary>绑定表现图片并立即按当前计数刷新；原表现引用被替换。</summary>
+        public void BindImage(Image target)
+        {
+            if (image == target) return;
+
+            image = target;
+            RefreshImage();
+        }
+
+        /// <summary>只在参数与当前引用一致时解除绑定，防止旧界面回调清除新绑定。</summary>
+        public void UnbindImage(Image target)
+        {
+            if (image != target) return;
+
+            image = null;
+        }
+
+        /// <summary>按当前计数刷新表现；未绑定图片时继续保存计数。</summary>
+        public void RefreshImage()
+        {
+            if (image == null) return;
+
+            image.enabled = Count > 0;
+        }
+
+        /// <summary>
+        /// 写入计数：拒绝负数，同值静默返回，变化后刷新自身表现。
+        /// </summary>
+        /// <returns>计数实际发生变化时返回 true。</returns>
+        protected bool ApplyCount(int count)
+        {
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), count, "红点计数不能为负。");
+            }
+
+            if (count == Count) return false;
+
+            Count = count;
+            RefreshImage();
+            return true;
+        }
+    }
+}

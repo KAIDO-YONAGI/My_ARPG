@@ -106,17 +106,24 @@ namespace Gameplay.Quest
                 int slotCount = questLogSlots.Length;
                 for (int i = 0; i < slotCount; i++)
                 {
+                    QuestLogSlot slot = questLogSlots[i];
                     QuestSO quest = i < questCount ? state.GetQuest(i) : null;
-                    bool hasQuest = quest != null;
-                    if (!hasQuest)
+                    if (quest == null)
                     {
-                        questLogSlots[i].SetQuestActive(false);
+                        // 空条目在收起前按旧任务解绑红点，避免槽位复用后残留红点。
+                        UnbindSlotRedDot(manager, slot);
+                        slot.SetQuestActive(false);
                         continue;
                     }
 
-                    questLogSlots[i].SetQuest(quest);
+                    // 列表重排后槽位可能改绑其他任务，先解绑旧任务再绑定新叶子。
+                    if (slot.currentQuest != quest)
+                        UnbindSlotRedDot(manager, slot);
+
+                    slot.SetQuest(quest);
+                    BindSlotRedDot(manager, slot, quest);
                     if (manager.GetQuestStateFromProgress(quest) == QuestState.Completed)
-                        questLogSlots[i].SetCompletedState();
+                        slot.SetCompletedState();
                 }
 
                 bool showNoQuests = questCount == 0 || manager.IsAllQuestsCompleted();
@@ -129,6 +136,36 @@ namespace Gameplay.Quest
             questListReader.Record(state, questListVersion);
             questReader.Record(state, questVersion);
             questStateReader.Record(state, questStateVersion);
+        }
+
+        /// <summary>把条目的红点绑定到任务当前的叶子；任务没有叶子时红点保持隐藏。</summary>
+        private static void BindSlotRedDot(QuestManager manager, QuestLogSlot slot, QuestSO quest)
+        {
+            QuestRedDotLeaf leaf = manager.GetRedDotLeaf(quest);
+            if (leaf == null) return;
+
+            leaf.BindImage(slot.RedDotImage);
+        }
+
+        /// <summary>解绑条目旧任务的红点并关闭表现，槽位复用时不残留上一个任务的红点。</summary>
+        private static void UnbindSlotRedDot(QuestManager manager, QuestLogSlot slot)
+        {
+            QuestSO previousQuest = slot.currentQuest;
+            if (previousQuest != null)
+            {
+                QuestRedDotLeaf leaf = manager.GetRedDotLeaf(previousQuest);
+                if (leaf != null)
+                    leaf.UnbindImage(slot.RedDotImage);
+            }
+
+            slot.RedDotImage.enabled = false;
+        }
+
+        /// <summary>界面关闭前解绑所有条目的红点；叶子计数继续由管理器保存。</summary>
+        private void UnbindAllSlotRedDots(QuestManager manager)
+        {
+            for (int i = 0; i < questLogSlots.Length; i++)
+                UnbindSlotRedDot(manager, questLogSlots[i]);
         }
 
         /// <summary>刷新选中任务的详情和操作按钮；同一任务只重绘目标进度。</summary>
@@ -163,7 +200,7 @@ namespace Gameplay.Quest
             group.interactable = state;
         }
 
-        /// <summary>关闭时通知管理器退出面板状态，下次打开重新拉取数据。</summary>
+        /// <summary>关闭时解绑条目红点并通知管理器退出面板状态，下次打开重新拉取数据。</summary>
         protected override void OnClose()
         {
             QuestManager manager = QuestManager.Instance;
@@ -173,6 +210,7 @@ namespace Gameplay.Quest
                 return;
             }
 
+            UnbindAllSlotRedDots(manager);
             manager.OnCachedViewClosed();
         }
     }

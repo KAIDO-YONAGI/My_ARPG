@@ -1,6 +1,7 @@
 using Pipeline.SO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Gameplay.Quest
 {
@@ -22,6 +23,10 @@ namespace Gameplay.Quest
         [Tooltip("条目根节点的 CanvasGroup，用于完成后的置灰和禁用交互。")]
         [SerializeField] private CanvasGroup slotCanvas;
 
+        [Header("红点")]
+        [Tooltip("条目上的红点表现，由任务画布视图按任务叶子绑定。")]
+        [SerializeField] private Image redDotImage;
+
         [Header("引用")]
         [Tooltip("点击条目时通知的任务详情面板。")]
         public QuestLogPanel questLogPanel;
@@ -32,11 +37,15 @@ namespace Gameplay.Quest
         /// <summary>本槽位的 CanvasGroup；保留给外部读取，避免外部再查找组件。</summary>
         public CanvasGroup SlotCanvas => slotCanvas;
 
+        /// <summary>本槽位的红点表现；任务画布视图按任务叶子绑定与解绑。</summary>
+        public Image RedDotImage => redDotImage;
+
         private void Awake()
         {
             Debug.Assert(questNameText != null, nameof(questNameText), this);
             Debug.Assert(questLevelText != null, nameof(questLevelText), this);
             Debug.Assert(slotCanvas != null, nameof(slotCanvas), this);
+            Debug.Assert(redDotImage != null, nameof(redDotImage), this);
             Debug.Assert(questLogPanel != null, nameof(questLogPanel), this);
             ResetSlotState();
         }
