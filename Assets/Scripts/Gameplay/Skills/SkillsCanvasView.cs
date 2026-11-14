@@ -23,6 +23,7 @@ namespace Gameplay.Skills
         [Tooltip("技能点数量文本。")]
         [SerializeField] private TMP_Text pointsText;
 
+        /// <summary>校验槽位数组与技能点文本的序列化引用，缺引用由断言显式报出。</summary>
         private void Awake()
         {
             Debug.Assert(slots != null, nameof(slots), this);
@@ -31,8 +32,11 @@ namespace Gameplay.Skills
                 Debug.Assert(slots[i] != null, $"{nameof(slots)}[{i}]", this);
         }
 
+        // 打开期间绑定的技能树管理器；关闭时断开，槽位状态仍留在管理器里。
         private SkillTreeManager manager;
+        // 技能状态版本读取器，记录已绘制的版本。
         private VersionReader skillsReader;
+        // 技能点版本读取器，与技能状态分开刷新。
         private VersionReader pointsReader;
 
         /// <summary>
@@ -62,6 +66,7 @@ namespace Gameplay.Skills
             RefreshIfChanged();
         }
 
+        /// <summary>每帧按版本把管理器数据同步到技能点文本与槽位，覆盖本帧 Update 内产生的写入。</summary>
         private void LateUpdate()
         {
             RefreshIfChanged();

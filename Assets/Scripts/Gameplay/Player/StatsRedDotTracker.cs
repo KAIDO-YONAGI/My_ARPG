@@ -36,16 +36,19 @@ namespace Gameplay.Player
         // 已查看的速度基线；与伤害分别比较，任意一项变大都要提醒。
         private float baselineSpeed;
 
+        /// <summary>组件启用时先尝试初始化；此时依赖可能尚未就绪，未完成的部分由 Start 与 LateUpdate 继续补齐。</summary>
         private void OnEnable()
         {
             TryInitialize();
         }
 
+        /// <summary>在所有 Awake 之后补一次初始化，覆盖 OnEnable 时数值服务与红点管理器尚未就绪的情况。</summary>
         private void Start()
         {
             TryInitialize();
         }
 
+        /// <summary>初始化完成前逐帧重试，等到数值服务与红点管理器就绪后建立叶子并登记画布可用性。</summary>
         private void LateUpdate()
         {
             if (initialized) return;
@@ -53,11 +56,13 @@ namespace Gameplay.Player
             TryInitialize();
         }
 
+        /// <summary>组件停用时释放订阅；重新启用后由 OnEnable 重新订阅，并把当时的数值重新记为基线。</summary>
         private void OnDisable()
         {
             ReleaseSubscriptions();
         }
 
+        /// <summary>销毁前退订并把叶子从红点树摘除，避免已销毁实例的委托与树节点残留。</summary>
         protected override void OnDestroy()
         {
             ReleaseSubscriptions();
@@ -77,8 +82,7 @@ namespace Gameplay.Player
             SyncBaseline();
         }
 
-        // 数值服务与红点管理器先后就绪，两项都可用后才建立订阅与叶子。
-        // 就绪顺序不固定，缺一项先返回，由 Start/LateUpdate 的下一次进入补齐。
+        /// <summary>依赖就绪时补上事件订阅并建立红点叶子；两项依赖就绪顺序不固定，缺一项先返回，由后续生命周期回调重试。</summary>
         private void TryInitialize()
         {
             TrySubscribe();
@@ -94,7 +98,7 @@ namespace Gameplay.Player
             initialized = true;
         }
 
-        // 数值服务就绪后订阅变化事件；订阅前把当前数值记为已查看基线。
+        /// <summary>数值服务就绪后订阅变化与读档事件，并在订阅前把当前数值记为已查看基线，保证首次触发有比较起点。</summary>
         private void TrySubscribe()
         {
             if (subscribed) return;
@@ -111,7 +115,7 @@ namespace Gameplay.Player
             subscribed = true;
         }
 
-        // 退订时对实际订阅的对象操作，避免静态事件残留。
+        /// <summary>对实际订阅的数值视图成对退订，避免静态事件继续指向已停用或已销毁的组件。</summary>
         private void ReleaseSubscriptions()
         {
             if (!subscribed) return;
@@ -122,8 +126,7 @@ namespace Gameplay.Player
             stats = null;
         }
 
-        // 伤害或速度实际提升时留下一个未查看标记；基线始终跟进当前值，
-        // 数值下降（受伤、增益到期）不推进未查看标记，但基线随之下移，后续再次提升仍能提醒。
+        /// <summary>数值变化时比较当前值与已查看基线：只有伤害或速度变大才标记未查看；基线始终跟进当前值，下降不提醒、后续再次提升仍能提醒。</summary>
         private void OnStatsChanged()
         {
             if (stats == null) return;
@@ -136,7 +139,7 @@ namespace Gameplay.Player
             if (leaf != null) leaf.MarkUnread();
         }
 
-        // 读档恢复的数值直接算作已查看，避免读档被当成新增提醒。
+        /// <summary>读档重建数值后把基线同步为恢复后的值并清除未查看标记，避免读档被当成新增提升。</summary>
         private void OnStatsLoaded()
         {
             SyncBaseline();
@@ -144,7 +147,7 @@ namespace Gameplay.Player
             if (leaf != null) leaf.ClearUnread();
         }
 
-        // 用当前数值刷新已查看基线；数值服务尚未就绪时保持不变。
+        /// <summary>把当前伤害与速度写为已查看基线供后续比较；数值视图尚未就绪时保持原值。</summary>
         private void SyncBaseline()
         {
             if (stats == null) return;
@@ -153,7 +156,7 @@ namespace Gameplay.Player
             baselineSpeed = stats.Speed;
         }
 
-        // 属性画布的可用性：数值服务就绪才能打开属性面板。
+        /// <summary>属性画布的可用性判定：数值服务就绪才允许红点导航把玩家带到属性面板。</summary>
         private static bool IsStatsAvailable()
         {
             return StatsService.Instance != null;

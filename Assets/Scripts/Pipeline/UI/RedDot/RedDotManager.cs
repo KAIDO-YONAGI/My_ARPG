@@ -21,6 +21,7 @@ namespace Pipeline.UI.RedDot
     /// </remarks>
     public sealed class RedDotManager : YSingleton<RedDotManager>
     {
+        /// <summary>待办导航的输入引用，场景里指向 UI/RedDotNavigate 动作。</summary>
         [Tooltip("待办导航按键（键盘反引号，即 ~ 键）。按下后按画布顺序打开或聚焦有待办的界面。")]
         [SerializeField]
         private InputActionReference navigateAction;
@@ -58,6 +59,7 @@ namespace Pipeline.UI.RedDot
         /// <summary>上次成功定位的画布，初值为 Default。</summary>
         public CanvasType LastNavigatedCanvas => lastNavigatedCanvas;
 
+        /// <summary>建立红点树根节点，并校验导航按键已经接线。</summary>
         protected override void OnSingletonInitialized()
         {
             root = new RedDotBranchNode();
@@ -65,24 +67,28 @@ namespace Pipeline.UI.RedDot
             Debug.Assert(navigateAction != null, nameof(navigateAction), this);
         }
 
+        /// <summary>启用导航按键，使反引号键能在 Update 中被采样。</summary>
         private void OnEnable()
         {
             navigateAction.action.Enable();
         }
 
+        /// <summary>停用导航按键，与 OnEnable 成对处理。</summary>
         private void OnDisable()
         {
             navigateAction.action.Disable();
         }
 
+        /// <summary>补绑根红点表现；界面重建后由聚合面板再次绑定。</summary>
         private void Start()
         {
             BindRootImage(rootImage);
         }
 
+        /// <summary>采样导航键并请求定位下一个有待办的画布。</summary>
+        /// <remarks>导航键在本组件内采样：UIManager 只接收画布请求，不感知红点。</remarks>
         private void Update()
         {
-            // 导航键在本组件内采样：UIManager 只接收画布请求，不感知红点。
             if (!navigateAction.action.WasPressedThisFrame()) return;
 
             TryNavigateToPendingCanvas();
@@ -234,7 +240,7 @@ namespace Pipeline.UI.RedDot
             return false;
         }
 
-        // 导航请求在本帧由 UIManager 消费，下一帧再确认界面是否真正打开，失败保持游标。
+        /// <summary>导航请求由 UIManager 消费，下一帧再确认界面是否真正打开；失败保持游标。</summary>
         private void LateUpdate()
         {
             if (pendingCanvas == CanvasType.Default) return;
@@ -249,12 +255,13 @@ namespace Pipeline.UI.RedDot
             pendingCanvas = CanvasType.Default;
         }
 
+        /// <summary>叶子计数变化后的回调：从它的父分支开始向上重算。</summary>
         private void OnLeafCountChanged(RedDotLeafBase leaf)
         {
             RecalculateFrom(leaf.Parent);
         }
 
-        // 从给定分支开始向上重算，直到根节点；每个祖先只汇总一次。
+        /// <summary>从给定分支开始向上重算，直到根节点；每个祖先只汇总一次。</summary>
         private void RecalculateFrom(RedDotBranchNode branch)
         {
             while (branch != null)
@@ -264,7 +271,7 @@ namespace Pipeline.UI.RedDot
             }
         }
 
-        // 画布分支按需建立；红点图片可能先于分支登记，这里把已有图片补绑上去。
+        /// <summary>取画布分支，没有则建立并挂到根节点；已有图片会补绑到新分支。</summary>
         private RedDotBranchNode EnsureCanvasBranch(CanvasType canvas)
         {
             if (root == null) return null;
@@ -283,17 +290,19 @@ namespace Pipeline.UI.RedDot
             return branch;
         }
 
+        /// <summary>判断画布当前是否还有待办，用于导航筛选。</summary>
         private bool HasPending(CanvasType canvas)
         {
             return canvasBranches.TryGetValue(canvas, out RedDotBranchNode branch) && branch.Count > 0;
         }
 
+        /// <summary>判断画布当前是否允许打开；未登记门槛回调的画布视为可打开。</summary>
         private bool IsCanvasAvailable(CanvasType canvas)
         {
             return !canvasGates.TryGetValue(canvas, out Func<bool> gate) || gate == null || gate();
         }
 
-        // 游标返回 -1 表示还没有成功定位过，循环从导航顺序的第一项开始。
+        /// <summary>取上次定位画布在导航顺序中的下标；返回 -1 表示从第一项开始找。</summary>
         private int IndexOfLastNavigated()
         {
             for (int i = 0; i < navigationOrder.Count; i++)

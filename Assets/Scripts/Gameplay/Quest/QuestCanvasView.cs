@@ -42,10 +42,14 @@ namespace Gameplay.Quest
         [Tooltip("没有任务时显示的提示文字区域。")]
         [SerializeField] private CanvasGroup promptCanvasGroup;
 
+        // 任务列表版本读取器，列表变化时才重填条目的任务。
         private VersionReader questListReader;
+        // 当前任务版本读取器，切换选中任务时刷新右侧详情。
         private VersionReader questReader;
+        // 当前任务状态版本读取器，完成态变化时刷新按钮组。
         private VersionReader questStateReader;
 
+        /// <summary>校验预制体上的列表、详情面板与按钮组序列化引用。</summary>
         private void Awake()
         {
             Debug.Assert(questLogPanel != null, nameof(questLogPanel), this);
@@ -76,6 +80,7 @@ namespace Gameplay.Quest
             RefreshIfChanged();
         }
 
+        /// <summary>按管理器版本变化刷新界面；未打开或管理器缺失时直接返回。</summary>
         private void LateUpdate()
         {
             RefreshIfChanged();

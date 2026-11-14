@@ -15,9 +15,8 @@ namespace Gameplay.Skills
     /// 通过只读状态查询同步给视图；技能画布上的红点叶子也由这里建立与重算。
     /// </summary>
     /// <remarks>
-    /// 技能槽位在界面关闭后会被缓存，但状态不能跟着界面走，所以统一存在这里。
-    /// 槽位用稳定的层级路径作为键，缓存重建后仍能找回原状态。
-    /// 红点叶子按同一套槽位路径索引，技能状态或技能点实际变化后触发
+    /// 技能槽位状态不跟界面走，统一存在这里，用稳定的层级路径作为键。
+    /// 红点叶子按同一套路径索引，技能状态或技能点实际变化后触发
     /// <see cref="SkillsChanged"/>，由管理器自身重算全部叶子。
     /// </remarks>
     public class SkillTreeManager : YSingleton<SkillTreeManager>
@@ -25,9 +24,14 @@ namespace Gameplay.Skills
         /// <summary>一个技能槽位的运行期状态。</summary>
         public struct SkillState
         {
+            /// <summary>当前等级。</summary>
             public int Level;
+            /// <summary>是否已经解锁。</summary>
             public bool IsUnlocked;
 
+            /// <summary>用初始等级与解锁状态建立槽位状态。</summary>
+            /// <param name="level">初始等级。</param>
+            /// <param name="isUnlocked">是否已解锁。</param>
             public SkillState(int level, bool isUnlocked)
             {
                 Level = level;
@@ -52,6 +56,7 @@ namespace Gameplay.Skills
             /// <summary>技能点版本。</summary>
             public ulong AbilityPointsVersion => AbilityPoints.Version;
 
+            /// <summary>建立默认状态：技能表为空，技能点为 0。</summary>
             public State()
             {
                 Skills = new VersionedValue<Dictionary<string, SkillState>>(
@@ -77,7 +82,9 @@ namespace Gameplay.Skills
             internal Dictionary<string, SkillState> SkillValues => Skills.Value;
         }
 
+        // 本管理器的运行状态；对外只通过 CurrentState 只读访问。
         private readonly State state = new();
+        // 是否已订阅 StatsService 的升级事件；防重复订阅，退订也按该标记处理。
         private bool listeningToLevelUp;
 
         // 技能画布预制体上的槽位路径到红点叶子的映射；叶子在预制体就绪后建立一次。
@@ -93,18 +100,21 @@ namespace Gameplay.Skills
         /// <summary>技能等级、解锁状态或技能点实际变化后触发；管理器用它重算全部红点叶子。</summary>
         public event Action SkillsChanged;
 
+        /// <summary>启用时挂上红点重算，并补订可能因数值服务未就绪而漏订的升级事件。</summary>
         private void OnEnable()
         {
             SkillsChanged += RefreshRedDotLeaves;
             TrySubscribeLevelUp();
         }
 
+        /// <summary>停用时成对退订红点重算与升级事件，避免停用后仍被回调。</summary>
         private void OnDisable()
         {
             SkillsChanged -= RefreshRedDotLeaves;
             UnsubscribeLevelUp();
         }
 
+        /// <summary>启动时补齐升级订阅与技能点，并按当前数据尝试建立红点叶子。</summary>
         private void Start()
         {
             // OnEnable 可能早于 StatsService 的 Awake，Start 再补一次订阅。
@@ -113,7 +123,7 @@ namespace Gameplay.Skills
             TryBuildRedDotLeaves();
         }
 
-        // 技能画布预制体与红点管理器可能在 Start 之后才就绪，LateUpdate 继续尝试直到叶子建成。
+        /// <summary>叶子未建成时每帧重试；建立依赖的界面缓存与红点管理器可能在 Start 之后才就绪。</summary>
         private void LateUpdate()
         {
             TryBuildRedDotLeaves();
@@ -227,9 +237,8 @@ namespace Gameplay.Skills
 
         /// <summary>
         /// 从技能画布的预制体收集槽位，按槽位路径建立红点叶子并写入初始计数。
-        /// 用预制体而不是画布实例：实例要到界面首次打开才创建，菜单红点需要在打开前聚合。
-        /// 界面缓存或红点管理器尚未就绪时返回 false，由下一帧继续尝试，不抛异常。
-        /// 叶子建成后立即按当前数据重算一次。
+        /// 用预制体是因为画布实例要到首次打开才创建，而菜单红点需要在打开前聚合。
+        /// 界面缓存或红点管理器未就绪时返回 false 由下一帧重试，建成后立即按当前数据重算一次。
         /// </summary>
         private bool TryBuildRedDotLeaves()
         {

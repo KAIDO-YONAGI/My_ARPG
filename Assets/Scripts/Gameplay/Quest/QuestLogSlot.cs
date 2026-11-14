@@ -41,6 +41,7 @@ namespace Gameplay.Quest
         /// <summary>本槽位的红点表现；任务画布视图按任务叶子绑定与解绑。</summary>
         public Image RedDotImage => redDotImage;
 
+        /// <summary>校验序列化引用，并把条目恢复为正常显示状态。</summary>
         private void Awake()
         {
             Debug.Assert(questNameText != null, nameof(questNameText), this);

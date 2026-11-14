@@ -27,8 +27,11 @@ namespace Gameplay.Player.Models
         /// <summary>读档替换运行时数值并完成阈值修复后触发一次，此时模型已经处于恢复后的状态。</summary>
         public event Action StatsLoaded;
 
+        /// <summary>升级所需经验的下限；低于该值的阈值会被修回本值，避免永远升不了级。</summary>
         public const int MinExpToUpgrade = 1;
+        /// <summary>升级时抬高阈值前用于截断的步长。</summary>
         public const int ExpStepLevels = 10;
+        /// <summary>升级时抬高阈值的除数。</summary>
         public const float ExpGrowthDivisor = 4f;
 
         // 运行时数值本体。构造与读档时整体替换为拷贝，之后只由本类的写方法修改。
@@ -47,19 +50,33 @@ namespace Gameplay.Player.Models
 
         // ---- 只读访问器：界面读取这些属性，数据的改动走本类的写方法 ----
 
+        /// <summary>近战伤害数值。</summary>
         public int Damage => data.damage;
+        /// <summary>武器攻击距离。</summary>
         public float WeaponRange => data.weaponRange;
+        /// <summary>攻击击退力度。</summary>
         public float KnockBackForce => data.knockBackForce;
+        /// <summary>受击硬直时长。</summary>
         public float KnockBackTime => data.knockBackTime;
+        /// <summary>受击眩晕时长。</summary>
         public float StunTime => data.stunTime;
+        /// <summary>攻击冷却时间。</summary>
         public float CoolDown => data.coolDown;
+        /// <summary>移动速度。</summary>
         public float Speed => data.speed;
+        /// <summary>生命值上限。</summary>
         public int MaxHealth => data.maxHealth;
+        /// <summary>当前生命值。</summary>
         public int CurrentHealth => data.currentHealth;
+        /// <summary>当前可用技能点。</summary>
         public int SkillPoints => data.skillPoints;
+        /// <summary>当前等级。</summary>
         public int Level => data.level;
+        /// <summary>当前经验值。</summary>
         public int CurrentExp => data.currentExp;
+        /// <summary>升到下一级所需的经验值。</summary>
         public int ExpToUpgrade => data.expToUpgrade;
+        /// <summary>经验阈值成长倍率。</summary>
         public float ExpMultiplier => data.expMultiplier;
         /// <summary>等级上限；0 表示不限制。</summary>
         public int MaxLevel => data.maxLevel;

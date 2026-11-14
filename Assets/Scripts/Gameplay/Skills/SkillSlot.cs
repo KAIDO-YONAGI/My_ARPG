@@ -21,11 +21,13 @@ namespace Gameplay.Skills
     public class SkillSlot : MonoBehaviour
     {
         [Header("技能配置")]
+        /// <summary>槽位对应的技能配置，由预制体逐个拖入。</summary>
         public SkillSO skillSO;
 
         [Header("控件")]
         [SerializeField] private Image skillIcon;
         [SerializeField] private TMP_Text skillLevelText;
+        /// <summary>槽位按钮，点击时尝试升级。</summary>
         public Button skillButton;
 
         // 技能可升级时显示的红点表现，由预制体按该字段名序列化接线；改名会丢失既有引用。
@@ -41,7 +43,9 @@ namespace Gameplay.Skills
         [SerializeField] private int currentLevel;
         public bool isUnlocked = false;
 
+        /// <summary>当前等级，向管理器读取后写入。</summary>
         public int CurrentLevel => currentLevel;
+        /// <summary>当前是否已解锁。</summary>
         public bool IsUnlocked => isUnlocked;
 
         /// <summary>槽位红点表现图片，由技能画布按状态键绑定到红点叶子。</summary>
@@ -69,6 +73,7 @@ namespace Gameplay.Skills
             stateKey = BuildStateKey(transform, stateRoot);
         }
 
+        /// <summary>校验预制体序列化接线的控件与红点引用，缺引用由断言显式报出。</summary>
         private void Awake()
         {
             Debug.Assert(skillIcon != null, nameof(skillIcon), this);
@@ -77,18 +82,21 @@ namespace Gameplay.Skills
             Debug.Assert(redDotImage != null, nameof(redDotImage), this);
         }
 
+        /// <summary>编辑器中技能配置变化时刷新显示，便于在预制体上直接查看效果。</summary>
         private void OnValidate()
         {
             if (skillSO != null)
                 UpdateUI();
         }
 
+        /// <summary>启用时挂上升级按钮监听，并从管理器恢复本槽位状态。</summary>
         private void OnEnable()
         {
             skillButton.onClick.AddListener(TryUpgradeSkill);
             RefreshFromManager();
         }
 
+        /// <summary>停用时移除升级按钮监听，与 OnEnable 成对管理回调。</summary>
         private void OnDisable()
         {
             skillButton.onClick.RemoveListener(TryUpgradeSkill);

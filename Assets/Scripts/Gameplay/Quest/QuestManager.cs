@@ -61,8 +61,10 @@ namespace Gameplay.Quest
             /// <summary>显示列表是否为已接取任务追踪视图。</summary>
             public bool IsTrackerMode => trackerMode;
 
+            // 显示列表的来源标记：任务板为 false，已接取任务追踪为 true。
             private bool trackerMode;
 
+            /// <summary>初始化任务运行状态，显示列表为空。</summary>
             public State() => displayQuests = new VersionedValue<List<QuestSO>>(null);
 
             /// <summary>写入显示列表并推进版本。</summary>
@@ -98,12 +100,17 @@ namespace Gameplay.Quest
         [Tooltip("完成任务时向背包发放奖励。")]
         [SerializeField] private InventorySlotsStatsSO QuestRewardRequest;
 
+        // 任务进度记录，按任务配置索引；条目只在首次登记时建立，运行期不覆盖。
         private readonly Dictionary<QuestSO, QuestProgressData> questProgress = new();
         // 已接取任务列表，只含 Accepted 与 IsToComplete；顺序即追踪视图的显示顺序。
         private readonly List<QuestSO> trackedQuests = new();
+        // 任务运行状态，供视图按版本读取。
         private readonly State state = new();
+        // 任务画布的开关事件，从界面缓存取到后缓存，退订时对同一份使用。
         private ToggleCanvasEventSO questToggleEvent;
+        // 是否已订阅任务画布开关，防重复订阅，退订按该标记处理。
         private bool listeningToQuestToggle;
+        // 任务画布是否由管理器记为已打开，避免重复打开与重复装载数据。
         private bool canvasIsActive;
 
         // 已接取任务的红点叶子，与 trackedQuests 一一对应；列表变化时同步建立或移除。
@@ -127,6 +134,8 @@ namespace Gameplay.Quest
         /// <summary>单个任务的运行期进度：状态 + 每个目标已完成的数量。</summary>
         private sealed class QuestProgressData
         {
+            /// <summary>按任务目标列表建立进度记录，每个目标初值为零。</summary>
+            /// <param name="objectives">任务目标列表，为每个目标建立进度记录。</param>
             public QuestProgressData(List<QuestObjective> objectives)
             {
                 if (objectives == null) return;
@@ -137,10 +146,13 @@ namespace Gameplay.Quest
                 }
             }
 
+            // 任务当前状态；初始为未接取，接取或放弃后由状态流转写入。
             public QuestState questState = QuestState.Idle;
+            // 每个目标的已完成数量，按目标对象索引；目标进度重算时覆盖写入。
             public readonly Dictionary<QuestObjective, int> questObjectives = new();
         }
 
+        /// <summary>单例注册后校验序列化的事件资产与奖励通道引用。</summary>
         protected override void OnSingletonInitialized()
         {
             Debug.Assert(openQuestEventSO != null, nameof(openQuestEventSO), this);
@@ -150,6 +162,7 @@ namespace Gameplay.Quest
             Debug.Assert(QuestRewardRequest != null, nameof(QuestRewardRequest), this);
         }
 
+        /// <summary>启用时登记事件资产订阅，并尝试订阅画布开关与历史通知。</summary>
         private void OnEnable()
         {
             openQuestEventSO.VoidEvent += OnOpenQuestBoard;
@@ -160,6 +173,7 @@ namespace Gameplay.Quest
             TrySubscribeHistoryNotifications();
         }
 
+        /// <summary>停用时退订全部事件与历史通知，避免事件通道残留。</summary>
         private void OnDisable()
         {
             openQuestEventSO.VoidEvent -= OnOpenQuestBoard;
@@ -170,6 +184,7 @@ namespace Gameplay.Quest
             UnsubscribeHistoryNotifications();
         }
 
+        /// <summary>补订 OnEnable 时尚未就绪的依赖，并尝试初始化任务红点。</summary>
         private void Start()
         {
             // OnEnable 可能早于 UICacheManager 的 Awake，Start 再补一次订阅。
@@ -181,6 +196,7 @@ namespace Gameplay.Quest
             TryInitializeQuestRedDot();
         }
 
+        /// <summary>红点管理器未就绪时逐帧重试初始化，就绪后由状态迁移增量维护叶子。</summary>
         private void LateUpdate()
         {
             // 红点管理器可能晚于本管理器初始化，就绪前每帧补试一次。

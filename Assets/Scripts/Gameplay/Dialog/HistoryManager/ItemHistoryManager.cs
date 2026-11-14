@@ -13,8 +13,12 @@ namespace Gameplay.Dialog.HistoryManager
         /// </summary>
         public event Action<ItemSO> ItemQuantityChanged;
 
+        // 物品累计数量记录，按物品配置索引。
         private Dictionary<ItemSO, int> itemHasPicked = new();
 
+        /// <summary>记录一次物品增量并通知监听方。</summary>
+        /// <param name="item">物品配置。</param>
+        /// <param name="quantity">本次增量，消耗与丢弃传负数。</param>
         public void RecordItem(ItemSO item, int quantity)
         {
             if (itemHasPicked.ContainsKey(item))
@@ -26,6 +30,9 @@ namespace Gameplay.Dialog.HistoryManager
             ItemQuantityChanged?.Invoke(item);
         }
 
+        /// <summary>判断物品累计数量是否达到指定阈值。</summary>
+        /// <param name="item">物品配置。</param>
+        /// <param name="amount">判定阈值。</param>
         public bool HasPickedOverAmount(ItemSO item, int amount)//实际上会记录是否捡过和数量，当前数量归零的并不会删除
         {
             if (itemHasPicked.ContainsKey(item) && itemHasPicked[item] >= amount)
@@ -33,6 +40,8 @@ namespace Gameplay.Dialog.HistoryManager
 
             return false;
         }
+        /// <summary>读取物品累计数量；没有记录时返回零。</summary>
+        /// <param name="item">物品配置。</param>
         public int GetItemQuantity(ItemSO item)
         {
             if (itemHasPicked.TryGetValue(item, out int amount))
