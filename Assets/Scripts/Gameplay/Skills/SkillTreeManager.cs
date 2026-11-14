@@ -81,7 +81,10 @@ namespace Gameplay.Skills
         private bool listeningToLevelUp;
 
         // 技能画布预制体上的槽位路径到红点叶子的映射；叶子在预制体就绪后建立一次。
+        // 键与技能状态相同，画布实例打开后按同一键取回叶子。
         private readonly Dictionary<string, SkillRedDotLeaf> redDotLeaves = new();
+
+        // 叶子是否已建立；界面缓存与红点管理器都就绪后只建一次，之后每帧只做一次判断。
         private bool redDotLeavesBuilt;
 
         /// <summary>技能树运行状态，供视图读取。</summary>
@@ -139,6 +142,9 @@ namespace Gameplay.Skills
         /// 共用升级资格判定：技能已解锁、未满级且当前有可用技能点。
         /// 红点显示与升级命令共用本判定，保证两条路径的规则一致。
         /// </summary>
+        /// <param name="key">槽位路径键，与技能状态字典使用同一套键。</param>
+        /// <param name="maxLevel">该技能配置的等级上限。</param>
+        /// <param name="initialState">没有存档记录时使用的初始等级与解锁状态。</param>
         public bool CanUpgradeSkill(string key, int maxLevel, SkillState initialState)
         {
             if (string.IsNullOrEmpty(key)) return false;
@@ -204,6 +210,7 @@ namespace Gameplay.Skills
         }
 
         /// <summary>按槽位路径取红点叶子；叶子尚未建立或路径没有对应槽位时返回 null。</summary>
+        /// <param name="stateKey">槽位路径键，由技能画布槽位按同一套路径生成。</param>
         public SkillRedDotLeaf GetRedDotLeaf(string stateKey)
         {
             return !string.IsNullOrEmpty(stateKey) && redDotLeaves.TryGetValue(stateKey, out SkillRedDotLeaf leaf)
@@ -220,13 +227,15 @@ namespace Gameplay.Skills
 
         /// <summary>
         /// 从技能画布的预制体收集槽位，按槽位路径建立红点叶子并写入初始计数。
-        /// 界面缓存或红点管理器尚未就绪时返回 false，由下一帧继续尝试。
+        /// 用预制体而不是画布实例：实例要到界面首次打开才创建，菜单红点需要在打开前聚合。
+        /// 界面缓存或红点管理器尚未就绪时返回 false，由下一帧继续尝试，不抛异常。
         /// 叶子建成后立即按当前数据重算一次。
         /// </summary>
         private bool TryBuildRedDotLeaves()
         {
             if (redDotLeavesBuilt) return true;
 
+            // 两个单例在各自 Awake 中注册，常驻场景内 Awake 顺序不保证，缺一个就先返回。
             UICacheManager cache = UICacheManager.Instance;
             RedDotManager redDot = RedDotManager.Instance;
             if (cache == null || redDot == null) return false;
@@ -235,12 +244,14 @@ namespace Gameplay.Skills
             if (prefab == null) return false;
 
             Transform root = prefab.transform;
+            // 包含未激活的子节点：技能树里部分分支在预制体上默认收起。
             SkillSlot[] prefabSlots = prefab.GetComponentsInChildren<SkillSlot>(true);
             for (int i = 0; i < prefabSlots.Length; i++)
             {
                 SkillSlot slot = prefabSlots[i];
                 if (slot.skillSO == null) continue;
 
+                // 预制体与实例的层级名、同级序号一致，视图在实例上按同一算法得到同一个键。
                 string key = SkillSlot.BuildStateKey(slot.transform, root);
                 SkillState initialState = new SkillState(slot.CurrentLevel, slot.IsUnlocked);
                 SkillRedDotLeaf leaf = new SkillRedDotLeaf(key, slot.skillSO, initialState);
@@ -251,6 +262,7 @@ namespace Gameplay.Skills
             }
 
             redDotLeavesBuilt = true;
+            // 建立期间技能状态可能已变化，用当前数据覆盖一次预制体初值。
             RefreshRedDotLeaves();
             return true;
         }

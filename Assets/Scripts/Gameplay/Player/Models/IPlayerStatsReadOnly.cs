@@ -12,6 +12,7 @@ namespace Gameplay.Player.Models
         event Action StatsChanged;
         event Action<int> LevelUp;
         event Action ExpChanged;
+        /// <summary>读档整体替换数值并完成阈值修复后触发一次，此时接口上的数值已是恢复后的结果。</summary>
         event Action StatsLoaded;
 
         int Damage { get; }

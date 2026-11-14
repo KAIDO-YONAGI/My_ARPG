@@ -13,9 +13,11 @@ namespace Pipeline.UI.RedDot
     public abstract class RedDotLeafBase : RedDotNodeBase
     {
         /// <summary>叶子计数变化时触发，携带自身引用。</summary>
+        /// <remarks>订阅者只有 <see cref="RedDotManager"/>，它在挂接时订阅、摘除时退订。</remarks>
         public event Action<RedDotLeafBase> CountChanged;
 
         /// <summary>写入叶子计数并通知父链重算；计数非负，同值直接返回。</summary>
+        /// <param name="count">新的计数，业务叶子取 0 或 1。</param>
         protected void SetCount(int count)
         {
             if (!ApplyCount(count)) return;
@@ -24,6 +26,7 @@ namespace Pipeline.UI.RedDot
         }
 
         /// <summary>挂接时由管理器写入初始计数，不触发变化通知。</summary>
+        /// <param name="count">挂接前按当前业务数据算好的初始计数。</param>
         internal void ApplyInitialCount(int count)
         {
             ApplyCount(count);

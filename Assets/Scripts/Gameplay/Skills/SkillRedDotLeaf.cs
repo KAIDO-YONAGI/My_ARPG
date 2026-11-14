@@ -13,13 +13,19 @@ namespace Gameplay.Skills
     /// </remarks>
     public sealed class SkillRedDotLeaf : RedDotLeafBase
     {
+        // 槽位对应的技能配置，来自技能画布预制体上的槽位引用；判定需要它的等级上限。
         private readonly SkillSO skillSO;
+
+        // 槽位在预制体上的初始等级与解锁状态，管理器没有存档记录时作为当前状态使用。
         private readonly SkillTreeManager.SkillState initialState;
 
         /// <summary>槽位在技能状态字典里的稳定路径键，与技能状态共用同一套键。</summary>
         public string StateKey { get; }
 
         /// <summary>用槽位路径、技能配置与槽位预制体初始状态建立叶子。</summary>
+        /// <param name="stateKey">槽位路径键，与管理器的技能状态共用同一套键。</param>
+        /// <param name="skillSO">槽位对应的技能配置，判定需要它的等级上限。</param>
+        /// <param name="initialState">没有存档记录时使用的初始等级与解锁状态。</param>
         public SkillRedDotLeaf(string stateKey, SkillSO skillSO, SkillTreeManager.SkillState initialState)
         {
             StateKey = stateKey;
@@ -28,6 +34,7 @@ namespace Gameplay.Skills
         }
 
         /// <summary>按管理器的共用资格判定重算红点计数：可升级为 1，否则为 0。</summary>
+        /// <param name="manager">持有技能状态与技能点的管理器。</param>
         public void Refresh(SkillTreeManager manager)
         {
             SetCount(manager.CanUpgradeSkill(StateKey, skillSO.maxLevel, initialState) ? 1 : 0);

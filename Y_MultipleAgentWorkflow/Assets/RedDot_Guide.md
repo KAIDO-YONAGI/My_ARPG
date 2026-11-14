@@ -35,7 +35,7 @@ RedDotManager.Root
 | `RedDotNodeBase` | Count、Parent、单个 Image，Image 通过 BoundImage 只读暴露 | 保存计数、父关系与当前表现 |
 | `RedDotBranchNode` | `List<RedDotNodeBase> children`，通过 Children 只读访问 | 汇总直接子节点；根与画布分支共用本类型 |
 | `RedDotLeafBase` | `CountChanged` 事件 | 变化时携带自身引用通知 Manager |
-| `RedDotManager` | root、canvasBranches、canvasGates、canvasImages | 保存树、CanvasType 到分支/可用性回调/Image 的映射 |
+| `RedDotManager` | root、rootImage、canvasBranches、canvasGates、canvasImages | 保存根与表现，以及 CanvasType 到分支、可用性回调、Image 的映射 |
 | `RedDotManager` | navigationOrder、lastNavigatedCanvas、pendingCanvas、pendingFrame | 保存导航顺序、成功游标与待确认请求 |
 | `SkillTreeManager` | `Dictionary<string, SkillRedDotLeaf> redDotLeaves` | 以槽位稳定路径关联技能状态与叶子 |
 | `QuestManager` | trackedQuests、questProgress、`Dictionary<QuestSO, QuestRedDotLeaf> questRedDotLeaves` | 已接取集合、任务进度与任务叶子索引 |
@@ -148,7 +148,7 @@ ConversationHistoryManager.RecordCharacter → CharacterTalkedChanged
   → SetCount → 通用父链传播
 ```
 
-记录入口每次调用均发送通知，叶子同值比较抑制重复计数传播。物品目标读取物品获得历史，角色目标读取对话历史，Completed 任务的目标进度保持冻结。历史通知重算进度与红点，Accepted 到 IsToComplete 的状态推进仍由任务板装载入口处理；奖励在首次进入 Completed 时发放。
+记录入口每次调用均发送通知，叶子同值比较抑制重复计数传播。物品目标读取物品获得历史，角色目标读取对话历史，Completed 任务的目标进度保持冻结。历史通知重算进度与红点，Accepted 到 IsToComplete 的状态推进由任务板装载入口处理；QuestStateChanged 从非 Completed 状态进入 Completed 时发放奖励。
 
 范围内的打开链为 `QuestBoardManager → 加载任务列表事件 → OnRefreshQuestState → 同步叶子 → 打开事件 → UICacheManager.OpenCanvas`。范围外为 `QuestManager.OnToggleQuestCanvas → OpenQuestTracker → trackedQuests 显示列表 → 重算目标与 SyncRedDotLeaves → OpenQuestCanvas`。
 
@@ -181,7 +181,7 @@ StatsCanvasView.OnOpen
 
 面板打开期间的 StatsChanged 同样调用 Controller.Refresh。清除点位于写入属性文本之后，属于同步绘制流程。读档链为 `StatsService.LoadData → PlayerStatsModel.LoadFrom → StatsLoaded → Tracker.OnStatsLoaded → 同步基线并清除`；随后依次发送 HealthChanged、StatsChanged、ExpChanged。
 
-证据：`Assets/Scripts/Gameplay/Player/StatsRedDotTracker.cs:77、93、122、135`；`Controllers/StatsCanvasController.cs:22、36`；`Views/StatsCanvasView.cs:71`；`Models/PlayerStatsModel.cs:75、120、126`。
+证据：`Assets/Scripts/Gameplay/Player/StatsRedDotTracker.cs:77、93、122、135`；`Controllers/StatsCanvasController.cs:22、36`；`Views/StatsCanvasView.cs:67`；`Models/PlayerStatsModel.cs:75、120、126`。
 
 ## 6. Image 与预制体引用链
 
@@ -236,7 +236,7 @@ Stats 与 Skills 沿缓存开关事件进入 `UIViewInstanceCache.Entry.HandleTo
 
 下一帧 RedDotManager.LateUpdate 调 UICacheManager.IsCanvasOpen 确认 pendingCanvas，打开则更新 lastNavigatedCanvas，随后清空 pendingCanvas。确认依据是缓存打开状态。Stats gate 检查数值服务就绪，Quest gate 检查任务板在范围内或已接取列表非空；Skills 使用已建立分支的默认可用性。
 
-证据：`Assets/Scripts/Pipeline/UI/RedDot/RedDotManager.cs:74、134、193、217、268`；`Assets/Scripts/Pipeline/UI/SystemCanvasManagers/UIManager.cs:126、252、334`；`CanvasFocusStack.cs:109`；`Assets/Scripts/Pipeline/UI/Runtime/UIViewInstanceCache.cs:46、218`。
+证据：`Assets/Scripts/Pipeline/UI/RedDot/RedDotManager.cs:74、134、193、217、268`；`Assets/Scripts/Pipeline/UI/SystemCanvasManagers/UIManager.cs:126、252、330`；`CanvasFocusStack.cs:109`；`Assets/Scripts/Pipeline/UI/Runtime/UIViewInstanceCache.cs:45、224`。
 
 ## 8. 生命周期与行为边界
 

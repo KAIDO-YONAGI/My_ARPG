@@ -28,6 +28,7 @@ namespace Gameplay.Skills
         [SerializeField] private TMP_Text skillLevelText;
         public Button skillButton;
 
+        // 技能可升级时显示的红点表现，由预制体按该字段名序列化接线；改名会丢失既有引用。
         [Header("红点")]
         [Tooltip("技能可升级时显示的槽位红点，由技能画布打开时绑定。")]
         [SerializeField] private Image redDotImage;
@@ -51,12 +52,15 @@ namespace Gameplay.Skills
 
         /// <summary>状态键的根节点；由技能画布在打开时注入。</summary>
         private Transform stateRoot;
+
+        // 最近一次构建出的状态键；重复刷新与点击升级复用，根节点重新注入时由 BindStateRoot 重建。
         private string stateKey;
 
         /// <summary>本槽位缓存的状态键；首次读取时按当前根节点构建。</summary>
         public string StateKey => GetStateKey();
 
         /// <summary>注入状态键根节点，使槽位能生成稳定且不依赖查找的路径。</summary>
+        /// <param name="root">画布根节点；状态路径以它为终点。</param>
         public void BindStateRoot(Transform root)
         {
             if (stateRoot == root && stateKey != null) return;
@@ -171,8 +175,11 @@ namespace Gameplay.Skills
 
         /// <summary>
         /// 从槽位向上走到画布根，记录每级名字与同级序号并拼成路径。
+        /// 同级序号区分同名兄弟节点，路径只依赖预制体层级，因此预制体与实例得到同一个键。
         /// 画布根未注入时退回槽位对象名。
         /// </summary>
+        /// <param name="slot">槽位自身的节点。</param>
+        /// <param name="root">画布根节点；为 null 时退回槽位对象名。</param>
         public static string BuildStateKey(Transform slot, Transform root)
         {
             if (root == null) return slot.name;

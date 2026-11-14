@@ -23,6 +23,7 @@ namespace Gameplay.Quest
         [Tooltip("条目根节点的 CanvasGroup，用于完成后的置灰和禁用交互。")]
         [SerializeField] private CanvasGroup slotCanvas;
 
+        // 条目红点表现，由任务画布视图按任务叶子绑定与解绑；条目自身不判断红点条件。
         [Header("红点")]
         [Tooltip("条目上的红点表现，由任务画布视图按任务叶子绑定。")]
         [SerializeField] private Image redDotImage;

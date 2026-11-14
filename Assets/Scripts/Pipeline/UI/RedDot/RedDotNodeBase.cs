@@ -14,6 +14,7 @@ namespace Pipeline.UI.RedDot
     /// </remarks>
     public abstract class RedDotNodeBase
     {
+        // 当前绑定的表现图片。界面打开时绑定、关闭时解绑；为 null 只表示没有表现载体，计数继续保存。
         private Image image;
 
         /// <summary>当前计数，对外只读。</summary>
@@ -26,6 +27,7 @@ namespace Pipeline.UI.RedDot
         public Image BoundImage => image;
 
         /// <summary>绑定表现图片并立即按当前计数刷新；原表现引用被替换。</summary>
+        /// <param name="target">要绑定的表现图片；与当前引用相同时不做事。</param>
         public void BindImage(Image target)
         {
             if (image == target) return;
@@ -35,6 +37,7 @@ namespace Pipeline.UI.RedDot
         }
 
         /// <summary>只在参数与当前引用一致时解除绑定，防止旧界面回调清除新绑定。</summary>
+        /// <param name="target">期望解除的引用；与当前绑定不一致时忽略。</param>
         public void UnbindImage(Image target)
         {
             if (image != target) return;
@@ -53,6 +56,7 @@ namespace Pipeline.UI.RedDot
         /// <summary>
         /// 写入计数：拒绝负数，同值静默返回，变化后刷新自身表现。
         /// </summary>
+        /// <param name="count">新的计数，不能为负。</param>
         /// <returns>计数实际发生变化时返回 true。</returns>
         protected bool ApplyCount(int count)
         {

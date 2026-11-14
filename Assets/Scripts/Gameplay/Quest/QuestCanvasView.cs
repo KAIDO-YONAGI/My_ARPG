@@ -110,13 +110,13 @@ namespace Gameplay.Quest
                     QuestSO quest = i < questCount ? state.GetQuest(i) : null;
                     if (quest == null)
                     {
-                        // 空条目在收起前按旧任务解绑红点，避免槽位复用后残留红点。
+                        // 空条目收起前按旧任务解绑：SetQuestActive(false) 会清空任务引用，之后取不到旧叶子。
                         UnbindSlotRedDot(manager, slot);
                         slot.SetQuestActive(false);
                         continue;
                     }
 
-                    // 列表重排后槽位可能改绑其他任务，先解绑旧任务再绑定新叶子。
+                    // 槽位可能改绑新任务，先解绑旧叶子，避免旧叶子的计数变化覆盖新任务红点。
                     if (slot.currentQuest != quest)
                         UnbindSlotRedDot(manager, slot);
 
@@ -210,6 +210,7 @@ namespace Gameplay.Quest
                 return;
             }
 
+            // 先释放条目表现绑定，再让管理器清空显示数据；实例留在缓存里，复用时不会带旧绑定。
             UnbindAllSlotRedDots(manager);
             manager.OnCachedViewClosed();
         }

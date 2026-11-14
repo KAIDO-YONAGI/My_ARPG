@@ -37,10 +37,19 @@ namespace Pipeline.UI.RedDot
         // 待办导航顺序，取值来源是聚合面板已配置的画布列表。
         private readonly List<CanvasType> navigationOrder = new();
 
+        // 树根，OnSingletonInitialized 创建；画布分支与业务叶子都挂在它下面。
         private RedDotBranchNode root;
+
+        // OpenMenu 的根红点表现；界面重建后由聚合面板重新绑定。
         private Image rootImage;
+
+        // 上次成功定位的画布，用于决定下一次从它之后继续找。
         private CanvasType lastNavigatedCanvas = CanvasType.Default;
+
+        // 已发出、尚未确认打开结果的导航目标；Default 表示没有待确认请求。
         private CanvasType pendingCanvas = CanvasType.Default;
+
+        // 发出导航请求的帧号。请求由 UIManager 在本帧或下一帧消费，确认必须等过这一帧。
         private int pendingFrame;
 
         /// <summary>红点树根节点。</summary>
@@ -73,12 +82,14 @@ namespace Pipeline.UI.RedDot
 
         private void Update()
         {
+            // 导航键在本组件内采样：UIManager 只接收画布请求，不感知红点。
             if (!navigateAction.action.WasPressedThisFrame()) return;
 
             TryNavigateToPendingCanvas();
         }
 
         /// <summary>绑定 OpenMenu 的根红点表现；界面重建后重新绑定即可立即显示。</summary>
+        /// <param name="image">OpenMenu 按钮上的红点图片。</param>
         public void BindRootImage(Image image)
         {
             rootImage = image;
@@ -88,6 +99,8 @@ namespace Pipeline.UI.RedDot
         }
 
         /// <summary>登记画布分支与可用性回调；重复登记以最后一次回调为准。</summary>
+        /// <param name="canvas">要登记的画布身份，重复登记不会重复建分支。</param>
+        /// <param name="available">待办导航前的可用性判定；返回 false 时跳过该画布。</param>
         public void RegisterCanvas(CanvasType canvas, Func<bool> available)
         {
             if (canvas == CanvasType.Default) return;
@@ -99,6 +112,8 @@ namespace Pipeline.UI.RedDot
         /// <summary>
         /// 为聚合面板入口绑定画布分支红点；没有对应分支时隐藏该红点。
         /// </summary>
+        /// <param name="canvas">红点对应的画布身份。</param>
+        /// <param name="image">分页按钮上的红点图片。</param>
         public void BindCanvasImage(CanvasType canvas, Image image)
         {
             if (canvas == CanvasType.Default || image == null) return;
@@ -114,6 +129,7 @@ namespace Pipeline.UI.RedDot
         }
 
         /// <summary>解除画布分支红点绑定；分页复用按钮时先解绑旧画布再绑新画布。</summary>
+        /// <param name="canvas">要解除绑定的画布身份。</param>
         public void UnbindCanvasImage(CanvasType canvas)
         {
             if (!canvasImages.TryGetValue(canvas, out Image image)) return;
@@ -131,6 +147,7 @@ namespace Pipeline.UI.RedDot
         }
 
         /// <summary>设置待办导航顺序；重复画布只参与一次，Default 不参与。</summary>
+        /// <param name="order">聚合面板展示画布的顺序，通常直接取 canvasToToggle。</param>
         public void SetNavigationOrder(IEnumerable<CanvasType> order)
         {
             navigationOrder.Clear();
@@ -147,6 +164,9 @@ namespace Pipeline.UI.RedDot
         /// <summary>
         /// 添加业务叶子：校验归属，建立父子关系，订阅一次计数变化并立即刷新父链。
         /// </summary>
+        /// <param name="canvas">叶子所属的画布分支。</param>
+        /// <param name="leaf">要挂接的业务叶子；已经挂接在树上时拒绝。</param>
+        /// <param name="initialCount">按当前业务数据算好的初始计数，挂接时静默写入。</param>
         /// <returns>叶子成功挂接到画布分支时返回 true。</returns>
         public bool AddLeaf(CanvasType canvas, RedDotLeafBase leaf, int initialCount)
         {
@@ -166,6 +186,7 @@ namespace Pipeline.UI.RedDot
         }
 
         /// <summary>移除业务叶子：退订、脱离父子关系、解除表现绑定并刷新原父链。</summary>
+        /// <param name="leaf">要摘除的叶子；没有挂接时直接返回。</param>
         public void RemoveLeaf(RedDotLeafBase leaf)
         {
             if (leaf == null) return;
@@ -233,6 +254,7 @@ namespace Pipeline.UI.RedDot
             RecalculateFrom(leaf.Parent);
         }
 
+        // 从给定分支开始向上重算，直到根节点；每个祖先只汇总一次。
         private void RecalculateFrom(RedDotBranchNode branch)
         {
             while (branch != null)
@@ -242,6 +264,7 @@ namespace Pipeline.UI.RedDot
             }
         }
 
+        // 画布分支按需建立；红点图片可能先于分支登记，这里把已有图片补绑上去。
         private RedDotBranchNode EnsureCanvasBranch(CanvasType canvas)
         {
             if (root == null) return null;
@@ -270,6 +293,7 @@ namespace Pipeline.UI.RedDot
             return !canvasGates.TryGetValue(canvas, out Func<bool> gate) || gate == null || gate();
         }
 
+        // 游标返回 -1 表示还没有成功定位过，循环从导航顺序的第一项开始。
         private int IndexOfLastNavigated()
         {
             for (int i = 0; i < navigationOrder.Count; i++)

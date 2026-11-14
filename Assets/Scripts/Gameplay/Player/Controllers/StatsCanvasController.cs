@@ -15,10 +15,13 @@ namespace Gameplay.Player.Controllers
     /// </remarks>
     public class StatsCanvasController
     {
+        // 创建并托管本控制器的属性面板视图。
         private readonly StatsCanvasView view;
+        // 构造时从 StatsService 取得的只读模型；Dispose 时对同一对象退订。
         private readonly IPlayerStatsReadOnly stats;
 
         /// <summary>订阅属性变化；由视图在打开时调用。</summary>
+        /// <param name="view">属性面板视图，控制器把最新数值推给它。</param>
         public StatsCanvasController(StatsCanvasView view)
         {
             this.view = view;
@@ -38,6 +41,7 @@ namespace Gameplay.Player.Controllers
             view.SetStats(stats.Damage, stats.Speed);
 
             // 面板已经显示最新数值，此刻才清除红点；追踪器尚未挂载时跳过。
+            // 顺序反过来会在玩家看到新值之前清掉提醒，这次提升就此丢失。
             StatsRedDotTracker tracker = StatsRedDotTracker.Instance;
             if (tracker != null)
                 tracker.ConfirmDisplayed();

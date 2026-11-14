@@ -16,6 +16,7 @@ namespace Gameplay.Dialog.HistoryManager
 
         public void RecordCharacter(CharacterSO character)
         {
+            // 重复记录不改变集合内容，但通知仍按本次记录发出，订阅方重算需要幂等。
             charactersHasChated.Add(character);
             CharacterTalkedChanged?.Invoke(character);
         }

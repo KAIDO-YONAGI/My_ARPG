@@ -177,12 +177,15 @@ namespace Pipeline.UI.SystemCanvasManagers
 
             }
 
+            // 按钮在翻页间复用，红点必须按当前页画布重新绑定。
             BindPageRedDots(startNum, canvasNum);
         }
 
         /// <summary>
         /// 分页复用按钮时先解绑旧分支，再绑定当前页画布分支；没有分支的按钮隐藏红点。
         /// </summary>
+        /// <param name="startNum">本页第一个画布在 canvasToToggle 中的下标。</param>
+        /// <param name="canvasNum">画布总数，用于判断本页是否还有可显示的画布。</param>
         private void BindPageRedDots(int startNum, int canvasNum)
         {
             UnbindPageRedDots();
@@ -203,6 +206,7 @@ namespace Pipeline.UI.SystemCanvasManagers
             }
         }
 
+        // 解除上一页已绑定的画布，避免复用后的按钮继续显示旧页画布的红点。
         private void UnbindPageRedDots()
         {
             RedDotManager redDot = RedDotManager.Instance;
@@ -215,6 +219,7 @@ namespace Pipeline.UI.SystemCanvasManagers
             boundRedDotCanvases.Clear();
         }
 
+        // 按按钮序号取红点图片；红点数组未配满时返回 null，由调用方跳过该按钮。
         private Image GetButtonRedDotImage(int buttonNum)
         {
             if (integratedButtonRedDots == null || buttonNum >= integratedButtonRedDots.Length) return null;

@@ -99,16 +99,20 @@ namespace Gameplay.Quest
         [SerializeField] private InventorySlotsStatsSO QuestRewardRequest;
 
         private readonly Dictionary<QuestSO, QuestProgressData> questProgress = new();
+        // 已接取任务列表，只含 Accepted 与 IsToComplete；顺序即追踪视图的显示顺序。
         private readonly List<QuestSO> trackedQuests = new();
         private readonly State state = new();
         private ToggleCanvasEventSO questToggleEvent;
         private bool listeningToQuestToggle;
         private bool canvasIsActive;
 
-        // 已接取任务的红点叶子，与 trackedQuests 一一对应。
+        // 已接取任务的红点叶子，与 trackedQuests 一一对应；列表变化时同步建立或移除。
         private readonly Dictionary<QuestSO, QuestRedDotLeaf> questRedDotLeaves = new();
+        // 任务画布回调已登记到红点管理器；就绪前由 Start 与 LateUpdate 重试。
         private bool redDotInitialized;
+        // 物品历史通知已订阅；历史管理器是独立单例，OnEnable 时可能尚未就绪。
         private bool listeningToItemHistory;
+        // 角色历史通知已订阅；两个历史管理器各自初始化，分开记录订阅状态。
         private bool listeningToConversationHistory;
 
         /// <summary>任务运行状态，供视图读取。</summary>
@@ -269,6 +273,7 @@ namespace Gameplay.Quest
         /// <summary>按历史记录重算已接取任务的全部目标，再刷新对应叶子。</summary>
         private void RefreshTrackedQuestRedDots()
         {
+            // 未接取任务没有叶子，红点不提示，历史通知只重算已接取任务。
             for (int i = 0; i < trackedQuests.Count; i++)
                 RefreshObjectiveProgress(trackedQuests[i]);
 
@@ -607,6 +612,7 @@ namespace Gameplay.Quest
         }
 
         /// <summary>读取任务的红点叶子；任务没有叶子时返回 null。</summary>
+        /// <param name="quest">已接取任务的配置资产，用作叶子索引键。</param>
         public QuestRedDotLeaf GetRedDotLeaf(QuestSO quest)
         {
             if (quest == null) return null;
@@ -677,6 +683,7 @@ namespace Gameplay.Quest
         }
 
         /// <summary>判断任务是否可交付：在已接取列表内且所有目标都已完成。</summary>
+        /// <param name="quest">待判断的任务配置；未接取时一律返回 false。</param>
         public bool IsQuestCompletable(QuestSO quest)
         {
             if (quest == null || !trackedQuests.Contains(quest)) return false;

@@ -31,11 +31,14 @@ namespace Gameplay.Player.Models
         public const int ExpStepLevels = 10;
         public const float ExpGrowthDivisor = 4f;
 
+        // 运行时数值本体。构造与读档时整体替换为拷贝，之后只由本类的写方法修改。
         private PlayerStatsData data;
 
         /// <summary>用一份全零的默认数据建立模型。</summary>
         public PlayerStatsModel() : this(new PlayerStatsData()) { }
 
+        /// <summary>用指定数据建立模型；构造时拷贝，之后与传入对象互不影响。</summary>
+        /// <param name="initial">初始数值模板，构造时复制一份。</param>
         public PlayerStatsModel(PlayerStatsData initial)
         {
             data = initial.Clone();
@@ -72,6 +75,7 @@ namespace Gameplay.Player.Models
         /// 低于下限的坏档值由 <see cref="RepairExpThreshold"/> 兜底。
         /// 事件顺序固定为 StatsLoaded → HealthChanged → StatsChanged → ExpChanged。
         /// </summary>
+        /// <param name="source">存档数据；方法内克隆一份，为 null 时直接返回、运行时状态不变。</param>
         public void LoadFrom(PlayerStatsData source)
         {
             if (source == null) return;
@@ -98,6 +102,8 @@ namespace Gameplay.Player.Models
 
         // ---- 规则：唯一写入口 ----
 
+        /// <summary>调整生命上限，结果最低为 1。</summary>
+        /// <param name="amount">上限增量，可为负。</param>
         public void UpdateMaxHealth(int amount)
         {
             data.maxHealth += amount;
@@ -105,24 +111,32 @@ namespace Gameplay.Player.Models
             HealthChanged?.Invoke();
         }
 
+        /// <summary>调整当前生命，结果钳制在 0 与生命上限之间。</summary>
+        /// <param name="amount">生命增量，负数表示受伤。</param>
         public void UpdateHealth(int amount)
         {
             data.currentHealth = Mathf.Clamp(data.currentHealth + amount, 0, data.maxHealth);
             HealthChanged?.Invoke();
         }
 
+        /// <summary>把当前生命设为指定值，结果钳制在 0 与生命上限之间。</summary>
+        /// <param name="value">目标生命值。</param>
         public void SetCurrentHealth(int value)
         {
             data.currentHealth = Mathf.Clamp(value, 0, data.maxHealth);
             HealthChanged?.Invoke();
         }
 
+        /// <summary>调整移动速度。</summary>
+        /// <param name="amount">速度增量，可为负。</param>
         public void UpdateSpeed(float amount)
         {
             data.speed += amount;
             StatsChanged?.Invoke();
         }
 
+        /// <summary>调整攻击伤害。</summary>
+        /// <param name="amount">伤害增量，可为负。</param>
         public void UpdateDamage(int amount)
         {
             data.damage += amount;
@@ -130,12 +144,14 @@ namespace Gameplay.Player.Models
         }
 
         /// <summary>技能点变化不触发事件，界面由 SkillTreeManager 刷新。</summary>
+        /// <param name="amount">技能点增量，可为负。</param>
         public void UpdateSkillPoints(int amount) => data.skillPoints += amount;
 
         /// <summary>
         /// 增加经验并结算升级。升级次数由经验曲线决定，结算完成后通过 <see cref="LevelUp"/> 广播本次升的级数。
         /// 非正数直接忽略，负数会留下警告。
         /// </summary>
+        /// <param name="amount">增加的经验值，非正数不生效。</param>
         public void AddExp(int amount)
         {
             if (amount <= 0)

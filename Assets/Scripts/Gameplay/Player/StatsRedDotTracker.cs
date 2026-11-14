@@ -27,9 +27,13 @@ namespace Gameplay.Player
         // 订阅的只读数值视图；退订时对同一对象操作。
         private IPlayerStatsReadOnly stats;
 
+        // 事件是否已经订阅；订阅与退订都先看它，避免同一委托挂两次或重复退订。
         private bool subscribed;
+        // 叶子是否已经挂到红点管理器；挂接成功后 LateUpdate 不再重试。
         private bool initialized;
+        // 已查看的伤害基线；作为判断本次变化是否为新提升的比较起点。
         private int baselineDamage;
+        // 已查看的速度基线；与伤害分别比较，任意一项变大都要提醒。
         private float baselineSpeed;
 
         private void OnEnable()
@@ -74,6 +78,7 @@ namespace Gameplay.Player
         }
 
         // 数值服务与红点管理器先后就绪，两项都可用后才建立订阅与叶子。
+        // 就绪顺序不固定，缺一项先返回，由 Start/LateUpdate 的下一次进入补齐。
         private void TryInitialize()
         {
             TrySubscribe();
