@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-14 背包槽位配置类型的分层归属
+
+背包初始槽位改为配置资产驱动：`InventorySlotState` 进入 `Gameplay.Inventory`，`InventoryConfigSO` 位于 `Pipeline.SO` 并引用该类型。产品代码文件数 `Pipeline` 70 → 71、`Gameplay` 66 → 67，合计 149 → 151；`Pipeline.SO` 10 → 11、`Gameplay.Inventory` 6 → 7。跨层 `using`：`Gameplay → Pipeline` 74 → 75，`Pipeline → Gameplay` 6 → 7。用 Unity 自带 Roslyn 编译 151 个脚本，0 error，输出 `Logs/_verify/csc-inventory-output.txt`；未进入 Play 模式。维护计数 `4/5 -> 5/5`，本次同步更新 Guide 后清零为 `0/5`。
+
 ## 2026-11-11 视图版本轮询定在 LateUpdate
 
 五个缓存画布视图与常驻 `HotbarCanvasView` 的每帧版本轮询从 `Update` 移到 `LateUpdate`，打开界面时的立即刷新不变。Layering Guide 补充：视图在每帧 `LateUpdate` 轮询版本，本帧 `Update` 内完成的写入在当帧绘制；`Contracts.State.VersionReader` 的注释同步该时机。以 Editor 自带的 Roslyn 对 `Assembly-CSharp` 全量 141 个脚本编译，0 错误，输出 `Logs/_verify/csc-output.txt`；未进入 Play 模式。维护计数 `2/5 -> 3/5`。

@@ -47,12 +47,12 @@
 
 ### 2.1 总体分类与统计方法
 
-GameSO 目录下共有 **63 个 ScriptableObject 资产**，分类依据是每个资产 `m_Script` 指向的脚本 GUID：
+GameSO 目录下共有 **64 个 ScriptableObject 资产**，分类依据是每个资产 `m_Script` 指向的脚本 GUID：
 
-- **配置/内容类：33 个**，覆盖 `ItemSO`、`QuestSO`、`DialogSO`、`RefuseDialogSO`、`CharacterSO`、`GameSceneSO`、`SkillSO`、`PlayerStatsSO`、`AudioConfigSO`
+- **配置/内容类：34 个**，覆盖 `ItemSO`、`QuestSO`、`DialogSO`、`RefuseDialogSO`、`CharacterSO`、`GameSceneSO`、`SkillSO`、`PlayerStatsSO`、`AudioConfigSO`
 - **运行时事件类：30 个**，覆盖 14 个事件通道类，清单见 `EventChannels_Guide.md`
 
-### 2.2 配置类资产清单（33 个）
+### 2.2 配置类资产清单（34 个）
 
 | 类 | 数量 | 代表资产 |
 |---|---|---|
@@ -63,6 +63,7 @@ GameSO 目录下共有 **63 个 ScriptableObject 资产**，分类依据是每�
 | `CharacterSO` | 3 | `PurpleBob` 等 |
 | `GameSceneSO` | 6 | `MenuScene`、`Scene1`、`Scene2`、`TestScene`、`RetrySceneSO`、`PersistentScene` |
 | `AudioConfigSO` | 1 | `Audio/AudioConfig`，音效与 BGM 的片段和权重，机制见 `Audio_Guide.md` |
+| `InventoryConfigSO` | 1 | `Configs/InventoryConfig`，快捷栏与背包的初始槽位，机制见 `InventoryShop_Guide.md` §2.1 |
 | `SkillSO` | 2 | `MaxHealthBoost`、`CombatUnlock` |
 | `PlayerStatsSO` | 1 | 玩家属性配置资产 |
 | `LocationSO` | **0** | 类定义存在，全工程无该类型资产 |
@@ -71,7 +72,7 @@ GameSO 目录下共有 **63 个 ScriptableObject 资产**，分类依据是每�
 
 - `ItemSO` 是纯 `ScriptableObject`，**无稳定 id**，字段只有 `itemName`、`icon` 与数值字段，物品身份靠资产引用。
 - `GuidSO` 提供 `[SerializeField] private string guid`，并在 `OnValidate` 里补发，唯一使用者是 `CharacterSO`。
-- `PlayerStatsSO` 存初始值模板，运行时取拷贝，`CreateInitialData()` 返回 `stats.Clone()`；`PlayerStatsSOTests` 断言模板不被运行时改动。
+- `PlayerStatsSO` 存初始值模板，运行时取拷贝，`CreateInitialData()` 返回 `stats.Clone()`，运行时取拷贝，模板不被改动。
 - `GameSceneSO.SaveKey` 取场景资产的 GUID，`ID` 标注为不可用于存档。场景加载语义属 SceneFlow 域，本文件只声明资产契约。
 
 ### 2.3 对话资产的组织方式

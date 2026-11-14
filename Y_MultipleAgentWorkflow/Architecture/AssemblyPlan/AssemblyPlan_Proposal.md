@@ -41,7 +41,7 @@
 
 - **目标**：新增 Assembly Definition 资产，把当前全部产品代码所在的预定义程序集 `Assembly-CSharp` 拆为 `Contracts` / `SO` / `Gameplay.Core` / 按功能域 / `UI` / `Units` / `Save` / `Pathfinding`；并为编辑器测试程序集建立 Assembly Definition、引用被测程序集。
 - **理由**：程序集边界是唯一能在编译期强制依赖方向的机制；拆分同时缩短增量编译时间。
-- **当前状态：未实施**。工程内 Assembly Definition 资产数量为 **0**，测试程序集下同为 **0**；5 个测试类型 `AStarOpenHeapTests` `CanvasFocusStackTests` `ObjectPoolTests` `PlayerStatsModelTests` `PlayerStatsSOTests` 仍在预定义程序集里。
+- **当前状态：未实施**。工程内 Assembly Definition 资产数量为 **0**，编辑器侧脚本与产品代码同处预定义程序集。
 - **前置依赖**：
   1. 反向引用先消除。已识别的候选是 `ICanvasManager` 的默认实现直读 `UIManager.Instance`，即 `Contracts` 层指向 `UI` 层的硬引用，见 `..\Composition\Composition_Guide.md` §2.6。
   2. 测试程序集的 Assembly Definition 需与产品程序集同步建立，测试程序集才能看见被测类型。

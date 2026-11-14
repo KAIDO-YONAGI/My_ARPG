@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-14 背包初始槽位改由配置资产承担
+
+`InventoryConfigSO` 资产落在 `Assets/GameSO/Configs/InventoryConfig`，承载快捷栏与背包的初始槽位；`Assets_Guide` 的资产总数改为 64、配置类 34，并补该类型一行。同步删除两处已移除测试类型的引用。验证：Roslyn 对 `Assets` 全量编译 0 错误。Assets 维护计数 `3/5 -> 4/5`。
+
 ## 2026-11-14 待办红点文档建立
 
 按 `Pipeline.UI.RedDot` 的四个类型、三个业务叶子与预制体、输入资产建立 `RedDot_Guide.md`，登记到 Assets Router 的任务线索、并发资源与能力边界。分层说明更新为 32 个命名空间、149 个产品代码文件与实测跨层 using；组合契约的单例清单补 `RedDotManager`、`StatsRedDotTracker` 与 `UICacheManager`，计 24 个具体单例。验证：Roslyn 对 `Assets` 全量编译 0 错误；红点树与导航的实际表现未在 Play 模式确认。Assets 维护计数 `2/5 -> 3/5`。

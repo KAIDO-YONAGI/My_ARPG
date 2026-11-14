@@ -7,6 +7,10 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-14 初始槽位配置进入分层统计
+
+`Pipeline.SO` 增 `InventoryConfigSO`、`Gameplay.Inventory` 增 `InventorySlotState`，产品代码 151、`Pipeline` 71、`Gameplay` 67；`Pipeline → Gameplay` 的反向依赖增至 7 处。Layering Guide 与 Router 按实测更新，AssemblyPlan 的 asmdef 现状去掉已移除的测试类型。验证：Roslyn 全量编译 0 错误。维护计数 `4/5 -> 5/5`。
+
 ## 2026-11-14 红点系统纳入分层与单例清单
 
 `Pipeline.UI.RedDot` 纳入管线层，三个业务叶子分属 `Gameplay.Player`、`Gameplay.Quest` 与 `Gameplay.Skills`。Layering Guide 更新为 32 个命名空间、149 个产品代码文件、Contracts 13 与 Pipeline 70、Gameplay 66，跨层 using 按实测改为 Gameplay→Contracts 56、Gameplay→Pipeline 74、Pipeline→Contracts 44；Composition Guide 的单例清单补三项，计 24 个具体单例。验证：Roslyn 全量编译 0 错误。维护计数 `2/5 -> 3/5`。

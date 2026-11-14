@@ -131,7 +131,7 @@ expToUpgrade = Mathf.Max(1, expToUpgrade + step)  // 下限仍受 MinExpToUpgrad
 ### 2.6 PlayerStatsSO 作为初始值模板（拷贝语义）
 
 - `CreateInitialData()` 返回 `stats.Clone()`，`StatsService` 用的就是它。
-- `Data` 属性返回的是模板本体。运行时代码不读 `Data`，唯一使用者是 `PlayerStatsSOTests`，它用 `Data` 配置初始值。取初始值走 `CreateInitialData()`。
+- `Data` 属性返回的是模板本体。运行时代码不读 `Data`，取初始值走 `CreateInitialData()`。
 - 配置资产现值：damage 2、weaponRange 1、knockBackForce 0.5、knockBackTime 0.2、stunTime 0.2、coolDown 0.3、speed 5、maxHealth 2、currentHealth 2、skillPoints 1、level 0、currentExp 0、expToUpgrade 10、expMultiplier 1.5、maxLevel 0。
 
 ### 2.7 存档边界
@@ -193,7 +193,7 @@ Newtonsoft 按字段名序列化；类名可以改。
 
 ### 3.6 `IPlayerStatsReadOnly` 是唯一的对外读类型
 
-`StatsService` 不暴露具体 `Model`，`PlayerStatsModelTests` 用反射锁死这一点。加写操作就加 Service 方法，把 Model 留在内部。
+`StatsService` 不暴露具体 `Model`，对外只给 `Stats` 属性。加写操作就加 Service 方法，把 Model 留在内部。
 
 ### 3.7 `UpdateSkillPoints` 不发事件
 

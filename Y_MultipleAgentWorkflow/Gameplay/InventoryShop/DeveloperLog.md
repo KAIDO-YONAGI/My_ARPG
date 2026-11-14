@@ -7,6 +7,15 @@
 Record completed task evidence, affected files/resources, validation, conclusions, and
 maintenance count changes here.
 
+## 2026-11-14 背包槽位数据从画布组分离
+
+- 现象：不打开一次背包画布就捡不起东西。快捷栏 3 槽占满后，背包列表为空，`AddToSlots` 放不进任何数量，余量经 `DropLoot` 掉回脚下且可再次拾取；商店购买与任务奖励同因。
+- 数据层：`InventorySlotState` 提升为 `Gameplay.Inventory` 顶层可序列化类型；新增 `InventoryConfigSO`（菜单 `Data/InventoryConfigSO`）与 `InventoryConfig.asset`（快捷栏 3 槽、背包 42 槽；快捷栏首格保留场景原有的 1 个蘑菇，其余为空）；`InventoryManager` 增加 `inventoryConfig` 引用，在 `OnSingletonInitialized` 复制成运行态，删除 `InitializeHotbarState`、`InitializeBackpackState` 与初始化标记。
+- 视图层：`HotbarCanvasView.Start` 与 `BackpackCanvasView.OnOpen` 只登记槽位地址、断言控件数量与配置槽位数一致并刷新；`InventorySlot` 删除初始物品字段、`InitialItem`、`InitialQuantity` 与 `OnValidate`，物品与数量仅作运行时显示副本。
+- 资产：常驻场景 `InventoryManager.inventoryConfig` 指向 `InventoryConfig.asset`；`BackpackCanvas.prefab` 清除 42 个槽位各 2 条初始值覆盖，`InventorySlot.prefab`、`BackpackInventorySlot.prefab` 与常驻场景快捷栏移除已删除字段的覆盖。
+- 验证：以 Unity 自带的 Roslyn（`DotNetSdkRoslyn/csc.dll`，Unity 2022.3.62f3 引用集）编译 `Assets/Scripts` 151 个文件，0 error；仅有既有未使用变量与 netstandard 兼容警告，输出 `Logs/_verify/csc-inventory-output.txt`。未进入 Play 模式，运行验证在 Editor 中执行。
+- 文档：Guide §2.1、§2.6、§3.8 与线索表同步；维护计数 `4/5 -> 5/5`，本次同步更新 Guide 后清零为 `0/5`。
+
 ## 2026-11-07 背包与商店使用独立版本读取
 
 - `InventoryManager.State` 为金币、快捷栏、背包提供独立版本，商品状态提供 `ItemsVersion`。视图各自保存 `VersionReader`，绘制后记录捕获版本，打开时使本地记录失效。

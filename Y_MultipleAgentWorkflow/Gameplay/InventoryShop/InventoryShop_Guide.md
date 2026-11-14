@@ -2,7 +2,7 @@
 
 文档 ID：`GP-INVENTORYSHOP-GUIDE`
 状态：`Active`
-最后更新：`2026-11-07`
+最后更新：`2026-11-14`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../../Workflow/Workflow_Guide.md#维护规则)。
@@ -44,6 +44,7 @@
 | `使用物品` / `UseItem` / `吃蘑菇` | §2.3 |
 | `物品史` / `ItemHistoryManager` / `RecordItem` | §2.4 |
 | `掉落` / `Loot` / `丢弃` / `DropByClick` | §2.2 |
+| `初始槽位` / `InventoryConfigSO` / `inventoryConfig` | §2.1、§2.6 |
 | `ItemSO` / `配置物品` | §2.7 |
 | `ShopKeeper` / `商店不打开` | §2.5、§2.6 |
 
@@ -51,10 +52,11 @@
 
 ### 2.1 背包数据结构与堆叠规则
 
-- `InventoryManager` 的 `State` 持有金币与快捷栏、背包两组 `InventorySlotState` 列表，分别提供 `GoldVersion`、`HotbarVersion`、`BackpackVersion`。视图通过稳定的 `CurrentState` 对象读取金币、槽位数量和索引槽位值，各自用 `VersionReader` 记录已绘制的数据源与版本。集合在管理器内部原地修改并推进版本，刷新直接查询已有数据。入包先遍历快捷栏再遍历背包，各组顺序由视图的序列化槽位数组决定。
-- `InventorySlot` 保存物品与数量的显示副本，并以 `IsBackpackSlot`、`SlotIndex` 标记槽位地址。快捷栏在首次初始化时配置地址，背包每次打开时为当前实例配置地址。
+- `InventoryManager` 的 `State` 持有金币与快捷栏、背包两组 `InventorySlotState` 列表，分别提供 `GoldVersion`、`HotbarVersion`、`BackpackVersion`。视图通过稳定的 `CurrentState` 对象读取金币、槽位数量和索引槽位值，各自用 `VersionReader` 记录已绘制的数据源与版本。集合在管理器内部原地修改并推进版本，刷新直接查询已有数据。入包先遍历快捷栏再遍历背包，各组顺序由 `InventoryConfigSO` 的槽位数组决定。
+- 槽位数量与初始内容来自 `InventoryConfigSO`：管理器在常驻场景加载时按配置建立快捷栏 3 槽与背包 42 槽，早于任何画布实例化。视图不提供初始数据。
+- `InventorySlot` 保存物品与数量的显示副本，并以 `IsBackpackSlot`、`SlotIndex` 标记槽位地址。快捷栏在启动时为场景实例配置地址，背包每次打开时为当前实例配置地址。
 - 堆叠上限来自 `ItemSO.stackableSize`，`AddToSlots` 按顺序填充空槽或同类物品槽位，返回剩余数量；`HasSpaceForItem` 检查两组列表的剩余空间。
-- `RemoveFromSlot` 在数量归零时清空物品引用并推进对应列表版本。视图按索引查询槽位，再通过 `RestoreState` 更新控件。视图在管理器尚未初始化时提取 `InventorySlotState[]`，交给接收 `IReadOnlyList<InventorySlotState>` 的初始化入口；该值数组仅在首次建立数据时分配。管理器复制初始槽位值到持久列表，缓存重建沿用运行态。点击命令传递值类型 `SlotAddress`，管理器按地址读取实际物品与数量。
+- `RemoveFromSlot` 在数量归零时清空物品引用并推进对应列表版本。视图按索引查询槽位，再通过 `RestoreState` 更新控件。点击命令传递值类型 `SlotAddress`，管理器按地址读取实际物品与数量。槽位列表只在管理器启动时按配置建立一次，画布缓存重建沿用运行态。
 - 背包内容与金币都不入档：`SaveData` 顶层只有 `lootsStatsDic`、`sceneIDAndPlayerPos`、`playerStatsData` 三个字段，`InventoryManager` 未实现 `ISaveable`。组件挂在常驻场景上，因此一次运行内跨游戏场景保留，读档后回到本局的运行值。
 
 ### 2.2 拾取、丢弃、使用三条入口
@@ -98,7 +100,7 @@
 ### 2.6 订阅惯例与画布
 
 - 事件通道都是 `ScriptableObject` 加 C# `event`，订阅成对写在 `OnEnable` 与 `OnDisable`；场景加载事件统一用来复位画布。缓存界面的开关与焦点事件由 `UIViewInstanceCache.Connect/Disconnect` 统一订阅。
-- 背包与商店分别由 `BackpackCanvasView`、`ShopCanvasView` 承担，预制体登记在 `UICacheManager.views`。缓存统一管理实例、开关和焦点，业务管理器持有运行状态。
+- 背包与商店分别由 `BackpackCanvasView`、`ShopCanvasView` 承担，预制体登记在 `UICacheManager.views`。缓存统一管理实例、开关和焦点，业务管理器持有运行状态。背包画布打开时只登记槽位地址并刷新显示，槽位数据在常驻场景加载时已经建立。
 - 面板内部控件由 `ShopCanvasView` 注入数据：`ShopManager.State` 提供商品数量、索引商品与价格查询及 `ItemsVersion`。视图在打开时使自己的读取记录失效，绘制后记录绘制前捕获的版本；多个读取者分别确认进度。
 - `InventorySlot` 直接走 `ShopManager.Instance`。
 - 商店头像相机订阅同一 `ShopKeeperEventSO`，无 keeper 时按 `hideWhenNoShopKeeper` 关闭 Camera，`LateUpdate` 跟目标偏移。
@@ -151,7 +153,7 @@
 
 ### 3.8 槽位顺序即优先级
 
-管理器先填快捷栏再填背包；各组内的优先级由视图序列化槽位数组的顺序决定。
+管理器先填快捷栏再填背包；各组内的优先级由 `InventoryConfigSO` 槽位数组的顺序决定。
 
 ### 3.9 池复用的掉落物必须经 `Initialize` 复原显示状态
 
