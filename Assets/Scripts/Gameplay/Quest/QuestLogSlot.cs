@@ -1,4 +1,5 @@
 using Pipeline.SO;
+using Pipeline.UI.RedDot;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,10 +24,10 @@ namespace Gameplay.Quest
         [Tooltip("条目根节点的 CanvasGroup，用于完成后的置灰和禁用交互。")]
         [SerializeField] private CanvasGroup slotCanvas;
 
-        // 条目红点表现，由任务画布视图按任务叶子绑定与解绑；条目自身不判断红点条件。
+        // 条目红点视图，由任务画布视图按任务叶子绑定与解绑；条目自身不判断红点条件。
         [Header("红点")]
         [Tooltip("条目上的红点表现，由任务画布视图按任务叶子绑定。")]
-        [SerializeField] private Image redDotImage;
+        [SerializeField] private RedDotView redDotView;
 
         [Header("引用")]
         [Tooltip("点击条目时通知的任务详情面板。")]
@@ -38,8 +39,8 @@ namespace Gameplay.Quest
         /// <summary>本槽位的 CanvasGroup；保留给外部读取，避免外部再查找组件。</summary>
         public CanvasGroup SlotCanvas => slotCanvas;
 
-        /// <summary>本槽位的红点表现；任务画布视图按任务叶子绑定与解绑。</summary>
-        public Image RedDotImage => redDotImage;
+        /// <summary>本槽位的红点视图；任务画布视图按任务叶子绑定与解绑。</summary>
+        public RedDotView RedDotView => redDotView;
 
         /// <summary>校验序列化引用，并把条目恢复为正常显示状态。</summary>
         private void Awake()
@@ -47,7 +48,7 @@ namespace Gameplay.Quest
             Debug.Assert(questNameText != null, nameof(questNameText), this);
             Debug.Assert(questLevelText != null, nameof(questLevelText), this);
             Debug.Assert(slotCanvas != null, nameof(slotCanvas), this);
-            Debug.Assert(redDotImage != null, nameof(redDotImage), this);
+            Debug.Assert(redDotView != null, nameof(redDotView), this);
             Debug.Assert(questLogPanel != null, nameof(questLogPanel), this);
             ResetSlotState();
         }

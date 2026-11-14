@@ -51,13 +51,13 @@ namespace Gameplay.Skills
                 slot.BindStateRoot(transform);
 
             // 槽位键以画布根为基准，必须在 BindStateRoot 之后读取；
-            // 叶子常驻在管理器里，视图只把本实例的图片挂上去，取不到时跳过。
+            // 叶子常驻在管理器里，视图只把本实例的红点视图挂上去，取不到时跳过。
             foreach (SkillSlot slot in slots)
             {
                 SkillRedDotLeaf leaf = manager.GetRedDotLeaf(slot.StateKey);
                 if (leaf == null) continue;
 
-                leaf.BindImage(slot.RedDotImage);
+                leaf.BindView(slot.RedDotView);
             }
 
             SkillSlot.OnMaxSkillLevel += HandleSkillMaxed;
@@ -114,14 +114,14 @@ namespace Gameplay.Skills
         {
             if (manager != null)
             {
-                // 关闭后缓存实例可能复用，解绑避免叶子继续持有已隐藏的图片；
-                // 必须传打开时绑定的同一个 Image，UnbindImage 只在参数与当前绑定一致时才清除。
+                // 关闭后缓存实例可能复用，解绑避免叶子继续持有已隐藏的视图；
+                // 必须传打开时绑定的同一个视图，UnbindView 只在参数与当前绑定一致时才清除。
                 foreach (SkillSlot slot in slots)
                 {
                     SkillRedDotLeaf leaf = manager.GetRedDotLeaf(slot.StateKey);
                     if (leaf == null) continue;
 
-                    leaf.UnbindImage(slot.RedDotImage);
+                    leaf.UnbindView(slot.RedDotView);
                 }
             }
 

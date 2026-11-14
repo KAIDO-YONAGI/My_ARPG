@@ -149,10 +149,10 @@ namespace Gameplay.Quest
             QuestRedDotLeaf leaf = manager.GetRedDotLeaf(quest);
             if (leaf == null) return;
 
-            leaf.BindImage(slot.RedDotImage);
+            leaf.BindView(slot.RedDotView);
         }
 
-        /// <summary>解绑条目旧任务的红点并关闭表现，槽位复用时不残留上一个任务的红点。</summary>
+        /// <summary>解绑条目旧任务的红点并关闭视图，槽位复用时不残留上一个任务的红点。</summary>
         private static void UnbindSlotRedDot(QuestManager manager, QuestLogSlot slot)
         {
             QuestSO previousQuest = slot.currentQuest;
@@ -160,10 +160,10 @@ namespace Gameplay.Quest
             {
                 QuestRedDotLeaf leaf = manager.GetRedDotLeaf(previousQuest);
                 if (leaf != null)
-                    leaf.UnbindImage(slot.RedDotImage);
+                    leaf.UnbindView(slot.RedDotView);
             }
 
-            slot.RedDotImage.enabled = false;
+            slot.RedDotView.SetVisible(false);
         }
 
         /// <summary>界面关闭前解绑所有条目的红点；叶子计数继续由管理器保存。</summary>

@@ -1,21 +1,19 @@
 using System;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace Pipeline.UI.RedDot
 {
     /// <summary>
-    /// 红点树节点的共同基类。持有计数、父分支与当前绑定的表现图片，
+    /// 红点树节点的共同基类。持有计数、父分支与当前绑定的红点视图，
     /// 负责计数写入与表现刷新；树结构关系由 <see cref="RedDotManager"/> 维护。
     /// </summary>
     /// <remarks>
     /// 计数只通过受保护入口写入，派生叶子与分支各自决定计数来源。
-    /// 表现按 <see cref="Image.enabled"/> 开关，宿主对象的启停仍由原 UI 生命周期控制。
+    /// 表现由 <see cref="RedDotView"/> 切换红点显隐，宿主对象的启停仍由原 UI 生命周期控制。
     /// </remarks>
     public abstract class RedDotNodeBase
     {
-        // 当前绑定的表现图片。界面打开时绑定、关闭时解绑；为 null 只表示没有表现载体，计数继续保存。
-        private Image image;
+        // 当前绑定的红点视图。界面打开时绑定、关闭时解绑；为 null 只表示没有表现载体，计数继续保存。
+        private RedDotView view;
 
         /// <summary>当前计数，对外只读。</summary>
         public int Count { get; private set; }
@@ -23,34 +21,34 @@ namespace Pipeline.UI.RedDot
         /// <summary>所属父分支，对外只读；根节点为 null。</summary>
         public RedDotBranchNode Parent { get; internal set; }
 
-        /// <summary>当前绑定的表现图片；未绑定时为 null。</summary>
-        public Image BoundImage => image;
+        /// <summary>当前绑定的红点视图；未绑定时为 null。</summary>
+        public RedDotView BoundView => view;
 
-        /// <summary>绑定表现图片并立即按当前计数刷新；原表现引用被替换。</summary>
-        /// <param name="target">要绑定的表现图片；与当前引用相同时不做事。</param>
-        public void BindImage(Image target)
+        /// <summary>绑定红点视图并立即按当前计数刷新；原视图引用被替换。</summary>
+        /// <param name="target">要绑定的红点视图；与当前引用相同时不做事。</param>
+        public void BindView(RedDotView target)
         {
-            if (image == target) return;
+            if (view == target) return;
 
-            image = target;
-            RefreshImage();
+            view = target;
+            RefreshView();
         }
 
         /// <summary>只在参数与当前引用一致时解除绑定，防止旧界面回调清除新绑定。</summary>
         /// <param name="target">期望解除的引用；与当前绑定不一致时忽略。</param>
-        public void UnbindImage(Image target)
+        public void UnbindView(RedDotView target)
         {
-            if (image != target) return;
+            if (view != target) return;
 
-            image = null;
+            view = null;
         }
 
-        /// <summary>按当前计数刷新表现；未绑定图片时继续保存计数。</summary>
-        public void RefreshImage()
+        /// <summary>按当前计数刷新红点显隐；未绑定视图时继续保存计数。</summary>
+        public void RefreshView()
         {
-            if (image == null) return;
+            if (view == null) return;
 
-            image.enabled = Count > 0;
+            view.SetVisible(Count > 0);
         }
 
         /// <summary>
@@ -68,7 +66,7 @@ namespace Pipeline.UI.RedDot
             if (count == Count) return false;
 
             Count = count;
-            RefreshImage();
+            RefreshView();
             return true;
         }
     }

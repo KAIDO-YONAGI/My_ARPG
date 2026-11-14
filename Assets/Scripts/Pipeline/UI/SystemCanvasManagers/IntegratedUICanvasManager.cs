@@ -24,15 +24,15 @@ namespace Pipeline.UI.SystemCanvasManagers
         [SerializeField] private Button[] integratedButtons;
         [SerializeField] private TMP_Text[] integratedButtonTexts;
 
-        /// <summary>OpenMenu 按钮上的根红点表现，由预制体实例上的 RedDot 子物体接线。</summary>
-        [Tooltip("OpenMenu 按钮上的根红点表现。")]
+        /// <summary>OpenMenu 按钮上的根红点视图，由预制体实例上的 RedDot 子物体接线。</summary>
+        [Tooltip("OpenMenu 按钮上的根红点视图。")]
         [SerializeField]
-        private Image toggleMenuRedDot;
+        private RedDotView toggleMenuRedDotView;
 
-        /// <summary>分页按钮各自的红点表现，顺序与 integratedButtons 一致。</summary>
-        [Tooltip("分页按钮各自的红点表现，顺序与 integratedButtons 一致。")]
+        /// <summary>分页按钮各自的红点视图，顺序与 integratedButtons 一致。</summary>
+        [Tooltip("分页按钮各自的红点视图，顺序与 integratedButtons 一致。")]
         [SerializeField]
-        private Image[] integratedButtonRedDots;
+        private RedDotView[] integratedButtonRedDotViews;
 
         [SerializeField] private ToggleCanvasEventSO toggleIntegratedCanvasEventSO;
         [SerializeField] private SceneLoadedEventSO sceneLoadedEvent;
@@ -65,14 +65,14 @@ namespace Pipeline.UI.SystemCanvasManagers
             InitiateUICanvasPanel(false);
         }
 
-        /// <summary>把 OpenMenu 根红点表现与导航顺序交给红点管理器。</summary>
+        /// <summary>把 OpenMenu 根红点视图与导航顺序交给红点管理器。</summary>
         private void Start()
         {
             // 红点管理器与本组件同在常驻场景，Awake 顺序不保证，因此在 Start 绑定一次。
             RedDotManager redDot = RedDotManager.Instance;
             if (redDot == null) return;
 
-            redDot.BindRootImage(toggleMenuRedDot);
+            redDot.BindRootView(toggleMenuRedDotView);
             redDot.SetNavigationOrder(canvasToToggle);
         }
 
@@ -226,11 +226,11 @@ namespace Pipeline.UI.SystemCanvasManagers
                  i < canvasNum && buttonNum < integratedButtons.Length;
                  i++, buttonNum++)
             {
-                Image redDotImage = GetButtonRedDotImage(buttonNum);
-                if (redDotImage == null) continue;
+                RedDotView redDotView = GetButtonRedDotView(buttonNum);
+                if (redDotView == null) continue;
 
                 CanvasType canvasType = canvasToToggle[i];
-                redDot.BindCanvasImage(canvasType, redDotImage);
+                redDot.BindCanvasView(canvasType, redDotView);
                 boundRedDotCanvases.Add(canvasType);
             }
         }
@@ -242,19 +242,19 @@ namespace Pipeline.UI.SystemCanvasManagers
             if (redDot != null)
             {
                 foreach (CanvasType canvas in boundRedDotCanvases)
-                    redDot.UnbindCanvasImage(canvas);
+                    redDot.UnbindCanvasView(canvas);
             }
 
             boundRedDotCanvases.Clear();
         }
 
-        /// <summary>按按钮序号取红点图片；红点数组未配满时返回 null，由调用方跳过该按钮。</summary>
+        /// <summary>按按钮序号取红点视图；红点数组未配满时返回 null，由调用方跳过该按钮。</summary>
         /// <param name="buttonNum">分页按钮在 integratedButtons 中的序号。</param>
-        private Image GetButtonRedDotImage(int buttonNum)
+        private RedDotView GetButtonRedDotView(int buttonNum)
         {
-            if (integratedButtonRedDots == null || buttonNum >= integratedButtonRedDots.Length) return null;
+            if (integratedButtonRedDotViews == null || buttonNum >= integratedButtonRedDotViews.Length) return null;
 
-            return integratedButtonRedDots[buttonNum];
+            return integratedButtonRedDotViews[buttonNum];
         }
         /// <summary>分页按钮点击：通过 UIManager 的外部请求入口打开对应画布。</summary>
         /// <param name="canvasType">该按钮当前页对应的画布身份。</param>

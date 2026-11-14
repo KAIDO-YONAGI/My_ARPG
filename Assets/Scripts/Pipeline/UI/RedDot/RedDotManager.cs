@@ -6,7 +6,6 @@ using Pipeline.UI.Runtime;
 using Pipeline.UI.SystemCanvasManagers;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace Pipeline.UI.RedDot
 {
@@ -32,8 +31,8 @@ namespace Pipeline.UI.RedDot
         // 所属域登记的画布可用性回调；未登记表示可以直接打开。
         private readonly Dictionary<CanvasType, Func<bool>> canvasGates = new();
 
-        // 当前绑定的画布红点表现，分支建立后自动补绑。
-        private readonly Dictionary<CanvasType, Image> canvasImages = new();
+        // 当前绑定的画布红点视图，分支建立后自动补绑。
+        private readonly Dictionary<CanvasType, RedDotView> canvasViews = new();
 
         // 待办导航顺序，取值来源是聚合面板已配置的画布列表。
         private readonly List<CanvasType> navigationOrder = new();
@@ -41,8 +40,8 @@ namespace Pipeline.UI.RedDot
         // 树根，OnSingletonInitialized 创建；画布分支与业务叶子都挂在它下面。
         private RedDotBranchNode root;
 
-        // OpenMenu 的根红点表现；界面重建后由聚合面板重新绑定。
-        private Image rootImage;
+        // OpenMenu 的根红点视图；界面重建后由聚合面板重新绑定。
+        private RedDotView rootView;
 
         // 上次成功定位的画布，用于决定下一次从它之后继续找。
         private CanvasType lastNavigatedCanvas = CanvasType.Default;
@@ -79,10 +78,10 @@ namespace Pipeline.UI.RedDot
             navigateAction.action.Disable();
         }
 
-        /// <summary>补绑根红点表现；界面重建后由聚合面板再次绑定。</summary>
+        /// <summary>补绑根红点视图；界面重建后由聚合面板再次绑定。</summary>
         private void Start()
         {
-            BindRootImage(rootImage);
+            BindRootView(rootView);
         }
 
         /// <summary>采样导航键并请求定位下一个有待办的画布。</summary>
@@ -94,14 +93,14 @@ namespace Pipeline.UI.RedDot
             TryNavigateToPendingCanvas();
         }
 
-        /// <summary>绑定 OpenMenu 的根红点表现；界面重建后重新绑定即可立即显示。</summary>
-        /// <param name="image">OpenMenu 按钮上的红点图片。</param>
-        public void BindRootImage(Image image)
+        /// <summary>绑定 OpenMenu 的根红点视图；界面重建后重新绑定即可立即显示。</summary>
+        /// <param name="view">OpenMenu 按钮上的红点视图。</param>
+        public void BindRootView(RedDotView view)
         {
-            rootImage = image;
-            if (root == null || image == null) return;
+            rootView = view;
+            if (root == null || view == null) return;
 
-            root.BindImage(image);
+            root.BindView(view);
         }
 
         /// <summary>登记画布分支与可用性回调；重复登记以最后一次回调为准。</summary>
@@ -116,39 +115,39 @@ namespace Pipeline.UI.RedDot
         }
 
         /// <summary>
-        /// 为聚合面板入口绑定画布分支红点；没有对应分支时隐藏该红点。
+        /// 为聚合面板入口绑定画布分支红点视图；没有对应分支时隐藏该红点。
         /// </summary>
         /// <param name="canvas">红点对应的画布身份。</param>
-        /// <param name="image">分页按钮上的红点图片。</param>
-        public void BindCanvasImage(CanvasType canvas, Image image)
+        /// <param name="view">分页按钮上的红点视图。</param>
+        public void BindCanvasView(CanvasType canvas, RedDotView view)
         {
-            if (canvas == CanvasType.Default || image == null) return;
+            if (canvas == CanvasType.Default || view == null) return;
 
-            canvasImages[canvas] = image;
+            canvasViews[canvas] = view;
             if (canvasBranches.TryGetValue(canvas, out RedDotBranchNode branch))
             {
-                branch.BindImage(image);
+                branch.BindView(view);
                 return;
             }
 
-            image.enabled = false;
+            view.SetVisible(false);
         }
 
         /// <summary>解除画布分支红点绑定；分页复用按钮时先解绑旧画布再绑新画布。</summary>
         /// <param name="canvas">要解除绑定的画布身份。</param>
-        public void UnbindCanvasImage(CanvasType canvas)
+        public void UnbindCanvasView(CanvasType canvas)
         {
-            if (!canvasImages.TryGetValue(canvas, out Image image)) return;
+            if (!canvasViews.TryGetValue(canvas, out RedDotView view)) return;
 
             if (canvasBranches.TryGetValue(canvas, out RedDotBranchNode branch))
             {
-                branch.UnbindImage(image);
+                branch.UnbindView(view);
             }
 
-            canvasImages.Remove(canvas);
-            if (image != null)
+            canvasViews.Remove(canvas);
+            if (view != null)
             {
-                image.enabled = false;
+                view.SetVisible(false);
             }
         }
 
@@ -203,11 +202,11 @@ namespace Pipeline.UI.RedDot
             leaf.CountChanged -= OnLeafCountChanged;
             parent.Detach(leaf);
 
-            Image image = leaf.BoundImage;
-            if (image != null)
+            RedDotView view = leaf.BoundView;
+            if (view != null)
             {
-                leaf.UnbindImage(image);
-                image.enabled = false;
+                leaf.UnbindView(view);
+                view.SetVisible(false);
             }
 
             RecalculateFrom(parent);
@@ -271,7 +270,7 @@ namespace Pipeline.UI.RedDot
             }
         }
 
-        /// <summary>取画布分支，没有则建立并挂到根节点；已有图片会补绑到新分支。</summary>
+        /// <summary>取画布分支，没有则建立并挂到根节点；已有视图会补绑到新分支。</summary>
         private RedDotBranchNode EnsureCanvasBranch(CanvasType canvas)
         {
             if (root == null) return null;
@@ -282,9 +281,9 @@ namespace Pipeline.UI.RedDot
             canvasBranches.Add(canvas, branch);
             root.Attach(branch);
 
-            if (canvasImages.TryGetValue(canvas, out Image image))
+            if (canvasViews.TryGetValue(canvas, out RedDotView view))
             {
-                branch.BindImage(image);
+                branch.BindView(view);
             }
 
             return branch;

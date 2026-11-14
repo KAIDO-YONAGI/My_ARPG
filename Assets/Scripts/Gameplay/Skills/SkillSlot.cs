@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Pipeline.SO;
+using Pipeline.UI.RedDot;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -30,10 +31,10 @@ namespace Gameplay.Skills
         /// <summary>槽位按钮，点击时尝试升级。</summary>
         public Button skillButton;
 
-        // 技能可升级时显示的红点表现，由预制体按该字段名序列化接线；改名会丢失既有引用。
+        // 技能可升级时显示的红点视图，由预制体按该字段名序列化接线；改名会丢失既有引用。
         [Header("红点")]
         [Tooltip("技能可升级时显示的槽位红点，由技能画布打开时绑定。")]
-        [SerializeField] private Image redDotImage;
+        [SerializeField] private RedDotView redDotView;
 
         [Header("前置技能")]
         [FormerlySerializedAs("preRiquriedForSkillUnlock_List")]
@@ -48,8 +49,8 @@ namespace Gameplay.Skills
         /// <summary>当前是否已解锁。</summary>
         public bool IsUnlocked => isUnlocked;
 
-        /// <summary>槽位红点表现图片，由技能画布按状态键绑定到红点叶子。</summary>
-        public Image RedDotImage => redDotImage;
+        /// <summary>槽位红点视图，由技能画布按状态键绑定到红点叶子。</summary>
+        public RedDotView RedDotView => redDotView;
 
         /// <summary>技能升满时广播，参数是升满的槽位。</summary>
         public static event Action<SkillSlot> OnMaxSkillLevel;
@@ -79,7 +80,7 @@ namespace Gameplay.Skills
             Debug.Assert(skillIcon != null, nameof(skillIcon), this);
             Debug.Assert(skillLevelText != null, nameof(skillLevelText), this);
             Debug.Assert(skillButton != null, nameof(skillButton), this);
-            Debug.Assert(redDotImage != null, nameof(redDotImage), this);
+            Debug.Assert(redDotView != null, nameof(redDotView), this);
         }
 
         /// <summary>编辑器中技能配置变化时刷新显示，便于在预制体上直接查看效果。</summary>
