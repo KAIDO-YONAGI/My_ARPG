@@ -26,7 +26,7 @@ namespace Pipeline.UI.RedDot
 
         /// <summary>绑定红点视图并立即按当前计数刷新；原视图引用被替换。</summary>
         /// <param name="target">要绑定的红点视图；与当前引用相同时不做事。</param>
-        public void BindView(RedDotView target)
+        public void BindAndRefresh(RedDotView target)
         {
             if (view == target) return;
 

@@ -1,8 +1,7 @@
 using System;
-using Contracts.Audio;
 using Pipeline.SO.Events;
 using UnityEngine;
-using AudioType = Contracts.Audio.AudioType;
+using AudioType = Contracts.Enums.AudioType;
 
 namespace Pipeline.Audio
 {

@@ -1,5 +1,5 @@
 using System;
-using Contracts.Audio;
+using Pipeline.Audio;
 using UnityEngine;
 
 namespace Pipeline.SO.Events

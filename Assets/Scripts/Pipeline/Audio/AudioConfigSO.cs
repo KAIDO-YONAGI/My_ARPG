@@ -1,6 +1,6 @@
-using Contracts.Audio;
+using Contracts.Enums;
 using UnityEngine;
-using AudioType = Contracts.Audio.AudioType;
+using AudioType = Contracts.Enums.AudioType;
 
 namespace Pipeline.Audio
 {

@@ -267,7 +267,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 9098675159725335488, guid: a2638a66248cbed478a5a23485bce105, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2638a66248cbed478a5a23485bce105, type: 3}
@@ -4717,7 +4718,7 @@ GameObject:
   - component: {fileID: 801696216}
   - component: {fileID: 801696215}
   m_Layer: 0
-  m_Name: BackgroundImage
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5759,7 +5760,11 @@ MonoBehaviour:
   canvasOpenedEvent: {fileID: 11400000, guid: 6aeafcf4d7f842c46a98d0b26bbbd02e, type: 2}
   canvasAudioBindings:
   - canvas: 2
-    audioType: 13
+    audioType: 15
+  - canvas: 3
+    audioType: 15
+  - canvas: 6
+    audioType: 15
 --- !u!1 &997136157
 GameObject:
   m_ObjectHideFlags: 0
@@ -11616,7 +11621,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2059701309}
   m_Layer: 0
-  m_Name: Audio
+  m_Name: AudioManagers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11918,7 +11923,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 9098675159725335488, guid: a2638a66248cbed478a5a23485bce105, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2638a66248cbed478a5a23485bce105, type: 3}

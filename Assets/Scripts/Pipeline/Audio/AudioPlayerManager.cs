@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using Contracts.Base;
-using Contracts.Audio;
+using Contracts.Enums;
 using Pipeline.SO;
 using Pipeline.SO.Events;
 using UnityEngine;
 using UnityEngine.Serialization;
-using AudioType = Contracts.Audio.AudioType;
+using AudioType = Contracts.Enums.AudioType;
 
 namespace Pipeline.Audio
 {

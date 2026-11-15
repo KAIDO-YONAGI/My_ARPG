@@ -1,4 +1,4 @@
-namespace Contracts.Audio
+namespace Contracts.Enums
 {
     /// <summary>音效类型：与 AudioConfigSO 的 SFXEntry 一一对应</summary>
     public enum AudioType
@@ -17,7 +17,9 @@ namespace Contracts.Audio
         Jump,
         PickUp,
         PressurePlate,
-        Run
+        Run,
+        CanvasOpen
+        
     }
 
     /// <summary>背景音乐类型：与 AudioConfigSO 的 BGMEntry 一一对应</summary>

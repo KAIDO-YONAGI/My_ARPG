@@ -1,6 +1,7 @@
 using UnityEngine;
+using AudioType = Contracts.Enums.AudioType;
 
-namespace Contracts.Audio
+namespace Pipeline.Audio
 {
     /// <summary>携带音效类型和可选世界坐标的统一播放请求。</summary>
     public readonly struct AudioRequest

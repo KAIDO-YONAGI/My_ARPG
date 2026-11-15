@@ -75,4 +75,8 @@ MonoBehaviour:
       weight: 1
     - clip: {fileID: 8300000, guid: 3689dce863fcb5745a60eb7e1e5206c8, type: 3}
       weight: 1
+  - type: 15
+    items:
+    - clip: {fileID: 8300000, guid: a04794f2251dfe142a76c0bb8ccde08e, type: 3}
+      weight: 0.1
   bgmEntries: []

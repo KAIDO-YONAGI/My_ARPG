@@ -100,7 +100,7 @@ namespace Pipeline.UI.RedDot
             rootView = view;
             if (root == null || view == null) return;
 
-            root.BindView(view);
+            root.BindAndRefresh(view);
         }
 
         /// <summary>登记画布分支与可用性回调；重复登记以最后一次回调为准。</summary>
@@ -126,7 +126,7 @@ namespace Pipeline.UI.RedDot
             canvasViews[canvas] = view;
             if (canvasBranches.TryGetValue(canvas, out RedDotBranchNode branch))
             {
-                branch.BindView(view);
+                branch.BindAndRefresh(view);
                 return;
             }
 
@@ -185,7 +185,7 @@ namespace Pipeline.UI.RedDot
 
             leaf.ApplyInitialCount(initialCount);
             leaf.CountChanged += OnLeafCountChanged;
-            branch.Attach(leaf);
+            branch.Add(leaf);
             RecalculateFrom(branch);
             return true;
         }
@@ -200,7 +200,7 @@ namespace Pipeline.UI.RedDot
             if (parent == null) return;
 
             leaf.CountChanged -= OnLeafCountChanged;
-            parent.Detach(leaf);
+            parent.Remove(leaf);
 
             RedDotView view = leaf.BoundView;
             if (view != null)
@@ -279,11 +279,11 @@ namespace Pipeline.UI.RedDot
 
             RedDotBranchNode branch = new RedDotBranchNode();
             canvasBranches.Add(canvas, branch);
-            root.Attach(branch);
+            root.Add(branch);
 
             if (canvasViews.TryGetValue(canvas, out RedDotView view))
             {
-                branch.BindView(view);
+                branch.BindAndRefresh(view);
             }
 
             return branch;
@@ -295,7 +295,7 @@ namespace Pipeline.UI.RedDot
             return canvasBranches.TryGetValue(canvas, out RedDotBranchNode branch) && branch.Count > 0;
         }
 
-        /// <summary>判断画布当前是否允许打开；未登记门槛回调的画布视为可打开。</summary>
+        /// <summary>判断画布当前是否允许打开</summary>
         private bool IsCanvasAvailable(CanvasType canvas)
         {
             return !canvasGates.TryGetValue(canvas, out Func<bool> gate) || gate == null || gate();

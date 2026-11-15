@@ -57,7 +57,7 @@ namespace Gameplay.Skills
                 SkillRedDotLeaf leaf = manager.GetRedDotLeaf(slot.StateKey);
                 if (leaf == null) continue;
 
-                leaf.BindView(slot.RedDotView);
+                leaf.BindAndRefresh(slot.RedDotView);
             }
 
             SkillSlot.OnMaxSkillLevel += HandleSkillMaxed;

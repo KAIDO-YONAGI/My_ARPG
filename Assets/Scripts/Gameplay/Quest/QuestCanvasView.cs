@@ -149,7 +149,7 @@ namespace Gameplay.Quest
             QuestRedDotLeaf leaf = manager.GetRedDotLeaf(quest);
             if (leaf == null) return;
 
-            leaf.BindView(slot.RedDotView);
+            leaf.BindAndRefresh(slot.RedDotView);
         }
 
         /// <summary>解绑条目旧任务的红点并关闭视图，槽位复用时不残留上一个任务的红点。</summary>
