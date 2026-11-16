@@ -2,7 +2,7 @@
 
 文档 ID：`BUILD-PROJECTCONFIG-GUIDE`
 状态：`Active`
-最后更新：`2026-11-07`
+最后更新：`2026-11-16`
 ## 维护规则
 
 本文件对应的实现、约束或规则发生变化时，按已核验事实更新相关章节，证据记录在[开发日志](DeveloperLog.md)。修改小标题时同步文档内目录；计数与维护周期遵循[工作流维护规则](../Workflow/Workflow_Guide.md#维护规则)。
@@ -13,11 +13,10 @@
 - [2. 当前实现](#2-当前实现)
   - [2.1 Unity 版本](#21-unity-版本)
   - [2.2 包依赖](#22-包依赖)
-  - [2.3 程序集结构：0 个 asmdef](#23-程序集结构0-个-asmdef)
-  - [2.4 构建场景列表与顺序](#24-构建场景列表与顺序)
-  - [2.5 Player / Build 配置项原值](#25-player--build-配置项原值)
-  - [2.6 Addressables：已安装、无运行时代码调用](#26-addressables已安装无运行时代码调用)
-  - [2.7 编辑器行为设置](#27-编辑器行为设置)
+  - [2.3 构建场景列表与顺序](#23-构建场景列表与顺序)
+  - [2.4 Player / Build 配置项原值](#24-player--build-配置项原值)
+  - [2.5 Addressables：已安装、无运行时代码调用](#25-addressables已安装无运行时代码调用)
+  - [2.6 编辑器行为设置](#26-编辑器行为设置)
 - [3. 约定与硬边界](#3-约定与硬边界)
   - [3.1 改播放器设置资产会静默改变构建产物契约](#31-改播放器设置资产会静默改变构建产物契约)
   - [3.2 场景顺序是有语义的，不能重排](#32-场景顺序是有语义的不能重排)
@@ -33,11 +32,10 @@
 |---|---|
 | `Unity 版本` | §2.1 |
 | `包版本` / `manifest 依赖` / `包清单` | §2.2 |
-| `asmdef` / `预定义程序集` / `Assembly-CSharp` | §2.3 |
-| `构建场景列表` / `场景顺序` / `入口场景 InitialScene` | §2.4 |
-| `Player Settings` / `Product Name` / `包名` / `minSdk` / `targetSdk` | §2.5 |
-| `Addressables` | §2.6 |
-| `domain reload` / `序列化模式` | §2.7 |
+| `构建场景列表` / `场景顺序` / `入口场景 InitialScene` | §2.3 |
+| `Player Settings` / `Product Name` / `包名` / `minSdk` / `targetSdk` | §2.4 |
+| `Addressables` | §2.5 |
+| `domain reload` / `序列化模式` | §2.6 |
 
 ## 2. 当前实现
 
@@ -69,12 +67,7 @@
 
 其余条目是内置模块包，版本统一为 1.0.0。锁定清单与包清单同在仓库中。
 
-### 2.3 程序集结构：0 个 asmdef
-
-- 工程内无 asmdef —— 产品代码全部落在预定义程序集里。
-- 编辑器程序集名为 `Assembly-CSharp-Editor`，收录编辑器侧的 `InputActionReferenceRebuilder`，并 `ProjectReference` 到 `Assembly-CSharp`。
-
-### 2.4 构建场景列表与顺序
+### 2.3 构建场景列表与顺序
 
 构建场景列表资产里有 6 条场景，全部 `enabled: 1`，按文件出现顺序即 Build Settings 顺序：
 
@@ -91,7 +84,7 @@
 
 列表另挂了两个配置对象，一个是 Addressables 的配置对象，一个是 Input System 项目设置的配置对象；二者都通过构建场景列表序列化引用。
 
-### 2.5 Player / Build 配置项原值
+### 2.4 Player / Build 配置项原值
 
 以下原值取自播放器设置资产：
 
@@ -124,12 +117,12 @@
 
 `scriptingDefineSymbols` 为空表，`apiCompatibilityLevelPerPlatform` 为空表，`additionalIl2CppArgs` 为空。
 
-### 2.6 Addressables：已安装、无运行时代码调用
+### 2.5 Addressables：已安装、无运行时代码调用
 
 - 配置资产齐全：Addressables 设置资产、内置数据组、`Scenes` 组、4 个 DataBuilder、Android / WebGL / Windows 三个平台的内容状态记录。
 - 产品代码里对 Addressables 的引用只有 2 条注释：`GameSceneSO` 的注释说明它的 GUI: 取值与 Addressables 方案的 `sceneReference.AssetGUI:` 完全一致；`SaveData` 的注释说明存的是 `GameSceneSO.SaveKey`，即 Addressables 资产 GUI:。没有任何代码调用 Addressables 运行时 API。
 
-### 2.7 编辑器行为设置
+### 2.6 编辑器行为设置
 
 编辑器设置资产：
 

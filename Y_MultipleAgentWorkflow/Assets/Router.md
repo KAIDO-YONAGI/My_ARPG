@@ -3,7 +3,7 @@
 文档 ID：`BUS-ASSETS`
 状态：`Active`
 维护计数：`4/5`
-最后更新：`2026-11-14`
+最后更新：`2026-11-16`
 
 ## 维护规则
 
@@ -60,7 +60,7 @@
 
 **不在本域范围，请转到对应 Router**
 
-- 事件总线机制与 MVC 及服务层的边界，归 Architecture 域。
+- MVC 及服务层的边界，归 Architecture 域。
 - 场景组加载、`SceneChanger`、Additive 语义、传送接线，归 SceneFlow 域。
 - 存档 schema、`SaveKey`、GUID 身份体系，归 Data 域。
 - 各 SO 的业务判定语义，即任务进度、对话分支、背包与商店结算，归对应 Gameplay 子域。

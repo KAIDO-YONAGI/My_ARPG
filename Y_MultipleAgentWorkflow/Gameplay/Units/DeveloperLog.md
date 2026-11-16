@@ -35,7 +35,6 @@ maintenance count changes here.
 - 商品列表在店主预制体里为空，内容由场景实例覆写；`dialogSO` 同样按实例覆写。
 - 玩家 tag 的唯一来源是常驻场景；`playerMask` 与 `playerLayer` 的取值 256 对应 TagManager 中第 8 层 `Player`。
 - `PathFollower` 四个对外方法的语义与返回值边界；`AStarNodeManager.Instance` 为空时 `GetThreshold()` 返回 `0f`。
-- 本域与全工程都没有程序集定义资产，全部脚本落在预定义程序集里。
 
 **维护计数**
 

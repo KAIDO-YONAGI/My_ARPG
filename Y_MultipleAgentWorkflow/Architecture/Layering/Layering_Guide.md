@@ -15,34 +15,32 @@
   - [2.5 命名空间分布](#25-命名空间分布)
   - [2.6 单例基类与写入口](#26-单例基类与写入口)
 - [3. 约定与硬边界](#3-约定与硬边界)
-  - [3.1 0 个 asmdef ⇒ 全工程一个程序集](#31-0-个-asmdef--全工程一个程序集)
-  - [3.2 命名空间按目录分配，重名只在同一命名空间内冲突](#32-命名空间按目录分配重名只在同一命名空间内冲突)
-  - [3.3 `SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`](#33-saveableservice-子类重写-onsingletoninitialized-必须调-base)
-  - [3.4 `Contracts` 不得反向 using `Gameplay` 或 `Pipeline`](#34-contracts-不得反向-using-gameplay-或-pipeline)
-  - [3.5 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法](#35-statsserviceinstancestats-是只读视图接口上不带写方法)
-  - [3.6 改 `PlayerStatsData` 的字段名等于坏档](#36-改-playerstatsata-的字段名等于坏档)
-  - [3.7 纯 C# 层不得引用 `MonoBehaviour` 生命周期](#37-纯-c-层不得引用-monobehaviour-生命周期)
+  - [3.1 命名空间按目录分配，重名只在同一命名空间内冲突](#31-命名空间按目录分配重名只在同一命名空间内冲突)
+  - [3.2 `SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`](#32-saveableservice-子类重写-onsingletoninitialized-必须调-base)
+  - [3.3 `Contracts` 不得反向 using `Gameplay` 或 `Pipeline`](#33-contracts-不得反向-using-gameplay-或-pipeline)
+  - [3.4 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法](#34-statsserviceinstancestats-是只读视图接口上不带写方法)
+  - [3.5 改 `PlayerStatsData` 的字段名等于坏档](#35-改-playerstatsata-的字段名等于坏档)
+  - [3.6 纯 C# 层不得引用 `MonoBehaviour` 生命周期](#36-纯-c-层不得引用-monobehaviour-生命周期)
 
 先读目录，再按任务读取相关章节，避免整份指南载入上下文。
 
 文档 ID：`ARCH-LAYERING-GUIDE`
 状态：`Active`
-最后更新：`2026-11-14`
-权威范围：`Contracts`、`Pipeline`、`Gameplay` 三层目录的含义、跨层依赖方向、命名空间与程序集边界、唯一写入口与只读接口的判定标准。各玩法域的内部实现归对应玩法域的 Guide，存档格式与场景流程细节由各自文档负责。
+最后更新：`2026-11-16`
+权威范围：`Contracts`、`Pipeline`、`Gameplay` 三层目录的含义、跨层依赖方向、命名空间分配、唯一写入口与只读接口的判定标准。各玩法域的内部实现归对应玩法域的 Guide，存档格式与场景流程细节由各自文档负责。
 
 ## 1. 触发线索
 
 | 线索 | 指向 |
 |---|---|
 | `分层` `Layering` `三层` | 本文 §2.1 |
-| `Contracts` `契约层` | 本文 §2.1、§3.4 |
+| `Contracts` `契约层` | 本文 §2.1、§3.3 |
 | `Pipeline` `管线层` | 本文 §2.1 |
 | `依赖方向` `反向依赖` | 本文 §2.2 |
-| `asmdef` `程序集` `Assembly-CSharp` | 本文 §2.7、§3.1 |
-| `命名空间` `namespace` `全局命名空间` | 本文 §2.5、§3.2 |
+| `命名空间` `namespace` `全局命名空间` | 本文 §2.5、§3.1 |
 | `MyEnums` `枚举拆开` | 本文 §2.1 |
 | `MVCS` `Model` `View` `Controller` `Service` | 本文 §2.3 |
-| `唯一写入口` `只读接口` `StatsService` | 本文 §2.4、§3.5 |
+| `唯一写入口` `只读接口` `StatsService` | 本文 §2.4、§3.4 |
 | `YSingleton` `单例基类` | 本文 §2.6 |
 
 ## 2. 当前实现
@@ -75,7 +73,7 @@
 
 ### 2.3 玩家数值线的 MVCS 四层
 
-`Gameplay` 的 `Player` 数值线拆成 MVCS 四层；对话、任务、商店、背包、技能五个域同样拆成两段：管理器只留数据与规则，界面放在继承 `Contracts.CachedCanvasViewBase` 的视图里，管理器不持有控件引用。`CachedUIViewBase` 与 `CachedCanvasViewBase` 这两个作为继承目标的基类住在 `Contracts`；缓存视图复用 `ICanvasManager` 完成显隐状态上报与画布排序，契约层依赖见 §3.4：
+`Gameplay` 的 `Player` 数值线拆成 MVCS 四层；对话、任务、商店、背包、技能五个域同样拆成两段：管理器只留数据与规则，界面放在继承 `Contracts.CachedCanvasViewBase` 的视图里，管理器不持有控件引用。`CachedUIViewBase` 与 `CachedCanvasViewBase` 这两个作为继承目标的基类住在 `Contracts`；缓存视图复用 `ICanvasManager` 完成显隐状态上报与画布排序，契约层依赖见 §3.3：
 
 | 层 | 类型 | 命名空间 | 形态与实例化方式 |
 |---|---|---|---|
@@ -154,21 +152,17 @@
 
 ## 3. 约定与硬边界
 
-### 3.1 0 个 asmdef ⇒ 全工程一个程序集
-
-改动任何源码都触发整个 `Assembly-CSharp` 重编；分层只靠命名约定与纪律，编译器不拦截跨层引用。
-
-### 3.2 命名空间按目录分配，重名只在同一命名空间内冲突
+### 3.1 命名空间按目录分配，重名只在同一命名空间内冲突
 
 产品代码全部在命名空间内，标识符分属 32 个命名空间。同名类型分处两个命名空间即不冲突，编译失败点落在该命名空间对应的目录。全局池只有 1 个编辑器脚本。
 
 代价是引用变长：跨目录引用都要写 `using`，漏写报 `CS0246`。新增文件的命名空间与所在目录一致，否则该类型在其目录内不可见，挪动目录时还会多出一次改名。
 
-### 3.3 `SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`
+### 3.2 `SaveableService` 子类重写 `OnSingletonInitialized` 必须调 `base`
 
 注册动作在基类里，漏调 `base.OnSingletonInitialized()` 不报错、不警告，该服务会漏掉 `SaveRegistry` 登记，存读档时被静默跳过。
 
-### 3.4 `Contracts` 不得反向 using `Gameplay` 或 `Pipeline`
+### 3.3 `Contracts` 不得反向 using `Gameplay` 或 `Pipeline`
 
 契约层被所有域引用，反向依赖会形成环。**当前违反 6 处**，分布在 5 个文件：
 
@@ -179,14 +173,14 @@
 
 命名空间让依赖显式化，环因此可见。本条按待偿债务对待，收口方向有两条：把契约层实际依赖的类型下沉进 `Contracts`，或让契约层改用不依赖具体类型的抽象（事件基类、`ISaveData` 之类的接口）。
 
-### 3.5 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法
+### 3.4 `StatsService.Instance.Stats` 是只读视图，接口上不带写方法
 
 对外只暴露 `Stats` 一个入口，`IPlayerStatsReadOnly` 上没有写方法。
 
-### 3.6 改 `PlayerStatsData` 的字段名等于坏档
+### 3.5 改 `PlayerStatsData` 的字段名等于坏档
 
 字段名就是存档 JSON 键；类名可以改，字段名不可以。
 
-### 3.7 纯 C# 层不得引用 `MonoBehaviour` 生命周期
+### 3.6 纯 C# 层不得引用 `MonoBehaviour` 生命周期
 
 包括 `PlayerStatsModel`、三个显示侧 Controller 与 `CanvasFocusStack`。

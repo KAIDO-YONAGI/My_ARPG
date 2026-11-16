@@ -13,7 +13,7 @@ maintenance count changes here.
 
 ## 2026-11-11 视图版本轮询定在 LateUpdate
 
-五个缓存画布视图与常驻 `HotbarCanvasView` 的每帧版本轮询从 `Update` 移到 `LateUpdate`，打开界面时的立即刷新不变。Layering Guide 补充：视图在每帧 `LateUpdate` 轮询版本，本帧 `Update` 内完成的写入在当帧绘制；`Contracts.State.VersionReader` 的注释同步该时机。以 Editor 自带的 Roslyn 对 `Assembly-CSharp` 全量 141 个脚本编译，0 错误，输出 `Logs/_verify/csc-output.txt`；未进入 Play 模式。维护计数 `2/5 -> 3/5`。
+五个缓存画布视图与常驻 `HotbarCanvasView` 的每帧版本轮询从 `Update` 移到 `LateUpdate`，打开界面时的立即刷新不变。Layering Guide 补充：视图在每帧 `LateUpdate` 轮询版本，本帧 `Update` 内完成的写入在当帧绘制；`Contracts.State.VersionReader` 的注释同步该时机。以 Editor 自带的 Roslyn 全量编译 141 个脚本，0 错误，输出 `Logs/_verify/csc-output.txt`；未进入 Play 模式。维护计数 `2/5 -> 3/5`。
 
 ## 2026-11-07 状态版本与视图读取记录分离
 
@@ -66,7 +66,7 @@ Unity 重编译及预制体引用检查完成；未运行测试或进入 Play �
 - `Contracts\MyEnums.cs` 现状：`namespace Contracts` 下 `PlayerState`、`EnemyState`、`SceneType`、`PersistentType`、`AStarNodeType`、`NPCState`、`QuestState`、`CanvasToToggle`、`SaveType`、`SaveLoadPanelType` 共 10 个枚举。
 - `Player` 目录 18 个文件的命名空间分布：`Gameplay.Player` 7、`.Controllers` 4、`.Models` 3、`.Views` 3、`.Services` 1。
 - 编辑器侧 `Assets\Editor\InputActionReferenceRebuilder.cs` 仍是全局命名空间，是仅剩的一个。
-- 编译验证：Roslyn `csc.dll` 配 Unity 2022.3.62f3c1 的 286 条程序集引用，编译 130 个源文件，0 error 0 warning。
+- 编译验证：Roslyn `csc.dll` 编译 130 个源文件，0 error 0 warning。
 
 **结论**
 
@@ -99,7 +99,6 @@ Unity 重编译及预制体引用检查完成；未运行测试或进入 Play �
 
 - 跨层 `using` 实测：`Contracts → Gameplay/Pipeline` 为 0 处；`Gameplay → Pipeline` 为 0 处；`Pipeline → Gameplay` 为 1 处，位于 `PlayerStatsSO` 顶部的 `using Gameplay.Player.Models;`。
 - 命名空间覆盖：124 个产品代码文件中 13 个带 namespace，含 `MyEnums` 1 个与 `Gameplay.Player.*` 12 个，其余 111 个在全局命名空间。
-- 全工程 asmdef 计数为 0，只有 `Assembly-CSharp` 一个程序集。
 - 单例规模：直接继承 `YSingleton<T>` 的具体类 18 个，另有抽象基类 `SaveableService<TSelf>`，其子类只有 `StatsService`。
 - 测试基线复算：编辑器侧测试 5 个文件、52 个 `[Test]`，其中 `PlayerStatsModelTests` 24、`CanvasFocusStackTests` 15、`AStarOpenHeapTests` 6、`ObjectPoolTests` 5、`PlayerStatsSOTests` 2，无 `[UnityTest]`。
 - 唯一写入口判定链：`IPlayerStatsReadOnly` 有 4 个事件与 15 个只读属性，成员集合里没有写方法；读入口是 `StatsService.Stats`，写入口是 6 个单行转发命令，`model`、`GetStats`、`LoadStats` 均为 private；`PlayerStatsModelTests` 断言 `StatsService` 的公开成员里没有 `Model` 属性。

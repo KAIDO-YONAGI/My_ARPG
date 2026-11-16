@@ -48,7 +48,6 @@ Unity 重编译及预制体引用检查完成；未运行测试或进入 Play �
 - 事件广播边界：4 个事件的触发点与非触发点逐条定位；`UpdateSkillPoints` 不发事件；`AddExp` 内 `ExpChanged` 先于 `LevelUp`。
 - 拷贝语义：`PlayerStatsData.Clone()` 用于构造、`LoadFrom`、`ToData` 与 `CreateInitialData`；`PlayerStatsSO.Data` 返回本体。
 - 26 个 EditMode 规格：`Select-String '[Test]'` 实测 ModelTests 24 个加 SOTests 2 个，合计 26。
-- 工程内没有 asmdef，测试落 `Assembly-CSharp-Editor`。
 - 存档链：`SaveData.playerStatsData` 字段、`SaveableService.GetDataID()` 返回 null、`OnAutoLoad` 跳过 `GetDataID()` 为 null 的服务。
 
 **维护计数**

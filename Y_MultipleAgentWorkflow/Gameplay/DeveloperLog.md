@@ -9,7 +9,7 @@ maintenance count changes here.
 
 ## 2026-11-11 玩法视图版本轮询迁到 LateUpdate
 
-六个视图的每帧 `RefreshIfChanged` 从 `Update` 移到 `LateUpdate`：`DialogCanvasView`、`QuestCanvasView`、`ShopCanvasView`、`BackpackCanvasView`、`SkillsCanvasView` 与常驻 `HotbarCanvasView`；打开界面时的立即刷新保持不变。所有 `Update` 执行完才轮询版本，本帧 `Update` 内完成的写入当帧绘制，渲染前完成刷新；晚于该视图 `LateUpdate` 的写入留到下一帧。`VersionReader` 的注释补充轮询时机。Unity 批处理启动被本机许可客户端阻断（退出码 199），改用 Editor 自带的 Roslyn 对 `Assembly-CSharp` 全量 141 个脚本编译，0 错误，产物与输出在 `Logs/_verify/`；未进入 Play 模式。维护计数 `1/5 -> 2/5`。
+六个视图的每帧 `RefreshIfChanged` 从 `Update` 移到 `LateUpdate`：`DialogCanvasView`、`QuestCanvasView`、`ShopCanvasView`、`BackpackCanvasView`、`SkillsCanvasView` 与常驻 `HotbarCanvasView`；打开界面时的立即刷新保持不变。所有 `Update` 执行完才轮询版本，本帧 `Update` 内完成的写入当帧绘制，渲染前完成刷新；晚于该视图 `LateUpdate` 的写入留到下一帧。`VersionReader` 的注释补充轮询时机。Unity 批处理启动被本机许可客户端阻断（退出码 199），改用 Editor 自带的 Roslyn 全量编译 141 个脚本，0 错误，产物与输出在 `Logs/_verify/`；未进入 Play 模式。维护计数 `1/5 -> 2/5`。
 
 ## 2026-11-01 缓存画布基类命名统一
 
@@ -23,7 +23,7 @@ maintenance count changes here.
 
 对话、任务、商店、背包与技能管理器不再公开可变刷新状态，视图按只读快照与字段版本确认刷新；快捷栏金币与槽位独立刷新。必需的单例依赖统一通过 `RequiredInstance` 明确取得。
 
-Unity Editor 对 `Assembly-CSharp` 与 `Assembly-CSharp-Editor` 均有成功编译记录；未运行 EditMode 测试，因工程验证要求运行前关闭该工程的 Unity 实例。Gameplay 维护计数更新为 `3/5 -> 4/5`。
+Unity Editor 有成功编译记录；未运行 EditMode 测试，因工程验证要求运行前关闭该工程的 Unity 实例。Gameplay 维护计数更新为 `3/5 -> 4/5`。
 
 ## 2026-10-31 五个玩法域拆出界面层
 

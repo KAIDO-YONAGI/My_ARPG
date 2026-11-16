@@ -53,5 +53,5 @@ Unity 重编译及预制体引用检查完成；未运行测试或进入 Play �
   - `DefaultExecutionOrder` 全工程仅 1 处，位于 `CameraPixelSnap`；工程设置中没有脚本执行顺序配置。
   - `RuntimeInitializeOnLoadMethod` 仅 2 处，位于 `SaveRegistry` 与 `PersistentSceneRegistry`，均为 `SubsystemRegistration`。
   - `OnSingletonInitialized` 重写点 6 处；18 个单例派生类均未重写 `Awake`。
-  - `ICanvasManager` 实现者 10 个；全工程 asmdef 数量为 0。
+  - `ICanvasManager` 实现者 10 个。
 - 维护计数：`0/5 -> 1/5`

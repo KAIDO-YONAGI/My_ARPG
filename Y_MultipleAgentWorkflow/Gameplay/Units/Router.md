@@ -3,7 +3,7 @@
 文档 ID：`BUS-GAMEPLAY-UNITS`
 状态：`Active`
 维护计数：`1/5`
-最后更新：`2026-10-31`
+最后更新：`2026-11-16`
 
 ## 维护规则
 
@@ -59,4 +59,4 @@
 - 对话推进规则、`DialogManager`、`DialogSO` 分支 → `..\Dialog\Router.md`。
 - 玩家数值、击退与硬直数值本身 → `..\PlayerStats\Router.md`。
 - 玩家攻击命中侧的 `PlayerCombat.DealDamage` 与 `Arrow` → `..\PlayerStats\Router.md`。
-- 事件总线机制与 MVC 边界 → `..\..\Architecture\Router.md`。
+- MVC 边界 → `..\..\Architecture\Router.md`。

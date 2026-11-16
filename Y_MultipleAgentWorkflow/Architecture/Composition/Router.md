@@ -3,7 +3,7 @@
 文档 ID：`BUS-ARCHITECTURE-COMPOSITION`
 状态：`Active`
 维护计数：`2/5`
-最后更新：`2026-11-02`
+最后更新：`2026-11-16`
 
 ## 维护规则
 
@@ -41,7 +41,3 @@ Active 能力：
 - `Composition_Guide.md` 是本域唯一权威文档，文档 ID 为 `ARCH-COMPOSITION-GUIDE`，覆盖单例清单与预算、初始化时序三套解法、唯一执行序属性语义、`SaveRegistry` 登记处契约、画布焦点栈契约。
 - 可据此判定「新增单例是否超预算」「跨单例协作该用哪种时序兜底」「画布契约是否被违反」。
 - 本域 Router 不含脚本目录的写入授权；修改被本域描述的源码须路由到对应业务域的 Router。
-
-Proposal：
-
-- `..\AssemblyPlan\AssemblyPlan_Proposal.md` 的文档 ID 为 `ARCH-ASSEMBLY-PLAN`，涉及程序集拆分前后的组合边界，尚未实施，按提案记录引用。

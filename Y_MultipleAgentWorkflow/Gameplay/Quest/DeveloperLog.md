@@ -12,7 +12,7 @@ maintenance count changes here.
 - 触发：任务板范围外按 C 时 `ToggleQuestEvent` 只有任务板响应，范围外没有数据准备，任务画布打不开。
 - 代码：`QuestManager` 从 `UICacheManager` 的 `QuestCanvas` 登记解析 `ToggleQuestEvent`，在 `OnEnable` 与 `Start` 两处尝试订阅。无任务板覆盖（`QuestBoardManager.AnyBoardInRange` 为假）时把显示列表切到 `trackedQuests` 并打开只读视图。`trackedQuests` 在 `QuestStateChanged` 按状态维护：`Accepted`、`IsToComplete` 加入，`Decline`、`Completed` 移出，顺序为接取顺序；追踪视图打开时逐个重算目标进度，不写任务状态。`QuestBoardManager` 维护静态在范围列表，画布已激活时跳过装载。`QuestCanvasView` 在 `IsTrackerMode` 为真时隐藏接取、放弃、完成三组按钮。`State` 的列表字段与查询接口改为 `displayQuests`、`QuestCount`、`GetQuest`、`QuestListVersion`、`CanOpenQuestCanvas`。
 - 接线：开关事件由 `QuestCanvas` 预制体在 `UICacheManager.views` 的登记提供，不写场景序列化字段；`PersistentScene`、任务板与 `QuestCanvas` 预制体未改。初版曾给 `QuestManager` 增加场景序列化字段，已打开的 Editor 持有改动前的场景数据，Play 模式备份中该字段为空并触发断言与空引用，故改为缓存登记解析。
-- 验证：Unity 自带 Roslyn 编译 `Assembly-CSharp` 全量 141 个脚本，0 error，仅 CS2023、CS1701 两条既有 warning；`git diff --check` 通过。
+- 验证：Unity 自带 Roslyn 全量编译 141 个脚本，0 error，仅 CS2023、CS1701 两条既有 warning；`git diff --check` 通过。
 - 维护计数 `1/5 → 2/5`。
 
 ## 2026-11-07 任务状态提供分组版本

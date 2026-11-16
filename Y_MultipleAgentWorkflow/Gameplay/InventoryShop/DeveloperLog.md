@@ -47,7 +47,7 @@ maintenance count changes here.
 - 代码：`Loot` 记录预制体静止显示状态（`Awake` 与首次 `Initialize`），取用时写回颜色、排序层级、子物体缩放与位置，并把状态机切回 `Idle`。
 - 资产：`Loot.prefab` 的 Animator 开启禁用时写回默认值，归还后再兜一层复原。
 - 用例：新增 `Assets/Tests/Editor/LootPoolingTests.cs`，模拟片段写下的透明与压扁后再次 `Initialize`，断言四项显示状态复原。
-- 验证：Unity 在 17:10:43 重建 `Assembly-CSharp.dll` 与 `Assembly-CSharp-Editor.dll`，编辑器日志无 `error CS`，两个程序集分别含 `ResetVisualState` 与 `LootPoolingTests`。EditMode 全量未跑：批处理 Editor 在本会话沙箱内启动即退出（退出码 140063，不产出 log 与结果 XML）。
+- 验证：Unity 在 17:10:43 完成脚本重建，编辑器日志无 `error CS`。EditMode 全量未跑：批处理 Editor 在本会话沙箱内启动即退出（退出码 140063，不产出 log 与结果 XML）。
 - 文档：Guide 新增 §2.2 池复用复原与 §3.9 硬边界；维护计数 `0/5 -> 1/5`。
 
 ## 2026-11-01 商店无效槽位与打开门槛

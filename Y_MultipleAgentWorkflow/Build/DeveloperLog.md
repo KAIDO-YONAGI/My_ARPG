@@ -16,7 +16,7 @@ maintenance count changes here.
 
 ## 2026-11-01 快照刷新回归覆盖增加
 
-`UICacheRegressionTests` 增加快照过期确认与集合只读性验证，金币只刷新金币文本的回归测试按无参刷新方法调用；EditMode 用例总数更新为 62。Unity Editor 编译测试程序集成功；测试未执行，因为该工程的 Editor 仍打开。Build 维护计数更新为 `2/5 -> 3/5`。
+`UICacheRegressionTests` 增加快照过期确认与集合只读性验证，金币只刷新金币文本的回归测试按无参刷新方法调用；EditMode 用例总数更新为 62。Unity Editor 编译成功；测试未执行，因为该工程的 Editor 仍打开。Build 维护计数更新为 `2/5 -> 3/5`。
 
 ## 2026-10-05 单元测试目录约定
 
@@ -30,7 +30,7 @@ maintenance count changes here.
 
 **已核验**
 
-- 测试目录下 5 个文件、0 个 asmdef，命名空间均为 `Gameplay.Tests`，与 §2.1 一致。
+- 测试目录下 5 个文件，命名空间均为 `Gameplay.Tests`，与 §2.1 一致。
 - 删除旧包后 `Builds\Android\` 只剩 `My_ARPG-release.apk`。
 
 ## 2026-10-05 建立 Build 域权威文档
@@ -45,7 +45,7 @@ maintenance count changes here.
 **依据的证据路径**
 
 - 构建：`..\..\Tools\UnityAndroid\Configure-UnityAndroidProxy.ps1`
-- 配置：`..\..\ProjectSettings\ProjectVersion.txt`、`..\..\Packages\manifest.json`、`..\..\ProjectSettings\EditorBuildSettings.asset`、`..\..\ProjectSettings\ProjectSettings.asset`、`..\..\ProjectSettings\EditorSettings.asset`、`Assembly-CSharp-Editor.csproj`、`Assembly-CSharp.csproj`、`AddressableAssetsData` 目录
+- 配置：`..\..\ProjectSettings\ProjectVersion.txt`、`..\..\Packages\manifest.json`、`..\..\ProjectSettings\EditorBuildSettings.asset`、`..\..\ProjectSettings\ProjectSettings.asset`、`..\..\ProjectSettings\EditorSettings.asset`、`AddressableAssetsData` 目录
 - 测试：`Tests/Editor` 目录下的 5 个测试文件、`AStarOpenHeap`、`CanvasFocusStack`、`MyEnums`、`Directory.Build.targets`
 
 **本轮实际核验（均为只读，未运行 Unity、未修改工程文件）**
@@ -54,7 +54,7 @@ maintenance count changes here.
 - StreamingAssets：目录下仅含 `GameGuide.txt` 及其元文件，1372 字节，非 ASCII 改名修复已落地。
 - 代理现状：`Configure-UnityAndroidProxy.ps1 -Action Status -SkipNetworkCheck` 输出 `State = Patched`、`SdkManagersFound = 1`、`GradleManaged = False`、`UserProxyHost/Port = 127.0.0.1 / 7890`；被补丁文件为 Editor 内置 cmdline-tools 6.0 的 `sdkmanager.bat`，其中含 UNITY_ANDROID_PROXY 标记块与注入 `%UNITY_ANDROID_SDKMANAGER_PROXY_ARGS%` 后的调用行，同目录存在 `.unity-android-proxy.original` 备份；用户级 `gradle.properties` 含六行 `systemProp.*` 代理属性，不含脚本标记。
 - Editor 与工具链：`D:\Unity\Editor\2022.3.62f3c1\Editor\Unity.exe` 存在；内置 build-tools 有 `33.0.2`、`34.0.0`，各含 `apksigner.bat`。
-- 场景与程序集：6 个构建场景文件在磁盘上全部存在；工程内 `*.asmdef` 计数为 0；`Assembly-CSharp-Editor.csproj` 收录 5 个测试文件与编辑器侧的 `InputActionReferenceRebuilder`，两者同处预定义编辑器程序集。
+- 场景：6 个构建场景文件在磁盘上全部存在。
 - 测试计数：逐文件清点 `[Test]` = 24 + 15 + 6 + 5 + 2 = **52**，`[TestCase]`/`[UnityTest]`/`[TestFixture]`/`[Category]` 均为 0。
 - 全仓检索 `-buildTarget` / `-executeMethod` / `BuildPipeline.` / `BuildPlayerOptions` 均无命中；唯一命中为 `-runTests -testPlatform EditMode`。
 

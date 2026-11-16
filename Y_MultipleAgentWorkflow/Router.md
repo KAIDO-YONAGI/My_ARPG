@@ -2,7 +2,7 @@
 
 文档 ID：`ROOT-ROUTER`  
 状态：`Active`  
-最后更新：`2026-10-05`
+最后更新：`2026-11-16`
 
 ## 维护规则
 
@@ -58,7 +58,6 @@ Router、DeveloperLog，以及项目根的 `AGENTS.md` 与 `CLAUDE.md`。
 | `runtime:UnityEditor` | 本机同时只应有一个编辑器实例；陈旧的锁文件不代表实例存活 |
 | `workflow:root` | 仅在变更根结构时使用 |
 | `codegraph:index` | codegraph 的索引库，重建需独占 |
-| 产品代码 | 全部产品代码在一个程序集内，任一改动触发全量重编译 |
 | 配置与事件资产 | 配置资产与事件通道；资产改名会让 Inspector 接线静默失效 |
 | 场景 | 多场景组叠加加载，常驻场景与游戏场景是热点 |
 | 预制体 | 与场景接线耦合 |
@@ -118,4 +117,3 @@ Router、DeveloperLog，以及项目根的 `AGENTS.md` 与 `CLAUDE.md`。
 ### 参考资料
 
 工程现状、Android 构建与开发历史等资料存放在项目 `Docs\` 目录，按名称检索。
-
