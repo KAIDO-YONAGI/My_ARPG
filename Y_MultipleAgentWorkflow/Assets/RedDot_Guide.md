@@ -69,7 +69,7 @@ Skills 在 Start 与 LateUpdate 尝试读取技能预制体并建立叶子；Que
 
 `AddLeaf` 校验叶子尚未挂接且 CanvasType 有效，调用 ApplyInitialCount，订阅 CountChanged，挂接父分支并重算父链。`RemoveLeaf` 退订事件、摘除叶子、清空 Parent、解除叶子视图绑定并隐藏红点，再重算原父链。分支的 Attach 与 Detach 同时维护 children 与 Parent。
 
-证据：`Assets/Scripts/Pipeline/UI/RedDot/RedDotManager.cs:151、169、231`；`RedDotLeafBase.cs:19`；`RedDotNodeBase.cs:57`；`RedDotBranchNode.cs:20`。
+证据：`RedDotManager.AddLeaf`、`RedDotManager.RemoveLeaf`、`RedDotManager.OnLeafCountChanged`、`RedDotManager.RecalculateFrom`；`RedDotLeafBase.SetCount`；`RedDotNodeBase.ApplyCount`；`RedDotBranchNode.Recalculate`。
 
 ## 3. Skills 调用链
 
@@ -115,7 +115,7 @@ SkillSlot 按钮点击
 
 SkillsChanged 是 SkillTreeManager 自身的通知；技能点写入口保持现有接口，红点获知点数变化依赖 RefreshAbilityPoints。技能文本与图标仍按现有 VersionReader 刷新。
 
-证据：`Assets/Scripts/Gameplay/Skills/SkillTreeManager.cs:93、142、155、173、189、197、215、226`；`SkillRedDotLeaf.cs:31`；`SkillSlot.cs:135、145、149`。
+证据：`SkillTreeManager.TryBuildRedDotLeaves`、`SkillTreeManager.RefreshRedDotLeaves`、`SkillTreeManager.CanUpgradeSkill`、`SkillTreeManager.GetRedDotLeaf`；`SkillRedDotLeaf.Refresh`；`SkillSlot.BuildStateKey`、`SkillSlot.StateKey`。
 
 ## 4. Quest 调用链
 
@@ -152,7 +152,7 @@ ConversationHistoryManager.RecordCharacter → CharacterTalkedChanged
 
 范围内的打开链为 `QuestBoardManager → 加载任务列表事件 → OnRefreshQuestState → 同步叶子 → 打开事件 → UICacheManager.OpenCanvas`。范围外为 `QuestManager.OnToggleQuestCanvas → OpenQuestTracker → trackedQuests 显示列表 → 重算目标与 SyncRedDotLeaves → OpenQuestCanvas`。
 
-证据：`Assets/Scripts/Gameplay/Quest/QuestManager.cs:214、258、270、280、293、307、325、336、431、498、525、559、576、680`；`QuestRedDotLeaf.cs:32`；`Assets/Scripts/Gameplay/Dialog/HistoryManager/ItemHistoryManager.cs:18`、`ConversationHistoryManager.cs:17`。
+证据：`QuestManager.TryInitializeQuestRedDot`、`QuestManager.SyncRedDotLeaves`、`QuestManager.AddQuestRedDotLeaf`、`QuestManager.RemoveQuestRedDotLeaf`、`QuestManager.RefreshRedDotLeaf`、`QuestManager.RefreshTrackedQuestRedDots`、`QuestManager.IsQuestCompletable`、`QuestManager.GetRedDotLeaf`；`QuestRedDotLeaf.Refresh`；`ItemHistoryManager.RecordItem`；`ConversationHistoryManager.RecordCharacter`。
 
 ## 5. Stats 调用链
 
@@ -181,7 +181,7 @@ StatsCanvasView.OnOpen
 
 面板打开期间的 StatsChanged 同样调用 Controller.Refresh。清除点位于写入属性文本之后，属于同步绘制流程。读档链为 `StatsService.LoadData → PlayerStatsModel.LoadFrom → StatsLoaded → Tracker.OnStatsLoaded → 同步基线并清除`；随后依次发送 HealthChanged、StatsChanged、ExpChanged。
 
-证据：`Assets/Scripts/Gameplay/Player/StatsRedDotTracker.cs:77、93、122、135`；`Controllers/StatsCanvasController.cs:22、36`；`Views/StatsCanvasView.cs:67`；`Models/PlayerStatsModel.cs:75、120、126`。
+证据：`StatsRedDotTracker.TryInitialize`、`StatsRedDotTracker.TrySubscribe`、`StatsRedDotTracker.OnStatsChanged`、`StatsRedDotTracker.OnStatsLoaded`、`StatsRedDotTracker.SyncBaseline`、`StatsRedDotTracker.ConfirmDisplayed`；`StatsCanvasController.Refresh`、`StatsCanvasController.SetStats`；`StatsCanvasView.SetStats`；`PlayerStatsModel.LoadFrom`、`PlayerStatsModel.UpdateDamage`、`PlayerStatsModel.UpdateSpeed`。
 
 ## 6. RedDotView 与预制体引用链
 
@@ -208,7 +208,7 @@ ToggleMenuButton / IntegratedMenuButton / SkillButton / QuestSlot 预制体
 
 聚合分页先 `UnbindPageRedDots → UnbindCanvasView`，再绑定本页。canvasViews 保存分支尚未建立时收到的 RedDotView，EnsureCanvasBranch 建立后补绑。Skills 关闭逐槽解绑；Quest 复用旧槽、空槽与关闭时解除对应绑定。
 
-证据：`Assets/Scripts/Pipeline/UI/SystemCanvasManagers/IntegratedUICanvasManager.cs:75、218、239`；`Assets/Scripts/Gameplay/Skills/SkillsCanvasView.cs:60、124`；`Assets/Scripts/Gameplay/Quest/QuestCanvasView.cs:152、163、166`；预制体引用位于 `Assets/Prefabs/UI/Buttons/`、`Slots/QuestSlot.prefab` 与 `RedDot.prefab`。
+证据：`IntegratedUICanvasManager.Start`、`IntegratedUICanvasManager.BindPageRedDots`、`IntegratedUICanvasManager.UnbindPageRedDots`；`SkillsCanvasView` 的打开与 `OnClose` 中的槽位视图绑定与解绑、`QuestCanvasView.BindSlotRedDot`、`QuestCanvasView.UnbindSlotRedDot`；预制体引用位于 `Assets/Prefabs/UI/Buttons/`、`Slots/QuestSlot.prefab` 与 `RedDot.prefab`。
 
 ## 7. 待办导航与画布调用链
 
@@ -236,7 +236,7 @@ Stats 与 Skills 沿缓存开关事件进入 `UIViewInstanceCache.Entry.HandleTo
 
 下一帧 RedDotManager.LateUpdate 调 UICacheManager.IsCanvasOpen 确认 pendingCanvas，打开则更新 lastNavigatedCanvas，随后清空 pendingCanvas。确认依据是缓存打开状态。Stats gate 检查数值服务就绪，Quest gate 检查任务板在范围内或已接取列表非空；Skills 使用已建立分支的默认可用性。
 
-证据：`Assets/Scripts/Pipeline/UI/RedDot/RedDotManager.cs:74、134、193、217、268`；`Assets/Scripts/Pipeline/UI/SystemCanvasManagers/UIManager.cs:126、252、330`；`CanvasFocusStack.cs:109`；`Assets/Scripts/Pipeline/UI/Runtime/UIViewInstanceCache.cs:45、224`。
+证据：`RedDotManager.Update`、`RedDotManager.TryNavigateToPendingCanvas`、`RedDotManager.LateUpdate`、`RedDotManager.IndexOfLastNavigated`、`RedDotManager.IsCanvasAvailable`；`UIManager.RequestCanvasToggle`、`CanvasFocusStack.HandleFocus`、`CanvasFocusStack.ReportState`；`UIViewInstanceCache.IsCanvasOpen`。
 
 ## 8. 生命周期与行为边界
 
